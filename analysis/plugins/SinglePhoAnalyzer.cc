@@ -91,6 +91,7 @@ struct phoTree_struc_ {
   int iphi[25];
   int ix[25];
   int iy[25];
+  int iz[25];
   int kSaturated[25];
   int kLeRecovered[25];
   int kNeighRecovered[25];
@@ -263,59 +264,135 @@ void SinglePhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
     // extra info on rechits for xtals in the 5x5 matrix around the seed
     DetId seedDetId = ( (g1->superCluster())->seed() )->seed();
     
-    std::vector<EcalRecHit> neighbors;
-
     if(seedDetId.subdetId()==EcalEndcap) {
       
+      int iNeigh=0; 
+      
       CaloNavigator<DetId> cursorE = CaloNavigator<DetId>(seedDetId, theSubdetTopologyEE_ );
+
       for(int ix=-2; ix<3; ++ix) {
 	for(int iy=-2; iy<3; ++iy) {
 	  cursorE.home();
 	  cursorE.offsetBy( ix, iy );
 	  DetId cryId = cursorE.pos();
-	  if(cryId.subdetId()!=EcalEndcap) continue;  
+
+	  if(cryId.subdetId()!=EcalEndcap) { 
+	    tree_.amplit[iNeigh] = -5000.;
+	    tree_.kSaturated[iNeigh] = -5000;
+	    tree_.kLeRecovered[iNeigh] = -5000;
+	    tree_.kNeighRecovered[iNeigh] = -5000;
+	    tree_.ieta[iNeigh] = -5000; 
+	    tree_.iphi[iNeigh] = -5000;
+	    tree_.ix[iNeigh] = -5000; 
+	    tree_.iy[iNeigh] = -5000; 
+	    tree_.iz[iNeigh] = -5000; 
+	    tree_.ieta[iNeigh] = -5000; 
+	    tree_.iphi[iNeigh] = -5000; 
+	    tree_.ix[iNeigh] = -5000;
+	    tree_.iy[iNeigh] = -5000;
+	    tree_.iz[iNeigh] = -5000;
+	    iNeigh++;
+	    continue;  
+	  }
+
 	  EcalRecHitCollection::const_iterator itneigh = EcalEndcapRecHits->find( cryId );
-	  if( itneigh != EcalEndcapRecHits->end() ) neighbors.push_back(*itneigh);
+
+	  if( itneigh != EcalEndcapRecHits->end() ) {
+	    tree_.amplit[iNeigh] = itneigh->energy();
+	    tree_.kSaturated[iNeigh] = itneigh->checkFlag(EcalRecHit::kSaturated);      
+	    tree_.kLeRecovered[iNeigh] = itneigh->checkFlag(EcalRecHit::kLeadingEdgeRecovered);      
+	    tree_.kNeighRecovered[iNeigh] = itneigh->checkFlag(EcalRecHit::kNeighboursRecovered);
+	    tree_.ieta[iNeigh] = -999; 
+	    tree_.iphi[iNeigh] = -999; 
+	    tree_.ix[iNeigh] = ((EEDetId)itneigh->detid()).ix();
+	    tree_.iy[iNeigh] = ((EEDetId)itneigh->detid()).iy();
+	    tree_.iz[iNeigh] = ((EEDetId)itneigh->detid()).zside();
+	  } else {
+	    tree_.amplit[iNeigh] = -2000.;
+	    tree_.kSaturated[iNeigh] = -2000;
+	    tree_.kLeRecovered[iNeigh] = -2000;
+	    tree_.kNeighRecovered[iNeigh] = -2000;
+	    tree_.ieta[iNeigh] = -2000; 
+	    tree_.iphi[iNeigh] = -2000;
+	    tree_.ix[iNeigh] = -2000; 
+	    tree_.iy[iNeigh] = -2000; 
+	    tree_.iz[iNeigh] = -2000; 
+	    tree_.ieta[iNeigh] = -2000; 
+	    tree_.iphi[iNeigh] = -2000; 
+	    tree_.ix[iNeigh] = -2000;
+	    tree_.iy[iNeigh] = -2000;
+	    tree_.iz[iNeigh] = -2000;
+	  }
+	  
+	  iNeigh++;
 	}
       }
+      if (iNeigh!=25) cout << "problem: not 25 crystals!  ==> " << iNeigh << endl;
 
     } else if (seedDetId.subdetId()==EcalBarrel) {
       
+      int iNeigh=0; 
+
       CaloNavigator<DetId> cursorE = CaloNavigator<DetId>(seedDetId, theSubdetTopologyEB_ );
+
       for(int ix=-2; ix<3; ++ix) {
 	for(int iy=-2; iy<3; ++iy) {
 	  cursorE.home();
 	  cursorE.offsetBy( ix, iy );
 	  DetId cryId = cursorE.pos();
-	  if(cryId.subdetId()!=EcalBarrel) continue;  
-	  EcalRecHitCollection::const_iterator itneigh = EcalBarrelRecHits->find( cryId );
-	  if( itneigh != EcalBarrelRecHits->end() ) neighbors.push_back(*itneigh);
-	}
-      }
-    }
 
-    // fixme: se il cristallo e' al bordo e la 5x5 non e' completa, 
-    // l'ordine puo' essere sballato e per il momento scartiamo gli eventi
-    if (neighbors.size()==25) {
-      for (uint iNeigh=0; iNeigh<neighbors.size(); iNeigh++) {
-	
-	tree_.amplit[iNeigh]          = neighbors[iNeigh].energy();
-	tree_.kSaturated[iNeigh]      = neighbors[iNeigh].checkFlag(EcalRecHit::kSaturated);      
-	tree_.kLeRecovered[iNeigh]    = neighbors[iNeigh].checkFlag(EcalRecHit::kLeadingEdgeRecovered);      
-	tree_.kNeighRecovered[iNeigh] = neighbors[iNeigh].checkFlag(EcalRecHit::kNeighboursRecovered);
-	
-	if (seedDetId.subdetId()==EcalBarrel) {
-	  tree_.ieta[iNeigh] = ((EBDetId)neighbors[iNeigh].detid()).ieta();
-	  tree_.iphi[iNeigh] = ((EBDetId)neighbors[iNeigh].detid()).iphi();
-	  tree_.ix[iNeigh] = -999; 
-	  tree_.iy[iNeigh] = -999; 
-	} else if (seedDetId.subdetId()==EcalEndcap) {
-	  tree_.ieta[iNeigh] = -999; 
-	  tree_.iphi[iNeigh] = -999; 
-	  tree_.ix[iNeigh] = ((EEDetId)neighbors[iNeigh].detid()).ix();
-	  tree_.iy[iNeigh] = ((EEDetId)neighbors[iNeigh].detid()).iy();
+	  if(cryId.subdetId()!=EcalBarrel) { 
+	    tree_.amplit[iNeigh] = -5000.;
+	    tree_.kSaturated[iNeigh] = -5000;
+	    tree_.kLeRecovered[iNeigh] = -5000;
+	    tree_.kNeighRecovered[iNeigh] = -5000;
+	    tree_.ieta[iNeigh] = -5000; 
+	    tree_.iphi[iNeigh] = -5000;
+	    tree_.ix[iNeigh] = -5000; 
+	    tree_.iy[iNeigh] = -5000; 
+	    tree_.iz[iNeigh] = -5000; 
+	    tree_.ieta[iNeigh] = -5000; 
+	    tree_.iphi[iNeigh] = -5000; 
+	    tree_.ix[iNeigh] = -5000;
+	    tree_.iy[iNeigh] = -5000;
+	    tree_.iz[iNeigh] = -5000;
+	    iNeigh++;
+	    continue;  
+	  }
+	  
+	  EcalRecHitCollection::const_iterator itneigh = EcalBarrelRecHits->find( cryId );
+
+	  if( itneigh != EcalBarrelRecHits->end() ) { 
+	    tree_.amplit[iNeigh] = itneigh->energy();
+	    tree_.kSaturated[iNeigh] = itneigh->checkFlag(EcalRecHit::kSaturated);      
+	    tree_.kLeRecovered[iNeigh] = itneigh->checkFlag(EcalRecHit::kLeadingEdgeRecovered);      
+	    tree_.kNeighRecovered[iNeigh] = itneigh->checkFlag(EcalRecHit::kNeighboursRecovered);
+	    tree_.ieta[iNeigh] = ((EBDetId)itneigh->detid()).ieta();
+	    tree_.iphi[iNeigh] = ((EBDetId)itneigh->detid()).iphi();
+	    tree_.ix[iNeigh] = -999;
+	    tree_.iy[iNeigh] = -999;
+	    tree_.iz[iNeigh] = -999;
+	  } else {
+	    tree_.amplit[iNeigh] = -2000.;
+	    tree_.kSaturated[iNeigh] = -2000;
+	    tree_.kLeRecovered[iNeigh] = -2000;
+	    tree_.kNeighRecovered[iNeigh] = -2000;
+	    tree_.ieta[iNeigh] = -2000; 
+	    tree_.iphi[iNeigh] = -2000;
+	    tree_.ix[iNeigh] = -2000; 
+	    tree_.iy[iNeigh] = -2000; 
+	    tree_.iz[iNeigh] = -2000; 
+	    tree_.ieta[iNeigh] = -2000; 
+	    tree_.iphi[iNeigh] = -2000; 
+	    tree_.ix[iNeigh] = -2000;
+	    tree_.iy[iNeigh] = -2000;
+	    tree_.iz[iNeigh] = -2000;
+	  }
+
+	  iNeigh++;
 	}
       }
+      if (iNeigh!=25) cout << "problem: not 25 crystals!  ==> " << iNeigh << endl;
     }
 
     // to count the number of reco photons and reco matching gen ones
@@ -348,7 +425,7 @@ void SinglePhoAnalyzer::beginJob() {
   TString treeID = "e1x5/F:e2x5/F:sigmaIetaIeta/F:r9/F:hoe/F:h1oe/F:h2oe/F:htoe/F:ht1oe/F:ht2oe/F:passEleVeto/B:hasPixelSeed/B";
   TString treeIso = "trackIso/F:ecalIso/F:hcalIso/F:chHadIso/F:nHadIso/F:photonIso/F:rho/F";
   TString treeTrue = "trueEnergy/F:truePt/F:trueEta/F:truePhi/F:minDR/F";
-  TString tree5x5 = "amplit[25]/F:ieta[25]/I:iphi[25]/I:ix[25]/I:iy[25]/I:kSaturated[25]/I:kLeRecovered[25]/I:kNeighRecovered[25]/I";
+  TString tree5x5 = "amplit[25]/F:ieta[25]/I:iphi[25]/I:ix[25]/I:iy[25]/I:iz[25]/I:kSaturated[25]/I:kLeRecovered[25]/I:kNeighRecovered[25]/I";
   phoTree->Branch("kinematics",&(tree_.pt),treeKine);
   phoTree->Branch("supercluster",&(tree_.scEta),treeSc);
   phoTree->Branch("energy",&(tree_.eMax),treeEne);
@@ -412,6 +489,7 @@ void SinglePhoAnalyzer::initPhoTreeStructure() {
     tree_.iphi[iNeigh]=-500;
     tree_.ix[iNeigh]=-500;
     tree_.iy[iNeigh]=-500;
+    tree_.iz[iNeigh]=-500;
   }
 }
 
