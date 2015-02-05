@@ -16,14 +16,8 @@ process.MessageLogger.cerr.threshold = 'ERROR' # can't get suppressWarning to wo
 
 process.source = cms.Source("PoolSource",
                             fileNames=cms.untracked.vstring(
-        # phys14, kMpl-01, M-3000
-        "/store/group/phys_higgs/cmshgg/flashgg/ExoPhys14/diphotons-phys14-v1/RSGravToGG_kMpl-01_M-3000_Tune4C_13TeV-pythia8/ExoPhys14-diphotons-phys14-v1-v0-Phys14DR-PU30bx50_PHYS14_25_V1-v1/141202_121354/0000/myOutputFile_1.root",
-        "/store/group/phys_higgs/cmshgg/flashgg/ExoPhys14/diphotons-phys14-v1/RSGravToGG_kMpl-01_M-3000_Tune4C_13TeV-pythia8/ExoPhys14-diphotons-phys14-v1-v0-Phys14DR-PU30bx50_PHYS14_25_V1-v1/141202_121354/0000/myOutputFile_2.root",
-        "/store/group/phys_higgs/cmshgg/flashgg/ExoPhys14/diphotons-phys14-v1/RSGravToGG_kMpl-01_M-3000_Tune4C_13TeV-pythia8/ExoPhys14-diphotons-phys14-v1-v0-Phys14DR-PU30bx50_PHYS14_25_V1-v1/141202_121354/0000/myOutputFile_3.root"
-        ## 5TeV                                         
-        #"root://eoscms//eos/cms/store/group/phys_higgs/cmshgg/flashgg/ExoPhys14/alphaV1-96-g5e4dc54/RSGravToGG_kMpl-02_M-5000_Tune4C_13TeV-pythia8/ExoPhys14-alphaV1-96-g5e4dc54-v1-Phys14DR-PU20bx25_PHYS14_25_V1-v1/141112_020912/0000/myOutputFile_1.root",
-        #"root://eoscms//eos/cms/store/group/phys_higgs/cmshgg/flashgg/ExoPhys14/alphaV1-96-g5e4dc54/RSGravToGG_kMpl-02_M-5000_Tune4C_13TeV-pythia8/ExoPhys14-alphaV1-96-g5e4dc54-v1-Phys14DR-PU20bx25_PHYS14_25_V1-v1/141112_020912/0000/myOutputFile_2.root",
-        #"root://eoscms//eos/cms/store/group/phys_higgs/cmshgg/flashgg/ExoPhys14/alphaV1-96-g5e4dc54/RSGravToGG_kMpl-02_M-5000_Tune4C_13TeV-pythia8/ExoPhys14-alphaV1-96-g5e4dc54-v1-Phys14DR-PU20bx25_PHYS14_25_V1-v1/141112_020912/0000/myOutputFile_3.root"
+        # Phys14, RSGrav, kMpl001, mG=5k
+        "/store/group/phys_higgs/cmshgg/musella/flashgg/ExoPhys14_v2/diphotonsPhys14V2/RSGravToGG_kMpl001_M_5000_Tune4C_13TeV_pythia8/ExoPhys14_v2-diphotonsPhys14V2-v0-Phys14DR-PU20bx25_PHYS14_25_V1-v1/150128_133931/0000/myOutputFile_1.root"
         )
                             )
 
@@ -33,6 +27,12 @@ process.eventCount = cms.EDProducer("EventCountProducer")
 
 from flashgg.MicroAODProducers.flashggMicroAODOutputCommands_cff import microAODDefaultOutputCommand
 
+#process.out = cms.OutputModule("PoolOutputModule", fileName = cms.untracked.string('myOutputFile.root'),
+#                               outputCommands = microAODDefaultOutputCommand
+#                               )
+#process.out.outputCommands.append("keep *_*_*_*")
+
+
 process.TFileService = cms.Service("TFileService",fileName = cms.string("singlePhotonTree.root"))
 process.singlePhoAna = cms.EDAnalyzer('SinglePhoAnalyzer',
                                       reducedBarrelRecHitCollection = cms.InputTag('reducedEgamma','reducedEBRecHits'),
@@ -41,3 +41,4 @@ process.singlePhoAna = cms.EDAnalyzer('SinglePhoAnalyzer',
 
 process.p = cms.Path(process.singlePhoAna)
 
+#process.e = cms.EndPath(process.out)
