@@ -12,6 +12,7 @@
 <use   name="PhysicsTools/PatUtils"/>
 <use   name="PhysicsTools/UtilAlgos"/>
 <use   name="RecoEcal/EgammaCoreTools"/>
+<use   name="RecoLocalCalo/EcalDeadChannelRecoveryAlgos"/>
 <use   name="clhep"/>
 <Flags CXXFLAGS="-ggdb"/>
 <export>

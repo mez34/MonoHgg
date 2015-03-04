@@ -25,6 +25,8 @@
 #include "RecoEcal/EgammaCoreTools/interface/EcalClusterLazyTools.h"
 #include "Geometry/Records/interface/CaloGeometryRecord.h"
 
+#include "RecoLocalCalo/EcalDeadChannelRecoveryAlgos/interface/EcalDeadChannelRecoveryAlgos.h" 
+
 #include "flashgg/MicroAODFormats/interface/Photon.h"
 
 
@@ -40,6 +42,10 @@ struct eventTree_struc_ {
 
 // per photon tree
 struct phoTree_struc_ {    
+
+  int run;
+  int event;
+  int nvertex;
 
   float pt;
   float eta;
@@ -100,7 +106,7 @@ struct phoTree_struc_ {
   int iz[25];
   int kSaturated[25];
   int kLeRecovered[25];
-  int kNeighRecovered[25];
+  float amplitRecovered[25];
 
   // da DataFormats/EgammaCandidates/interface/Photon.h, ma da capire come spacchettare
   // const EnergyCorrections & energyCorrections() const { return eCorrections_ ; }
@@ -129,18 +135,24 @@ private:
   eventTree_struc_ treeEv_;
   phoTree_struc_ tree_;  
 
+  // saturation
+  EcalDeadChannelRecoveryAlgos<EBDetId> ebDeadChannelCorrector;
+  EcalDeadChannelRecoveryAlgos<EEDetId> eeDeadChannelCorrector;
+
   // collections
   edm::EDGetTokenT<edm::View<flashgg::Photon> > photonToken_;
   edm::EDGetTokenT<View<reco::GenParticle> > genParticleToken_;
   edm::EDGetTokenT<EcalRecHitCollection> ecalHitEBToken_;
   edm::EDGetTokenT<EcalRecHitCollection> ecalHitEEToken_;
+  edm::EDGetTokenT<edm::View<reco::Vertex> > vertexToken_;
 };
 
 SinglePhoAnalyzer::SinglePhoAnalyzer(const edm::ParameterSet& iConfig): 
   photonToken_(consumes<View<flashgg::Photon> >(iConfig.getUntrackedParameter<InputTag> ("PhotonTag", InputTag("flashggPhotons")))), 
   genParticleToken_(consumes<View<reco::GenParticle> >(iConfig.getUntrackedParameter<InputTag> ("GenParticleTag", InputTag("prunedGenParticles")))),
   ecalHitEBToken_(consumes<EcalRecHitCollection>(iConfig.getParameter<edm::InputTag>("reducedBarrelRecHitCollection"))),
-  ecalHitEEToken_(consumes<EcalRecHitCollection>(iConfig.getParameter<edm::InputTag>("reducedEndcapRecHitCollection")))
+  ecalHitEEToken_(consumes<EcalRecHitCollection>(iConfig.getParameter<edm::InputTag>("reducedEndcapRecHitCollection"))),
+  vertexToken_(consumes<View<reco::Vertex> >(iConfig.getUntrackedParameter<InputTag> ("VertexTag", InputTag("offlineSlimmedPrimaryVertices"))))
 {
 }
 
@@ -160,6 +172,10 @@ void SinglePhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
   Handle<double> objs_rho;
   iEvent.getByLabel("fixedGridRhoAll",objs_rho); 
   const double rhoFixedGrd = *(objs_rho.product());
+
+  Handle<View<reco::Vertex> > primaryVertices;
+  iEvent.getByToken(vertexToken_,primaryVertices);
+  const PtrVector<reco::Vertex>& pvPointers = primaryVertices->ptrVector();
 
   Handle< EcalRecHitCollection > EcalBarrelRecHits;
   iEvent.getByToken(ecalHitEBToken_, EcalBarrelRecHits); 
@@ -198,8 +214,12 @@ void SinglePhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 
     // photon tree re-initialization
     initPhoTreeStructure();
-    
+
     // filling the photon tree with basic infos
+    tree_.run = iEvent.id().run(); 
+    tree_.event = iEvent.id().event(); 
+    tree_.nvertex = pvPointers.size();
+
     tree_.pt =g1->pt();
     tree_.eta=g1->eta();
     tree_.phi=g1->phi();
@@ -242,7 +262,6 @@ void SinglePhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
     tree_.photonIso = g1->photonIso();
     tree_.rho       = rhoFixedGrd;
 
-
     // not zero-suppressed quantities 
     std::vector<float> vCovnoZS = lazyToolnoZS->localCovariances(*(g1->superCluster()->seed())) ;
     float sieienoZS;
@@ -273,15 +292,15 @@ void SinglePhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
       bool genOk = false;      
       
       // chiara: when running on graviton samples
-      // if( gen->status() == 1 && (gen->mother())->pdgId()==5100039 ) genOk = true;
+      if( gen->status() == 1 && (gen->mother())->pdgId()==5100039 ) genOk = true;
 
       // chiara: when running on g+jets samples 
-      if ( gen->status() == 3 ) genOk = true;    
-      else if ( gen->status() == 1 ) {
-      	int mpdgId = gen->mother(0)->pdgId();
-      	int mpdgSt = gen->mother(0)->status();
-      	if (mpdgId==22 && (mpdgSt==22 || mpdgSt==23 || mpdgSt==3)) genOk = true;
-      }              
+      // if ( gen->status() == 3 ) genOk = true;    
+      // else if ( gen->status() == 1 ) {
+      // int mpdgId = gen->mother(0)->pdgId();
+      // int mpdgSt = gen->mother(0)->status();
+      // if (mpdgId==22 && (mpdgSt==22 || mpdgSt==23 || mpdgSt==3)) genOk = true;
+      // }              
 
       // hardcoded: dR<0.01 & pT/pTtrue>0.5
       if (genOk) {
@@ -309,7 +328,7 @@ void SinglePhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
     tree_.truePhi = matchedPhi;
     tree_.minDR = minDR;
 
-
+    
     // extra info on rechits for xtals in the 5x5 matrix around the seed
     DetId seedDetId = ( (g1->superCluster())->seed() )->seed();
     
@@ -334,7 +353,7 @@ void SinglePhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 	    tree_.iz[iNeigh] = -5000; 
 	    tree_.kSaturated[iNeigh] = -5000;
 	    tree_.kLeRecovered[iNeigh] = -5000;
-	    tree_.kNeighRecovered[iNeigh] = -5000;
+	    tree_.amplitRecovered[iNeigh] = -5000.;
 	    iNeigh++;
 	    continue;  
 	  }
@@ -350,7 +369,17 @@ void SinglePhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 	    tree_.iz[iNeigh] = ((EEDetId)itneigh->detid()).zside();
 	    tree_.kSaturated[iNeigh] = itneigh->checkFlag(EcalRecHit::kSaturated);      
 	    tree_.kLeRecovered[iNeigh] = itneigh->checkFlag(EcalRecHit::kLeadingEdgeRecovered);      
-	    tree_.kNeighRecovered[iNeigh] = itneigh->checkFlag(EcalRecHit::kNeighboursRecovered);
+
+	    // extra saturation studies
+	    if (tree_.kSaturated[iNeigh] || tree_.kLeRecovered[iNeigh]) {
+	      eeDeadChannelCorrector.setCaloTopology(theCaloTopology.product());
+	      bool AcceptRecHit=true;
+	      EcalRecHit hit = eeDeadChannelCorrector.correct( (EEDetId)itneigh->detid(), *EcalEndcapRecHits, "NeuralNetworks", 8, &AcceptRecHit);
+	      tree_.amplitRecovered[iNeigh] = hit.energy();
+	    } else {
+	      tree_.amplitRecovered[iNeigh] = -999.;	      
+	    }
+
 	  } else {
 	    tree_.amplit[iNeigh] = -2000.;
 	    tree_.ieta[iNeigh] = -2000; 
@@ -360,14 +389,14 @@ void SinglePhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 	    tree_.iz[iNeigh] = -2000; 
 	    tree_.kSaturated[iNeigh] = -2000;
 	    tree_.kLeRecovered[iNeigh] = -2000;
-	    tree_.kNeighRecovered[iNeigh] = -2000;
+	    tree_.amplitRecovered[iNeigh] = -2000.;
 	  }
 	  
 	  iNeigh++;
 	}
       }
       if (iNeigh!=25) cout << "problem: not 25 crystals!  ==> " << iNeigh << endl;
-
+      
     } else if (seedDetId.subdetId()==EcalBarrel) {
       
       int iNeigh=0; 
@@ -389,7 +418,7 @@ void SinglePhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 	    tree_.iz[iNeigh] = -5000; 
 	    tree_.kSaturated[iNeigh] = -5000;
 	    tree_.kLeRecovered[iNeigh] = -5000;
-	    tree_.kNeighRecovered[iNeigh] = -5000;
+	    tree_.amplitRecovered[iNeigh] = -5000.;
 	    iNeigh++;
 	    continue;  
 	  }
@@ -405,7 +434,16 @@ void SinglePhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 	    tree_.iz[iNeigh] = -999;
 	    tree_.kSaturated[iNeigh] = itneigh->checkFlag(EcalRecHit::kSaturated);      
 	    tree_.kLeRecovered[iNeigh] = itneigh->checkFlag(EcalRecHit::kLeadingEdgeRecovered);      
-	    tree_.kNeighRecovered[iNeigh] = itneigh->checkFlag(EcalRecHit::kNeighboursRecovered);
+	    // extra saturation studies
+	    if (tree_.kSaturated[iNeigh] || tree_.kLeRecovered[iNeigh]) {
+	      ebDeadChannelCorrector.setCaloTopology(theCaloTopology.product());
+	      bool AcceptRecHit=true;
+	      EcalRecHit hit = ebDeadChannelCorrector.correct( (EBDetId)itneigh->detid(), *EcalBarrelRecHits, "NeuralNetworks", 8, &AcceptRecHit);
+	      tree_.amplitRecovered[iNeigh] = hit.energy();
+	    } else {
+	      tree_.amplitRecovered[iNeigh] = -999.;
+	    }
+
 	  } else {
 	    tree_.amplit[iNeigh] = -2000.;
 	    tree_.ieta[iNeigh] = -2000; 
@@ -415,13 +453,21 @@ void SinglePhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 	    tree_.iz[iNeigh] = -2000; 
 	    tree_.kSaturated[iNeigh] = -2000;
 	    tree_.kLeRecovered[iNeigh] = -2000;
-	    tree_.kNeighRecovered[iNeigh] = -2000;
+	    tree_.amplitRecovered[iNeigh] = -2000.;
 	  }
 
 	  iNeigh++;
 	}
       }
       if (iNeigh!=25) cout << "problem: not 25 crystals!  ==> " << iNeigh << endl;
+
+      // if (tree_.kSaturated[12] || tree_.kLeRecovered[12]) {  
+      // std::cout << "chiara: check from my code ==> " << std::endl;
+      // std::cout << tree_.amplit[6]  << " " << tree_.amplit[7]  << " " << tree_.amplit[8]  << " " 
+      // << tree_.amplit[11] << " " << tree_.amplit[12] << " " << tree_.amplit[13] << " " 
+      // << tree_.amplit[16] << " " << tree_.amplit[17] << " " << tree_.amplit[18] << endl; 
+      // }
+
     }
 
     // to count the number of reco photons and reco matching gen ones
@@ -457,7 +503,8 @@ void SinglePhoAnalyzer::beginJob() {
   TString treeIso = "trackIso/F:ecalIso/F:hcalIso/F:chHadIso/F:nHadIso/F:photonIso/F:rho/F";
   TString treeIDnoZS = "sieienoZS/F:e5x5noZS/F:r9noZS/F";
   TString treeTrue = "trueEnergy/F:truePt/F:trueEta/F:truePhi/F:minDR/F";
-  TString tree5x5 = "amplit[25]/F:ieta[25]/I:iphi[25]/I:ix[25]/I:iy[25]/I:iz[25]/I:kSaturated[25]/I:kLeRecovered[25]/I:kNeighRecovered[25]/I";
+  TString tree5x5 = "amplit[25]/F:ieta[25]/I:iphi[25]/I:ix[25]/I:iy[25]/I:iz[25]/I:kSaturated[25]/I:kLeRecovered[25]/I:amplitRecovered[25]/F";
+  TString treeEve = "run/I:event/I:nvertex/I";
   phoTree->Branch("kinematics",&(tree_.pt),treeKine);
   phoTree->Branch("supercluster",&(tree_.scEta),treeSc);
   phoTree->Branch("energy",&(tree_.eMax),treeEne);
@@ -466,6 +513,7 @@ void SinglePhoAnalyzer::beginJob() {
   phoTree->Branch("identificationNoZS",&(tree_.sigmaIetaIetaNoZS),treeIDnoZS);
   phoTree->Branch("mctruth",&(tree_.trueEnergy),treeTrue);
   phoTree->Branch("tree5x5",&(tree_.amplit),tree5x5);  
+  phoTree->Branch("eventInfo",&(tree_.run),treeEve);
 }
 
 void SinglePhoAnalyzer::endJob() { 
@@ -474,6 +522,9 @@ void SinglePhoAnalyzer::endJob() {
 
 void SinglePhoAnalyzer::initPhoTreeStructure() {
 
+  tree_.run=-500; 
+  tree_.event=-500; 
+  tree_.nvertex=-500;
   tree_.pt=-500.;
   tree_.eta=-500.;
   tree_.phi=-500.;
@@ -520,7 +571,7 @@ void SinglePhoAnalyzer::initPhoTreeStructure() {
     tree_.amplit[iNeigh]=-500.;
     tree_.kSaturated[iNeigh]=-500;
     tree_.kLeRecovered[iNeigh]=-500;
-    tree_.kNeighRecovered[iNeigh]=-500;
+    tree_.amplitRecovered[iNeigh]=-500.;
     tree_.ieta[iNeigh]=-500;
     tree_.iphi[iNeigh]=-500;
     tree_.ix[iNeigh]=-500;
