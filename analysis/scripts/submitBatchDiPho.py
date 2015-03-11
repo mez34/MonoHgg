@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-# example: ./submitBatch.py -c -T 2000 -n 1 -p run_gensim --cfg step_fullSIM.py T1tttt_2J_mGo1300_mStop300_mChi280_pythia8-4bodydec
+# example: ./submitBatchDiPho.py -c -T 2000 -n 1 -p run_gensim --cfg step_fullSIM.py T1tttt_2J_mGo1300_mStop300_mChi280_pythia8-4bodydec
 
 import os
 import sys
@@ -23,11 +23,11 @@ def main():
     parser.add_option('-n', '--nfileperjob', action='store', dest='nfileperjob', help='split the jobs with n files read/batch job' , default=1, type='int')
     parser.add_option('-p', '--prefix', action='store', dest='prefix', help='the prefix to be added to the output' , default=defaultoutputdir)
     parser.add_option('-a', '--application', action='store', dest='application', help='the executable to be run' , default='cmsRun')
-    parser.add_option('-d', '--download', action='store', dest='download', help='download the output on a local computer' , default='')
+    parser.add_option('-d', '--download', action='store', dest='download', help='download the output on a local computer' , default='pccmsrm')
     parser.add_option('-c', '--create', action='store_true',dest='create', help='create only the jobs, do not submit them' , default=False)
     parser.add_option('-t', '--testnjobs', action='store', dest='testnjobs', help='submit only the first n jobs' , default=1000000, type='int')
-    parser.add_option('-N', '--neventsjob', action='store', dest='neventsjob', help='split the jobs with n events / batch job' , default=200, type='int')
-    parser.add_option('-T', '--eventsperfile', action='store', dest='eventsperfile', help='number of events per input file' , default=2000, type='int')
+    parser.add_option('-N', '--neventsjob', action='store', dest='neventsjob', help='split the jobs with n events / batch job' , default=-1, type='int')
+    parser.add_option('-T', '--eventsperfile', action='store', dest='eventsperfile', help='number of events per input file' , default=-1, type='int')
     parser.add_option('--eos', action='store', dest='eos', help='copy the output in the specified EOS path' , default='')
     parser.add_option('--cfg', action='store', dest='cfg', help='the cfg to be run' , default='pippo_cfg.py')
     (opt, args) = parser.parse_args()
@@ -49,7 +49,7 @@ def main():
     print "the outputs will be in the directory: "+opt.prefix
 
     if opt.download=='pccmsrm':
-        diskoutputdir = "/cmsrm/pc24_2/emanuele/data/EcalReco7.1.X/"    # chiara
+        diskoutputdir = "/cmsrm/pc25_2/crovelli/data/Exo/" 
     else: diskoutputdir = ''
     diskoutputmain = diskoutputdir+"/"+opt.prefix+"/"+output
 
@@ -60,7 +60,7 @@ def main():
     outputroot = diskoutputmain+"/root/"
 
     if (diskoutputdir != "none" and opt.download=='pccmsrm'):
-        os.system("ssh -o BatchMode=yes -o StrictHostKeyChecking=no pccmsrm24 mkdir -p "+diskoutputmain)    # chiara
+        os.system("ssh -o BatchMode=yes -o StrictHostKeyChecking=no pccmsrm25 mkdir -p "+diskoutputmain)   
 
 
     #look for the current directory
@@ -77,7 +77,7 @@ def main():
         for line in range(min(opt.nfileperjob,len(inputfiles))):
             ntpfile = inputfiles.pop()
             ntpfile = ntpfile.rstrip('\n')
-            ntpfile = re.sub(r'/eos/cms','',ntpfile.rstrip())      # chiara?
+            ntpfile = re.sub(r'/eos/cms','',ntpfile.rstrip())     
             if ntpfile != '':
                 L.append("\'"+ntpfile+"\',\n")
 
