@@ -98,8 +98,8 @@ def main():
             puRewString = 'dopureweight = cms.untracked.int32('+str(doPUreweighting)+')'
             sampleIndexString = 'sampleIndex  = cms.untracked.int32('+str(sampleIndex)+')'
             puWfileString = 'puWFileName  = cms.string("'+PUweights+'")'
-            xsecString = 'xsec = cms.double('+str(xsection)+')'
-            kfacString = 'kfac = cms.double('+str(kfactor)+')'
+            xsecString = 'xsec = cms.untracked.double('+str(xsection)+')'
+            kfacString = 'kfac = cms.untracked.double('+str(kfactor)+')'
             outputFileName = output+'_'+str(ijob)+'.root'
             for line in cfgfile:
                 line = re.sub(r'fileNames = cms.untracked.vstring',stringtoreplace, line.rstrip())
