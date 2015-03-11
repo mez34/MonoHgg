@@ -16,9 +16,6 @@ process.source = cms.Source("PoolSource",
                             fileNames=cms.untracked.vstring(
         # Phys14, RSGrav, kMpl001, mG=5k    -- new production
         "/store/group/phys_higgs/cmshgg/musella/flashgg/ExoPhys14_v2/diphotonsPhys14V2/RSGravToGG_kMpl001_M_5000_Tune4C_13TeV_pythia8/ExoPhys14_v2-diphotonsPhys14V2-v0-Phys14DR-PU20bx25_PHYS14_25_V1-v1/150128_133931/0000/myOutputFile_1.root"
-
-        # Phys14, RSGrav, kMpl01, mG=5k   -- old production
-        #"/store/group/phys_higgs/cmshgg/flashgg/ExoPhys14/diphotonsPhys14V1/RSGravToGG_kMpl01_M-5000_Tune4C_13TeV-pythia8/ExoPhys14-diphotonsPhys14V1-v0-Phys14DR-PU40bx25_PHYS14_25_V1-v1/141205_002243/0000/myOutputFile_1.root"
         )
                             )
 
