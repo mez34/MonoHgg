@@ -184,7 +184,7 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
   // PU weight for MC only and if requested
   float pu_weight = 1.;
   float pu_n      = -1.;
-  if (genGammas->size()>0) {   
+  if (sampleID>0) {   
     pu_n = 0.;
     for( unsigned int PVI = 0; PVI < PileupInfoPointers.size(); ++PVI) {
       Int_t pu_bunchcrossing = PileupInfoPointers[PVI]->getBunchCrossing();
@@ -198,13 +198,13 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 
   // x-sec * kFact for MC only 
   float totXsec = -1.;
-  if (genGammas->size()>0) totXsec = xsec_ * kfac_;
+  if (sampleID>0) totXsec = xsec_ * kfac_;
 
   // Diphoton candidates
   // chiara: per il momento quello a pT del sistema piu' alto
   // chiara: questi sono tutti i candidati, che se capisco non sono selezionati (da controllare). 
   // La selezione va applicata prima della scelta
-  // La scelta e' chiaramente bacata per un po' di eventi, va capito perche'
+  // La scelta e' bacata per un po' di eventi, va capito perche'
   float maxDiphoPt = -999.;
   int candIndex = 9999;    // This int will store the index of the best diphoton candidate
   for (unsigned int diphotonlooper =0; diphotonlooper < dipho.size() ; diphotonlooper++){
@@ -292,7 +292,7 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
     genmatch2 = 0;
     // genmatch1 = (dipho[candIndex]->leadingPhoton()->genMatchType() == Photon::kPrompt); 
     // genmatch2 = (dipho[candIndex]->subLeadingPhoton()->genMatchType() == Photon::kPrompt); 
-    if (genGammas->size()>0) {   
+    if (sampleID>0) {   
       for(vector<PackedGenParticle>::const_iterator igen=genGammas->begin(); igen!=genGammas->end(); ++igen) {
 	if( igen->status() != 1 || igen->pdgId() != 22 ) continue; 
 	// if( igen->motherRef()->pdgId() <= 25 ) {
