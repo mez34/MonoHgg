@@ -19,11 +19,12 @@
 #include "DataFormats/EcalDetId/interface/EBDetId.h"
 #include "DataFormats/EcalDetId/interface/EEDetId.h"
 #include "DataFormats/EcalRecHit/interface/EcalRecHitCollections.h"
+#include "DataFormats/PatCandidates/interface/PackedGenParticle.h"
 #include "Geometry/CaloTopology/interface/CaloTopology.h"
 #include "Geometry/CaloEventSetup/interface/CaloTopologyRecord.h"
+#include "Geometry/Records/interface/CaloGeometryRecord.h"
 #include "RecoCaloTools/Navigation/interface/CaloNavigator.h"
 #include "RecoEcal/EgammaCoreTools/interface/EcalClusterLazyTools.h"
-#include "Geometry/Records/interface/CaloGeometryRecord.h"
 
 #include "RecoLocalCalo/EcalDeadChannelRecoveryAlgos/interface/EcalDeadChannelRecoveryAlgos.h" 
 
@@ -32,6 +33,9 @@
 
 using namespace std;
 using namespace edm;
+using namespace flashgg;
+
+using pat::PackedGenParticle;
 
 // per event tree
 struct eventTree_struc_ {  
@@ -96,7 +100,6 @@ struct phoTree_struc_ {
   float truePt;
   float trueEta;
   float truePhi;
-  float minDR;
 
   float amplit[25];
   int ieta[25];
@@ -141,7 +144,7 @@ private:
 
   // collections
   edm::EDGetTokenT<edm::View<flashgg::Photon> > photonToken_;
-  edm::EDGetTokenT<View<reco::GenParticle> > genParticleToken_;
+  edm::InputTag packedGenGamma_;
   edm::EDGetTokenT<EcalRecHitCollection> ecalHitEBToken_;
   edm::EDGetTokenT<EcalRecHitCollection> ecalHitEEToken_;
   edm::EDGetTokenT<edm::View<reco::Vertex> > vertexToken_;
@@ -149,7 +152,7 @@ private:
 
 SinglePhoAnalyzer::SinglePhoAnalyzer(const edm::ParameterSet& iConfig): 
   photonToken_(consumes<View<flashgg::Photon> >(iConfig.getUntrackedParameter<InputTag> ("PhotonTag", InputTag("flashggPhotons")))), 
-  genParticleToken_(consumes<View<reco::GenParticle> >(iConfig.getUntrackedParameter<InputTag> ("GenParticleTag", InputTag("prunedGenParticles")))),
+  packedGenGamma_(iConfig.getUntrackedParameter<InputTag>("packedGenParticles", InputTag("flashggGenPhotons"))),
   ecalHitEBToken_(consumes<EcalRecHitCollection>(iConfig.getParameter<edm::InputTag>("reducedBarrelRecHitCollection"))),
   ecalHitEEToken_(consumes<EcalRecHitCollection>(iConfig.getParameter<edm::InputTag>("reducedEndcapRecHitCollection"))),
   vertexToken_(consumes<View<reco::Vertex> >(iConfig.getUntrackedParameter<InputTag> ("VertexTag", InputTag("offlineSlimmedPrimaryVertices"))))
@@ -165,9 +168,8 @@ void SinglePhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
   iEvent.getByToken(photonToken_,objs_pho);
   const PtrVector<flashgg::Photon>& photonPointers = objs_pho->ptrVector();
 
-  Handle<View<reco::GenParticle> > objs_gens;
-  iEvent.getByToken(genParticleToken_,objs_gens);
-  const PtrVector<reco::GenParticle>& genPointers = objs_gens->ptrVector();
+  Handle<vector<PackedGenParticle> > genGammas;
+  iEvent.getByLabel(packedGenGamma_, genGammas);
 
   Handle<double> objs_rho;
   iEvent.getByLabel("fixedGridRhoAll",objs_rho); 
@@ -206,6 +208,7 @@ void SinglePhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
     Ptr<flashgg::Photon> g1 = photonPointers[ipho];
 
     // mninimal selection to speed up: photon eta and pT cuts
+    // chiara: hardcoded
     float gammaPt    = g1->pt();
     float gammaScEta = (g1->superCluster())->eta();
     if (gammaPt<30) continue;
@@ -281,52 +284,37 @@ void SinglePhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
     float matchedPt  = -999.;
     float matchedEta = -999.;
     float matchedPhi = -999.;
-    float minDR = 999.;
+    // float minDR = 999.;
 
-    for( unsigned int genLoop =0 ; genLoop < genPointers.size(); genLoop++) {
-
-      Ptr<reco::GenParticle> gen = genPointers[genLoop];
-
-      if ( gen->pdgId() != 22 ) continue;
-
-      bool genOk = false;      
-      
-      // chiara: when running on graviton samples
-      if( gen->status() == 1 && (gen->mother())->pdgId()==5100039 ) genOk = true;
-
-      // chiara: when running on g+jets samples 
-      // if ( gen->status() == 3 ) genOk = true;    
-      // else if ( gen->status() == 1 ) {
-      // int mpdgId = gen->mother(0)->pdgId();
-      // int mpdgSt = gen->mother(0)->status();
-      // if (mpdgId==22 && (mpdgSt==22 || mpdgSt==23 || mpdgSt==3)) genOk = true;
-      // }              
-
-      // hardcoded: dR<0.01 & pT/pTtrue>0.5
-      if (genOk) {
-	float dR = deltaR(gen->eta(),gen->phi(),g1->eta(),g1->phi());
-	if ( dR<minDR ) {
-	  minDR = dR;
-	  if ( dR<0.01 ) {
-	    float genPt  = fabs(gen->energy()*sin(gen->theta()));
-	    float recoPt = g1->pt(); 
-	    if ((recoPt/genPt)>0.5) {
-	      matchedEne = gen->energy();
-	      matchedPt  = fabs(gen->energy()*sin(gen->theta()));
-	      matchedEta = gen->eta();
-	      matchedPhi = gen->phi();
-	      break;
-	    }
-	  }
-	}
+    // chiara: per g+jets questo pare funzionare, per segnal no - to be checked
+    bool genmatch = (g1->genMatchType() == Photon::kPrompt);
+    if (genmatch) {
+      matchedEne = g1->matchedGenPhoton()->energy();
+      matchedPt  = fabs(matchedEne*sin(g1->matchedGenPhoton()->theta()));
+      matchedEta = g1->matchedGenPhoton()->eta();
+      matchedPhi = g1->matchedGenPhoton()->phi();
+    }
+    /*
+    // per segnale
+    for(vector<PackedGenParticle>::const_iterator igen=genGammas->begin(); igen!=genGammas->end(); ++igen) {
+      if( igen->status() != 1 || igen->pdgId() != 22 ) continue;
+      float deta = g1->eta() - igen->eta();
+      float dphi = deltaPhi(g1->phi(),igen->phi());
+      float dr   = sqrt(deta*deta + dphi*dphi);
+      float pt_change = (g1->et() -igen->et())/igen->et();
+      if (dr<0.3 && fabs(pt_change) < 0.5) {
+	matchedEne = igen->energy();
+	matchedPt  = fabs(igen->energy()*sin(igen->theta()));
+	matchedEta = igen->eta();
+	matchedPhi = igen->phi();
+	break;
       }
-    } // loop over gen photons
-
+    }
+    */
     tree_.trueEnergy = matchedEne;
     tree_.truePt = matchedPt;
     tree_.trueEta = matchedEta;
     tree_.truePhi = matchedPhi;
-    tree_.minDR = minDR;
 
     
     // extra info on rechits for xtals in the 5x5 matrix around the seed
@@ -398,7 +386,7 @@ void SinglePhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
       if (iNeigh!=25) cout << "problem: not 25 crystals!  ==> " << iNeigh << endl;
       
     } else if (seedDetId.subdetId()==EcalBarrel) {
-      
+
       int iNeigh=0; 
 
       CaloNavigator<DetId> cursorE = CaloNavigator<DetId>(seedDetId, theSubdetTopologyEB_ );
@@ -460,14 +448,6 @@ void SinglePhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 	}
       }
       if (iNeigh!=25) cout << "problem: not 25 crystals!  ==> " << iNeigh << endl;
-
-      // if (tree_.kSaturated[12] || tree_.kLeRecovered[12]) {  
-      // std::cout << "chiara: check from my code ==> " << std::endl;
-      // std::cout << tree_.amplit[6]  << " " << tree_.amplit[7]  << " " << tree_.amplit[8]  << " " 
-      // << tree_.amplit[11] << " " << tree_.amplit[12] << " " << tree_.amplit[13] << " " 
-      // << tree_.amplit[16] << " " << tree_.amplit[17] << " " << tree_.amplit[18] << endl; 
-      // }
-
     }
 
     // to count the number of reco photons and reco matching gen ones
@@ -502,7 +482,7 @@ void SinglePhoAnalyzer::beginJob() {
   TString treeID = "e1x5/F:e2x5/F:sigmaIetaIeta/F:r9/F:hoe/F:h1oe/F:h2oe/F:htoe/F:ht1oe/F:ht2oe/F:passEleVeto/B:hasPixelSeed/B";
   TString treeIso = "trackIso/F:ecalIso/F:hcalIso/F:chHadIso/F:nHadIso/F:photonIso/F:rho/F";
   TString treeIDnoZS = "sieienoZS/F:e5x5noZS/F:r9noZS/F";
-  TString treeTrue = "trueEnergy/F:truePt/F:trueEta/F:truePhi/F:minDR/F";
+  TString treeTrue = "trueEnergy/F:truePt/F:trueEta/F:truePhi/F";
   TString tree5x5 = "amplit[25]/F:ieta[25]/I:iphi[25]/I:ix[25]/I:iy[25]/I:iz[25]/I:kSaturated[25]/I:kLeRecovered[25]/I:amplitRecovered[25]/F";
   TString treeEve = "run/I:event/I:nvertex/I";
   phoTree->Branch("kinematics",&(tree_.pt),treeKine);
@@ -566,7 +546,6 @@ void SinglePhoAnalyzer::initPhoTreeStructure() {
   tree_.truePt=-500.;
   tree_.trueEta=-500.;
   tree_.truePhi=-500.;
-  tree_.minDR=-500.;
   for (uint iNeigh=0; iNeigh<25; iNeigh++) {
     tree_.amplit[iNeigh]=-500.;
     tree_.kSaturated[iNeigh]=-500;
