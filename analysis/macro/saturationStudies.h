@@ -102,12 +102,12 @@ saturationStudies::saturationStudies(TTree *tree) : fChain(0)
 {
   // if parameter tree is not specified (or zero), connect the file
   // used to generate this class and read the Tree.
-  if (tree == 0) {
-    TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("../python/singlePhotonTree__kMpl01_M5000_amplitRecovered.root");
+  if (tree == 0) {       
+    TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("../python/singlePhotonTree_M5k_kMpl01.root");
     if (!f || !f->IsOpen()) {
-      f = new TFile("../python/singlePhotonTree__kMpl01_M5000_amplitRecovered.root");
+      f = new TFile("../python/singlePhotonTree_M5k_kMpl01.root");
     }
-    TDirectory * dir = (TDirectory*)f->Get("../python/singlePhotonTree__kMpl01_M5000_amplitRecovered.root:/singlePhoAna");
+    TDirectory * dir = (TDirectory*)f->Get("../python/singlePhotonTree_M5k_kMpl01.root:/singlePhoAna");
     dir->GetObject("singlePhotons",tree);
 
   }
