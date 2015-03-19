@@ -10,7 +10,7 @@ process.load("Configuration.StandardSequences.MagneticField_cff")
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.GlobalTag.globaltag = 'POSTLS170_V5::All'
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32( 200 ) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32( 100 ) )
 
 process.source = cms.Source("PoolSource",
                             fileNames=cms.untracked.vstring(
@@ -33,6 +33,8 @@ process.diPhoAna = cms.EDAnalyzer('DiPhoAnalyzer',
                                   VertexTag = cms.untracked.InputTag('offlineSlimmedPrimaryVertices'),
                                   packedGenParticles = cms.untracked.InputTag('flashggGenPhotons'),
                                   DiPhotonTag = cms.untracked.InputTag('flashggDiPhotons'),
+                                  reducedBarrelRecHitCollection = cms.InputTag('reducedEgamma','reducedEBRecHits'),
+                                  reducedEndcapRecHitCollection = cms.InputTag('reducedEgamma','reducedEERecHits'),
                                   PileupTag = cms.untracked.InputTag('addPileupInfo'),
                                   dopureweight = cms.untracked.int32(0),
                                   sampleIndex  = cms.untracked.int32(0),

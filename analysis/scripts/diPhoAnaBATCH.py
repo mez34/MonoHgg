@@ -24,6 +24,8 @@ process.TFileService = cms.Service("TFileService",fileName = cms.string("OUTPUT"
 process.diPhoAna = cms.EDAnalyzer('DiPhoAnalyzer',
                                   VertexTag = cms.untracked.InputTag('offlineSlimmedPrimaryVertices'),
                                   packedGenParticles = cms.untracked.InputTag('flashggGenPhotons'),
+                                  reducedBarrelRecHitCollection = cms.InputTag('reducedEgamma','reducedEBRecHits'),
+                                  reducedEndcapRecHitCollection = cms.InputTag('reducedEgamma','reducedEERecHits'),
                                   DiPhotonTag = cms.untracked.InputTag('flashggDiPhotons'),
                                   PileupTag = cms.untracked.InputTag('addPileupInfo'),
                                   dopureweight = PU,
