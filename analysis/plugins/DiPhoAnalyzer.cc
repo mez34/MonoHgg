@@ -577,7 +577,7 @@ void DiPhoAnalyzer::beginJob() {
   DiPhotonTree->Branch("nvtx",&(treeDipho_.nvtx),"nvtx/I");
   DiPhotonTree->Branch("rho",&(treeDipho_.rho),"rho/F");
   DiPhotonTree->Branch("sampleID",&(treeDipho_.sampleID),"sampleID/I");
-  DiPhotonTree->Branch("totXsec",&(treeDipho_.totXsec),"totXsec/I");
+  DiPhotonTree->Branch("totXsec",&(treeDipho_.totXsec),"totXsec/F");
   DiPhotonTree->Branch("pu_weight",&(treeDipho_.pu_weight),"pu_weight/F");
   DiPhotonTree->Branch("pu_n",&(treeDipho_.pu_n),"pu_n/F");
   DiPhotonTree->Branch("ptgg",&(treeDipho_.ptgg),"ptgg/F");
