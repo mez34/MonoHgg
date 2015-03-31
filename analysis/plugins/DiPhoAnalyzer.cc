@@ -571,24 +571,48 @@ void DiPhoAnalyzer::beginJob() {
   DiPhotonTree = fs_->make<TTree>("DiPhotonTree","di-photon tree");
 
   // with all infos
-  TString treeEvent  = "run/I:event/I:lumi/I:nvtx/I:rho/F";
-  TString treeSample = "sampleID/I:totXsec/F:pu_weight/F:pu_n/F";
-  TString treeDiPho  = "ptgg/F:mgg/F";
-  TString treePho1   = "pt1/F:ptOverM1/F:eta1/F:phi1/F:r91/F:sieie1/F:hoe1/F:scRawEne1/F:chiso1/F:phoiso1/F/neuiso1:F";
-  TString treePho2   = "pt2/F:ptOverM2/F:eta2/F:phi2/F:r92/F:sieie2/F:hoe2/F:scRawEne2/F:chiso2/F:phoiso2/F/neuiso2:F";
-  TString treeMcPho1 = "genmatch1/I";
-  TString treeMcPho2 = "genmatch2/I";
-  TString treeVtx    = "vtxIndex/I:vtxX/F:vtxY/F:vtxZ/F";
-  TString treeGenVtx = "genVtxX/F:genVtxY/F:genVtxZ/F";
-  DiPhotonTree->Branch("eventinfo",&(treeDipho_.run),treeEvent);
-  DiPhotonTree->Branch("sample",&(treeDipho_.sampleID),treeSample);
-  DiPhotonTree->Branch("diphotons",&(treeDipho_.ptgg),treeDiPho);
-  DiPhotonTree->Branch("gamma1",&(treeDipho_.pt1),treePho1);
-  DiPhotonTree->Branch("gamma2",&(treeDipho_.pt2),treePho2);
-  DiPhotonTree->Branch("mcgamma1",&(treeDipho_.genmatch1),treeMcPho1);
-  DiPhotonTree->Branch("mcgamma2",&(treeDipho_.genmatch2),treeMcPho2);
-  DiPhotonTree->Branch("vertex",&(treeDipho_.vtxIndex),treeVtx);
-  DiPhotonTree->Branch("genVertex",&(treeDipho_.genVtxX),treeGenVtx);
+  DiPhotonTree->Branch("run",&(treeDipho_.run),"run/I");
+  DiPhotonTree->Branch("event",&(treeDipho_.event),"event/I");
+  DiPhotonTree->Branch("lumi",&(treeDipho_.lumi),"lumi/I");
+  DiPhotonTree->Branch("nvtx",&(treeDipho_.nvtx),"nvtx/I");
+  DiPhotonTree->Branch("rho",&(treeDipho_.rho),"rho/F");
+  DiPhotonTree->Branch("sampleID",&(treeDipho_.sampleID),"sampleID/I");
+  DiPhotonTree->Branch("totXsec",&(treeDipho_.totXsec),"totXsec/I");
+  DiPhotonTree->Branch("pu_weight",&(treeDipho_.pu_weight),"pu_weight/F");
+  DiPhotonTree->Branch("pu_n",&(treeDipho_.pu_n),"pu_n/F");
+  DiPhotonTree->Branch("ptgg",&(treeDipho_.ptgg),"ptgg/F");
+  DiPhotonTree->Branch("mgg",&(treeDipho_.mgg),"mgg/F");
+  DiPhotonTree->Branch("pt1",&(treeDipho_.pt1),"pt1/F");
+  DiPhotonTree->Branch("ptOverM1",&(treeDipho_.ptOverM1),"ptOverM1/F");
+  DiPhotonTree->Branch("eta1",&(treeDipho_.eta1),"eta1/F");
+  DiPhotonTree->Branch("phi1",&(treeDipho_.phi1),"phi1/F");
+  DiPhotonTree->Branch("r91",&(treeDipho_.r91),"r91/F");
+  DiPhotonTree->Branch("sieie1",&(treeDipho_.sieie1),"sieie1/F");
+  DiPhotonTree->Branch("hoe1",&(treeDipho_.hoe1),"hoe1/F");
+  DiPhotonTree->Branch("scRawEne1",&(treeDipho_.scRawEne1),"scRawEne1/F");
+  DiPhotonTree->Branch("chiso1",&(treeDipho_.chiso1),"chiso1/F");
+  DiPhotonTree->Branch("phoiso1",&(treeDipho_.phoiso1),"phoiso1/F");
+  DiPhotonTree->Branch("neuiso1",&(treeDipho_.neuiso1),"neuiso1/F");
+  DiPhotonTree->Branch("pt2",&(treeDipho_.pt2),"pt2/F");
+  DiPhotonTree->Branch("ptOverM2",&(treeDipho_.ptOverM2),"ptOverM2/F");
+  DiPhotonTree->Branch("eta2",&(treeDipho_.eta2),"eta2/F");
+  DiPhotonTree->Branch("phi2",&(treeDipho_.phi2),"phi2/F");
+  DiPhotonTree->Branch("r92",&(treeDipho_.r92),"r92/F");
+  DiPhotonTree->Branch("sieie2",&(treeDipho_.sieie2),"sieie2/F");
+  DiPhotonTree->Branch("hoe2",&(treeDipho_.hoe2),"hoe2/F");
+  DiPhotonTree->Branch("scRawEne2",&(treeDipho_.scRawEne2),"scRawEne2/F");
+  DiPhotonTree->Branch("chiso2",&(treeDipho_.chiso2),"chiso2/F");
+  DiPhotonTree->Branch("phoiso2",&(treeDipho_.phoiso2),"phoiso2/F");
+  DiPhotonTree->Branch("neuiso2",&(treeDipho_.neuiso2),"neuiso2/F");
+  DiPhotonTree->Branch("genmatch1",&(treeDipho_.genmatch1),"genmatch1/I");
+  DiPhotonTree->Branch("genmatch2",&(treeDipho_.genmatch2),"genmatch12/I");
+  DiPhotonTree->Branch("vtxIndex",&(treeDipho_.vtxIndex),"vtxIndex/I");
+  DiPhotonTree->Branch("vtxX",&(treeDipho_.vtxX),"vtxX/F");
+  DiPhotonTree->Branch("vtxY",&(treeDipho_.vtxY),"vtxY/F");
+  DiPhotonTree->Branch("vtxZ",&(treeDipho_.vtxZ),"vtxZ/F");
+  DiPhotonTree->Branch("genVtxX",&(treeDipho_.genVtxX),"genVtxX/F");
+  DiPhotonTree->Branch("genVtxY",&(treeDipho_.genVtxY),"genVtxY/F");
+  DiPhotonTree->Branch("genVtxZ",&(treeDipho_.genVtxZ),"genVtxZ/F");
 }
 
 void DiPhoAnalyzer::endJob() {
