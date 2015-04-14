@@ -19,13 +19,16 @@
 
 #include "flashgg/MicroAODFormats/interface/Photon.h"
 #include "flashgg/MicroAODFormats/interface/DiPhotonCandidate.h"
+#include "flashgg/MicroAODFormats/interface/GenPhotonExtra.h"
 
 #include "TMath.h"
 #include "TTree.h"
 #include "TVector3.h"
 #include "TLorentzVector.h"
 
+// chiara: to be set
 #define MAX_PU_REWEIGHT 60
+#define wantId 1
 
 using namespace std;
 using namespace edm;
@@ -47,10 +50,12 @@ struct diphoTree_struc_ {
   float pu_n;
   float ptgg;
   float mgg;
+  int eventClass;
   float pt1; 
   float ptOverM1; 
   float eta1; 
   float phi1;
+  float sceta1;
   float r91; 
   float sieie1; 
   float hoe1; 
@@ -62,6 +67,7 @@ struct diphoTree_struc_ {
   float ptOverM2; 
   float eta2; 
   float phi2;
+  float sceta2;
   float r92; 
   float sieie2; 
   float hoe2; 
@@ -75,6 +81,8 @@ struct diphoTree_struc_ {
   float vtxZ;
   int genmatch1;   
   int genmatch2;
+  float geniso1;   
+  float geniso2;
   float genVtxX; 
   float genVtxY; 
   float genVtxZ;
@@ -99,7 +107,7 @@ private:
 
   void SetPuWeights(std::string puWeightFile);
   float GetPUWeight(float pun);
-  bool isGammaPresel( float pt, float r9, float chiso);
+  bool isGammaPresel( float sceta, float pt, float r9, float chiso);
   bool isGammaSelected( float rho, float pt, float sceta, float r9, float chiso, float nhiso, float phoiso, float hoe, float sieie);
   int effectiveAreaRegion(float sceta);
 
@@ -107,10 +115,11 @@ private:
   edm::EDGetTokenT<EcalRecHitCollection> ecalHitEBToken_;
   edm::EDGetTokenT<EcalRecHitCollection> ecalHitEEToken_;
   EDGetTokenT<View<reco::Vertex> > vertexToken_;
-  edm::InputTag packedGenGamma_;  
+  // edm::InputTag packedGenGamma_;  
   EDGetTokenT<edm::View<flashgg::DiPhotonCandidate> > diPhotonToken_; 
   EDGetTokenT<edm::View<PileupSummaryInfo> > PileUpToken_; 
   edm::InputTag rhoFixedGrid_;
+  EDGetTokenT<vector<flashgg::GenPhotonExtra> > genPhotonExtraToken_;
   
   // sample-dependent parameters needed for the analysis
   int dopureweight_;
@@ -131,6 +140,13 @@ private:
 
   // events breakdown
   TH1F *h_selection;
+
+  // photon ID efficiency
+  float xsecForEff;
+  TH1F *h_denom0, *h_denomPlusPres0, *h_num0;
+  TH1F *h_denom1, *h_denomPlusPres1, *h_num1;
+  TH1F *h_denom2, *h_denomPlusPres2, *h_num2;
+  TH1F *h_denom3, *h_denomPlusPres3, *h_num3;
 };
    
 
@@ -140,9 +156,10 @@ DiPhoAnalyzer::DiPhoAnalyzer(const edm::ParameterSet& iConfig):
   ecalHitEBToken_(consumes<EcalRecHitCollection>(iConfig.getParameter<edm::InputTag>("reducedBarrelRecHitCollection"))),
   ecalHitEEToken_(consumes<EcalRecHitCollection>(iConfig.getParameter<edm::InputTag>("reducedEndcapRecHitCollection"))),
   vertexToken_(consumes<View<reco::Vertex> >(iConfig.getUntrackedParameter<InputTag> ("VertexTag", InputTag("offlineSlimmedPrimaryVertices")))),
-  packedGenGamma_(iConfig.getUntrackedParameter<InputTag>("packedGenParticles", InputTag("flashggGenPhotons"))),
+  // packedGenGamma_(iConfig.getUntrackedParameter<InputTag>("packedGenParticles", InputTag("flashggGenPhotons"))),
   diPhotonToken_(consumes<View<flashgg::DiPhotonCandidate> >(iConfig.getUntrackedParameter<InputTag> ("DiPhotonTag", InputTag("flashggDiPhotons")))),
-  PileUpToken_(consumes<View<PileupSummaryInfo> >(iConfig.getUntrackedParameter<InputTag> ("PileUpTag", InputTag("addPileupInfo"))))
+  PileUpToken_(consumes<View<PileupSummaryInfo> >(iConfig.getUntrackedParameter<InputTag> ("PileUpTag", InputTag("addPileupInfo")))),
+  genPhotonExtraToken_(mayConsume<vector<flashgg::GenPhotonExtra> >(iConfig.getParameter<InputTag>("genPhotonExtraTag")))
 { 
   dopureweight_ = iConfig.getUntrackedParameter<int>("dopureweight", 0);
   sampleIndex_  = iConfig.getUntrackedParameter<int>("sampleIndex",0);
@@ -160,8 +177,8 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
   iEvent.getByToken(vertexToken_,primaryVertices);
   const PtrVector<reco::Vertex>& vtxs = primaryVertices->ptrVector();
 
-  Handle<vector<PackedGenParticle> > genGammas;     
-  iEvent.getByLabel(packedGenGamma_, genGammas);       
+  // Handle<vector<PackedGenParticle> > genGammas;     
+  // iEvent.getByLabel(packedGenGamma_, genGammas);       
 
   Handle<View<flashgg::DiPhotonCandidate> > diPhotons;
   iEvent.getByToken(diPhotonToken_,diPhotons);
@@ -174,6 +191,8 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
   Handle<double> objs_rho;
   iEvent.getByLabel("fixedGridRhoAll",objs_rho);
 
+  Handle<vector<flashgg::GenPhotonExtra> > genPhotonsHandle;
+  iEvent.getByToken(genPhotonExtraToken_,genPhotonsHandle);
 
   // to recompute not-zero-suppressed cluster shapes 
   noZS::EcalClusterLazyTools *lazyToolnoZS = new noZS::EcalClusterLazyTools(iEvent, iSetup, ecalHitEBToken_, ecalHitEEToken_);
@@ -220,6 +239,91 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
   
   // analysis cuts: trigger (chiara: qualcosa per emulare?)
   
+
+  // to study photonID efficiency
+  int effClass = -1;
+  int effDiphoIndex = -1;
+  if (sampleID>0 && dipho.size()>0 && wantId) {   
+
+    xsecForEff = totXsec;
+
+    for (unsigned int diphotonlooper = 0; diphotonlooper < dipho.size() ; diphotonlooper++){
+      
+      // kinematics
+      if (dipho[diphotonlooper]->leadingPhoton()->et()<200)    continue;
+      if (dipho[diphotonlooper]->subLeadingPhoton()->et()<200) continue;
+      if (dipho[diphotonlooper]->mass()<500) continue;
+
+      // MC truth
+      bool genmatch1eff = 0;
+      bool genmatch2eff = 0;
+
+      const auto & genPhotons = *genPhotonsHandle;
+      for (unsigned int j = 0 ; j < genPhotons.size() ; j++) {
+        auto igen = genPhotons[j].ptr();
+	if( igen->status() != 1 || igen->pdgId() != 22 ) continue; 
+	float deta = dipho[diphotonlooper]->leadingPhoton()->eta() - igen->eta();
+	float dphi = deltaPhi(dipho[diphotonlooper]->leadingPhoton()->phi(),igen->phi());
+	float dr = sqrt(deta*deta + dphi*dphi);
+	float pt_change = (dipho[diphotonlooper]->leadingPhoton()->et() - igen->et())/igen->et();
+	if (dr<0.3 && fabs(pt_change) < 0.5){
+	  auto & extra = genPhotons[j];
+	  float genIso = extra.genIso();
+	  if (genIso<10) {
+	    genmatch1eff = 1;  // we want the matched gen photon to be isolated at gen level
+	    break;
+	  }
+	}
+      }
+      for (unsigned int j = 0 ; j < genPhotons.size() ; j++) {
+        auto igen = genPhotons[j].ptr();
+	if( igen->status() != 1 || igen->pdgId() != 22 ) continue; 
+	float deta = dipho[diphotonlooper]->subLeadingPhoton()->eta() - igen->eta();
+	float dphi = deltaPhi(dipho[diphotonlooper]->subLeadingPhoton()->phi(),igen->phi());
+	float dr = sqrt(deta*deta + dphi*dphi);
+	float pt_change = (dipho[diphotonlooper]->subLeadingPhoton()->et() - igen->et())/igen->et();
+	if (dr<0.3 && fabs(pt_change) < 0.5) {
+	  auto & extra = genPhotons[j];
+          float genIso = extra.genIso();
+          if (genIso<10) {
+	    genmatch2eff = 1;  // we want the matched gen photon to be isolated at gen level
+	    break;
+	  }
+	}
+      }
+      
+      if (!genmatch1eff) continue;
+      if (!genmatch2eff) continue;
+
+      effDiphoIndex = diphotonlooper;
+      break;
+    }
+    
+    if(effDiphoIndex>=0) { 
+      
+      float scetaL = (dipho[effDiphoIndex]->leadingPhoton()->superCluster())->eta();
+      float scetaS = (dipho[effDiphoIndex]->subLeadingPhoton()->superCluster())->eta();
+      float maxEta = fabs(scetaL);
+      if (fabs(scetaS)>fabs(scetaL)) maxEta = fabs(scetaS);
+      
+      float r9L = lazyToolnoZS->e3x3(*(dipho[effDiphoIndex]->leadingPhoton()->superCluster()->seed())) / dipho[effDiphoIndex]->leadingPhoton()->superCluster()->rawEnergy();
+      float r9S = lazyToolnoZS->e3x3(*(dipho[effDiphoIndex]->subLeadingPhoton()->superCluster()->seed())) / dipho[effDiphoIndex]->subLeadingPhoton()->superCluster()->rawEnergy();
+      float minR9 = r9S;
+      if ( r9L<r9S ) minR9 = r9L;
+      
+      if (maxEta<1.5 && minR9>0.94) effClass = 0;
+      else if (maxEta<1.5 && minR9<0.94) effClass = 1;
+      else if (maxEta>1.5 && minR9>0.94) effClass = 2;
+      else if (maxEta>1.5 && minR9<0.94) effClass = 3;
+
+      if (effClass==0)      h_denom0 -> Fill( dipho[effDiphoIndex]->mass() );
+      else if (effClass==1) h_denom1 -> Fill( dipho[effDiphoIndex]->mass() );
+      else if (effClass==2) h_denom2 -> Fill( dipho[effDiphoIndex]->mass() );
+      else if (effClass==3) h_denom3 -> Fill( dipho[effDiphoIndex]->mass() );
+    }
+  }
+
+
   // Diphoton candidates before any selection
   if (dipho.size()>0) {
 
@@ -227,30 +331,44 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
     vector<int> preselDipho;
     for (unsigned int diphotonlooper = 0; diphotonlooper < dipho.size() ; diphotonlooper++){
       
+      float leadScEta  = (dipho[diphotonlooper]->leadingPhoton()->superCluster())->eta();         
       float leadPt     = dipho[diphotonlooper]->leadingPhoton()->et();
       float leadChIso  = dipho[diphotonlooper]->leadingPhoton()->egChargedHadronIso();
       float leadR9noZS = lazyToolnoZS->e3x3(*(dipho[diphotonlooper]->leadingPhoton()->superCluster()->seed())) / dipho[diphotonlooper]->leadingPhoton()->superCluster()->rawEnergy();
-      bool leadPresel  = isGammaPresel( leadPt, leadR9noZS, leadChIso); 
-      
+      bool leadPresel  = isGammaPresel( leadScEta, leadPt, leadR9noZS, leadChIso); 
+
+      float subleadScEta  = (dipho[diphotonlooper]->subLeadingPhoton()->superCluster())->eta();               
       float subleadPt     = dipho[diphotonlooper]->subLeadingPhoton()->et();
       float subleadChIso  = dipho[diphotonlooper]->subLeadingPhoton()->egChargedHadronIso();
       float subleadR9noZS = lazyToolnoZS->e3x3(*(dipho[diphotonlooper]->subLeadingPhoton()->superCluster()->seed())) / dipho[diphotonlooper]->subLeadingPhoton()->superCluster()->rawEnergy();
-      bool subleadPresel  = isGammaPresel( subleadPt, subleadR9noZS, subleadChIso); 
-      if (!leadPresel || !subleadPresel) continue;
-      
+      bool subleadPresel  = isGammaPresel( subleadScEta, subleadPt, subleadR9noZS, subleadChIso); 
+      if (!leadPresel || !subleadPresel) continue;   
+
       preselDipho.push_back(diphotonlooper);
     }
 
     if (preselDipho.size()>0) {
       h_selection->Fill(1);  
-  
       
+      // to study photon id efficiency
+      if(effDiphoIndex>=0 && wantId) {
+	for (unsigned int diphotonlooper =0; diphotonlooper < preselDipho.size() ; diphotonlooper++){	
+	  int theDiphoton = preselDipho[diphotonlooper];
+	  if (theDiphoton == effDiphoIndex) {
+	    if (effClass==0) h_denomPlusPres0 -> Fill( dipho[effDiphoIndex]->mass() );
+	    else if (effClass==1) h_denomPlusPres1 -> Fill( dipho[effDiphoIndex]->mass() );
+	    else if (effClass==2) h_denomPlusPres2 -> Fill( dipho[effDiphoIndex]->mass() );
+	    else if (effClass==3) h_denomPlusPres3 -> Fill( dipho[effDiphoIndex]->mass() );
+	  }
+	}}
+
+
       // Diphoton candidates: Id/isolation selection
       vector<int> selectedDipho;
       for (unsigned int diphotonlooper =0; diphotonlooper < preselDipho.size() ; diphotonlooper++){
 	
 	int theDiphoton = preselDipho[diphotonlooper];
-	
+
 	std::vector<float> leadCovnoZS    = lazyToolnoZS->localCovariances(*(dipho[theDiphoton]->leadingPhoton()->superCluster()->seed())) ;
 	std::vector<float> subleadCovnoZS = lazyToolnoZS->localCovariances(*(dipho[theDiphoton]->subLeadingPhoton()->superCluster()->seed())) ;
 	
@@ -265,10 +383,11 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 	  subleadSieienoZS = sqrt (subleadCovnoZS[0]); 
 	else 
 	  continue;
+
 	float leadPt     = dipho[theDiphoton]->leadingPhoton()->et();
 	float leadScEta  = (dipho[theDiphoton]->leadingPhoton()->superCluster())->eta();   
 	float leadR9noZS = lazyToolnoZS->e3x3(*(dipho[theDiphoton]->leadingPhoton()->superCluster()->seed())) / dipho[theDiphoton]->leadingPhoton()->superCluster()->rawEnergy();
-	float leadHoE    = dipho[theDiphoton]->leadingPhoton()->hadronicOverEm();
+	float leadHoE    = dipho[theDiphoton]->leadingPhoton()->hadTowOverEm();
 	float leadChIso  = dipho[theDiphoton]->leadingPhoton()->egChargedHadronIso();
 	float leadNeuIso = dipho[theDiphoton]->leadingPhoton()->egNeutralHadronIso();
 	float leadPhoIso = dipho[theDiphoton]->leadingPhoton()->egPhotonIso();
@@ -277,19 +396,29 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 	float subleadPt     = dipho[theDiphoton]->subLeadingPhoton()->et();
 	float subleadScEta  = (dipho[theDiphoton]->subLeadingPhoton()->superCluster())->eta();   
 	float subleadR9noZS = lazyToolnoZS->e3x3(*(dipho[theDiphoton]->subLeadingPhoton()->superCluster()->seed())) / dipho[theDiphoton]->subLeadingPhoton()->superCluster()->rawEnergy();
-	float subleadHoE    = dipho[theDiphoton]->subLeadingPhoton()->hadronicOverEm();
+	float subleadHoE    = dipho[theDiphoton]->subLeadingPhoton()->hadTowOverEm();
 	float subleadChIso  = dipho[theDiphoton]->subLeadingPhoton()->egChargedHadronIso();
 	float subleadNeuIso = dipho[theDiphoton]->subLeadingPhoton()->egNeutralHadronIso();
 	float subleadPhoIso = dipho[theDiphoton]->subLeadingPhoton()->egPhotonIso();
 	bool  subleadSelel  = isGammaSelected( rho, subleadPt, subleadScEta, subleadR9noZS, subleadChIso, subleadNeuIso, subleadPhoIso, subleadHoE, subleadSieienoZS);  
-	if (!leadSelel || !subleadSelel) continue;
-	
+	if (!leadSelel || !subleadSelel) continue;  
+
 	selectedDipho.push_back(theDiphoton);    
       }
 
       if (selectedDipho.size()>0) {
 	h_selection->Fill(2);  
 
+	// to study photon id efficiency
+	if(effDiphoIndex>=0 && wantId) {
+	  for (unsigned int diphotonlooper =0; diphotonlooper < selectedDipho.size() ; diphotonlooper++){	
+	    int theDiphoton = selectedDipho[diphotonlooper];
+	    if (theDiphoton == effDiphoIndex) {
+	      if (effClass==0)      h_num0 -> Fill( dipho[effDiphoIndex]->mass() );
+	      else if (effClass==1) h_num1 -> Fill( dipho[effDiphoIndex]->mass() );
+	      else if (effClass==2) h_num2 -> Fill( dipho[effDiphoIndex]->mass() );
+	      else if (effClass==3) h_num3 -> Fill( dipho[effDiphoIndex]->mass() );
+	    }}}
 
 	// Diphoton candidates: pT
 	vector<int> kineDipho;
@@ -297,9 +426,9 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 	  
 	  int theDiphoton = selectedDipho[diphotonlooper];
 	  
-	  float leadPt     = dipho[theDiphoton]->leadingPhoton()->et();
-	  float subleadPt  = dipho[theDiphoton]->subLeadingPhoton()->et();
-	  if (leadPt<80 || subleadPt<80) continue;           // chiara: hardcoded
+	  float leadPt    = dipho[theDiphoton]->leadingPhoton()->et();
+	  float subleadPt = dipho[theDiphoton]->subLeadingPhoton()->et();
+	  if (leadPt<200 || subleadPt<200) continue;           // chiaraaaaaaaaaaa: hardcoded; era 80
 	  
 	  kineDipho.push_back(theDiphoton);
 	}
@@ -307,7 +436,8 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 	if (kineDipho.size()>0) {
 	  h_selection->Fill(3);
   
-	  
+	  // chiara: studiare il numero di candidati
+
 	  // Diphoton candidates choice
 	  // chiara: per il momento quello a pT del sistema piu' alto
 	  float maxDiphoPt = -999.;
@@ -324,7 +454,6 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 	  }
 	  
 	  if (candIndex<999) {
-	    h_selection->Fill(4);
 
 	    // analysis cuts: good vertex 
 	    // Since diphoton candidates have already an associated vtx, I check it only and discard the event if bad 
@@ -337,27 +466,32 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 	    if (fabs(vtxs[theVertex]->position().z())>=24) goodVtx = false;
 	    bool isVtxFake = (vtxs[theVertex]->ndof()==0) && (vtxs[theVertex]->chi2()==0);   // chiara: also && tracks.empty, but can not be used here
 	    if (isVtxFake) goodVtx = false;
+	    // chiara: studiare quanti sono e quante volte e' il primo
 
 	    if (goodVtx) {
-	      h_selection->Fill(5);	    
+	      h_selection->Fill(4);	    
 
 	      // to be kept in the tree
 	      float ptgg, mgg;
+	      int eventClass;
 	      float pt1, ptOverM1, eta1, phi1;
+	      float sceta1;
 	      float r91, sieie1, hoe1, scRawEne1;
 	      float chiso1, phoiso1, neuiso1;
 	      float pt2, ptOverM2, eta2, phi2;
+	      float sceta2;
 	      float r92, sieie2, hoe2, scRawEne2;
 	      float chiso2, phoiso2, neuiso2;
 	      int vtxIndex;
 	      float vtxX, vtxY, vtxZ;
 	      int genmatch1, genmatch2;
-	      float genVtxX, genVtxY, genVtxZ;   // chiara: vuoti
+	      float geniso1, geniso2;
+	      float genVtxX, genVtxY, genVtxZ;   // chiara: vuoti - poi andra' studiato quale matchea meglio
 	      
 	      
 	      // analysis cuts: mgg > 300  
-	      if (dipho[candIndex]->mass()>=300) {
-		h_selection->Fill(6);
+	      if (dipho[candIndex]->mass()>=500) {    // chiaraaaaaaaaaaaaaaaa: hardcoded. Era 300
+	 	h_selection->Fill(5);
 		
 		// fully selected event: tree re-initialization                                                                          
 		initTreeStructure();        
@@ -367,7 +501,7 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 		mgg  = dipho[candIndex]->mass();
 		
 		
-		//-------> individual photon properties, cominciamo con questi
+		//-------> individual photon properties
 		std::vector<float> leadCovnoZS = lazyToolnoZS->localCovariances(*(dipho[candIndex]->leadingPhoton()->superCluster()->seed())) ;
 		std::vector<float> subleadCovnoZS = lazyToolnoZS->localCovariances(*(dipho[candIndex]->subLeadingPhoton()->superCluster()->seed())) ;
 		
@@ -375,9 +509,10 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 		ptOverM1  = pt1/mgg;
 		eta1      = dipho[candIndex]->leadingPhoton()->eta();
 		phi1      = dipho[candIndex]->leadingPhoton()->phi();
+		sceta1    = (dipho[candIndex]->leadingPhoton()->superCluster())->eta();
 		r91       = lazyToolnoZS->e3x3(*(dipho[candIndex]->leadingPhoton()->superCluster()->seed())) / dipho[candIndex]->leadingPhoton()->superCluster()->rawEnergy();
 		sieie1    = sqrt(leadCovnoZS[0]);
-		hoe1      = dipho[candIndex]->leadingPhoton()->hadronicOverEm();
+		hoe1      = dipho[candIndex]->leadingPhoton()->hadTowOverEm();
 		scRawEne1 = dipho[candIndex]->leadingPhoton()->superCluster()->rawEnergy();
 		chiso1    = dipho[candIndex]->leadingPhoton()->egChargedHadronIso();
 		phoiso1   = dipho[candIndex]->leadingPhoton()->egPhotonIso();
@@ -387,13 +522,31 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 		ptOverM2  = pt2/mgg;
 		eta2      = dipho[candIndex]->subLeadingPhoton()->eta();
 		phi2      = dipho[candIndex]->subLeadingPhoton()->phi();
+		sceta2    = (dipho[candIndex]->subLeadingPhoton()->superCluster())->eta();
 		r92       = lazyToolnoZS->e3x3(*(dipho[candIndex]->subLeadingPhoton()->superCluster()->seed())) / dipho[candIndex]->subLeadingPhoton()->superCluster()->rawEnergy();;
 		sieie2    = sqrt(subleadCovnoZS[0]);
-		hoe2      = dipho[candIndex]->subLeadingPhoton()->hadronicOverEm();
+		hoe2      = dipho[candIndex]->subLeadingPhoton()->hadTowOverEm();
 		scRawEne2 = dipho[candIndex]->subLeadingPhoton()->superCluster()->rawEnergy();
 		chiso2    = dipho[candIndex]->subLeadingPhoton()->egChargedHadronIso();
 		phoiso2   = dipho[candIndex]->subLeadingPhoton()->egPhotonIso();
 		neuiso2   = dipho[candIndex]->subLeadingPhoton()->egNeutralHadronIso();
+
+
+		//-------> event class
+		float maxEta = sceta1;
+		if (fabs(sceta2)>fabs(sceta1)) maxEta = sceta2;
+		
+		float r91 = lazyToolnoZS->e3x3(*(dipho[candIndex]->leadingPhoton()->superCluster()->seed())) / dipho[candIndex]->leadingPhoton()->superCluster()->rawEnergy();
+		float r92 = lazyToolnoZS->e3x3(*(dipho[candIndex]->subLeadingPhoton()->superCluster()->seed())) / dipho[candIndex]->subLeadingPhoton()->superCluster()->rawEnergy();
+		float minR9 = r92;
+		if ( r91<r92 ) minR9 = r91;
+		
+		eventClass = -1;
+		if (fabs(maxEta)<1.5 && minR9>0.94) eventClass = 0;
+		else if (fabs(maxEta)<1.5 && minR9<0.94) eventClass = 1;
+		else if (fabs(maxEta)>1.5 && minR9>0.94) eventClass = 2;
+		else if (fabs(maxEta)>1.5 && minR9<0.94) eventClass = 3;
+
 		
 		//-------> vtx info
 		vtxIndex = dipho[candIndex]->vertex_index();
@@ -402,7 +555,7 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 		vtxZ= dipho[candIndex]->getVertex()->z();
 		
 		//-------> generated vtx info
-		// chiara: rigirare per accedere alla mc truth completa (check con Pasquale)
+		// chiara: rigirare per accedere alla mc truth completa
 		// controllare, ma dovrebbe esserci associata al diphoton (ma e' vuota)
 		/*
 		  genVtxX = 0.;
@@ -422,48 +575,60 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 		
 		//-------> photons, MC truth match
 		// chiara: se nel tree fossero ok basterebbe fare come le righe commentate sotto.
-		genmatch1 = 0;
-		genmatch2 = 0;
+		genmatch1 = -999;
+		genmatch2 = -999;
+		geniso1   = -999.;
+		geniso2   = -999.;
 		// genmatch1 = (dipho[candIndex]->leadingPhoton()->genMatchType() == Photon::kPrompt); 
 		// genmatch2 = (dipho[candIndex]->subLeadingPhoton()->genMatchType() == Photon::kPrompt); 
 		if (sampleID>0) {   
-		  for(vector<PackedGenParticle>::const_iterator igen=genGammas->begin(); igen!=genGammas->end(); ++igen) {
+
+		  const auto & genPhotons = *genPhotonsHandle;
+		  for (unsigned int j = 0 ; j < genPhotons.size() ; j++) {
+		    auto igen = genPhotons[j].ptr();
 		    if( igen->status() != 1 || igen->pdgId() != 22 ) continue; 
-		    // if( igen->motherRef()->pdgId() <= 25 ) {
 		    float deta = dipho[candIndex]->leadingPhoton()->eta() - igen->eta();
 		    float dphi = deltaPhi(dipho[candIndex]->leadingPhoton()->phi(),igen->phi());
 		    float dr = sqrt(deta*deta + dphi*dphi);
-		    float pt_change = (dipho[candIndex]->leadingPhoton()->et() - igen->et())/igen->et();
-		    if (dr<0.3 && fabs(pt_change) < 0.5) {
-		      genmatch1 = 1;
+		    if (dr<0.3) {
+		      genmatch1 = j;  
 		      break;
 		    }
-		    //}
 		  }
-		  for(vector<PackedGenParticle>::const_iterator igen=genGammas->begin(); igen!=genGammas->end(); ++igen) {
+		  if (genmatch1>=0) {
+		    auto & extra = genPhotons[genmatch1];
+		    geniso1 = extra.genIso();
+		  }
+
+		  for (unsigned int j = 0 ; j < genPhotons.size() ; j++) {
+		    auto igen = genPhotons[j].ptr();
 		    if( igen->status() != 1 || igen->pdgId() != 22 ) continue; 
-		    // if( igen->motherRef()->pdgId() <= 25 ) {
 		    float deta = dipho[candIndex]->subLeadingPhoton()->eta() - igen->eta();
 		    float dphi = deltaPhi(dipho[candIndex]->subLeadingPhoton()->phi(),igen->phi());
 		    float dr = sqrt(deta*deta + dphi*dphi);
-		    float pt_change = (dipho[candIndex]->subLeadingPhoton()->et() - igen->et())/igen->et();
-		    if (dr<0.3 && fabs(pt_change) < 0.5) {
-		      genmatch2 = 1;
+		    if (dr<0.3) {
+		      genmatch2 = j;  
 		      break;
 		    }
-		    //}
 		  }
-		  
+		  if (genmatch2>=0) {
+		    auto & extra = genPhotons[genmatch2];
+		    geniso2 = extra.genIso();
+		  }
+		
 		} // MC truth
 
 	      } else {    // if we could not find any diphoton candidate
 		
 		ptgg     = -999.;
 		mgg      = -999.;
+		eventClass = -999;
+
 		pt1      = -999.;
 		ptOverM1 = -999.;
 		eta1     = -999.;
 		phi1     = -999.;
+		sceta1   = -999.;
 		r91      = -999.;
 		sieie1   = -999.;
 		hoe1     = -999.;
@@ -476,6 +641,7 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 		ptOverM2 = -999.;
 		eta2     = -999.;
 		phi2     = -999.;
+		sceta2   = -999.;
 		r92      = -999.;
 		sieie2   = -999.;
 		hoe2     = -999.;
@@ -491,7 +657,9 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 		
 		genmatch1 = -999;
 		genmatch2 = -999;
-		
+		geniso1   = -999.; 
+		geniso2   = -999.; 
+
 		genVtxX = -999.;
 		genVtxY = -999.;
 		genVtxZ = -999.;
@@ -509,10 +677,12 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 	      treeDipho_.pu_n = pu_n;
 	      treeDipho_.ptgg = ptgg;
 	      treeDipho_.mgg = mgg;
+	      treeDipho_.eventClass = eventClass;
 	      treeDipho_.pt1 = pt1;
 	      treeDipho_.ptOverM1 = ptOverM1;
 	      treeDipho_.eta1 = eta1;
 	      treeDipho_.phi1 = phi1;
+	      treeDipho_.sceta1 = sceta1;
 	      treeDipho_.r91 = r91;
 	      treeDipho_.sieie1 = sieie1;
 	      treeDipho_.hoe1 = hoe1; 
@@ -524,6 +694,7 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 	      treeDipho_.ptOverM2 = ptOverM2;
 	      treeDipho_.eta2 = eta2;
 	      treeDipho_.phi2 = phi2;
+	      treeDipho_.sceta2 = sceta2;
 	      treeDipho_.r92 = r92;
 	      treeDipho_.sieie2 = sieie2;
 	      treeDipho_.hoe2 = hoe2; 
@@ -537,6 +708,8 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 	      treeDipho_.vtxZ = vtxZ;
 	      treeDipho_.genmatch1 = genmatch1; 
 	      treeDipho_.genmatch2 = genmatch2; 
+	      treeDipho_.geniso1 = geniso1; 
+	      treeDipho_.geniso2 = geniso2; 
 	      treeDipho_.genVtxX = genVtxX;
 	      treeDipho_.genVtxY = genVtxY;
 	      treeDipho_.genVtxZ = genVtxZ;
@@ -563,10 +736,38 @@ void DiPhoAnalyzer::beginJob() {
   
   // to keep track of the original number of events
   h_entries = fs_->make<TH1F>("h_entries", "h_entries", 10,  0., 10.);
+  h_entries->Sumw2();
 
   // for the event breakdown
-  h_selection = fs_->make<TH1F>("h_selection", "h_selection", 10, 0., 10.);
-  
+  h_selection = fs_->make<TH1F>("h_selection", "h_selection", 6, -0.5, 5.5);
+  h_selection->Sumw2();
+
+  // to study the photon ID efficiency
+  h_denom0         = fs_->make<TH1F>("h_denom0",         "h_denom0",         120, 0., 6000.);
+  h_denom1         = fs_->make<TH1F>("h_denom1",         "h_denom1",         120, 0., 6000.);
+  h_denom2         = fs_->make<TH1F>("h_denom2",         "h_denom2",         120, 0., 6000.);
+  h_denom3         = fs_->make<TH1F>("h_denom3",         "h_denom3",         120, 0., 6000.);
+  h_denomPlusPres0 = fs_->make<TH1F>("h_denomPlusPres0", "h_denomPlusPres0", 120, 0., 6000.);
+  h_denomPlusPres1 = fs_->make<TH1F>("h_denomPlusPres1", "h_denomPlusPres1", 120, 0., 6000.);
+  h_denomPlusPres2 = fs_->make<TH1F>("h_denomPlusPres2", "h_denomPlusPres2", 120, 0., 6000.);
+  h_denomPlusPres3 = fs_->make<TH1F>("h_denomPlusPres3", "h_denomPlusPres3", 120, 0., 6000.);
+  h_num0           = fs_->make<TH1F>("h_num0",           "h_num0",           120, 0., 6000.);
+  h_num1           = fs_->make<TH1F>("h_num1",           "h_num1",           120, 0., 6000.);
+  h_num2           = fs_->make<TH1F>("h_num2",           "h_num2",           120, 0., 6000.);
+  h_num3           = fs_->make<TH1F>("h_num3",           "h_num3",           120, 0., 6000.);
+  h_denom0->Sumw2();
+  h_denom1->Sumw2();
+  h_denom2->Sumw2();
+  h_denom3->Sumw2();
+  h_denomPlusPres0->Sumw2();
+  h_denomPlusPres1->Sumw2();
+  h_denomPlusPres2->Sumw2();
+  h_denomPlusPres3->Sumw2();
+  h_num0->Sumw2();
+  h_num1->Sumw2();
+  h_num2->Sumw2();
+  h_num3->Sumw2();
+
   // Trees
   DiPhotonTree = fs_->make<TTree>("DiPhotonTree","di-photon tree");
 
@@ -582,10 +783,12 @@ void DiPhoAnalyzer::beginJob() {
   DiPhotonTree->Branch("pu_n",&(treeDipho_.pu_n),"pu_n/F");
   DiPhotonTree->Branch("ptgg",&(treeDipho_.ptgg),"ptgg/F");
   DiPhotonTree->Branch("mgg",&(treeDipho_.mgg),"mgg/F");
+  DiPhotonTree->Branch("eventClass",&(treeDipho_.eventClass),"eventClass/I");
   DiPhotonTree->Branch("pt1",&(treeDipho_.pt1),"pt1/F");
   DiPhotonTree->Branch("ptOverM1",&(treeDipho_.ptOverM1),"ptOverM1/F");
   DiPhotonTree->Branch("eta1",&(treeDipho_.eta1),"eta1/F");
   DiPhotonTree->Branch("phi1",&(treeDipho_.phi1),"phi1/F");
+  DiPhotonTree->Branch("sceta1",&(treeDipho_.sceta1),"sceta1/F");
   DiPhotonTree->Branch("r91",&(treeDipho_.r91),"r91/F");
   DiPhotonTree->Branch("sieie1",&(treeDipho_.sieie1),"sieie1/F");
   DiPhotonTree->Branch("hoe1",&(treeDipho_.hoe1),"hoe1/F");
@@ -597,6 +800,7 @@ void DiPhoAnalyzer::beginJob() {
   DiPhotonTree->Branch("ptOverM2",&(treeDipho_.ptOverM2),"ptOverM2/F");
   DiPhotonTree->Branch("eta2",&(treeDipho_.eta2),"eta2/F");
   DiPhotonTree->Branch("phi2",&(treeDipho_.phi2),"phi2/F");
+  DiPhotonTree->Branch("sceta2",&(treeDipho_.sceta2),"sceta2/F");
   DiPhotonTree->Branch("r92",&(treeDipho_.r92),"r92/F");
   DiPhotonTree->Branch("sieie2",&(treeDipho_.sieie2),"sieie2/F");
   DiPhotonTree->Branch("hoe2",&(treeDipho_.hoe2),"hoe2/F");
@@ -606,6 +810,8 @@ void DiPhoAnalyzer::beginJob() {
   DiPhotonTree->Branch("neuiso2",&(treeDipho_.neuiso2),"neuiso2/F");
   DiPhotonTree->Branch("genmatch1",&(treeDipho_.genmatch1),"genmatch1/I");
   DiPhotonTree->Branch("genmatch2",&(treeDipho_.genmatch2),"genmatch12/I");
+  DiPhotonTree->Branch("geniso1",&(treeDipho_.geniso1),"geniso1/F");
+  DiPhotonTree->Branch("geniso2",&(treeDipho_.geniso2),"geniso2/F");
   DiPhotonTree->Branch("vtxIndex",&(treeDipho_.vtxIndex),"vtxIndex/I");
   DiPhotonTree->Branch("vtxX",&(treeDipho_.vtxX),"vtxX/F");
   DiPhotonTree->Branch("vtxY",&(treeDipho_.vtxY),"vtxY/F");
@@ -617,6 +823,30 @@ void DiPhoAnalyzer::beginJob() {
 
 void DiPhoAnalyzer::endJob() {
 
+  /*
+  // scaling efficiency plots with the correct weight
+  if(wantId) {
+    float theEntries = (float)h_entries->Integral();
+
+    h_denom0->Scale( xsecForEff / theEntries );
+    h_denomPlusPres0->Scale( xsecForEff / theEntries);
+    h_num0->Scale( xsecForEff / theEntries );
+
+    h_denom1->Scale( xsecForEff / theEntries );
+    h_denomPlusPres1->Scale( xsecForEff / theEntries);
+    h_num1->Scale( xsecForEff / theEntries );
+
+    h_denom2->Scale( xsecForEff / theEntries );
+    h_denomPlusPres2->Scale( xsecForEff / theEntries);
+    h_num2->Scale( xsecForEff / theEntries );
+
+    h_denom3->Scale( xsecForEff / theEntries );
+    h_denomPlusPres3->Scale( xsecForEff / theEntries);
+    h_num3->Scale( xsecForEff / theEntries );
+
+    h_selection->Scale( xsecForEff / theEntries );
+  }
+  */
 }
 
 void DiPhoAnalyzer::initTreeStructure() {
@@ -632,10 +862,12 @@ void DiPhoAnalyzer::initTreeStructure() {
   treeDipho_.pu_n = -500.;
   treeDipho_.ptgg = -500.;
   treeDipho_.mgg  = -500.;
+  treeDipho_.eventClass  = -500;
   treeDipho_.pt1  = -500.;
   treeDipho_.ptOverM1 = -500.;
   treeDipho_.eta1 = -500.;
   treeDipho_.phi1 = -500.;
+  treeDipho_.sceta1 = -500.;
   treeDipho_.r91  = -500.;
   treeDipho_.sieie1 = -500.;
   treeDipho_.hoe1   = -500.;
@@ -647,6 +879,7 @@ void DiPhoAnalyzer::initTreeStructure() {
   treeDipho_.ptOverM2 = -500.;
   treeDipho_.eta2 = -500.;
   treeDipho_.phi2 = -500.;
+  treeDipho_.sceta2 = -500.;
   treeDipho_.r92  = -500.;
   treeDipho_.sieie2 = -500.;
   treeDipho_.hoe2   = -500.;
@@ -660,6 +893,8 @@ void DiPhoAnalyzer::initTreeStructure() {
   treeDipho_.vtxZ = -500.;
   treeDipho_.genmatch1 = -500;
   treeDipho_.genmatch2 = -500;
+  treeDipho_.geniso1 = -500.;
+  treeDipho_.geniso2 = -500.;
   treeDipho_.genVtxX = -500.;
   treeDipho_.genVtxY = -500.;
   treeDipho_.genVtxZ = -500.;
@@ -709,31 +944,36 @@ float DiPhoAnalyzer::GetPUWeight(float pun) {
   return weight;
 }
 
-// AOD preselection
-bool DiPhoAnalyzer::isGammaPresel( float pt, float r9, float chiso) {
+// miniAOD preselection + ECAL acceptance
+bool DiPhoAnalyzer::isGammaPresel( float sceta, float pt, float r9, float chiso) {
 
   bool isPresel = false;
-  if (r9>0.8)         isPresel = true;
-  if (chiso<20)       isPresel = true;
-  if ((chiso/pt)<0.3) isPresel = true;
 
+  // ECAL good acceptance
+  if (fabs(sceta)>2.5) return false;
+  if (fabs(sceta)>1.4442 && fabs(sceta)<1.566) return false;
+  
+  // miniAOD preselection
+  if (r9>0.8)         return true;
+  if (chiso<20)       return true;
+  if ((chiso/pt)<0.3) return true;
+  
   return isPresel;
 }
 
-// chiara: still to be fully defined
 bool DiPhoAnalyzer::isGammaSelected( float rho, float pt, float sceta, float r9, float chiso, float nhiso, float phoiso, float hoe, float sieie) {
-  
+
   // classes: 0 = EB highR9, 1 = EB low R9, 2 = EE high R9, 3 = EE lowR9
   int etaclass = fabs(sceta)>1.5;
   int r9class  = r9<0.94;                   
   int theclass = 2.*etaclass + r9class;                  
 
   // cuts - hardcoded
-  float chiso_cut[4]  = { 5.95, 7.08, 6.10, 5.07 };
-  float phoiso_cut[4] = { 2.87, 5.47, 5.98, 3.44 };
-  float nhiso_cut[4]  = { 27.4, 30.0, 30.0, 15.0 };   
-  float sieie_cut[4]  = { 1.05e-02, 1.05e-02, 2.8e-02, 2.8e-02 };
-  float hoe_cut[4]    = { 4.53e-01, 2.10e-01, 6.3e-02, 7.8e-02 };
+  float chiso_cut[4]  = { 5.95, 7.08, 6.10, 5.07 };     
+  float phoiso_cut[4] = { 2.87, 5.47, 5.98, 3.44 };  
+  float nhiso_cut[4]  = { 27.4, 30.0, 30.0, 15.0 };  
+  float sieie_cut[4]  = { 1.05e-02, 1.05e-02, 2.82e-02, 2.8e-02 };
+  float hoe_cut[4]    = { 4.53e-01, 2.12e-01, 6.3e-02, 7.8e-02 };
   
   // effective areas - hardcoded 
   float chIsoAE[5] = { 0.00,0.000,0.00,0.00,0.00 };
@@ -745,7 +985,7 @@ bool DiPhoAnalyzer::isGammaSelected( float rho, float pt, float sceta, float r9,
   float corrChIso = chiso - rho*chIsoAE[theEAregion];
   float corrPhIso = phoiso - rho*phIsoAE[theEAregion];
   float corrNhIso = nhiso - rho*nhIsoAE[theEAregion];   
-
+  
   if (corrChIso > chiso_cut[theclass])  return false;
   if (corrPhIso > phoiso_cut[theclass]) return false;
   if (corrNhIso > nhiso_cut[theclass])  return false;
