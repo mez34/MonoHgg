@@ -13,9 +13,9 @@
 #include <iostream>
 #endif
 
-enum samp { iRS, iGG, iGJets, nSamples };
+enum samp { iRS, iGJets, iGG, nSamples };
 
-float xPos[nSamples+1] = {0.22,0.22,0.22};
+float xPos[nSamples+1] = {0.70,0.70,0.70};
 float yOff[nSamples+1] = {0,1,2};
 
 const Float_t _tsize   = 0.03;
@@ -142,13 +142,13 @@ public:
     
     Color_t _sampleColor[nSamples];
     _sampleColor[iRS  ]  = kBlue+1;
-    _sampleColor[iGG   ] = kViolet-9;
-    _sampleColor[iGJets] = kGreen-9;
+    _sampleColor[iGJets ] = kViolet-9;
+    _sampleColor[iGG    ] = kGreen-9;
 
     Color_t _lineColor[nSamples];
     _lineColor[iRS  ]  = kBlue+1;
-    _lineColor[iGG   ] = kViolet;   
-    _lineColor[iGJets] = kGreen;
+    _lineColor[iGJets] = kViolet;   
+    _lineColor[iGG   ] = kGreen;
     
     if(!gPad) new TCanvas();
     
@@ -205,8 +205,10 @@ public:
     }
 
     if (gPad->GetLogy()) {
-      hstack->SetMaximum(500 * theMax);
-      hstack->SetMinimum(0.05);
+      // hstack->SetMaximum(500 * theMax);
+      // if (hstack->GetMinimum()==0) hstack->SetMinimum(0.05);   
+      hstack->SetMaximum(1.2 * theMax);
+      if (hstack->GetMinimum()==0) hstack->SetMinimum(0.00005);   // chiara
     } else {
       hstack->SetMaximum(1.55 * theMax);
     }
@@ -235,7 +237,8 @@ public:
     if(_hist[iGG   ]) { DrawLegend(xPos[j], 0.84 - yOff[j]*_yoffset, _hist[iGG   ], " gg",      "f" ); j++; }
     if(_hist[iGJets]) { DrawLegend(xPos[j], 0.84 - yOff[j]*_yoffset, _hist[iGJets], " g+jets",  "f" ); j++; }
 
-    TLatex* luminosity = new TLatex(0.9, 0.815, TString::Format("L = %.1f fb^{-1}",_lumi));
+    // TLatex* luminosity = new TLatex(0.9, 0.815, TString::Format("L = %.1f pb^{-1}",_lumi));
+    TLatex* luminosity = new TLatex(0.9, 0.715, TString::Format("L = %.1f pb^{-1}",_lumi));
     luminosity->SetNDC();
     luminosity->SetTextAlign(32);
     luminosity->SetTextFont(42);
