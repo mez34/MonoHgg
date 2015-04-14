@@ -13,7 +13,7 @@
 #include <iostream>
 
 #define NSPECIES 3
-#define NVARIABLES 4
+#define NVARIABLES 1
 #define NCUTS 5
 
 void makeMCPlots(float lumi, int signalFactor=1)
@@ -24,7 +24,6 @@ void makeMCPlots(float lumi, int signalFactor=1)
   gStyle->SetOptStat(0); 
   gStyle->SetOptFit(111110); 
   gStyle->SetOptFile(1); 
-  //  gStyle->SetOptTitle(0); 
   
   gStyle->SetMarkerStyle(20);
   gStyle->SetMarkerSize(1.0);
@@ -45,9 +44,9 @@ void makeMCPlots(float lumi, int signalFactor=1)
 
   // chiara
   TString files[NSPECIES];
-  files[0]="data/mergedFinal/RSGravToGG_kMpl-01_M-1500.root";
-  files[1]="data/mergedFinal/GJets.root";
-  files[2]="data/mergedFinal/GGJets.root";
+  files[0]="data/fullSel/mergedFinal/RSGravToGG_kMpl-01_M-1500.root";
+  files[1]="data/fullSel/mergedFinal/GJets.root";
+  files[2]="data/fullSel/mergedFinal/GGJets.root";
 
   TString plotsDir="./diphotPlots/";
 
@@ -59,10 +58,10 @@ void makeMCPlots(float lumi, int signalFactor=1)
   // chiara
   TString variables[NVARIABLES];
   variables[0]="mgg";
+  /*
   variables[1]="ptgg";
   variables[2]="pt1";
   variables[3]="pt2";
-  /*
   variables[4]="eta1";
   variables[5]="eta2";
   variables[6]="r91";
@@ -72,10 +71,10 @@ void makeMCPlots(float lumi, int signalFactor=1)
   // chiara
   TString units[NVARIABLES];
   units[0]="GeV/c^{2}";
+  /*
   units[1]="GeV/c";
   units[2]="GeV/c";
   units[3]="GeV/c";
-  /*
   units[4]="";
   units[5]="";
   units[6]="";
@@ -84,11 +83,11 @@ void makeMCPlots(float lumi, int signalFactor=1)
 
   // chiara
   int nbins[NVARIABLES];
-  nbins[0]=120;
+  nbins[0]=60;
+  /*
   nbins[1]=50;
   nbins[2]=50;
   nbins[3]=50;
-  /*
   nbins[4]=50;
   nbins[5]=50;
   nbins[6]=20;
@@ -100,6 +99,7 @@ void makeMCPlots(float lumi, int signalFactor=1)
   // mgg
   range[0][0]=0.;
   range[0][1]=6000.;
+  /*
   // ptgg
   range[1][0]=0.;
   range[1][1]=3000.;
@@ -109,7 +109,6 @@ void makeMCPlots(float lumi, int signalFactor=1)
   // pt2
   range[3][0]=0.;
   range[3][1]=1000.;
-  /*
   // eta1
   range[4][0]=-3.;
   range[4][1]=3.;
@@ -127,10 +126,10 @@ void makeMCPlots(float lumi, int signalFactor=1)
   // chiara
   TString xaxisLabel[NVARIABLES];
   xaxisLabel[0]="m(#gamma#gamma)";
+  /*
   xaxisLabel[1]="p_{T}(#gamma #gamma)";
   xaxisLabel[2]="p_{T}(#gamma1)";
   xaxisLabel[3]="p_{T}(#gamma2)";
-  /*
   xaxisLabel[4]="#eta(#gamma1)";
   xaxisLabel[5]="#eta(#gamma2)";
   xaxisLabel[6]="R9(#gamma1)";
@@ -156,10 +155,10 @@ void makeMCPlots(float lumi, int signalFactor=1)
   // chiara
   TString cut[NCUTS];
   cut[0]="(pt1>200 && pt2>200 && mgg>500)*";
-  cut[1]="(pt1>200 && pt2>200 && mgg>500 && abs(eta1)<1.5 && abs(eta2)<1.5 && r91>0.94 && r92>0.94)*";
-  cut[2]="(pt1>200 && pt2>200 && mgg>500 && abs(eta1)<1.5 && abs(eta2)<1.5 && (r91<0.94 || r92<0.94))*";
-  cut[3]="(pt1>200 && pt2>200 && mgg>500 && (abs(eta1)>1.5 || abs(eta2)>1.5) && r91>0.94 && r92>0.94)*";
-  cut[4]="(pt1>200 && pt2>200 && mgg>500 && (abs(eta1)>1.5 || abs(eta2)>1.5) && (r91<0.94 || r92<0.94))*";
+  cut[1]="(pt1>200 && pt2>200 && mgg>500 && eventClass==0)*";
+  cut[2]="(pt1>200 && pt2>200 && mgg>500 && eventClass==1)*";
+  cut[3]="(pt1>200 && pt2>200 && mgg>500 && eventClass==2)*";
+  cut[4]="(pt1>200 && pt2>200 && mgg>500 && eventClass==3)*";
 
   char lumistr[5];
   sprintf(lumistr,"%.1f",lumi);
@@ -185,7 +184,6 @@ void makeMCPlots(float lumi, int signalFactor=1)
 	  return;
 	}
 	T1[i]->Project(histoName,variables[z],cut[j]+"weight*"+intLumi);
-	// T1[i]->Project(histoName,variables[z],cut[j]+"weight");
 	std::cout << "Done " << histoName << std::endl;
       }
           
@@ -194,10 +192,9 @@ void makeMCPlots(float lumi, int signalFactor=1)
       myPlot.addLabel("");
       myPlot.setLabel((xaxisLabel[z]).Data());
       myPlot.setUnits((units[z]).Data());
-      myPlot.setMCHist(iGG,    histos[1][j][z]);
-      myPlot.setMCHist(iGJets,  histos[2][j][z]);
-      // myPlot.setMCHist(iRS,    histos[0][j][z]);
-      
+      myPlot.setMCHist(iGJets, histos[1][j][z]);
+      myPlot.setMCHist(iGG, histos[2][j][z]);
+      myPlot.setMCHist(iRS, histos[0][j][z]);
 
       // Draw
       //--------------------------------------------------------------------
