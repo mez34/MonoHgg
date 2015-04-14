@@ -14,10 +14,6 @@ void addWeights(const char* filename, float lumiForW) {
   TTree *treeOrig = 0;
   TH1F  *h_entries = 0;
   TH1F  *h_selection = 0;
-  TH1F  *h_denom0 = 0;
-  TH1F  *h_denom1 = 0;
-  TH1F  *h_denom2 = 0;
-  TH1F  *h_denom3 = 0;
   TH1F  *h_denomPlusPres0 = 0;
   TH1F  *h_denomPlusPres1 = 0;
   TH1F  *h_denomPlusPres2 = 0;
@@ -34,19 +30,15 @@ void addWeights(const char* filename, float lumiForW) {
     h_entries = (TH1F*)fileOrig->Get("diPhoAna/h_entries");
     h_selection = (TH1F*)fileOrig->Get("diPhoAna/h_selection");
 
-    h_denom0 = (TH1F*)fileOrig->Get("diPhoAna/h_denom0");
     h_denomPlusPres0 = (TH1F*)fileOrig->Get("diPhoAna/h_denomPlusPres0");
     h_num0 = (TH1F*)fileOrig->Get("diPhoAna/h_num0");
 
-    h_denom1 = (TH1F*)fileOrig->Get("diPhoAna/h_denom1");
     h_denomPlusPres1 = (TH1F*)fileOrig->Get("diPhoAna/h_denomPlusPres1");
     h_num1 = (TH1F*)fileOrig->Get("diPhoAna/h_num1");
 
-    h_denom2 = (TH1F*)fileOrig->Get("diPhoAna/h_denom2");
     h_denomPlusPres2 = (TH1F*)fileOrig->Get("diPhoAna/h_denomPlusPres2");
     h_num2 = (TH1F*)fileOrig->Get("diPhoAna/h_num2");
 
-    h_denom3 = (TH1F*)fileOrig->Get("diPhoAna/h_denom3");
     h_denomPlusPres3 = (TH1F*)fileOrig->Get("diPhoAna/h_denomPlusPres3");
     h_num3 = (TH1F*)fileOrig->Get("diPhoAna/h_num3");
 
@@ -110,6 +102,8 @@ void addWeights(const char* filename, float lumiForW) {
   Float_t         neuiso2;
   Int_t           genmatch1;
   Int_t           genmatch2;
+  Float_t         geniso1;
+  Float_t         geniso2;
   Int_t           vtxIndex;
   Float_t         vtxX;
   Float_t         vtxY;
@@ -157,6 +151,8 @@ void addWeights(const char* filename, float lumiForW) {
   TBranch        *b_neuiso2;   
   TBranch        *b_genmatch1; 
   TBranch        *b_genmatch2; 
+  TBranch        *b_geniso1; 
+  TBranch        *b_geniso2; 
   TBranch        *b_vtxIndex; 
   TBranch        *b_vtxX;
   TBranch        *b_vtxY;
@@ -204,6 +200,8 @@ void addWeights(const char* filename, float lumiForW) {
   treeOrig->SetBranchAddress("neuiso2", &neuiso2, &b_neuiso2);
   treeOrig->SetBranchAddress("genmatch1", &genmatch1, &b_genmatch1);
   treeOrig->SetBranchAddress("genmatch2", &genmatch2, &b_genmatch2);
+  treeOrig->SetBranchAddress("geniso1", &geniso1, &b_geniso1);
+  treeOrig->SetBranchAddress("geniso2", &geniso2, &b_geniso2);
   treeOrig->SetBranchAddress("vtxIndex", &vtxIndex, &b_vtxIndex);
   treeOrig->SetBranchAddress("vtxX", &vtxX, &b_vtxX);
   treeOrig->SetBranchAddress("vtxY", &vtxY, &b_vtxY);
@@ -215,6 +213,9 @@ void addWeights(const char* filename, float lumiForW) {
   // new variables to be added
   Float_t xsecWeight;
   Float_t weight;
+
+  // xsec to weight histos
+  Float_t xsecToWeight = 0.;
 
   for(int i=0; i<(int)trees.size();i++) {
     TTree *theTreeNew = trees[i];
@@ -262,6 +263,8 @@ void addWeights(const char* filename, float lumiForW) {
     theTreeNew->Branch("neuiso2", &neuiso2, "neuiso2/F");
     theTreeNew->Branch("genmatch1", &genmatch1, "genmatch1/I");
     theTreeNew->Branch("genmatch2", &genmatch2, "genmatch2/I");
+    theTreeNew->Branch("geniso1", &geniso1, "geniso1/F");
+    theTreeNew->Branch("geniso2", &geniso2, "geniso2/F");
     theTreeNew->Branch("vtxIndex", &vtxIndex, "vtxIndex/I");
     theTreeNew->Branch("vtxX", &vtxX, "vtxX/F");
     theTreeNew->Branch("vtxY", &vtxY, "vtxY/F");
@@ -275,7 +278,9 @@ void addWeights(const char* filename, float lumiForW) {
 
     if (i%10000 == 0) std::cout << ">>> Weighting event # " << i << " / " << nentriesOrig << " entries" << std::endl; 
     treeOrig->GetEntry(i);
-    
+   
+    if (i==0) xsecToWeight = totXsec;
+
     // new variables
     if (sampleID!=0) {
       xsecWeight = lumiForW * totXsec/sampleSize;             
@@ -289,13 +294,24 @@ void addWeights(const char* filename, float lumiForW) {
   }
 
   
+  // histos scaling with xsec to have the correct weight
+  float theEntries = (float)h_entries->Integral();                                                                                                           
+  cout << "using xsec " << xsecToWeight << " and " << theEntries << " entries " << endl;
+  h_denomPlusPres0->Scale( xsecToWeight / theEntries );     
+  h_denomPlusPres1->Scale( xsecToWeight / theEntries );     
+  h_denomPlusPres2->Scale( xsecToWeight / theEntries );     
+  h_denomPlusPres3->Scale( xsecToWeight / theEntries );     
+  h_num0->Scale( xsecToWeight / theEntries );     
+  h_num1->Scale( xsecToWeight / theEntries );     
+  h_num2->Scale( xsecToWeight / theEntries );     
+  h_num3->Scale( xsecToWeight / theEntries );     
+  h_selection->Scale( xsecToWeight / theEntries );
+
+
+  // new info
   fileNew->cd();
   h_entries->Write();
   h_selection->Write();
-  h_denom0->Write();
-  h_denom1->Write();
-  h_denom2->Write();
-  h_denom3->Write();
   h_denomPlusPres0->Write();  
   h_denomPlusPres1->Write();  
   h_denomPlusPres2->Write();  
