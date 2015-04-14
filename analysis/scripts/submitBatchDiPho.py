@@ -43,13 +43,13 @@ def main():
     xsection = args[4]
     kfactor = args[5]
 
-    inputlist="lists/"+dataset+".list"
+    inputlist="lists_prod4/"+dataset+".list"
     output = dataset
 
     print "the outputs will be in the directory: "+opt.prefix
 
     if opt.download=='pccmsrm':
-        diskoutputdir = "/cmsrm/pc25/crovelli/data/Exo/" 
+        diskoutputdir = "/cmsrm/pc29_2/crovelli/data/Exo/" 
     else: diskoutputdir = ''
     diskoutputmain = diskoutputdir+"/"+opt.prefix+"/"+output
 
@@ -60,7 +60,7 @@ def main():
     outputroot = diskoutputmain+"/root/"
 
     if (diskoutputdir != "none" and opt.download=='pccmsrm'):
-        os.system("ssh -o BatchMode=yes -o StrictHostKeyChecking=no pccmsrm25 mkdir -p "+diskoutputmain)   
+        os.system("ssh -o BatchMode=yes -o StrictHostKeyChecking=no pccmsrm29 mkdir -p "+diskoutputmain)   
 
 
     #look for the current directory
@@ -124,7 +124,7 @@ def main():
             outputfile.write('eval `scramv1 runtime -sh`\n')
             outputfile.write('cd $WORKDIR\n')
             outputfile.write(opt.application+' '+icfgfilename+' \n')
-            if(opt.download=='pccmsrm'): outputfile.write('ls *.root | xargs -i scp -o BatchMode=yes -o StrictHostKeyChecking=no {} pccmsrm25:'+diskoutputmain+'/{}\n')
+            if(opt.download=='pccmsrm'): outputfile.write('ls *.root | xargs -i scp -o BatchMode=yes -o StrictHostKeyChecking=no {} pccmsrm29:'+diskoutputmain+'/{}\n')
             if(opt.eos!=''): outputfile.write('ls *.root | grep -v histProbFunction | xargs -i xrdcp {} root://eoscms/'+opt.eos+'/\n')
             outputfile.close
             logfile = opt.prefix+"/"+output+"/log/"+output+"_"+str(ijob)+".log"
