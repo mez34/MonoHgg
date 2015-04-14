@@ -1,12 +1,14 @@
 #define singleGammaPlots_cxx
 #include "singleGammaPlots.h"
 #include <TH2.h>
+#include <TProfile2D.h>
 #include <TStyle.h>
 #include <TCanvas.h>
+#include <TLine.h>
 #include <TLegend.h>
 #include <TProfile.h>
 #include <TGraphAsymmErrors.h>
-#include <iostream.h> 
+#include <iostream> 
 
 using namespace std;
 
@@ -289,6 +291,19 @@ void singleGammaPlots::Loop()
   H_trueET_okNhIso_EE->Sumw2();
 
 
+  // booking histos: E/Etrue maps 
+  TProfile2D *mapEB_EoEtrue = new TProfile2D("mapEB_EoEtrue", "mapEB, E/Etrue",360,0.,360.,170,-85.,85.);
+  mapEB_EoEtrue->GetYaxis()->SetTitle("eta index") ;
+  mapEB_EoEtrue->GetXaxis()->SetTitle("phi index") ;
+
+  TProfile2D *mapEEP_EoEtrue = new TProfile2D("mapEEP_EoEtrue", "mapEEP, E/Etrue", 100, 0., 100., 100, 0., 100.); 
+  TProfile2D *mapEEM_EoEtrue = new TProfile2D("mapEEM_EoEtrue", "mapEEM, E/Etrue", 100, 0., 100., 100, 0., 100.);
+  mapEEP_EoEtrue->GetYaxis()->SetTitle("Y") ;
+  mapEEP_EoEtrue->GetXaxis()->SetTitle("X") ;
+  mapEEM_EoEtrue->GetYaxis()->SetTitle("Y") ;
+  mapEEM_EoEtrue->GetXaxis()->SetTitle("X") ;
+
+
   // loop over entries
   for (Long64_t jentry=0; jentry<nentries;jentry++) {
     Long64_t ientry = LoadTree(jentry);
@@ -307,43 +322,22 @@ void singleGammaPlots::Loop()
     if (fabs(supercluster_scEta)>2.5) continue;
     if (fabs(supercluster_scEta)>1.4442 &&fabs(supercluster_scEta)<1.566) continue;
 
-    // if (identification_r9<0.9) continue;
+    // if (identificationNoZS_r9noZS<0.9) continue;
 
 
     // extended eta gaps for H/E studies
     // default is 1 xtal only, we remove 2.5 per side
     bool inExtEBEtaGap = false;
-    int ieta = abs(kinematics_iEta);
+    int ieta = abs(tree5x5_ieta[12]);
+    // int ieta = abs(kinematics_iEta);
     if ( ieta==0 ||  ieta==1 ||  ieta==2 ||  
 	 ieta==23 || ieta==24 || ieta==25 || ieta==26 || ieta==27 || 
 	 ieta==43 || ieta==44 || ieta==45 || ieta==46 || ieta==47 ||
 	 ieta==63 || ieta==64 || ieta==65 || ieta==66 || ieta==67 ||
 	 ieta==83 || ieta==84 || ieta==85) inExtEBEtaGap = true;
 
-    // default is 1 xtal per side only, we remove 2 per side    
+    // default is 1 xtal per side only
     bool inExtEBPhiGap = false;
-    /*
-    int iphi = abs(kinematics_iPhi);
-    if (iphi==0 || iphi==1 ||
-	iphi== 18 || iphi== 19 ||  iphi==20 ||  iphi==21 || iphi==22  ||  iphi==23  ||  
-	iphi== 38 || iphi== 39 ||  iphi==40 ||  iphi==41 || iphi==42  ||  iphi==43  ||  
-	iphi== 58 || iphi== 59 ||  iphi==60 ||  iphi==61 || iphi==62  ||  iphi==63  ||  
-	iphi== 78 || iphi== 79 ||  iphi==80 ||  iphi==81 || iphi==82  ||  iphi==83  ||  
-	iphi== 98 || iphi== 99 || iphi==100 || iphi==101 || iphi==102 ||  iphi==103 ||  
-	iphi==118 || iphi==119 || iphi==120 || iphi==121 || iphi==122 ||  iphi==123 ||  
-	iphi==138 || iphi==139 || iphi==140 || iphi==141 || iphi==142 ||  iphi==143 ||  
-	iphi==158 || iphi==159 || iphi==160 || iphi==161 || iphi==162 ||  iphi==163 ||  
-	iphi==178 || iphi==179 || iphi==180 || iphi==181 || iphi==182 ||  iphi==183 ||  
-	iphi==198 || iphi==199 || iphi==200 || iphi==201 || iphi==202 ||  iphi==203 ||  
-	iphi==218 || iphi==219 || iphi==220 || iphi==221 || iphi==222 ||  iphi==223 ||  
-	iphi==238 || iphi==239 || iphi==240 || iphi==241 || iphi==242 ||  iphi==243 ||  
-	iphi==258 || iphi==259 || iphi==260 || iphi==261 || iphi==262 ||  iphi==263 ||  
-	iphi==278 || iphi==279 || iphi==280 || iphi==281 || iphi==282 ||  iphi==283 ||  
-	iphi==298 || iphi==299 || iphi==300 || iphi==301 || iphi==302 ||  iphi==303 ||  
-	iphi==318 || iphi==319 || iphi==320 || iphi==321 || iphi==322 ||  iphi==323 ||  
-	iphi==338 || iphi==339 || iphi==340 || iphi==341 || iphi==342 ||  iphi==343 ||  
-	iphi==358 || iphi==359 || iphi==360 ) inExtEBPhiGap = true;
-    */
 
     // filling histos
 
@@ -370,6 +364,7 @@ void singleGammaPlots::Loop()
       float theH = identification_htoe*energy_energy;
       P_HvsScEta -> Fill(supercluster_scEta,theH);
       P_HvsScPhi -> Fill(supercluster_scPhi,theH);
+
 
       // same but removing (extended) gaps
       if (!kinematics_isEBEtaGap && !kinematics_isEBPhiGap && 
@@ -401,13 +396,20 @@ void singleGammaPlots::Loop()
     // EB / EE
     if (fabs(kinematics_eta)<1.5) {
 
+      float thisEtaFill=-500;
+      float thisPhiFill=tree5x5_iphi[12]-0.5;
+      if (tree5x5_ieta[12]>0) thisEtaFill = tree5x5_ieta[12]-0.5;     
+      if (tree5x5_ieta[12]<0) thisEtaFill = tree5x5_ieta[12];   
+
       H_pt_EB  -> Fill(kinematics_pt);
       
       // energy studies
-      H_E25OverEtrue_EB -> Fill(energy_e5x5/mctruth_trueEnergy);
+      cout << identificationNoZS_e5x5noZS/mctruth_trueEnergy << endl;
+      H_E25OverEtrue_EB -> Fill(identificationNoZS_e5x5noZS/mctruth_trueEnergy);
       H_EneOverEtrue_EB -> Fill(energy_energy/mctruth_trueEnergy);
-      P_E25OverEtrueVsETtrue_EB -> Fill(mctruth_truePt, (energy_e5x5/mctruth_trueEnergy));
+      P_E25OverEtrueVsETtrue_EB -> Fill(mctruth_truePt, (identificationNoZS_e5x5noZS/mctruth_trueEnergy));
       P_EneOverEtrueVsETtrue_EB -> Fill(mctruth_truePt, (energy_energy/mctruth_trueEnergy));
+      mapEB_EoEtrue -> Fill(thisPhiFill, thisEtaFill, (energy_energy/mctruth_trueEnergy));
 
       // H/E cut efficiency studies
       H_trueET_EB -> Fill(mctruth_truePt);
@@ -439,7 +441,7 @@ void singleGammaPlots::Loop()
 	if (identification_hoe<0.05)  okHoE_totalEB_noGap++;
 	if (identification_htoe<0.05) okHoET_totalEB_noGap++;
 
-	if (identification_r9>0.9){ 
+	if (identificationNoZS_r9noZS>0.9){ 
 	  totalEB_noGap_highR9++;
 	  if (identification_hoe<0.05)  okHoE_totalEB_noGap_highR9++;
 	  if (identification_htoe<0.05) okHoET_totalEB_noGap_highR9++;
@@ -447,7 +449,7 @@ void singleGammaPlots::Loop()
       }
 
       // 2012 loose photon ID. chiara, da capire che cono e' (ci vorrebbe 0.3)
-      if (identification_sigmaIetaIeta<0.012)          H_trueET_okSee_EB   -> Fill(mctruth_truePt);
+      if (identificationNoZS_sieienoZS<0.012)          H_trueET_okSee_EB   -> Fill(mctruth_truePt);
       if (correctedChIso<2.6)                          H_trueET_okChIso_EB -> Fill(mctruth_truePt);
       if (correctedNIso<(3.5 + 0.04*kinematics_pt))    H_trueET_okNhIso_EB -> Fill(mctruth_truePt);
 
@@ -456,10 +458,13 @@ void singleGammaPlots::Loop()
       H_pt_EE  -> Fill(kinematics_pt);
       
       // energy studies
-      H_E25OverEtrue_EE  -> Fill(energy_e5x5/mctruth_trueEnergy);
+      H_E25OverEtrue_EE  -> Fill(identificationNoZS_e5x5noZS/mctruth_trueEnergy);
       H_EneOverEtrue_EE  -> Fill(energy_energy/mctruth_trueEnergy);
-      P_E25OverEtrueVsETtrue_EE  -> Fill(mctruth_truePt, (energy_e5x5/mctruth_trueEnergy));
+      P_E25OverEtrueVsETtrue_EE  -> Fill(mctruth_truePt, (identificationNoZS_e5x5noZS/mctruth_trueEnergy));
       P_EneOverEtrueVsETtrue_EE  -> Fill(mctruth_truePt, (energy_energy/mctruth_trueEnergy));
+      if (tree5x5_iz[12]>0) mapEEP_EoEtrue->Fill(tree5x5_ix[12], tree5x5_iy[12], (energy_energy/mctruth_trueEnergy));
+      if (tree5x5_iz[12]<0) mapEEM_EoEtrue->Fill(tree5x5_ix[12], tree5x5_iy[12], (energy_energy/mctruth_trueEnergy));
+
 
       // H/E cut efficiency studies    
       H_trueET_EE -> Fill(mctruth_truePt);
@@ -491,7 +496,7 @@ void singleGammaPlots::Loop()
 	if (identification_hoe<0.05)  okHoE_totalEE_noGap++;
 	if (identification_htoe<0.05) okHoET_totalEE_noGap++;
 
-	if (identification_r9>0.9){ 
+	if (identificationNoZS_r9noZS>0.9){ 
 	  totalEE_noGap_highR9++;
 	  if (identification_hoe<0.05)  okHoE_totalEE_noGap_highR9++;
 	  if (identification_htoe<0.05) okHoET_totalEE_noGap_highR9++;
@@ -499,7 +504,7 @@ void singleGammaPlots::Loop()
       }
 
       // 2012 loose photon ID. chiara, da capire che cono e' (ci vorrebbe 0.3)
-      if (identification_sigmaIetaIeta<0.034)          H_trueET_okSee_EE   -> Fill(mctruth_truePt);
+      if (identificationNoZS_sieienoZS<0.034)          H_trueET_okSee_EE   -> Fill(mctruth_truePt);
       if (correctedChIso<2.3)                          H_trueET_okChIso_EE -> Fill(mctruth_truePt);
       if (correctedNIso<(2.9 + 0.04*kinematics_pt))    H_trueET_okNhIso_EE -> Fill(mctruth_truePt);
     }
@@ -1129,4 +1134,60 @@ void singleGammaPlots::Loop()
   h1_effHoET_EE->Draw("sameP");
   leg6->Draw();
   c17b.SaveAs("2012EffVsET_EE.png");
+
+
+  // E/Etrue maps
+  int iLineEB=0; 
+  TLine lEB;
+  TLine lEE;     
+  lEE.SetLineWidth(1);
+  int ixSectorsEE[202] = {
+    62, 62, 61, 61, 60, 60, 59, 59, 58, 58, 56, 56, 46, 46, 44, 44, 43, 43, 42, 42,
+    41, 41, 40, 40, 41, 41, 42, 42, 43, 43, 44, 44, 46, 46, 56, 56, 58, 58, 59, 59,
+    60, 60, 61, 61, 62, 62, 0,101,101, 98, 98, 96, 96, 93, 93, 88, 88, 86, 86, 81,
+    81, 76, 76, 66, 66, 61, 61, 41, 41, 36, 36, 26, 26, 21, 21, 16, 16, 14, 14, 9,
+    9, 6, 6, 4, 4, 1, 1, 4, 4, 6, 6, 9, 9, 14, 14, 16, 16, 21, 21, 26,
+    26, 36, 36, 41, 41, 61, 61, 66, 66, 76, 76, 81, 81, 86, 86, 88, 88, 93, 93, 96,
+    96, 98, 98,101,101, 0, 62, 66, 66, 71, 71, 81, 81, 91, 91, 93, 0, 62, 66, 66,
+    91, 91, 98, 0, 58, 61, 61, 66, 66, 71, 71, 76, 76, 81, 81, 0, 51, 51, 0, 44,
+    41, 41, 36, 36, 31, 31, 26, 26, 21, 21, 0, 40, 36, 36, 11, 11, 4, 0, 40, 36,
+    36, 31, 31, 21, 21, 11, 11, 9, 0, 46, 46, 41, 41, 36, 36, 0, 56, 56, 61, 61, 66, 66};
+  int iySectorsEE[202] = {
+    51, 56, 56, 58, 58, 59, 59, 60, 60, 61, 61, 62, 62, 61, 61, 60, 60, 59, 59, 58,
+    58, 56, 56, 46, 46, 44, 44, 43, 43, 42, 42, 41, 41, 40, 40, 41, 41, 42, 42, 43,
+    43, 44, 44, 46, 46, 51, 0, 51, 61, 61, 66, 66, 76, 76, 81, 81, 86, 86, 88, 88,
+    93, 93, 96, 96, 98, 98,101,101, 98, 98, 96, 96, 93, 93, 88, 88, 86, 86, 81, 81,
+    76, 76, 66, 66, 61, 61, 41, 41, 36, 36, 26, 26, 21, 21, 16, 16, 14, 14, 9, 9,
+    6, 6, 4, 4, 1, 1, 4, 4, 6, 6, 9, 9, 14, 14, 16, 16, 21, 21, 26, 26,
+    36, 36, 41, 41, 51, 0, 46, 46, 41, 41, 36, 36, 31, 31, 26, 26, 0, 51, 51, 56,
+    56, 61, 61, 0, 61, 61, 66, 66, 71, 71, 76, 76, 86, 86, 88, 0, 62,101, 0, 61,
+    61, 66, 66, 71, 71, 76, 76, 86, 86, 88, 0, 51, 51, 56, 56, 61, 61, 0, 46, 46,
+    41, 41, 36, 36, 31, 31, 26, 26, 0, 40, 31, 31, 16, 16, 6, 0, 40, 31, 31, 16, 16, 6};
+
+  mapEB_EoEtrue->SetMaximum(1.);
+  mapEEP_EoEtrue->SetMaximum(1.);
+  mapEEM_EoEtrue->SetMaximum(1.);
+
+  TCanvas c19("c19","c19",1);  
+  iLineEB=0;
+  mapEB_EoEtrue->Draw("colz");
+  lEB.DrawLine(0,0,360,0);                                                     
+  while (iLineEB<18) { lEB.DrawLine (iLineEB*20, -85, iLineEB*20, 85);  iLineEB++; }
+  c19.SaveAs("EoEtrueMapEB.png");
+
+  TCanvas c20("c20","c20",700,700);
+  mapEEP_EoEtrue->Draw("colz");
+  for (int iLineEEP=0; iLineEEP<201; iLineEEP=iLineEEP+1 ) {                
+    if ( (ixSectorsEE[iLineEEP]!=0 || iySectorsEE[iLineEEP]!=0)  && (ixSectorsEE[iLineEEP+1]!=0 || iySectorsEE[iLineEEP+1]!=0) ) { 
+      lEE.DrawLine(ixSectorsEE[iLineEEP], iySectorsEE[iLineEEP], ixSectorsEE[iLineEEP+1], iySectorsEE[iLineEEP+1]);   
+    }}
+  c20.SaveAs("EoEtrueMapEEP.png");
+
+  TCanvas c21("c21","c21",700,700);
+  mapEEM_EoEtrue->Draw("colz");
+  for ( int iLineEEM=0; iLineEEM<201; iLineEEM=iLineEEM+1 ) { 
+    if ( (ixSectorsEE[iLineEEM]!=0 || iySectorsEE[iLineEEM]!=0) && (ixSectorsEE[iLineEEM+1]!=0 || iySectorsEE[iLineEEM+1]!=0) ) {  
+      lEE.DrawLine(ixSectorsEE[iLineEEM], iySectorsEE[iLineEEM], ixSectorsEE[iLineEEM+1], iySectorsEE[iLineEEM+1]); 
+    }}
+  c21.SaveAs("EoEtrueMapEEM.png");
 }

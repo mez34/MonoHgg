@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Wed Nov 19 13:08:37 2014 by ROOT version 5.34/10
-// from TTree singlePhotons/singlePhotons
-// found on file: analyzeFWLdiphot__5TeV.root
+// Tue Dec  9 12:22:26 2014 by ROOT version 5.34/18
+// from TTree singlePhotons/single photon tree
+// found on file: ../python/singlePhotonTree__kMpl01_M3000.root
 //////////////////////////////////////////////////////////
 
 #ifndef singleGammaPlots_h
@@ -30,8 +30,6 @@ public :
    Int_t           kinematics_isEERingGap;
    Int_t           kinematics_isEEDeeGap;
    Int_t           kinematics_isEBEEGap;
-   Int_t           kinematics_iPhi;
-   Int_t           kinematics_iEta;
    Float_t         supercluster_scEta;
    Float_t         supercluster_scPhi;
    Float_t         energy_eMax;
@@ -51,6 +49,10 @@ public :
    Float_t         identification_ht2oe;
    Char_t          identification_passEleVeto;
    Char_t          identification_hasPixelSeed;
+   Float_t         identificationNoZS_sieienoZS;
+   Float_t         identificationNoZS_e5x5noZS;
+   Float_t         identificationNoZS_e1x5noZS;
+   Float_t         identificationNoZS_r9noZS;
    Float_t         isolation_trackIso;
    Float_t         isolation_ecalIso;
    Float_t         isolation_hcalIso;
@@ -63,14 +65,25 @@ public :
    Float_t         mctruth_trueEta;
    Float_t         mctruth_truePhi;
    Float_t         mctruth_minDR;
+   Float_t         tree5x5_amplit[25];
+   Int_t           tree5x5_ieta[25];
+   Int_t           tree5x5_iphi[25];
+   Int_t           tree5x5_ix[25];
+   Int_t           tree5x5_iy[25];
+   Int_t           tree5x5_iz[25];
+   Int_t           tree5x5_kSaturated[25];
+   Int_t           tree5x5_kLeRecovered[25];
+   Int_t           tree5x5_kNeighRecovered[25];
 
    // List of branches
    TBranch        *b_kinematics;   //!
    TBranch        *b_supercluster;   //!
    TBranch        *b_energy;   //!
    TBranch        *b_identification;   //!
+   TBranch        *b_identificationNoZS;   //!      
    TBranch        *b_isolation;   //!
    TBranch        *b_mctruth;   //!
+   TBranch        *b_tree5x5;   //!
 
    singleGammaPlots(TTree *tree=0);
    virtual ~singleGammaPlots();
@@ -96,11 +109,12 @@ singleGammaPlots::singleGammaPlots(TTree *tree) : fChain(0)
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
    if (tree == 0) {
-      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("analyzeFWLdiphot__5TeV.root");
+      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("../python/singlePhotonTree__kMpl01_M5000.root");
       if (!f || !f->IsOpen()) {
-         f = new TFile("analyzeFWLdiphot__5TeV.root");
+         f = new TFile("../python/singlePhotonTree__kMpl01_M5000.root");
       }
-      f->GetObject("singlePhotons",tree);
+      TDirectory * dir = (TDirectory*)f->Get("../python/singlePhotonTree__kMpl01_M5000.root:/singlePhoAna");
+      dir->GetObject("singlePhotons",tree);
 
    }
    Init(tree);
@@ -151,8 +165,10 @@ void singleGammaPlots::Init(TTree *tree)
    fChain->SetBranchAddress("supercluster", &supercluster_scEta, &b_supercluster);
    fChain->SetBranchAddress("energy", &energy_eMax, &b_energy);
    fChain->SetBranchAddress("identification", &identification_e1x5, &b_identification);
+   fChain->SetBranchAddress("identificationNoZS", &identificationNoZS_sieienoZS, &b_identificationNoZS);
    fChain->SetBranchAddress("isolation", &isolation_trackIso, &b_isolation);
    fChain->SetBranchAddress("mctruth", &mctruth_trueEnergy, &b_mctruth);
+   fChain->SetBranchAddress("tree5x5", tree5x5_amplit, &b_tree5x5);
    Notify();
 }
 
