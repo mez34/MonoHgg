@@ -13,47 +13,29 @@ void addWeights(const char* filename, float lumiForW) {
   TFile *fileOrig = 0;
   TTree *treeOrig = 0;
   TH1F  *h_entries = 0;
+  TH1F  *h_sumW = 0;
   TH1F  *h_selection = 0;
-  TH1F  *h_denomPlusPres0 = 0;
-  TH1F  *h_denomPlusPres1 = 0;
-  TH1F  *h_denomPlusPres2 = 0;
-  TH1F  *h_denomPlusPres3 = 0;
-  TH1F  *h_num0 = 0;
-  TH1F  *h_num1 = 0;
-  TH1F  *h_num2 = 0;
-  TH1F  *h_num3 = 0;
 
   fileOrig = TFile::Open(filename);
   if( fileOrig ) {
     fileOrig->cd();
     treeOrig = (TTree*)fileOrig->Get("diPhoAna/DiPhotonTree");
     h_entries = (TH1F*)fileOrig->Get("diPhoAna/h_entries");
+    h_sumW    = (TH1F*)fileOrig->Get("diPhoAna/h_sumW");
     h_selection = (TH1F*)fileOrig->Get("diPhoAna/h_selection");
-
-    h_denomPlusPres0 = (TH1F*)fileOrig->Get("diPhoAna/h_denomPlusPres0");
-    h_num0 = (TH1F*)fileOrig->Get("diPhoAna/h_num0");
-
-    h_denomPlusPres1 = (TH1F*)fileOrig->Get("diPhoAna/h_denomPlusPres1");
-    h_num1 = (TH1F*)fileOrig->Get("diPhoAna/h_num1");
-
-    h_denomPlusPres2 = (TH1F*)fileOrig->Get("diPhoAna/h_denomPlusPres2");
-    h_num2 = (TH1F*)fileOrig->Get("diPhoAna/h_num2");
-
-    h_denomPlusPres3 = (TH1F*)fileOrig->Get("diPhoAna/h_denomPlusPres3");
-    h_num3 = (TH1F*)fileOrig->Get("diPhoAna/h_num3");
-
   } else {
     cout << "File " << filename << " not existing !" << endl;
     return;
   }
+
 
   fileOrig->cd();
   if (!treeOrig) {
     cout << "Tree diPhoAna/DiPhotonTree not existing !" << endl; 
     return;    
   }
-
-  float sampleSize = (float)h_entries->GetEntries();  // number of events we run on originally
+  
+  float sampleSumWeight = (float)h_sumW->Integral();    // sum of weights in the dataset we ran on originally
 
   int nentriesOrig = treeOrig->GetEntries();   // number fo entries saved in the first tree
   
@@ -73,6 +55,8 @@ void addWeights(const char* filename, float lumiForW) {
   Float_t         totXsec; 
   Float_t         pu_weight;
   Float_t         pu_n;
+  Float_t         sumDataset;
+  Float_t         perEveW;
   Float_t         ptgg;
   Float_t         mgg;
   Int_t           eventClass;
@@ -100,6 +84,10 @@ void addWeights(const char* filename, float lumiForW) {
   Float_t         chiso2;
   Float_t         phoiso2;
   Float_t         neuiso2;
+  Int_t           presel1;
+  Int_t           presel2;
+  Int_t           sel1;
+  Int_t           sel2;
   Int_t           genmatch1;
   Int_t           genmatch2;
   Float_t         geniso1;
@@ -122,6 +110,8 @@ void addWeights(const char* filename, float lumiForW) {
   TBranch        *b_totXsec;
   TBranch        *b_pu_weight;
   TBranch        *b_pu_n;
+  TBranch        *b_sumDataset;
+  TBranch        *b_perEveW;
   TBranch        *b_ptgg;
   TBranch        *b_mgg; 
   TBranch        *b_eventClass; 
@@ -149,6 +139,10 @@ void addWeights(const char* filename, float lumiForW) {
   TBranch        *b_chiso2;  
   TBranch        *b_phoiso2; 
   TBranch        *b_neuiso2;   
+  TBranch        *b_presel1;
+  TBranch        *b_presel2;
+  TBranch        *b_sel1;
+  TBranch        *b_sel2;
   TBranch        *b_genmatch1; 
   TBranch        *b_genmatch2; 
   TBranch        *b_geniso1; 
@@ -171,6 +165,8 @@ void addWeights(const char* filename, float lumiForW) {
   treeOrig->SetBranchAddress("totXsec", &totXsec, &b_totXsec);
   treeOrig->SetBranchAddress("pu_weight", &pu_weight, &b_pu_weight);
   treeOrig->SetBranchAddress("pu_n", &pu_n, &b_pu_n);
+  treeOrig->SetBranchAddress("sumDataset", &sumDataset, &b_sumDataset);
+  treeOrig->SetBranchAddress("perEveW", &perEveW, &b_perEveW);
   treeOrig->SetBranchAddress("ptgg", &ptgg, &b_ptgg);
   treeOrig->SetBranchAddress("mgg", &mgg, &b_mgg);
   treeOrig->SetBranchAddress("eventClass", &eventClass, &b_eventClass);
@@ -198,6 +194,10 @@ void addWeights(const char* filename, float lumiForW) {
   treeOrig->SetBranchAddress("chiso2", &chiso2, &b_chiso2);
   treeOrig->SetBranchAddress("phoiso2", &phoiso2, &b_phoiso2);
   treeOrig->SetBranchAddress("neuiso2", &neuiso2, &b_neuiso2);
+  treeOrig->SetBranchAddress("presel1",&presel1,&b_presel1);
+  treeOrig->SetBranchAddress("presel2",&presel2,&b_presel2);
+  treeOrig->SetBranchAddress("sel1",&sel1,&b_sel1);
+  treeOrig->SetBranchAddress("sel2",&sel2,&b_sel2);
   treeOrig->SetBranchAddress("genmatch1", &genmatch1, &b_genmatch1);
   treeOrig->SetBranchAddress("genmatch2", &genmatch2, &b_genmatch2);
   treeOrig->SetBranchAddress("geniso1", &geniso1, &b_geniso1);
@@ -234,6 +234,8 @@ void addWeights(const char* filename, float lumiForW) {
     theTreeNew->Branch("totXsec", &totXsec, "totXsec/F");
     theTreeNew->Branch("pu_weight", &pu_weight, "pu_weight/F");
     theTreeNew->Branch("pu_n", &pu_n, "pu_n/F");
+    theTreeNew->Branch("sumDataset", &sumDataset, "sumDataset/F");
+    theTreeNew->Branch("perEveW", &perEveW, "perEveW/F");
     theTreeNew->Branch("ptgg", &ptgg, "ptgg/F");
     theTreeNew->Branch("mgg", &mgg, "mgg/F");
     theTreeNew->Branch("eventClass", &eventClass, "eventClass/I");
@@ -261,6 +263,10 @@ void addWeights(const char* filename, float lumiForW) {
     theTreeNew->Branch("chiso2", &chiso2, "chiso2/F");
     theTreeNew->Branch("phoiso2", &phoiso2, "phoiso2/F");
     theTreeNew->Branch("neuiso2", &neuiso2, "neuiso2/F");
+    theTreeNew->Branch("presel1",&presel1,"presel1/I");
+    theTreeNew->Branch("presel2",&presel2,"presel2/I");
+    theTreeNew->Branch("sel1",&sel1,"sel1/I");
+    theTreeNew->Branch("sel2",&sel2,"sel2/I");
     theTreeNew->Branch("genmatch1", &genmatch1, "genmatch1/I");
     theTreeNew->Branch("genmatch2", &genmatch2, "genmatch2/I");
     theTreeNew->Branch("geniso1", &geniso1, "geniso1/F");
@@ -278,12 +284,12 @@ void addWeights(const char* filename, float lumiForW) {
 
     if (i%10000 == 0) std::cout << ">>> Weighting event # " << i << " / " << nentriesOrig << " entries" << std::endl; 
     treeOrig->GetEntry(i);
-   
-    if (i==0) xsecToWeight = totXsec;
 
+    if (i==0) xsecToWeight = totXsec;
+   
     // new variables
     if (sampleID!=0) {
-      xsecWeight = lumiForW * totXsec/sampleSize;             
+      xsecWeight = perEveW * lumiForW * totXsec / sampleSumWeight;             
       weight     = xsecWeight * pu_weight;
     } else {   
       xsecWeight = 1.;
@@ -293,33 +299,14 @@ void addWeights(const char* filename, float lumiForW) {
     treeNew->Fill();
   }
 
-  
-  // histos scaling with xsec to have the correct weight
-  float theEntries = (float)h_entries->Integral();                                                                                                           
-  cout << "using xsec " << xsecToWeight << " and " << theEntries << " entries " << endl;
-  h_denomPlusPres0->Scale( xsecToWeight / theEntries );     
-  h_denomPlusPres1->Scale( xsecToWeight / theEntries );     
-  h_denomPlusPres2->Scale( xsecToWeight / theEntries );     
-  h_denomPlusPres3->Scale( xsecToWeight / theEntries );     
-  h_num0->Scale( xsecToWeight / theEntries );     
-  h_num1->Scale( xsecToWeight / theEntries );     
-  h_num2->Scale( xsecToWeight / theEntries );     
-  h_num3->Scale( xsecToWeight / theEntries );     
-  h_selection->Scale( xsecToWeight / theEntries );
-
+  // histo scaling to get the correct normalization
+  h_selection->Scale( xsecToWeight / sampleSumWeight );  
 
   // new info
   fileNew->cd();
   h_entries->Write();
+  h_sumW->Write();
   h_selection->Write();
-  h_denomPlusPres0->Write();  
-  h_denomPlusPres1->Write();  
-  h_denomPlusPres2->Write();  
-  h_denomPlusPres3->Write();  
-  h_num0->Write();
-  h_num1->Write();
-  h_num2->Write();
-  h_num3->Write();
   treeNew->Write();
   fileNew->Close();
 

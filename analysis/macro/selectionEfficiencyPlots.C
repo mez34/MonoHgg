@@ -2,35 +2,73 @@
 #include "TFile.h"
 #include "TH1.h"
 #include "TH2.h"
+#include "TTree.h"
 #include <TGraphAsymmErrors.h>
 #include "TCanvas.h"
 #include "TLegend.h"
 
 #include <iostream>
 
-void selectionEfficiencyPlots() {
+bool selectionEfficiencyPlots() {
 
   // taking inputs
-  // TFile *infile = new TFile("data/fullSel/mergedFinal/GGJets.root");   
-  // TFile *infile = new TFile("data/fullSel/mergedFinal/GJets.root");
-  // TFile *infile = new TFile("data/fullSel/mergedFinal/RSGravToGG_kMpl-01_M-1500.root");   
-  TFile *infile = new TFile("data/fullSel/mergedFinal/RSGravToGG_kMpl-01_M-3000.root");   
-  // 
-  // TFile *infile = new TFile("data/noNHiso/mergedFinal/GGJets.root");   
+  TFile *infile = new TFile("data/mergedFinal/GGJets.root");   
+  if (!infile) {
+    cout << "File " << infile << " not existing" << endl;
+    return 0;
+  }
 
-  TH1F *h_denomPlusPres0 = (TH1F*)infile->Get("h_denomPlusPres0");
-  TH1F *h_denomPlusPres1 = (TH1F*)infile->Get("h_denomPlusPres1");
-  TH1F *h_denomPlusPres2 = (TH1F*)infile->Get("h_denomPlusPres2");
-  TH1F *h_denomPlusPres3 = (TH1F*)infile->Get("h_denomPlusPres3");
+  TTree *theTree = (TTree*)infile->Get("DiPhotonTree");
+  if (!theTree) { 
+    cout << "Tree DiPhotonTree not existing" << endl;
+    return 0;
+  }
 
-  TH1F *h_num0 = (TH1F*)infile->Get("h_num0");
-  TH1F *h_num1 = (TH1F*)infile->Get("h_num1");
-  TH1F *h_num2 = (TH1F*)infile->Get("h_num2");
-  TH1F *h_num3 = (TH1F*)infile->Get("h_num3");  
-  
+  // selection breakdown
   TH1F *h_selection = (TH1F*)infile->Get("h_selection");
 
-  // bins
+  // num & den histos
+  TH1D *h_denomPlusPres0 = new TH1D("h_denomPlusPres0", "h_denomPlusPres0", 120, 0., 6000.);
+  TH1D *h_denomPlusPres1 = new TH1D("h_denomPlusPres1", "h_denomPlusPres1", 120, 0., 6000.);
+  TH1D *h_denomPlusPres2 = new TH1D("h_denomPlusPres2", "h_denomPlusPres2", 120, 0., 6000.);
+  TH1D *h_denomPlusPres3 = new TH1D("h_denomPlusPres3", "h_denomPlusPres3", 120, 0., 6000.);
+
+  TH1D *h_num0 = new TH1D("h_num0", "h_num0", 120, 0., 6000.);
+  TH1D *h_num1 = new TH1D("h_num1", "h_num1", 120, 0., 6000.);
+  TH1D *h_num2 = new TH1D("h_num2", "h_num2", 120, 0., 6000.);
+  TH1D *h_num3 = new TH1D("h_num3", "h_num3", 120, 0., 6000.);
+
+  h_denomPlusPres0->Sumw2();
+  h_denomPlusPres1->Sumw2();
+  h_denomPlusPres2->Sumw2();
+  h_denomPlusPres3->Sumw2();
+
+  h_num0->Sumw2();
+  h_num1->Sumw2();
+  h_num2->Sumw2();
+  h_num3->Sumw2();
+
+
+  // Filling histos
+  TString cutBase = "(mgg>500 && pt1>200 && pt2>200 && genmatch1>-800 && genmatch2>-800 && geniso1<10 && geniso2<10 ";
+  TString cutPresel = cutBase + " && presel1==1 && presel2==1";
+  TString cutSel    = cutPresel + " && sel1==1 && sel2==1";
+  cout << endl;
+  cout << cutPresel << endl;
+  cout << cutSel << endl;
+  cout << endl;
+  // 
+  theTree->Project("h_denomPlusPres0","mgg",cutPresel + TString(" && eventClass==0)*weight"));
+  theTree->Project("h_denomPlusPres1","mgg",cutPresel + TString(" && eventClass==1)*weight"));
+  theTree->Project("h_denomPlusPres2","mgg",cutPresel + TString(" && eventClass==2)*weight"));
+  theTree->Project("h_denomPlusPres3","mgg",cutPresel + TString(" && eventClass==3)*weight"));
+  //
+  theTree->Project("h_num0","mgg",cutSel + TString(" && eventClass==0)*weight"));
+  theTree->Project("h_num1","mgg",cutSel + TString(" && eventClass==1)*weight"));
+  theTree->Project("h_num2","mgg",cutSel + TString(" && eventClass==2)*weight"));
+  theTree->Project("h_num3","mgg",cutSel + TString(" && eventClass==3)*weight"));
+
+  // rebinning
   h_denomPlusPres0->Rebin(4);
   h_denomPlusPres1->Rebin(4);
   h_denomPlusPres2->Rebin(4);
@@ -75,8 +113,9 @@ void selectionEfficiencyPlots() {
   h_selection->GetXaxis()->SetBinLabel(2,"2 preselected #gamma");
   h_selection->GetXaxis()->SetBinLabel(3,"2 selected #gamma");
   h_selection->GetXaxis()->SetBinLabel(4,"pT cuts");
-  h_selection->GetXaxis()->SetBinLabel(5,"good vertex");
-  h_selection->GetXaxis()->SetBinLabel(6,"m(#gamma#gamma) cut");
+  h_selection->GetXaxis()->SetBinLabel(5,"m(#gamma#gamma) cut");
+  h_selection->GetXaxis()->SetBinLabel(6,"good vertex");
+
 
   // plots
   gStyle->SetOptStat(0);
@@ -112,9 +151,9 @@ void selectionEfficiencyPlots() {
   TCanvas ce("ce","",1);
   h_selection->Draw("hist");
   h_selection->SetTitle("");
-  // h_selection->SetMinimum(55000);
-  // h_selection->SetMaximum(105000);
   ce.SaveAs("breakdown.png");
   ce.SetLogy();
   ce.SaveAs("breakdown_log.png");
+
+  return 1;
 }
