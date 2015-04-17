@@ -31,11 +31,13 @@ process.diPhoAna = cms.EDAnalyzer('DiPhoAnalyzer',
                                   reducedEndcapRecHitCollection = cms.InputTag('reducedEgamma','reducedEERecHits'),
                                   DiPhotonTag = cms.untracked.InputTag('flashggDiPhotons'),
                                   PileupTag = cms.untracked.InputTag('addPileupInfo'),
+                                  generatorInfo = cms.InputTag("generator"),
                                   dopureweight = PU,
                                   sampleIndex  = SI,
                                   puWFileName  = weights,
                                   xsec         = XS,
-                                  kfac         = KF
+                                  kfac         = KF,
+                                  sumDataset   = SDS
                                   )
 
 process.p = cms.Path(process.diPhoAna)
