@@ -44,6 +44,7 @@ def main():
     kfactor = args[5]
 
     inputlist="lists_prod4/"+dataset+".list"
+    inputweights="lists_prod4/"+dataset+".weight"
     output = dataset
 
     print "the outputs will be in the directory: "+opt.prefix
@@ -70,6 +71,8 @@ def main():
     #######################################
     inputListfile=open(inputlist)
     inputfiles = inputListfile.readlines()
+    inputWeightsfile=open(inputweights)
+    inputweights = inputWeightsfile.readlines()
     ijob=0
 
     while (len(inputfiles) > 0):
@@ -80,6 +83,13 @@ def main():
             ntpfile = re.sub(r'/eos/cms','',ntpfile.rstrip())     
             if ntpfile != '':
                 L.append("\'"+ntpfile+"\',\n")
+
+        LW = []
+        for line in range(min(opt.nfileperjob,len(inputweights))):
+            ntpfile = inputweights.pop()
+            ntpfile = ntpfile.rstrip('\n')
+            if ntpfile != '':
+                LW.append("\'"+ntpfile+"\',\n")
 
         firstEvent = 1
         while (firstEvent < opt.eventsperfile or opt.eventsperfile == -1):
@@ -93,6 +103,10 @@ def main():
             stringtoreplace = ''.join(L)
             stringtoreplace = stringtoreplace[:-2] # remove the "," and the end of line for the last input
             stringtoreplace = 'fileNames = cms.untracked.vstring('+stringtoreplace+')\n#'
+            stringtoreplaceW = ''.join(LW)
+            stringtoreplaceW = stringtoreplaceW[:-3]
+            stringtoreplaceW = stringtoreplaceW[1:]
+            print stringtoreplaceW
             if (opt.eventsperfile == -1): maxEventsString = 'process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )#'
             else: maxEventsString = 'process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32('+str(opt.neventsjob)+') )#'
             puRewString = 'dopureweight = cms.untracked.int32('+str(doPUreweighting)+')'
@@ -100,6 +114,7 @@ def main():
             puWfileString = 'puWFileName  = cms.string("'+PUweights+'")'
             xsecString = 'xsec = cms.untracked.double('+str(xsection)+')'
             kfacString = 'kfac = cms.untracked.double('+str(kfactor)+')'
+            sdsString = 'sumDataset = cms.untracked.double('+stringtoreplaceW+')'
             outputFileName = output+'_'+str(ijob)+'.root'
             for line in cfgfile:
                 line = re.sub(r'fileNames = cms.untracked.vstring',stringtoreplace, line.rstrip())
@@ -110,6 +125,7 @@ def main():
                 line = re.sub(r'puWFileName  = weights',puWfileString,line.rstrip())
                 line = re.sub(r'xsec         = XS',xsecString,line.rstrip())
                 line = re.sub(r'kfac         = KF',kfacString,line.rstrip())
+                line = re.sub(r'sumDataset   = SDS',sdsString,line.rstrip())
                 line = re.sub(r'OUTPUT',outputFileName,line.rstrip())
                 icfgfile.write(line+'\n')
 
