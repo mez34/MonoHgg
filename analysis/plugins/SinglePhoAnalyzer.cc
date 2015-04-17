@@ -212,7 +212,7 @@ void SinglePhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
     // chiara: hardcoded
     float gammaPt    = g1->pt();
     float gammaScEta = (g1->superCluster())->eta();
-    if (gammaPt<30) continue;
+    if (gammaPt<200) continue;
     if (fabs(gammaScEta)>2.5) continue;
     if (fabs(gammaScEta)>1.4442 && fabs(gammaScEta)<1.566) continue;
 
