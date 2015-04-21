@@ -12,7 +12,7 @@
 
 #include <iostream>
 
-#define NSPECIES 3
+#define NSPECIES 4
 #define NVARIABLES 1
 #define NCUTS 5
 
@@ -39,14 +39,16 @@ void makeMCPlots(float lumi, int signalFactor=1)
     sprintf(scaleF,"%dxG1500",signalFactor);
     species[0]=TString(scaleF);
   }
-  species[1]="gjets";
-  species[2]="gg";
+  species[1]="qcd";
+  species[2]="gjets";
+  species[3]="gg";
 
   // chiara
   TString files[NSPECIES];
   files[0]="data/mergedFinal/RSGravToGG_kMpl-01_M-1500.root";
-  files[1]="data/mergedFinal/GJets.root";
-  files[2]="data/mergedFinal/GGJets.root";
+  files[1]="data/mergedFinal/QCD.root";
+  files[2]="data/mergedFinal/GJets.root";
+  files[3]="data/mergedFinal/GGJets.root";
 
   TString plotsDir="./diphotPlots/";
 
@@ -192,9 +194,10 @@ void makeMCPlots(float lumi, int signalFactor=1)
       myPlot.addLabel("");
       myPlot.setLabel((xaxisLabel[z]).Data());
       myPlot.setUnits((units[z]).Data());
-      myPlot.setMCHist(iGJets, histos[1][j][z]);
-      myPlot.setMCHist(iGG, histos[2][j][z]);
-      myPlot.setMCHist(iRS, histos[0][j][z]);
+      myPlot.setMCHist(iQCD,   histos[1][j][z]);
+      myPlot.setMCHist(iGJets, histos[2][j][z]);
+      myPlot.setMCHist(iGG,    histos[3][j][z]);
+      myPlot.setMCHist(iRS,    histos[0][j][z]);
 
       // Draw
       //--------------------------------------------------------------------

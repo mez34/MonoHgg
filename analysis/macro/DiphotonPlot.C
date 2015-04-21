@@ -13,10 +13,10 @@
 #include <iostream>
 #endif
 
-enum samp { iRS, iGJets, iGG, nSamples };
+enum samp { iRS, iQCD, iGJets, iGG, nSamples };
 
-float xPos[nSamples+1] = {0.70,0.70,0.70};
-float yOff[nSamples+1] = {0,1,2};
+float xPos[nSamples+1] = {0.70,0.70,0.70,0.70};
+float yOff[nSamples+1] = {0,1,2,3};
 
 const Float_t _tsize   = 0.03;
 const Float_t _xoffset = 0.20;
@@ -112,6 +112,7 @@ public:
   void setRSHist   (TH1F * h)                 { setMCHist(iRS   ,h); } 
   void setGGHist   (TH1F * h)                 { setMCHist(iGG   ,h); } 
   void setGJetsHist(TH1F * h)                 { setMCHist(iGJets,h); } 
+  void setQCDHist  (TH1F * h)                 { setMCHist(iQCD,h);   } 
   
   void setNoStack() { _nostack = true; }
 
@@ -144,11 +145,13 @@ public:
     _sampleColor[iRS  ]  = kBlue+1;
     _sampleColor[iGJets ] = kViolet-9;
     _sampleColor[iGG    ] = kGreen-9;
+    _sampleColor[iQCD   ] = kAzure-9;
 
     Color_t _lineColor[nSamples];
     _lineColor[iRS  ]  = kBlue+1;
     _lineColor[iGJets] = kViolet;   
     _lineColor[iGG   ] = kGreen;
+    _lineColor[iQCD  ] = kAzure;
     
     if(!gPad) new TCanvas();
     
@@ -236,9 +239,10 @@ public:
     if(_hist[iRS   ]) { DrawLegend(xPos[j], 0.84 - yOff[j]*_yoffset, _hist[iRS  ],   rsLabel, "l" ); j++; }
     if(_hist[iGG   ]) { DrawLegend(xPos[j], 0.84 - yOff[j]*_yoffset, _hist[iGG   ], " gg",      "f" ); j++; }
     if(_hist[iGJets]) { DrawLegend(xPos[j], 0.84 - yOff[j]*_yoffset, _hist[iGJets], " g+jets",  "f" ); j++; }
+    if(_hist[iQCD])   { DrawLegend(xPos[j], 0.84 - yOff[j]*_yoffset, _hist[iQCD],   " QCD",  "f" ); j++; }
 
     // TLatex* luminosity = new TLatex(0.9, 0.815, TString::Format("L = %.1f pb^{-1}",_lumi));
-    TLatex* luminosity = new TLatex(0.9, 0.715, TString::Format("L = %.1f pb^{-1}",_lumi));
+    TLatex* luminosity = new TLatex(0.9, 0.615, TString::Format("L = %.1f pb^{-1}",_lumi));
     luminosity->SetNDC();
     luminosity->SetTextAlign(32);
     luminosity->SetTextFont(42);
