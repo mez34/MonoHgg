@@ -14,7 +14,7 @@
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/PythonParameterSet/interface/MakeParameterSets.h"
 
-#include "flashgg/MicroAODFormats/interface/Photon.h"
+#include "flashgg/DataFormats/interface/Photon.h"
 
 using namespace std;
 
@@ -46,8 +46,8 @@ struct phoTree_struc_ {
   float eMax;
   float e5x5;
   float energy;
-  float energyInitial;
-  float energyRegression;
+  // float energyInitial;
+  // float energyRegression;
 
   float e1x5;
   float e2x5;
@@ -124,7 +124,8 @@ int main(int argc, char* argv[]) {
   TTree *phoTree = new TTree("singlePhotons","singlePhotons");
   TString treeKine = "pt/F:eta/F:phi/F:isEBEtaGap/I:isEBPhiGap/I:isEERingGap/I:isEEDeeGap/I:isEBEEGap/I:iPhi/I:iEta/I";
   TString treeSc   = "scEta/F:scPhi/F";
-  TString treeEne  = "eMax/F:e5x5/F:energy/F:energyInitial/F:energyRegression/F";
+  // TString treeEne  = "eMax/F:e5x5/F:energy/F:energyInitial/F:energyRegression/F";
+  TString treeEne  = "eMax/F:e5x5/F:energy/F:";
   TString treeID   = "e1x5/F:e2x5/F:sigmaIetaIeta/F:r9/F:hoe/F:h1oe/F:h2oe/F:htoe/F:ht1oe/F:ht2oe/F:passEleVeto/B:hasPixelSeed/B";
   TString treeIso  = "trackIso/F:ecalIso/F:hcalIso/F:chHadIso/F:nHadIso/F:photonIso/F:rho/F";
   TString treeTrue = "trueEnergy/F:truePt/F:trueEta/F:truePhi/F:minDR/F";
@@ -186,8 +187,8 @@ int main(int argc, char* argv[]) {
 	  tree_.eMax=g1->maxEnergyXtal();
 	  tree_.e5x5=g1->e5x5();
 	  tree_.energy=g1->energy();
-	  tree_.energyInitial=g1->getEnergyAtStep("initial");
-	  tree_.energyRegression=g1->getEnergyAtStep("regression");
+	  // tree_.energyInitial=g1->getEnergyAtStep("initial");
+	  // tree_.energyRegression=g1->getEnergyAtStep("regression");
 	  
 	  tree_.e1x5=g1->e1x5();
 	  tree_.e2x5=g1->e2x5();

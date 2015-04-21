@@ -9,7 +9,7 @@
 <use   name="PhysicsTools/FWLite"/>
 <use   name="PhysicsTools/Utilities"/>
 <use   name="PhysicsTools/SelectorUtils"/>
-<use   name="flashgg/MicroAODFormats"/>
+<use   name="flashgg/DataFormats"/>
 <environment>
   <bin   file="SinglePhoFWLite.cc"></bin>
 </environment>
