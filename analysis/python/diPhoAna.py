@@ -24,8 +24,8 @@ process.source = cms.Source("PoolSource",
         )
                             )
 
-process.load("flashgg/MicroAODProducers/flashggPhotons_cfi")
-process.load("flashgg/MicroAODProducers/flashggDiPhotons_cfi")
+process.load("flashgg/MicroAOD/flashggPhotons_cfi")
+process.load("flashgg/MicroAOD/flashggDiPhotons_cfi")
 
 process.TFileService = cms.Service("TFileService",fileName = cms.string("diPhotons.root"))
 
