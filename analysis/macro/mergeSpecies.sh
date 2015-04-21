@@ -7,5 +7,7 @@ hadd data/mergedFinal/GGJets.root data/merged/GGJets_M-200To500.root data/merged
 #
 hadd data/mergedFinal/GJets.root data/merged/GJets_HT-100to200.root data/merged/GJets_HT-200to400.root data/merged/GJets_HT-400to600.root data/merged/GJets_HT-600toInf.root 
 #
+hadd data/mergedFinal/QCD.root data/merged/QCD_HT-100To250.root data/merged/QCD_HT-250To500.root data/merged/QCD_HT-500To1000.root data/merged/QCD_HT-1000ToInf.root
+#
 cp data/merged/RSGravToGG_kMpl-01_M-1500.root data/mergedFinal/RSGravToGG_kMpl-01_M-1500.root
 cp data/merged/RSGravToGG_kMpl-01_M-3000.root data/mergedFinal/RSGravToGG_kMpl-01_M-3000.root

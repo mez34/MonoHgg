@@ -15,6 +15,10 @@ addWeights("data/merged/GJets_HT-100to200.root", $lumi);
 addWeights("data/merged/GJets_HT-200to400.root", $lumi);
 addWeights("data/merged/GJets_HT-400to600.root", $lumi);
 addWeights("data/merged/GJets_HT-600toInf.root", $lumi);
+addWeights("data/merged/QCD_HT-100To250.root", $lumi);    
+addWeights("data/merged/QCD_HT-250To500.root", $lumi);   
+addWeights("data/merged/QCD_HT-500To1000.root", $lumi);   
+addWeights("data/merged/QCD_HT-1000ToInf.root", $lumi);   
 addWeights("data/merged/RSGravToGG_kMpl-01_M-1500.root", $lumi);
 addWeights("data/merged/RSGravToGG_kMpl-01_M-3000.root", $lumi);
 .q
