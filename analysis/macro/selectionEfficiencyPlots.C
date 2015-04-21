@@ -12,7 +12,7 @@
 bool selectionEfficiencyPlots() {
 
   // taking inputs
-  TFile *infile = new TFile("data/mergedFinal/GGJets.root");   
+  TFile *infile = new TFile("data/eff_newSel/mergedFinal/GGJets.root");   
   if (!infile) {
     cout << "File " << infile << " not existing" << endl;
     return 0;
@@ -50,7 +50,7 @@ bool selectionEfficiencyPlots() {
 
 
   // Filling histos
-  TString cutBase = "(mgg>500 && pt1>200 && pt2>200 && genmatch1>-800 && genmatch2>-800 && geniso1<10 && geniso2<10 ";
+  TString cutBase = "(mgg>500 && pt1>200 && pt2>200 && genmatch1==1 && genmatch2==1 && geniso1<10 && geniso2<10 ";
   TString cutPresel = cutBase + " && presel1==1 && presel2==1";
   TString cutSel    = cutPresel + " && sel1==1 && sel2==1";
   cout << endl;
