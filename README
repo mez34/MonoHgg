@@ -19,7 +19,6 @@ bash flashgg/setup.sh | tee setup.log
 
 # clone this repository
 cd ${CMSSW_BASE}/src
-git clone https://github.com/crovelli/Diphotons.git
 git remote add crovelli https://github.com/crovelli/Diphotons.git
 git fetch crovelli
 git checkout crovelli/diphoANv1
