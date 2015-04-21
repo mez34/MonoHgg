@@ -19,8 +19,8 @@ process.source = cms.Source("PoolSource",
                             fileNames = cms.untracked.vstring('/store/group/phys_higgs/cmshgg/musella/flashgg/ExoPhys14_v2/diphotonsPhys14V2/RSGravToGG_kMpl001_M_5000_Tune4C_13TeV_pythia8/ExoPhys14_v2-diphotonsPhys14V2-v0-Phys14DR-PU20bx25_PHYS14_25_V1-v1/150128_133931/0000/myOutputFile_1.root'
                                                               )
 
-process.load("flashgg/MicroAODProducers/flashggPhotons_cfi")
-process.load("flashgg/MicroAODProducers/flashggDiPhotons_cfi")
+process.load("flashgg/MicroAOD/flashggPhotons_cfi")
+process.load("flashgg/MicroAOD/flashggDiPhotons_cfi")
 
 process.TFileService = cms.Service("TFileService",fileName = cms.string("OUTPUT"))
 
