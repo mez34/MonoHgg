@@ -28,7 +28,7 @@
 
 #include "RecoLocalCalo/EcalDeadChannelRecoveryAlgos/interface/EcalDeadChannelRecoveryAlgos.h" 
 
-#include "flashgg/MicroAODFormats/interface/Photon.h"
+#include "flashgg/DataFormats/interface/Photon.h"
 
 
 using namespace std;
@@ -67,8 +67,8 @@ struct phoTree_struc_ {
   float eMax;
   float e5x5;
   float energy;
-  float energyInitial;
-  float energyRegression;
+  // float energyInitial;
+  // float energyRegression;
 
   float e1x5;
   float e2x5;
@@ -167,7 +167,7 @@ void SinglePhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
   // access edm objects
   Handle<View<flashgg::Photon> > objs_pho;
   iEvent.getByToken(photonToken_,objs_pho);
-  const PtrVector<flashgg::Photon>& photonPointers = objs_pho->ptrVector();
+  // const PtrVector<flashgg::Photon>& photonPointers = objs_pho->ptrVector();
 
   Handle<vector<PackedGenParticle> > genGammas;
   iEvent.getByLabel(packedGenGamma_, genGammas);
@@ -178,7 +178,7 @@ void SinglePhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 
   Handle<View<reco::Vertex> > primaryVertices;
   iEvent.getByToken(vertexToken_,primaryVertices);
-  const PtrVector<reco::Vertex>& pvPointers = primaryVertices->ptrVector();
+  // const PtrVector<reco::Vertex>& pvPointers = primaryVertices->ptrVector();
 
   Handle< EcalRecHitCollection > EcalBarrelRecHits;
   iEvent.getByToken(ecalHitEBToken_, EcalBarrelRecHits); 
@@ -204,9 +204,9 @@ void SinglePhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
   initEvtTreeStructure();
 
   // loop over photons
-  for( size_t ipho = 0; ipho < photonPointers.size(); ipho++ ) {
+  for( size_t photonlooper = 0; photonlooper < objs_pho->size(); photonlooper++ ) {
 
-    Ptr<flashgg::Photon> g1 = photonPointers[ipho];
+    Ptr<flashgg::Photon> g1 = objs_pho->ptrAt( photonlooper );
 
     // mninimal selection to speed up: photon eta and pT cuts
     // chiara: hardcoded
@@ -222,7 +222,7 @@ void SinglePhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
     // filling the photon tree with basic infos
     tree_.run = iEvent.id().run(); 
     tree_.event = iEvent.id().event(); 
-    tree_.nvertex = pvPointers.size();
+    tree_.nvertex = primaryVertices->size();
 
     tree_.pt =g1->pt();
     tree_.eta=g1->eta();
@@ -240,8 +240,8 @@ void SinglePhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
     tree_.eMax=g1->maxEnergyXtal();
     tree_.e5x5=g1->e5x5();
     tree_.energy=g1->energy();
-    tree_.energyInitial=g1->getEnergyAtStep("initial");
-    tree_.energyRegression=g1->getEnergyAtStep("regression");
+    // tree_.energyInitial=g1->getEnergyAtStep("initial");
+    // tree_.energyRegression=g1->getEnergyAtStep("regression");
 
     tree_.e1x5=g1->e1x5();
     tree_.e2x5=g1->e2x5();
@@ -286,10 +286,8 @@ void SinglePhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
     float matchedPt  = -999.;
     float matchedEta = -999.;
     float matchedPhi = -999.;
-    // float minDR = 999.;
 
-    // chiara: per g+jets questo pare funzionare, per segnale no - to be checked
-    /*
+    // mc truth match
     bool genmatch = (g1->genMatchType() == Photon::kPrompt);
     if (genmatch) {
       matchedEne = g1->matchedGenPhoton()->energy();
@@ -297,15 +295,13 @@ void SinglePhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
       matchedEta = g1->matchedGenPhoton()->eta();
       matchedPhi = g1->matchedGenPhoton()->phi();
     }
-    */
-    // per segnale
+
+    /* old production
     for(vector<PackedGenParticle>::const_iterator igen=genGammas->begin(); igen!=genGammas->end(); ++igen) {
       if( igen->status() != 1 || igen->pdgId() != 22 ) continue;
       float deta = g1->eta() - igen->eta();
       float dphi = deltaPhi(g1->phi(),igen->phi());
       float dr   = sqrt(deta*deta + dphi*dphi);
-      // float pt_change = (g1->et() -igen->et())/igen->et();
-      // if (dr<0.3 && fabs(pt_change) < 0.5) {  // chiara: per studi di risoluzione cosi' bias
       if (dr<0.3) { 
 	matchedEne = igen->energy();
 	matchedPt  = fabs(igen->energy()*sin(igen->theta()));
@@ -314,6 +310,8 @@ void SinglePhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 	break;
       }
     }
+    */
+
     tree_.trueEnergy = matchedEne;
     tree_.truePt = matchedPt;
     tree_.trueEta = matchedEta;
@@ -481,7 +479,8 @@ void SinglePhoAnalyzer::beginJob() {
   // tree per photon
   TString treeKine = "pt/F:eta/F:phi/F:isEBEtaGap/I:isEBPhiGap/I:isEERingGap/I:isEEDeeGap/I:isEBEEGap/I";
   TString treeSc = "scEta/F:scPhi/F:scRawEnergy/F";
-  TString treeEne = "eMax/F:e5x5/F:energy/F:energyInitial/F:energyRegression/F";
+  // TString treeEne = "eMax/F:e5x5/F:energy/F:energyInitial/F:energyRegression/F";
+  TString treeEne = "eMax/F:e5x5/F:energy/F";
   TString treeID = "e1x5/F:e2x5/F:sigmaIetaIeta/F:r9/F:hoe/F:h1oe/F:h2oe/F:htoe/F:ht1oe/F:ht2oe/F:passEleVeto/B:hasPixelSeed/B";
   TString treeIso = "trackIso/F:ecalIso/F:hcalIso/F:chHadIso/F:nHadIso/F:photonIso/F:rho/F";
   TString treeIDnoZS = "sieienoZS/F:e5x5noZS/F:r9noZS/F";
@@ -522,8 +521,8 @@ void SinglePhoAnalyzer::initPhoTreeStructure() {
   tree_.eMax=-500.;
   tree_.e5x5=-500.;
   tree_.energy=-500.;
-  tree_.energyInitial=-500.;
-  tree_.energyRegression=-500.;
+  // tree_.energyInitial=-500.;
+  // tree_.energyRegression=-500.;
   tree_.e1x5=-500.;
   tree_.e2x5=-500.;
   tree_.sigmaIetaIeta=-500.; 
