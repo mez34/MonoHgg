@@ -12,15 +12,16 @@ process.GlobalTag.globaltag = 'POSTLS170_V5::All'
 #process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff")
 #process.GlobalTag.globaltag = 'POSTLS170_V5'
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32( 100 ) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32( -1 ) )
 
 process.source = cms.Source("PoolSource",
                             fileNames=cms.untracked.vstring(
-        # Phys14, GG+jets, v4
-        #"/store/group/phys_higgs/cmshgg/musella/flashgg/ExoPhys14_v4/diphotonsPhys14V2/GGJets_M-500To1000_Pt-50_13TeV-sherpa/ExoPhys14_v4-diphotonsPhys14V2-v0-Phys14DR-PU20bx25_PHYS14_25_V1-v1/150204_005517/0000/myOutputFile_1.root"
 
         # Phys14, GG+jets, AnV1 
         "/store/group/phys_higgs/cmshgg/musella/flashgg/ExoPhys14ANv1/diphotonsPhys14AnV1/GGJets_M-500To1000_Pt-50_13TeV-sherpa/ExoPhys14ANv1-diphotonsPhys14AnV1-v0-Phys14DR-PU20bx25_PHYS14_25_V1-v1/150330_141301/0000/diphotonsMicroAOD_1.root"
+
+        # Phys14, RS 3TeV, AnV1 
+        #"/store/group/phys_higgs/cmshgg/musella/flashgg/ExoPhys14ANv1/diphotonsPhys14AnV1/RSGravToGG_kMpl-01_M-3000_Tune4C_13TeV-pythia8/ExoPhys14ANv1-diphotonsPhys14AnV1-v0-Phys14DR-PU30bx50_PHYS14_25_V1-v1/150330_141554/0000/diphotonsMicroAOD_2.root"
         )
                             )
 
@@ -42,8 +43,8 @@ process.diPhoAna = cms.EDAnalyzer('DiPhoAnalyzer',
                                   puWFileName  = cms.string('xxx'),   # chiara  
                                   xsec         = cms.untracked.double(0.172872),
                                   kfac         = cms.untracked.double(1.),
-                                  #sumDataset   = cms.untracked.double(23210.306640625)   
                                   sumDataset   = cms.untracked.double(2236.0)
+                                  #sumDataset   = cms.untracked.double(49972.0)
                                   )
 
 process.p = cms.Path(process.diPhoAna)
