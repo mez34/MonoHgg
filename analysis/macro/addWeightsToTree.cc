@@ -6,7 +6,7 @@
 
 using namespace std;
 
-void addWeights(const char* filename, float lumiForW) {
+void addWeights(const char* filename, float lumiForW, float massTrue=1) {
 
   cout << "Adding weight branch to file " << filename << endl;
 
@@ -213,6 +213,7 @@ void addWeights(const char* filename, float lumiForW) {
   // new variables to be added
   Float_t xsecWeight;
   Float_t weight;
+  Float_t mggTrue;
 
   // xsec to weight histos
   Float_t xsecToWeight = 0.;
@@ -223,6 +224,7 @@ void addWeights(const char* filename, float lumiForW) {
     // New branches
     theTreeNew->Branch("xsecWeight", &xsecWeight, "xsecWeight/F");
     theTreeNew->Branch("weight", &weight, "weight/F");
+    theTreeNew->Branch("mggTrue", &mggTrue, "mggTrue/F");
     
     // Copy branches
     theTreeNew->Branch("run", &run, "run/I");
@@ -291,9 +293,11 @@ void addWeights(const char* filename, float lumiForW) {
     if (sampleID!=0) {
       xsecWeight = perEveW * lumiForW * totXsec / sampleSumWeight;             
       weight     = xsecWeight * pu_weight;
+      mggTrue    = massTrue;
     } else {   
       xsecWeight = 1.;
       weight     = 1.;
+      mggTrue    = 1.;
     }
 
     treeNew->Fill();
