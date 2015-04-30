@@ -11,3 +11,12 @@ hadd data/mergedFinal/QCD.root data/merged/QCD_HT-100To250.root data/merged/QCD_
 #
 cp data/merged/RSGravToGG_kMpl-01_M-1500.root data/mergedFinal/RSGravToGG_kMpl-01_M-1500.root
 cp data/merged/RSGravToGG_kMpl-01_M-3000.root data/mergedFinal/RSGravToGG_kMpl-01_M-3000.root
+#
+cp data/merged/RSGravToGG_kMpl-001_M-750.root data/mergedFinal/RSGravToGG_kMpl-001_M-750.root
+cp data/merged/RSGravToGG_kMpl-001_M-1500.root data/mergedFinal/RSGravToGG_kMpl-001_M-1500.root
+cp data/merged/RSGravToGG_kMpl-001_M-5000.root data/mergedFinal/RSGravToGG_kMpl-001_M-5000.root
+#
+cp data/merged/RSGravToGG_kMpl-02_M-1500.root data/mergedFinal/RSGravToGG_kMpl-02_M-1500.root
+cp data/merged/RSGravToGG_kMpl-02_M-3000.root data/mergedFinal/RSGravToGG_kMpl-02_M-3000.root
+cp data/merged/RSGravToGG_kMpl-02_M-5000.root data/mergedFinal/RSGravToGG_kMpl-02_M-5000.root
+
