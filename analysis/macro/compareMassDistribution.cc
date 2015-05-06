@@ -37,9 +37,9 @@ void compareMassDistribution() {
   H_A_cat0->Sumw2();
   H_B_cat0->Sumw2();
   H_C_cat0->Sumw2();
-  tA -> Project("H_A_cat0", Form("mgg/%d-1",massA),"mgg>500 && mgg<6000 && eventClass==0");
-  tB -> Project("H_B_cat0", Form("mgg/%d-1",massB),"mgg>500 && mgg<6000 && eventClass==0");
-  tC -> Project("H_C_cat0", Form("mgg/%d-1",massC),"mgg>500 && mgg<6000 && eventClass==0");
+  tA -> Project("H_A_cat0", "mgg/mggGen-1","mgg>500 && mgg<6000 && mggGen>=0 && eventClass==0");
+  tB -> Project("H_B_cat0", "mgg/mggGen-1","mgg>500 && mgg<6000 && mggGen>=0 && eventClass==0");
+  tC -> Project("H_C_cat0", "mgg/mggGen-1","mgg>500 && mgg<6000 && mggGen>=0 && eventClass==0");
 
   // projecting - cat1
   TH1D *H_A_cat1 = new TH1D("H_A_cat1","H_A_cat1", 60,-0.12,0.12);
@@ -48,9 +48,9 @@ void compareMassDistribution() {
   H_A_cat1->Sumw2();
   H_B_cat1->Sumw2();
   H_C_cat1->Sumw2();
-  tA -> Project("H_A_cat1", Form("mgg/%d-1",massA),"mgg>500 && mgg<6000 && eventClass==1");
-  tB -> Project("H_B_cat1", Form("mgg/%d-1",massB),"mgg>500 && mgg<6000 && eventClass==1");
-  tC -> Project("H_C_cat1", Form("mgg/%d-1",massC),"mgg>500 && mgg<6000 && eventClass==1");
+  tA -> Project("H_A_cat1", "mgg/mggGen-1","mgg>500 && mgg<6000 && mggGen>=0 && eventClass==1");
+  tB -> Project("H_B_cat1", "mgg/mggGen-1","mgg>500 && mgg<6000 && mggGen>=0 && eventClass==1");
+  tC -> Project("H_C_cat1", "mgg/mggGen-1","mgg>500 && mgg<6000 && mggGen>=0 && eventClass==1");
 
   // projecting - cat2
   TH1D *H_A_cat2 = new TH1D("H_A_cat2","H_A_cat2", 60,-0.12,0.12);
@@ -59,9 +59,9 @@ void compareMassDistribution() {
   H_A_cat2->Sumw2();
   H_B_cat2->Sumw2();
   H_C_cat2->Sumw2();
-  tA -> Project("H_A_cat2", Form("mgg/%d-1",massA),"mgg>500 && mgg<6000 && eventClass==2");
-  tB -> Project("H_B_cat2", Form("mgg/%d-1",massB),"mgg>500 && mgg<6000 && eventClass==2");
-  tC -> Project("H_C_cat2", Form("mgg/%d-1",massC),"mgg>500 && mgg<6000 && eventClass==2");
+  tA -> Project("H_A_cat2", "mgg/mggGen-1","mgg>500 && mgg<6000 && mggGen>=0 && eventClass==2");
+  tB -> Project("H_B_cat2", "mgg/mggGen-1","mgg>500 && mgg<6000 && mggGen>=0 && eventClass==2");
+  tC -> Project("H_C_cat2", "mgg/mggGen-1","mgg>500 && mgg<6000 && mggGen>=0 && eventClass==2");
 
   // projecting - cat3
   TH1D *H_A_cat3 = new TH1D("H_A_cat3","H_A_cat3", 60,-0.12,0.12);
@@ -70,10 +70,9 @@ void compareMassDistribution() {
   H_A_cat3->Sumw2();
   H_B_cat3->Sumw2();
   H_C_cat3->Sumw2();
-  tA -> Project("H_A_cat3", Form("mgg/%d-1",massA),"mgg>500 && mgg<6000 && eventClass==3");
-  tB -> Project("H_B_cat3", Form("mgg/%d-1",massB),"mgg>500 && mgg<6000 && eventClass==3");
-  tC -> Project("H_C_cat3", Form("mgg/%d-1",massC),"mgg>500 && mgg<6000 && eventClass==3");
-
+  tA -> Project("H_A_cat3", "mgg/mggGen-1","mgg>500 && mgg<6000 && mggGen>=0 && eventClass==3");
+  tB -> Project("H_B_cat3", "mgg/mggGen-1","mgg>500 && mgg<6000 && mggGen>=0 && eventClass==3");
+  tC -> Project("H_C_cat3", "mgg/mggGen-1","mgg>500 && mgg<6000 && mggGen>=0 && eventClass==3");
 
   // cosmetics
   H_A_cat0->SetLineColor(2);
