@@ -8,7 +8,7 @@ using namespace std;
 
 void addWeights(const char* filename, float lumiForW, float massTrue=1) {
 
-  cout << "Adding weight branch to file " << filename << endl;
+  cout << "Adding weight branch to file " << filename << endl;  
 
   TFile *fileOrig = 0;
   TTree *treeOrig = 0;
@@ -88,6 +88,7 @@ void addWeights(const char* filename, float lumiForW, float massTrue=1) {
   Int_t           presel2;
   Int_t           sel1;
   Int_t           sel2;
+  Float_t         genmgg;
   Int_t           genmatch1;
   Int_t           genmatch2;
   Float_t         geniso1;
@@ -143,6 +144,7 @@ void addWeights(const char* filename, float lumiForW, float massTrue=1) {
   TBranch        *b_presel2;
   TBranch        *b_sel1;
   TBranch        *b_sel2;
+  TBranch        *b_genmgg; 
   TBranch        *b_genmatch1; 
   TBranch        *b_genmatch2; 
   TBranch        *b_geniso1; 
@@ -198,6 +200,7 @@ void addWeights(const char* filename, float lumiForW, float massTrue=1) {
   treeOrig->SetBranchAddress("presel2",&presel2,&b_presel2);
   treeOrig->SetBranchAddress("sel1",&sel1,&b_sel1);
   treeOrig->SetBranchAddress("sel2",&sel2,&b_sel2);
+  treeOrig->SetBranchAddress("genmgg", &genmgg, &b_genmgg);
   treeOrig->SetBranchAddress("genmatch1", &genmatch1, &b_genmatch1);
   treeOrig->SetBranchAddress("genmatch2", &genmatch2, &b_genmatch2);
   treeOrig->SetBranchAddress("geniso1", &geniso1, &b_geniso1);
@@ -213,7 +216,8 @@ void addWeights(const char* filename, float lumiForW, float massTrue=1) {
   // new variables to be added
   Float_t xsecWeight;
   Float_t weight;
-  Float_t mggTrue;
+  Float_t mggNominal;
+  Float_t mggGen;
 
   // xsec to weight histos
   Float_t xsecToWeight = 0.;
@@ -224,7 +228,8 @@ void addWeights(const char* filename, float lumiForW, float massTrue=1) {
     // New branches
     theTreeNew->Branch("xsecWeight", &xsecWeight, "xsecWeight/F");
     theTreeNew->Branch("weight", &weight, "weight/F");
-    theTreeNew->Branch("mggTrue", &mggTrue, "mggTrue/F");
+    theTreeNew->Branch("mggNominal", &mggNominal, "mggNominal/F");
+    theTreeNew->Branch("mggGen", &mggGen, "mggGen/F");
     
     // Copy branches
     theTreeNew->Branch("run", &run, "run/I");
@@ -293,11 +298,13 @@ void addWeights(const char* filename, float lumiForW, float massTrue=1) {
     if (sampleID!=0) {
       xsecWeight = perEveW * lumiForW * totXsec / sampleSumWeight;             
       weight     = xsecWeight * pu_weight;
-      mggTrue    = massTrue;
+      mggNominal = massTrue;
+      mggGen     = genmgg;
     } else {   
       xsecWeight = 1.;
       weight     = 1.;
-      mggTrue    = 1.;
+      mggNominal = 1.;
+      mggGen     = 1.;
     }
 
     treeNew->Fill();

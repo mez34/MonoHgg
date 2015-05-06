@@ -21,7 +21,7 @@ addWeights("data/merged/QCD_HT-500To1000.root", $lumi);
 addWeights("data/merged/QCD_HT-1000ToInf.root", $lumi);   
 addWeights("data/merged/RSGravToGG_kMpl-001_M-750.root",  $lumi, 750);
 addWeights("data/merged/RSGravToGG_kMpl-001_M-1500.root", $lumi, 1500);
-addWeights("data/merged/RSGravToGG_kMpl-001_M-3000.root", $lumi, 3000);
+addWeights("data/merged/RSGravToGG_kMpl-001_M-5000.root", $lumi, 5000);
 addWeights("data/merged/RSGravToGG_kMpl-01_M-1500.root", $lumi, 1500);
 addWeights("data/merged/RSGravToGG_kMpl-01_M-3000.root", $lumi, 3000);
 addWeights("data/merged/RSGravToGG_kMpl-02_M-1500.root", $lumi, 1500);
