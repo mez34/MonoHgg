@@ -90,6 +90,7 @@ struct diphoTree_struc_ {
   float vtxZ;
   int genmatch1;   
   int genmatch2;
+  float genmgg;
   float geniso1;   
   float geniso2;
   float genVtxX; 
@@ -437,6 +438,7 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 		int vtxIndex;
 		float vtxX, vtxY, vtxZ;
 		int genmatch1, genmatch2;
+		float genmgg;
 		float geniso1, geniso2;
 		float genVtxX, genVtxY, genVtxZ;   
 		int eleveto1, eleveto2;
@@ -525,6 +527,7 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 		}
 	      	
 		//-------> photons, MC truth match
+		genmgg    = -999.;
 		genmatch1 = -999;
 		genmatch2 = -999;
 		geniso1   = -999.;
@@ -539,6 +542,7 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 		      auto igen = genPhotons[j].ptr();
 		      if ( igen->status() != 1 || igen->pdgId() != 22 ) continue; 
 		      if ( fabs(igen->eta()-candDiphoPtr->leadingPhoton()->matchedGenPhoton()->eta())<0.001 && fabs(igen->phi()-candDiphoPtr->leadingPhoton()->matchedGenPhoton()->phi())<0.001 ) {
+			if (j!=0 && j!=1) genmgg = -1999.; 
 			auto & extra = genPhotons[j];
 			geniso1 = extra.genIso();
 			break;
@@ -552,6 +556,7 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 		      auto igen = genPhotons[j].ptr();
 		      if ( igen->status() != 1 || igen->pdgId() != 22 ) continue; 
 		      if ( fabs(igen->eta()-candDiphoPtr->subLeadingPhoton()->matchedGenPhoton()->eta())<0.001 && fabs(igen->phi()-candDiphoPtr->subLeadingPhoton()->matchedGenPhoton()->phi())<0.001 ) {
+			if (j!=0 && j!=1) genmgg = -1999.; 
 			auto & extra = genPhotons[j];
 			geniso2 = extra.genIso();
 			break;
@@ -584,6 +589,21 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 		  }
 		  }
 		*/
+
+		// gen level mgg
+		if (sampleID>0 && genmgg>-1000.) {   
+		  const auto & genPhotons = *genPhotonsHandle;
+		  if(genPhotons.size()>=2) { 
+		    auto igen1 = genPhotons[0].ptr();
+		    auto igen2 = genPhotons[1].ptr();
+		    TLorentzVector *myGen1 = new TLorentzVector(0,0,0,0);
+		    TLorentzVector *myGen2 = new TLorentzVector(0,0,0,0);
+		    myGen1->SetPtEtaPhiM(igen1->pt(), igen1->eta(), igen1->phi(), 0.);
+		    myGen2->SetPtEtaPhiM(igen2->pt(), igen2->eta(), igen2->phi(), 0.);
+		    genmgg = (*myGen1+*myGen2).M();
+		  }
+		}
+
 
 		// Variables for the tree
 		treeDipho_.run = run;
@@ -636,6 +656,7 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 		treeDipho_.vtxZ = vtxZ;
 		treeDipho_.genmatch1 = genmatch1; 
 		treeDipho_.genmatch2 = genmatch2; 
+		treeDipho_.genmgg  = genmgg;        // -999: not enough gen level gamma; -1999: strange association with reco
 		treeDipho_.geniso1 = geniso1; 
 		treeDipho_.geniso2 = geniso2; 
 		treeDipho_.genVtxX = genVtxX;
@@ -726,6 +747,7 @@ void DiPhoAnalyzer::beginJob() {
   DiPhotonTree->Branch("sel2",&(treeDipho_.sel2),"sel2/I");
   DiPhotonTree->Branch("genmatch1",&(treeDipho_.genmatch1),"genmatch1/I");
   DiPhotonTree->Branch("genmatch2",&(treeDipho_.genmatch2),"genmatch12/I");
+  DiPhotonTree->Branch("genmgg",&(treeDipho_.genmgg),"genmgg/F");
   DiPhotonTree->Branch("geniso1",&(treeDipho_.geniso1),"geniso1/F");
   DiPhotonTree->Branch("geniso2",&(treeDipho_.geniso2),"geniso2/F");
   DiPhotonTree->Branch("vtxIndex",&(treeDipho_.vtxIndex),"vtxIndex/I");
@@ -791,6 +813,7 @@ void DiPhoAnalyzer::initTreeStructure() {
   treeDipho_.vtxZ = -500.;
   treeDipho_.genmatch1 = -500;
   treeDipho_.genmatch2 = -500;
+  treeDipho_.genmgg  = -500.;
   treeDipho_.geniso1 = -500.;
   treeDipho_.geniso2 = -500.;
   treeDipho_.genVtxX = -500.;
