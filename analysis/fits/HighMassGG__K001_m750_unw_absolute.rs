@@ -7,7 +7,7 @@ eventClass[-10,10];
 Mass_sig_mean_cat0[750,400,1100];
 Mass_sig_sigma_cat0[4, 1., 15.];
 Mass_sig_alphaCBpos_cat0[-1., -3., -0.1];
-Mass_sig_alphaCBneg_cat0[0.8, 1., 5.]; 
+Mass_sig_alphaCBneg_cat0[0.8, 0., 5.]; 
 Mass_sig_nCBpos_cat0[3., 3., 3.];    
 Mass_sig_nCBneg_cat0[3., 3., 3.];     
 Mass_sig_frac_cat0[0.7, 0., 1.];
