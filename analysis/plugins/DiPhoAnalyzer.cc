@@ -517,6 +517,7 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 		genVtxZ = -999.;
 		if (sampleID>0) {     // MC
 		  for( unsigned int genLoop = 0 ; genLoop < genParticles->size(); genLoop++ ) {
+		    
 		    if( genParticles->ptrAt( genLoop )->pdgId() != 2212 || genParticles->ptrAt( genLoop )->vertex().z() != 0. ) {
 		      genVtxX = genParticles->ptrAt( genLoop )->vertex().x();
 		      genVtxY = genParticles->ptrAt( genLoop )->vertex().y();
@@ -527,7 +528,6 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 		}
 	      	
 		//-------> photons, MC truth match
-		genmgg    = -999.;
 		genmatch1 = -999;
 		genmatch2 = -999;
 		geniso1   = -999.;
@@ -542,7 +542,6 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 		      auto igen = genPhotons[j].ptr();
 		      if ( igen->status() != 1 || igen->pdgId() != 22 ) continue; 
 		      if ( fabs(igen->eta()-candDiphoPtr->leadingPhoton()->matchedGenPhoton()->eta())<0.001 && fabs(igen->phi()-candDiphoPtr->leadingPhoton()->matchedGenPhoton()->phi())<0.001 ) {
-			if (j!=0 && j!=1) genmgg = -1999.; 
 			auto & extra = genPhotons[j];
 			geniso1 = extra.genIso();
 			break;
@@ -556,7 +555,6 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 		      auto igen = genPhotons[j].ptr();
 		      if ( igen->status() != 1 || igen->pdgId() != 22 ) continue; 
 		      if ( fabs(igen->eta()-candDiphoPtr->subLeadingPhoton()->matchedGenPhoton()->eta())<0.001 && fabs(igen->phi()-candDiphoPtr->subLeadingPhoton()->matchedGenPhoton()->phi())<0.001 ) {
-			if (j!=0 && j!=1) genmgg = -1999.; 
 			auto & extra = genPhotons[j];
 			geniso2 = extra.genIso();
 			break;
@@ -590,20 +588,47 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 		  }
 		*/
 
-		// gen level mgg
-		if (sampleID>0 && genmgg>-1000.) {   
-		  const auto & genPhotons = *genPhotonsHandle;
-		  if(genPhotons.size()>=2) { 
-		    auto igen1 = genPhotons[0].ptr();
-		    auto igen2 = genPhotons[1].ptr();
-		    TLorentzVector *myGen1 = new TLorentzVector(0,0,0,0);
-		    TLorentzVector *myGen2 = new TLorentzVector(0,0,0,0);
-		    myGen1->SetPtEtaPhiM(igen1->pt(), igen1->eta(), igen1->phi(), 0.);
-		    myGen2->SetPtEtaPhiM(igen2->pt(), igen2->eta(), igen2->phi(), 0.);
-		    genmgg = (*myGen1+*myGen2).M();
+		//--------> gen level mgg for signal samples
+		genmgg = -999.;
+		if (sampleID>99) {  // signal only 
+
+		  for( unsigned int genLoop = 0 ; genLoop < genParticles->size(); genLoop++ ) {
+		    
+		    genmgg = -1999.;
+
+		    if ( genParticles->ptrAt( genLoop )->pdgId()==5100039) {  // graviton
+
+		      if (genParticles->ptrAt( genLoop )->numberOfDaughters()!=2) {
+			genmgg = -2999.;
+			break;
+		      }
+
+		      int statusd1 = genParticles->ptrAt( genLoop )->daughter(0)->status();
+		      int statusd2 = genParticles->ptrAt( genLoop )->daughter(1)->status();
+		      int pdgidd1  = genParticles->ptrAt( genLoop )->daughter(0)->pdgId();
+		      int pdgidd2  = genParticles->ptrAt( genLoop )->daughter(1)->pdgId();
+		      if (statusd1!=1 || statusd2!=1 || pdgidd1!=22 || pdgidd2!=22) { 
+			genmgg = -3999.;
+			break;
+		      }
+
+		      float ptd1  = genParticles->ptrAt( genLoop )->daughter(0)->pt();
+		      float ptd2  = genParticles->ptrAt( genLoop )->daughter(1)->pt();
+		      float etad1 = genParticles->ptrAt( genLoop )->daughter(0)->eta();
+		      float etad2 = genParticles->ptrAt( genLoop )->daughter(1)->eta();
+		      float phid1 = genParticles->ptrAt( genLoop )->daughter(0)->phi();
+		      float phid2 = genParticles->ptrAt( genLoop )->daughter(1)->phi();
+		      
+		      TLorentzVector *myGenD1 = new TLorentzVector(0,0,0,0);
+		      TLorentzVector *myGenD2 = new TLorentzVector(0,0,0,0);
+		      myGenD1->SetPtEtaPhiM(ptd1, etad1, phid1, 0.);
+		      myGenD2->SetPtEtaPhiM(ptd2, etad2, phid2, 0.);
+		      genmgg = (*myGenD1+*myGenD2).M();
+
+		      break;
+		    }
 		  }
 		}
-
 
 		// Variables for the tree
 		treeDipho_.run = run;
