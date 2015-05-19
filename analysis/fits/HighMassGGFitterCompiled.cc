@@ -35,8 +35,9 @@ static const Int_t NCAT = 4;
 Int_t MINmass= 500;
 Int_t MAXmass= 6000;
 std::string filePOSTfix="";
-double signalScaler=1.00;
 Float_t Lum = 19500.0;    
+bool wantResponse = 1;
+bool wantGenLevel = 0;
 // ============================================
 
 
@@ -186,7 +187,7 @@ void AddSigData(RooWorkspace* w, Float_t mass, TString coupling) {
 
   
   // -------------------------
-  // split in categories, wrt mgg
+  // split in categories, wrt mgg - this is the dataset to be used for the convolution
   cout << endl;
   cout << "preparing dataset with observable mgg" << endl;
   RooDataSet* signal[NCAT];
@@ -214,20 +215,33 @@ void AddSigData(RooWorkspace* w, Float_t mass, TString coupling) {
 
 
   // -------------------------
-  // split in categories, wrt massReduced
-  cout << endl;
-  cout << endl;
-  cout << "preparing dataset with observable massReduced" << endl;
-  RooDataSet* signalR[NCAT];
-  for (int c=0; c<ncat; ++c) {
-    if (c==0) signalR[c] = (RooDataSet*) sigWeighted.reduce(*w->var("massReduced"),mainCut+TString::Format("&& eventClass==0"));
-    if (c==1) signalR[c] = (RooDataSet*) sigWeighted.reduce(*w->var("massReduced"),mainCut+TString::Format("&& eventClass==1"));
-    if (c==2) signalR[c] = (RooDataSet*) sigWeighted.reduce(*w->var("massReduced"),mainCut+TString::Format("&& eventClass==2"));
-    if (c==3) signalR[c] = (RooDataSet*) sigWeighted.reduce(*w->var("massReduced"),mainCut+TString::Format("&& eventClass==3"));
-    w->import(*signalR[c],Rename(TString::Format("SigWeightReduced_cat%d",c)));
+  // split in categories, wrt massReduced - to study the detector response
+  if (wantResponse) {
+    cout << endl;
+    cout << endl;
+    cout << "preparing dataset with observable massReduced" << endl;
+    RooDataSet* signalR[NCAT];
+    for (int c=0; c<ncat; ++c) {
+      if (c==0) signalR[c] = (RooDataSet*) sigWeighted.reduce(*w->var("massReduced"),mainCut+TString::Format("&& eventClass==0"));
+      if (c==1) signalR[c] = (RooDataSet*) sigWeighted.reduce(*w->var("massReduced"),mainCut+TString::Format("&& eventClass==1"));
+      if (c==2) signalR[c] = (RooDataSet*) sigWeighted.reduce(*w->var("massReduced"),mainCut+TString::Format("&& eventClass==2"));
+      if (c==3) signalR[c] = (RooDataSet*) sigWeighted.reduce(*w->var("massReduced"),mainCut+TString::Format("&& eventClass==3"));
+      w->import(*signalR[c],Rename(TString::Format("SigWeightReduced_cat%d",c)));
+    }
+    cout << endl;
   }
-  cout << endl;
 
+
+  // -------------------------
+  // split in categories, wrt genMass - to study the theory width
+  if (wantGenLevel) {
+    cout << endl;
+    cout << endl;
+    cout << "preparing dataset with observable mggGen, no split in categories since they're all the same" << endl;
+    RooDataSet* signalGAll = (RooDataSet*) sigWeighted.reduce(*w->var("mggGen"),mainCut);
+    w->import(*signalGAll, Rename("SigWeightGen"));
+    cout << endl;
+  }
 
   cout << "workspace summary" << endl;
   w->Print();
@@ -671,6 +685,96 @@ void SigModelResponseReducedDoubleCBFit(RooWorkspace* w, Float_t mass, TString c
 
 //-------------------------------------------------------------------------
 // Signal model: BW only fit to the gen level mass - to check it is doable or not due to the PDFs
+// Fit all categories together
+void SigModelBWFit(RooWorkspace* w, Float_t mass, TString coupling) {
+
+  int iMass = abs(mass);   
+  
+  // Variables
+  RooRealVar* mggGen = w->var("mggGen");     
+
+  // dataset
+  RooDataSet* signal = (RooDataSet*) w->data(TString::Format("SigWeightGen"));
+
+  // fit function
+  RooFormulaVar meanBW("meanBWgen","","@0",*w->var("meanBW"));   
+  RooFormulaVar sigmaBW("sigmaBWgen","","@0",*w->var("sigmaBW"));     
+  RooBreitWigner *genMassBW = new RooBreitWigner("genMassBW","genMassBW",*mggGen,meanBW,sigmaBW);  
+  w->import(*genMassBW);
+  
+  TCanvas* c1 = new TCanvas("c1", "c1", 1);
+  c1->cd();
+
+  std::cout<<TString::Format("******************************** gen level mass fit with BW, %f ***********************************",mass)<<std::endl;
+  RooFitResult* fitresults = 0;
+  if (coupling=="001") {
+    if (mass==750)  fitresults = (RooFitResult* ) genMassBW->fitTo(*signal, SumW2Error(kFALSE), Range(740, 760), RooFit::Save(kFALSE));    
+    if (mass==1500) fitresults = (RooFitResult* ) genMassBW->fitTo(*signal, SumW2Error(kFALSE), Range(1490, 1510), RooFit::Save(kFALSE));
+    if (mass==5000) fitresults = (RooFitResult* ) genMassBW->fitTo(*signal, SumW2Error(kFALSE), Range(4980, 5020), RooFit::Save(kFALSE));
+  } else if (coupling=="01") {
+    if (mass==1500) fitresults = (RooFitResult* ) genMassBW->fitTo(*signal, SumW2Error(kFALSE), Range(1400, 1600), RooFit::Save(kFALSE));
+    if (mass==3000) fitresults = (RooFitResult* ) genMassBW->fitTo(*signal, SumW2Error(kFALSE), Range(2750, 3250), RooFit::Save(kFALSE));
+  } else if (coupling=="02") {
+    if (mass==1500) fitresults = (RooFitResult* ) genMassBW->fitTo(*signal, SumW2Error(kFALSE), Range(1000, 2000), RooFit::Save(kFALSE));
+    if (mass==3000) fitresults = (RooFitResult* ) genMassBW->fitTo(*signal, SumW2Error(kFALSE), Range(2000, 4000), RooFit::Save(kFALSE));
+    if (mass==5000) fitresults = (RooFitResult* ) genMassBW->fitTo(*signal, SumW2Error(kFALSE), Range(4000, 6000), RooFit::Save(kFALSE));
+  }
+
+  // Plot
+  RooPlot* plotG = mggGen->frame(Range(740,760),Title("Gen Level mgg"),Bins(60));
+  plotG->GetXaxis()->SetTitle("m_{true}");
+  plotG->GetXaxis()->SetTitleFont(42);
+  plotG->GetXaxis()->SetTitleSize(0.04);
+  plotG->GetXaxis()->SetTitleOffset(1.40);
+  plotG->GetYaxis()->SetTitleFont(42);
+  plotG->GetYaxis()->SetTitleSize(0.04);
+
+  TLegend* legmc = new TLegend(0.6, 0.58, 0.91, 0.91, "", "brNDC");
+  legmc->SetTextSize(0.0286044);  
+  legmc->SetTextFont(42);
+  legmc->SetBorderSize(0);
+  legmc->SetFillStyle(0);
+  legmc->AddEntry(plotG->getObject(0),"Simulation","LP");    
+  legmc->AddEntry(plotG->getObject(1),"BW fit","L");
+  
+  TLatex* latex = new TLatex(0.21, 0.76, TString::Format("m_{X}=%d GeV",iMass));
+  latex->SetTextSize(0.038);
+  latex->SetTextAlign(11);
+  latex->SetTextFont(42); 
+  latex->SetNDC();
+
+  if (coupling=="001") {
+    if (mass==750)  plotG = mggGen->frame(Range(740,760),Title("Gen Level mgg"),Bins(60));
+    if (mass==1500) plotG = mggGen->frame(Range(1490,1510),Title("Gen Level mgg"),Bins(60));
+    if (mass==5000) plotG = mggGen->frame(Range(4980,5020),Title("Gen Level mgg"),Bins(60));
+  } else if (coupling=="01") {
+    if (mass==1500) plotG = mggGen->frame(Range(1400,1600),Title("Gen Level mgg"),Bins(60));
+    if (mass==3000) plotG = mggGen->frame(Range(2750,3250),Title("Gen Level mgg"),Bins(60));
+  } else if (coupling=="02") {
+    if (mass==1500) plotG = mggGen->frame(Range(1000,2000),Title("Gen Level mgg"),Bins(60));
+    if (mass==3000) plotG = mggGen->frame(Range(2000,4000),Title("Gen Level mgg"),Bins(60));
+    if (mass==5000) plotG = mggGen->frame(Range(4000,6000),Title("Gen Level mgg"),Bins(60));
+  }
+
+  signal->plotOn(plotG);
+  genMassBW->plotOn(plotG, LineColor(kBlue));
+  plotG->Draw();
+  latex->Draw("same");
+  legmc->Draw("same");
+
+  c1->SetLogy(0);
+  c1->SaveAs("plots/mggGenFitBW.png");
+  c1->SetLogy();
+  c1->SaveAs("plots/mggGenFitBW_LOG.png");
+  
+  w->defineSet("genMassBWPdfParam",RooArgSet(*w->var("meanBW"),*w->var("sigmaBW")));  
+  SetConstantParams(w->set("genMassBWPdfParam"));
+
+  w->Print();
+}
+
+/*
+// Signal model: BW only fit to the gen level mass - to check it is doable or not due to the PDFs
 void SigModelBWFit(RooWorkspace* w, Float_t mass, TString coupling) {
 
   int iMass = abs(mass);   
@@ -792,6 +896,7 @@ void SigModelBWFit(RooWorkspace* w, Float_t mass, TString coupling) {
     w->Print();
   }
 }
+*/
 //-------------------------------------------------------------------------
 
 // Fit signal with model with CB convoluted with BW
@@ -1152,8 +1257,6 @@ void runfits(const Float_t mass=1500, string coupling="001", Bool_t dobands = fa
   HLFactory hlf("HLFactory", "HighMassGG.rs", false);
   RooWorkspace* w = hlf.GetWs();
  
-  // RooFitResult* fitresults;
-  
   // import luminosity in the ws
   RooRealVar lumi("lumi","lumi",Lum);
   w->import(lumi); 
@@ -1171,15 +1274,19 @@ void runfits(const Float_t mass=1500, string coupling="001", Bool_t dobands = fa
   AddSigData(w, mass, coupling);   
 
   cout << endl; 
-  cout << "Now prepare signal model fit - resolution function" << endl;  
-  // SigModelResponseCBCBFit(w, mass, coupling);     
-  // SigModelResponseDoubleCBFit(w, mass, coupling); 
-  // SigModelResponseReducedCBCBFit(w, mass, coupling);       
-  SigModelResponseReducedDoubleCBFit(w, mass, coupling); 
+  if (wantResponse) {
+    cout << "Now prepare signal model fit - resolution function" << endl;  
+    // SigModelResponseCBCBFit(w, mass, coupling);     
+    // SigModelResponseDoubleCBFit(w, mass, coupling); 
+    // SigModelResponseReducedCBCBFit(w, mass, coupling);       
+    SigModelResponseReducedDoubleCBFit(w, mass, coupling); 
+  }    
 
   cout << endl;
-  cout << "Now try test with BW only on gen level mgg" << endl;
-  // SigModelBWFit(w, mass, coupling);     
+  if (wantGenLevel) {
+    cout << "Now try BW only on gen level mgg" << endl;
+    SigModelBWFit(w, mass, coupling);     
+  }
   
   cout << endl;
   cout << "Now prepare signal model fit - resolution function x BW" << endl;  
