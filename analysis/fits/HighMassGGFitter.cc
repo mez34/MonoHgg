@@ -12,14 +12,15 @@ Float_t Lum = 19500.0;
 // ============================================
 
 // functions
-void AddSigData(RooWorkspace*, Float_t, std::string);
+void AddSigData(RooWorkspace*, Float_t, std::string);   
+
+void SigModelResponseCBCBFit(RooWorkspace*, Float_t, std::string);   
+void SigModelResponseReducedCBCBFit(RooWorkspace*, Float_t, std::string);   
+
+void SigModelBWFit(RooWorkspace*, Float_t, std::string);
+void SigModelFitConvBW(RooWorkspace*, Float_t, Double_t);
 
 void AddBkgData(RooWorkspace*, Float_t);
-
-void SigModelResponseCBCBFit(RooWorkspace*, Float_t, std::string);
-void SigModelBWFit(RooWorkspace*, Float_t, std::string);
-
-void SigModelFitConvBW(RooWorkspace*, Float_t, Double_t);
 
 RooFitResult*  BkgModelFitDiJetFunc(RooWorkspace*, Bool_t, Float_t, bool);
 
@@ -33,16 +34,20 @@ void SetConstantParams(const RooArgSet* params);
 TPaveText* get_labelCMS( int legendQuadrant, std::string year, bool sim);
 TPaveText* get_labelSqrt( int legendQuadrant );
 
+
+
 // Definition of the variables in the input ntuple
 RooArgSet* defineVariables() {
 
-  RooRealVar* mgg        = new RooRealVar("mgg",        "M(gg)",       MINmass, MAXmass, "GeV");
+  ////////////////RooRealVar* mgg        = new RooRealVar("mgg",        "M(gg)",       MINmass, MAXmass, "GeV");
+  RooRealVar* mgg        = new RooRealVar("mgg",        "M(gg)",       1250., 1700., "GeV");    // chiara: 1100-1700
   RooRealVar* mggGen     = new RooRealVar("mggGen",     "M(gg) gen",   MINmass, MAXmass, "GeV");
   RooRealVar* eventClass = new RooRealVar("eventClass", "eventClass",    -10,      10,   "");
-  RooRealVar* weight     = new RooRealVar("weight",     "weightings",      0,     1000,  "");
+  // RooRealVar* weight     = new RooRealVar("weight",     "weightings",      0,     1000,  "");
   RooRealVar* nvtx       = new RooRealVar("nvtx",       "nvtx",            0,      50,   "");
 
-  RooArgSet* ntplVars = new RooArgSet(*mgg, *mggGen, *eventClass, *weight, *nvtx);
+  // RooArgSet* ntplVars = new RooArgSet(*mgg, *mggGen, *eventClass, *weight, *nvtx);
+  RooArgSet* ntplVars = new RooArgSet(*mgg, *mggGen, *eventClass, *nvtx);
   
   return ntplVars;
 }
@@ -59,7 +64,6 @@ void runfits(const Float_t mass=1500, TString coupling="001", Bool_t dobands = f
 
   TString fileBaseName("HighMassGG");    
   TString fileBkgName("HighMassGG.inputbkg");
-  
   HLFactory hlf("HLFactory", "HighMassGG.rs", false);
   RooWorkspace* w = hlf.GetWs();
  
@@ -69,42 +73,11 @@ void runfits(const Float_t mass=1500, TString coupling="001", Bool_t dobands = f
   RooRealVar lumi("lumi","lumi",Lum);
   w->import(lumi); 
   
-  // compute roohistfunc with min and max for the fit range 
-  RooRealVar* var = new RooRealVar("var","var", 500, 6000 );   // maximum range
-
-  // define the range for the fit at each mass
-  RooHistFunc* rooFitMin = getRooHistFuncFitMIN(0, var);   
-  RooHistFunc* rooFitMax = getRooHistFuncFitMAX(0, var);   
-  TF1* fFitMin = getFuncFitMIN(0, var);
-  TF1* fFitMax = getFuncFitMAX(0, var);
-  makeRooHistPlot(rooFitMin,rooFitMax,fFitMin,fFitMax,var); 
-  
-  
-  cout << endl;
-  cout << endl;
-  cout << "--------------------------------------------------------" << endl;
-  cout << "mass range for mass " << mass << " under study: " << fFitMin->Eval(mass) << " - " << fFitMax->Eval(mass) << std::endl;
-  cout << "--------------------------------------------------------" << endl;
-  cout << endl;
-  cout << endl;  
-
-  var->setVal(mass);
-  
-  // and now set the range for the fit at this mass
-  double newmin = fFitMin->Eval(mass);
-  double newmax = fFitMax->Eval(mass);
-  MINmass=newmin;
-  MAXmass=newmax;
-  // chiara: for the moment skip the part above and always consider the full range
-  // Double_t MMIN = MINmass; 
-  // Double_t MMAX = MAXmass; 
-  Double_t MMIN = 500.;
-  Double_t MMAX = 6000.;
-  w->var("mgg")->setMin(MMIN);
-  w->var("mgg")->setMax(MMAX);
-  w->var("mggGen")->setMin(MMIN);
-  w->var("mggGen")->setMax(MMAX);
-
+  // range for the variables
+  w->var("mgg")->setMin(MINmass);
+  w->var("mgg")->setMax(MAXmass);
+  w->var("mggGen")->setMin(MINmass);
+  w->var("mggGen")->setMax(MAXmass);
   w->Print("v");
   
   
@@ -112,16 +85,15 @@ void runfits(const Float_t mass=1500, TString coupling="001", Bool_t dobands = f
   cout << "Now add signal data" << endl;
   AddSigData(w, mass, coupling);   
 
-  // chiara: qui va capito cosa accendere e cosa no quando dovro' avere la convoluzione
   cout << endl; 
   cout << "Now prepare signal model fit - resolution function" << endl;  
   SigModelResponseCBCBFit(w, mass, coupling);     
+  // SigModelResponseReducedCBCBFit(w, mass, coupling);       
 
   cout << endl;
   cout << "Now try test with BW only on gen level mgg" << endl;
   // SigModelBWFit(w, mass, coupling);     
-
-  // chiara: arrivata qui e sistemati i metodi usati sopra
+  
   cout << endl;
   cout << "Now prepare signal model fit - resolution function x BW" << endl;  
   // SigModelFitConvBW(w, mass, width);
@@ -165,33 +137,49 @@ void runfits(const Float_t mass=1500, TString coupling="001", Bool_t dobands = f
 void AddSigData(RooWorkspace* w, Float_t mass, TString coupling) {
   
   Int_t ncat = NCAT;
-  TString inDir = "data/newSelection/mergedFinal/";
   
   // Variables
   RooArgSet* ntplVars = defineVariables();
-  ntplVars->add(*w->var("mgg"));       
-  ntplVars->add(*w->var("mggGen"));       
-  
+
+  // -------------------------  
   // Files
   int iMass = abs(mass);   
+  TString inDir = "data/newSelection/mergedFinal/";
   TChain* sigTree = new TChain();
   cout << "reading file " << inDir+TString(Form("RSGravToGG_kMpl-"))+coupling+TString(Form("_M-%d.root/DiPhotonTree", iMass)) << endl;
   sigTree->Add(inDir+TString(Form("RSGravToGG_kMpl-"))+coupling+TString(Form("_M-%d.root/DiPhotonTree", iMass)));
   sigTree->SetTitle("sigTree");
   sigTree->SetName("sigTree");
 
-  // common preselection cut
-  TString mainCut = "mgg>=500 && mgg<=6000 && mggGen>=500 && mggGen<=6000";    // chiara: metto qui anche i tagli a gen level per consistenza. Forse da togliere x datacard
-    
-  // Create signal dataset 
-  RooDataSet sigWeighted("sigWeighted","dataset",sigTree,*ntplVars,mainCut,"weight");
+
+  // -------------------------
+  // common preselection cut on mgg and mggGen
+  TString mainCut1 = TString::Format("mgg>=500 && mgg<=6000 && mggGen>=500 && mggGen<=6000");   
+  // RooDataSet sigWeighted("sigWeighted","dataset",sigTree,*ntplVars,mainCut1,"weight");   // chiara!
+  RooDataSet sigWeighted("sigWeighted","dataset",sigTree,*ntplVars,mainCut1);
+
+
+  // -------------------------
+  // reduced mass
+  RooFormulaVar *massReduced_formula = new RooFormulaVar("massReduced_formula","","@0/@1 -1",RooArgList(*w->var("mgg"),*w->var("mggGen")));
+  RooRealVar* massReduced = (RooRealVar*) sigWeighted.addColumn(*massReduced_formula);
+  massReduced->SetName("massReduced");
+  massReduced->SetTitle("massReduced");
+  w->import(*massReduced);  
+  massReduced->setRange(-0.5, 0.5);
+  
+  // common preselection cut on the reduced mass
+  TString mainCut = TString::Format("massReduced>-0.5 && massReduced <0.5"); 
   cout << endl;
   cout << "sigWeighted" << endl;
   sigWeighted.Print("v");
   cout << "---- nX:  " << sigWeighted.sumEntries() << endl; 
   
-  // apply a common preselection cut; split in categories
+
+  // -------------------------
+  // split in categories, wrt mgg
   cout << endl;
+  cout << "preparing dataset with observable mgg" << endl;
   RooDataSet* signal[NCAT];
   for (int c=0; c<ncat; ++c) {
     if (c==0) signal[c] = (RooDataSet*) sigWeighted.reduce(*w->var("mgg"),mainCut+TString::Format("&& eventClass==0"));
@@ -214,6 +202,26 @@ void AddSigData(RooWorkspace* w, Float_t mass, TString coupling) {
   signalAll->Print("v");
   cout << "---- nX for signalAll:  " << signalAll->sumEntries() << endl; 
   cout << endl;
+
+
+  // -------------------------
+  // split in categories, wrt massReduced
+  cout << endl;
+  cout << endl;
+  cout << "preparing dataset with observable massReduced" << endl;
+  RooDataSet* signalR[NCAT];
+  for (int c=0; c<ncat; ++c) {
+    if (c==0) signalR[c] = (RooDataSet*) sigWeighted.reduce(*w->var("massReduced"),mainCut+TString::Format("&& eventClass==0"));
+    if (c==1) signalR[c] = (RooDataSet*) sigWeighted.reduce(*w->var("massReduced"),mainCut+TString::Format("&& eventClass==1"));
+    if (c==2) signalR[c] = (RooDataSet*) sigWeighted.reduce(*w->var("massReduced"),mainCut+TString::Format("&& eventClass==2"));
+    if (c==3) signalR[c] = (RooDataSet*) sigWeighted.reduce(*w->var("massReduced"),mainCut+TString::Format("&& eventClass==3"));
+    w->import(*signalR[c],Rename(TString::Format("SigWeightReduced_cat%d",c)));
+  }
+  cout << endl;
+
+
+  cout << "workspace summary" << endl;
+  w->Print();
 }
 
 // Data dataset
@@ -272,95 +280,153 @@ void AddBkgData(RooWorkspace* w, Float_t mass) {
   cout << "---- nX:  " << data->sumEntries() << endl; 
 }
 
-
 // ok
-// Signal model: sum of two CB with same mass and mean. This is the response function
 void SigModelResponseCBCBFit(RooWorkspace* w, Float_t mass, TString coupling) {
 
   int iMass = abs(mass);   
-
-  // Files
-  TString inDir = "data/newSelection/mergedFinal/";
-  TChain* sigTree = new TChain();
-  sigTree->Add(inDir+TString(Form("RSGravToGG_kMpl-"))+coupling+TString(Form("_M-%d.root/DiPhotonTree", iMass)));
-  sigTree->SetTitle("sigTree");
-  sigTree->SetName("sigTree");
-
-  // Variables
-  RooArgSet* ntplVars = defineVariables();
   
-  // common preselection cut
-  TString mainCut1 = TString::Format("mgg>=500 && mgg<=6000 && mggGen>=500 && mggGen<=6000");   
-  RooDataSet sigWeighted("sigWeighted","dataset",sigTree,*ntplVars,mainCut1,"weight");
+  // Dataset
+  RooDataSet* signal[NCAT];
   RooRealVar* mgg = w->var("mgg");     
 
-  RooRealVar *mG = new RooRealVar("MG", "MG", MINmass, MAXmass);   
-  mG->setVal(mass); 
-  mG->setConstant(); 
-  w->import(*mG); 
-
-  // reduced mass
-  RooFormulaVar *massReduced_formula = new RooFormulaVar("massReduced_formula","","@0/@1 -1",RooArgList(*w->var("mgg"),*w->var("mggGen")));
-  RooRealVar* massReduced = (RooRealVar*) sigWeighted.addColumn(*massReduced_formula);
-  massReduced->SetName("massReduced");
-  massReduced->SetTitle("massReduced");
-  w->import(*massReduced);  
-  massReduced->setRange(-0.5, 0.5);
-  
-  // common preselection cut on the reduced mass
-  TString mainCut = TString::Format("massReduced>-0.5 && massReduced <0.5"); 
-  
   // fit functions
-  RooDataSet* signal[NCAT];
   RooCBShape* ResponseCBpos[NCAT];
   RooCBShape* ResponseCBneg[NCAT];
-  RooGaussian* ResponseGauss[NCAT];
-  RooAddPdf* ResponseAddGauss[NCAT];
   RooAddPdf* ResponseAdd[NCAT];
   
   TCanvas* c1 = new TCanvas("c1", "c1", 1);
   c1->cd();
-  TPaveText* label_cms  = get_labelCMS(0, "2015", true);
-  TPaveText* label_sqrt = get_labelSqrt(0);
-  
-  // chiara: sistematiche, commento per ora
-  // Double_t scaleSyst;
-  // Double_t smearSyst;
-  
+
   for(int c = 0; c<NCAT; c++){
     
-    TLatex *lat  = new TLatex(0.6,0.9,TString::Format("Cat: %d", c));  
-    lat->SetTextSize(0.038);
-    lat->SetTextAlign(11);
-    lat->SetTextFont(42); 
-    lat->SetNDC();
+    // taking the dataset
+    signal[c] = (RooDataSet*) w->data(TString::Format("SigWeight_cat%d",c)); 
 
-    RooRealVar *mShift = new RooRealVar(TString::Format("mShift_cat%d", c), TString::Format("mShift_cat%d",c), -10., 10.);
-    mShift->setVal(0.);
-    ////  mShift->setConstant();
-    w->import(*mShift);
+    // cb pos                                                               
+    RooFormulaVar CBpos_mean(TString::Format("MassCB_sig_mean_cat%d",c),"", "@0", *w->var(TString::Format("Mass_sig_mean_cat%d",c)));
+    RooFormulaVar CBpos_sigma(TString::Format("MassCB_sig_sigma_cat%d",c), "", "sqrt(@0*@0)", *w->var(TString::Format("Mass_sig_sigma_cat%d",c)));
+    RooFormulaVar CBpos_alphaCB(TString::Format("MassCB_sig_alphaCBpos_cat%d",c),"", "@0", *w->var( TString::Format("Mass_sig_alphaCBpos_cat%d",c)));
+    RooFormulaVar CBpos_n(TString::Format("MassCB_sig_nCBpos_cat%d",c),"", "@0", *w->var( TString::Format("Mass_sig_nCBpos_cat%d",c)));
+    ResponseCBpos[c] = new RooCBShape(TString::Format("ResponseCBpos_cat%d",c),TString::Format("ResponseCBpos_cat%d",c) , *mgg, CBpos_mean, CBpos_sigma,  CBpos_alphaCB, CBpos_n) ;
     
-    RooRealVar *mSmear = new RooRealVar(TString::Format("mSmear_cat%d", c), TString::Format("mSmear_cat%d",c), -10., 10.);
-    mSmear->setVal(0.);
-    ////  mSmear->setConstant();
-    w->import(*mSmear);
+    // cb neg (same mean and sigma)
+    RooFormulaVar CBneg_n(TString::Format("MassCB_sig_nCBneg_cat%d",c),"", "@0", *w->var( TString::Format("Mass_sig_nCBneg_cat%d",c)));
+    RooFormulaVar CBneg_alphaCB(TString::Format("MassCB_sig_alphaCBneg_cat%d",c),"", "@0", *w->var( TString::Format("Mass_sig_alphaCBneg_cat%d",c)));
+    ResponseCBneg[c] = new RooCBShape(TString::Format("ResponseCBneg_cat%d",c),TString::Format("ResponseCBneg_cat%d",c) , *mgg, CBpos_mean, CBpos_sigma, CBneg_alphaCB, CBneg_n) ;
+   
+    // combination pos and neg
+    RooFormulaVar CB_frac(TString::Format("MassCB_sig_frac_cat%d",c),"", "@0", *w->var(TString::Format("Mass_sig_frac_cat%d",c)));
+    ResponseAdd[c]= new RooAddPdf(TString::Format("ResponseAddPdf_cat%d",c),TString::Format("ResponseAddPdf_cat%d",c) , RooArgList(*ResponseCBneg[c], *ResponseCBpos[c]), CB_frac);
+
+    w->import(*ResponseAdd[c]);
+   
+    // Fit with ResponseAdd
+    RooFitResult* fitresults;
+    if (mass==1500) 
+      fitresults = (RooFitResult* ) ResponseAdd[c]->fitTo(*signal[c], SumW2Error(kFALSE), Range(1250, 1700), RooFit::Save(kTRUE));
+    else if (mass==750) 
+      fitresults = (RooFitResult* ) ResponseAdd[c]->fitTo(*signal[c], SumW2Error(kFALSE), Range(400, 1200), RooFit::Save(kTRUE));
+    else if (mass==5000) 
+      fitresults = (RooFitResult* ) ResponseAdd[c]->fitTo(*signal[c], SumW2Error(kFALSE), Range(4000, 5500), RooFit::Save(kTRUE));
     
+    std::cout<<TString::Format("******************************** Signal Fit results CB+CB  mass %f cat %d***********************************", mass, c)<<std::endl;
+    fitresults->Print("V");
+   
+    
+    // Plot
+    RooPlot* plotG;
+    if (mass==1500) {
+      plotG = mgg->frame(Range(1250, 1650),Title("Mgg, response"),Bins(60));               // chiara: Lin scale
+      // plotG = mgg->frame(Range(1400, 1550),Title("Mgg, response"),Bins(60));            // chiara: Log scale
+    } else if (mass==750) {
+      plotG = mgg->frame(Range(710, 780),Title("Mgg, response"),Bins(60));               // chiara: Lin scale
+      // plotG = mgg->frame(Range(550, 850),Title("Mgg, response"),Bins(60));               // chiara: Log scale
+    } else if (mass==5000) {
+      // plotG = mgg->frame(Range(4500, 5300),Title("Mgg, response"),Bins(60));               // chiara: Lin scale
+      plotG = mgg->frame(Range(4000, 5500),Title("Mgg, response"),Bins(60));               // chiara: Log scale
+    }
+    signal[c]->plotOn(plotG);
+
+    ResponseAdd[c]->plotOn(plotG, LineColor(kBlue));
+    ResponseAdd[c]->plotOn(plotG,Components(TString::Format("ResponseCBneg_cat%d",c)), LineColor(kGreen), LineStyle(kDotted));
+    ResponseAdd[c]->plotOn(plotG,Components(TString::Format("ResponseCBpos_cat%d",c)), LineColor(kRed), LineStyle(kDashed));
+  
+    plotG->GetXaxis()->SetTitle("m_{reco}");
+    plotG->GetXaxis()->SetTitleFont(42);
+    plotG->GetXaxis()->SetTitleSize(0.04);
+    plotG->GetXaxis()->SetTitleOffset(1.40);
+    plotG->GetYaxis()->SetTitle("Events");
+    plotG->GetYaxis()->SetTitleFont(42);
+    plotG->GetYaxis()->SetTitleSize(0.04);
+
+    TLegend* legmc = new TLegend(0.6, 0.58, 0.91, 0.91, "", "brNDC");
+    legmc->SetTextSize(0.0286044);  
+    legmc->SetTextFont(42);
+    legmc->SetBorderSize(0);
+    legmc->SetFillStyle(0);
+    legmc->AddEntry(plotG->getObject(0),"Simulation","LP");    
+    legmc->AddEntry(plotG->getObject(1),"Sum of two CB ","L");
+    legmc->AddEntry(plotG->getObject(2),"CB 1","L");   
+    legmc->AddEntry(plotG->getObject(3),"CB 2","L");   
+    
+    TLatex* latex = new TLatex(0.21, 0.76, TString::Format("#splitline{m_{X}=%d GeV}{#splitline{}{Class %d}}",iMass,c));
+    latex->SetTextSize(0.038);
+    latex->SetTextAlign(11);
+    latex->SetTextFont(42); 
+    latex->SetNDC();
+   
+    plotG->Draw();
+    
+    latex->Draw("same");
+    legmc->Draw("same");
+    int iPos=11 ;
+
+    c1->SetLogy(0);
+    c1->SaveAs(TString::Format("plots/responseAbsoluteFitCBCB_cat%d.png",c));
+    c1->SetLogy();
+    c1->SaveAs(TString::Format("plots/responseAbsoluteFitCBCB_cat%d_LOG.png",c));
+
+    w->defineSet(TString::Format("ResponseAddPdfParam_cat%d",c),RooArgSet(*w->var(TString::Format("Mass_sig_sigma_cat%d",c)), 
+									  *w->var(TString::Format("Mass_sig_alphaCBpos_cat%d",c)),
+									  *w->var(TString::Format("Mass_sig_alphaCBneg_cat%d",c)),
+									  *w->var(TString::Format("Mass_sig_nCBpos_cat%d",c)),
+									  *w->var(TString::Format("Mass_sig_nCBneg_cat%d",c)),	   
+									  *w->var(TString::Format("Mass_sig_frac_cat%d",c)),  
+									  *w->var(TString::Format("Mass_sig_mean_cat%d",c))));
+    SetConstantParams(w->set(TString::Format("ResponseAddPdfParam_cat%d",c)));
+
+    cout << "before exiting SigModelResponseCBCBFit" << endl;
     w->Print();
-    
-    // splitting in categories
-    if (c==0) signal[c] = (RooDataSet*) sigWeighted.reduce(*w->var("massReduced"),mainCut+TString::Format("&& eventClass==0"));
-    if (c==1) signal[c] = (RooDataSet*) sigWeighted.reduce(*w->var("massReduced"),mainCut+TString::Format("&& eventClass==1"));
-    if (c==2) signal[c] = (RooDataSet*) sigWeighted.reduce(*w->var("massReduced"),mainCut+TString::Format("&& eventClass==2"));
-    if (c==3) signal[c] = (RooDataSet*) sigWeighted.reduce(*w->var("massReduced"),mainCut+TString::Format("&& eventClass==3"));
-    w->import(*signal[c],Rename(TString::Format("SigWeightReduced_cat%d",c))); 
-    
-    // chiara: sistematiche, commento per ora  
-    // if (c==0 || c==1) scaleSyst = 0.005;
-    // if (c==2 || c==3) scaleSyst = 0.007;
-    // if (c==0) smearSyst = 0.005;
-    // if (c==1) smearSyst = 0.0058;
-    // if (c==2 || c==3) smearSyst = 0.01;
+  }
+}
 
+
+
+// --------------------------------------------------------------------------------------------------------------
+// ok
+// Signal model: sum of two CB with same mass and mean. This is the response function based on mreco/mgen -1
+void SigModelResponseReducedCBCBFit(RooWorkspace* w, Float_t mass, TString coupling) {
+  
+  int iMass = abs(mass);   
+  
+  // Dataset 
+  RooDataSet* signal[NCAT];
+  RooRealVar* mgg = w->var("mgg");     
+  RooRealVar* massReduced = w->var("massReduced");
+    
+  // fit functions
+  RooCBShape* ResponseCBpos[NCAT];
+  RooCBShape* ResponseCBneg[NCAT];
+  RooAddPdf* ResponseAdd[NCAT];
+  
+  TCanvas* c1 = new TCanvas("c1", "c1", 1);
+  c1->cd();
+  
+  for(int c = 0; c<NCAT; c++){
+
+    // taking the dataset  
+    signal[c] = (RooDataSet*) w->data(TString::Format("SigWeightReduced_cat%d",c));
+    
     // cb pos                                                               
     RooFormulaVar CBpos_mean(TString::Format("ReducedMassCB_sig_mean_cat%d",c),"", "@0", *w->var(TString::Format("ReducedMass_sig_mean_cat%d",c)));
     RooFormulaVar CBpos_sigma(TString::Format("ReducedMassCB_sig_sigma_cat%d",c), "", "sqrt(@0*@0)", *w->var(TString::Format("ReducedMass_sig_sigma_cat%d",c)));
@@ -379,12 +445,11 @@ void SigModelResponseCBCBFit(RooWorkspace* w, Float_t mass, TString coupling) {
 
     w->import(*ResponseAdd[c]);
    
-    // Fit with ResponseAdd - chiara! da esportare anche agli altri
+    // Fit with ResponseAdd
     RooFitResult* fitresults = (RooFitResult* ) ResponseAdd[c]->fitTo(*signal[c], SumW2Error(kFALSE), Range(-0.05, 0.05), RooFit::Save(kTRUE));
     std::cout<<TString::Format("******************************** Signal Fit results CB+CB  mass %f cat %d***********************************", mass, c)<<std::endl;
     fitresults->Print("V");
    
-    
     // Plot
     RooPlot* plotG = massReduced->frame(Range(-0.05, 0.05),Title("Mass Reduced"),Bins(60));
     signal[c]->plotOn(plotG);
@@ -428,7 +493,7 @@ void SigModelResponseCBCBFit(RooWorkspace* w, Float_t mass, TString coupling) {
     c1->SetLogy();
     c1->SaveAs(TString::Format("plots/responseFitCBCB_cat%d_LOG.png",c));
     c1->SaveAs(TString::Format("plots/responseFitCBCB_cat%d_LOG.pdf",c));
-	       
+    
     w->defineSet(TString::Format("ResponseAddPdfParam_cat%d",c),RooArgSet(*w->var(TString::Format("ReducedMass_sig_sigma_cat%d",c)), 
 									  *w->var(TString::Format("ReducedMass_sig_alphaCBpos_cat%d",c)),
 									  *w->var(TString::Format("ReducedMass_sig_alphaCBneg_cat%d",c)),
@@ -462,7 +527,8 @@ void SigModelBWFit(RooWorkspace* w, Float_t mass, TString coupling) {
   
   // common preselection cut
   TString mainCut = TString::Format("mgg>=500 && mgg<=6000 && mggGen>=500 && mggGen<=6000");   
-  RooDataSet sigWeightedGen("sigWeightedGen","dataset",sigTree,*ntplVars,mainCut,"weight");
+  // RooDataSet sigWeightedGen("sigWeightedGen","dataset",sigTree,*ntplVars,mainCut,"weight");
+  RooDataSet sigWeightedGen("sigWeightedGen","dataset",sigTree,*ntplVars,mainCut);
   RooRealVar* mggGen = w->var("mggGen");     
 
   // fit functions
@@ -476,12 +542,6 @@ void SigModelBWFit(RooWorkspace* w, Float_t mass, TString coupling) {
   
   for(int c = 0; c<NCAT; c++){
     
-    TLatex *lat  = new TLatex(0.6,0.9,TString::Format("Cat: %d", c));  
-    lat->SetTextSize(0.038);
-    lat->SetTextAlign(11);
-    lat->SetTextFont(42); 
-    lat->SetNDC();
-
     // splitting in categories
     if (c==0) signal[c] = (RooDataSet*) sigWeightedGen.reduce(*w->var("mggGen"),mainCut+TString::Format("&& eventClass==0"));
     if (c==1) signal[c] = (RooDataSet*) sigWeightedGen.reduce(*w->var("mggGen"),mainCut+TString::Format("&& eventClass==1"));
@@ -500,16 +560,16 @@ void SigModelBWFit(RooWorkspace* w, Float_t mass, TString coupling) {
     // chiara
     RooFitResult* fitresults;
     if (coupling=="001") {
-      if (mass==750)  fitresults = (RooFitResult* ) genMassBW[c]->fitTo(*signal[c], SumW2Error(kTRUE), Range(740, 760), RooFit::Save(kTRUE));    
-      if (mass==1500) fitresults = (RooFitResult* ) genMassBW[c]->fitTo(*signal[c], SumW2Error(kTRUE), Range(1490, 1510), RooFit::Save(kTRUE));
-      if (mass==5000) fitresults = (RooFitResult* ) genMassBW[c]->fitTo(*signal[c], SumW2Error(kTRUE), Range(4980, 5020), RooFit::Save(kTRUE));
+      if (mass==750)  fitresults = (RooFitResult* ) genMassBW[c]->fitTo(*signal[c], SumW2Error(kFALSE), Range(740, 760), RooFit::Save(kFALSE));    
+      if (mass==1500) fitresults = (RooFitResult* ) genMassBW[c]->fitTo(*signal[c], SumW2Error(kFALSE), Range(1490, 1510), RooFit::Save(kFALSE));
+      if (mass==5000) fitresults = (RooFitResult* ) genMassBW[c]->fitTo(*signal[c], SumW2Error(kFALSE), Range(4980, 5020), RooFit::Save(kFALSE));
     } else if (coupling=="01") {
-      if (mass==1500) fitresults = (RooFitResult* ) genMassBW[c]->fitTo(*signal[c], SumW2Error(kTRUE), Range(1400, 1600), RooFit::Save(kTRUE));
-      if (mass==3000) fitresults = (RooFitResult* ) genMassBW[c]->fitTo(*signal[c], SumW2Error(kTRUE), Range(2750, 3250), RooFit::Save(kTRUE));
+      if (mass==1500) fitresults = (RooFitResult* ) genMassBW[c]->fitTo(*signal[c], SumW2Error(kFALSE), Range(1400, 1600), RooFit::Save(kFALSE));
+      if (mass==3000) fitresults = (RooFitResult* ) genMassBW[c]->fitTo(*signal[c], SumW2Error(kFALSE), Range(2750, 3250), RooFit::Save(kFALSE));
     } else if (coupling=="02") {
-      if (mass==1500) fitresults = (RooFitResult* ) genMassBW[c]->fitTo(*signal[c], SumW2Error(kTRUE), Range(1000, 2000), RooFit::Save(kTRUE));
-      if (mass==3000) fitresults = (RooFitResult* ) genMassBW[c]->fitTo(*signal[c], SumW2Error(kTRUE), Range(2000, 4000), RooFit::Save(kTRUE));
-      if (mass==5000) fitresults = (RooFitResult* ) genMassBW[c]->fitTo(*signal[c], SumW2Error(kTRUE), Range(4000, 6000), RooFit::Save(kTRUE));
+      if (mass==1500) fitresults = (RooFitResult* ) genMassBW[c]->fitTo(*signal[c], SumW2Error(kFALSE), Range(1000, 2000), RooFit::Save(kFALSE));
+      if (mass==3000) fitresults = (RooFitResult* ) genMassBW[c]->fitTo(*signal[c], SumW2Error(kFALSE), Range(2000, 4000), RooFit::Save(kFALSE));
+      if (mass==5000) fitresults = (RooFitResult* ) genMassBW[c]->fitTo(*signal[c], SumW2Error(kFALSE), Range(4000, 6000), RooFit::Save(kFALSE));
     }
     std::cout<<TString::Format("******************************** gen level mass fit with BW, %f cat %d***********************************", mass, c)<<std::endl;
     fitresults->Print("V");
@@ -577,11 +637,12 @@ void SigModelBWFit(RooWorkspace* w, Float_t mass, TString coupling) {
 
 // Fit signal with model with CB convoluted with BW
 void SigModelFitConvBW(RooWorkspace* w, Float_t mass, Double_t width) {
-  
+
   Float_t MASS(mass);  
   Float_t minMassFit(mass*0.8);
   Float_t maxMassFit(mass*1.2); 
 
+  // chiara
   RooDataSet* sigToFit[NCAT];
   RooRealVar* mgg = w->var("mgg"); 
 
@@ -597,58 +658,63 @@ void SigModelFitConvBW(RooWorkspace* w, Float_t mass, Double_t width) {
   for (int c=0; c<NCAT; ++c) {
     cout << "---------- Category = " << c << endl;
     
-    // chiara: to be uncommented
+    // chiara: to be uncommented when we have the parametric model
     // get sigma from TF1:     
     // TF1* fcn = (TF1*)f->Get(TString::Format("f%d",c));   
     // Float_t massF = (Float_t) (*w->var("MG")).getVal();   
     // Float_t sigmaCorr = fcn->Eval(massF);
     // if(massF==1500)sigmaCorr=1;   
-    Float_t sigmaCorr=1;   
-    RooRealVar rooSigmaCorr (TString::Format("rooSigmaCorr_cat%d",c), TString::Format("rooSigmaCorr_cat%d",c), sigmaCorr, "");
-    rooSigmaCorr.setConstant(); 
-    w->import(rooSigmaCorr);
+    // Float_t sigmaCorr=1;   
+    // RooRealVar rooSigmaCorr (TString::Format("rooSigmaCorr_cat%d",c), TString::Format("rooSigmaCorr_cat%d",c), sigmaCorr, "");
+    // rooSigmaCorr.setConstant(); 
+    // w->import(rooSigmaCorr);
 
     // chiara: to be uncommented for syst.
     // ( *w->var(TString::Format("mShift_cat%d",c))).setConstant();
     // ( *w->var(TString::Format("mSmear_cat%d",c))).setConstant(); 
 
-    // CB
-    RooFormulaVar CBpos_mean(TString::Format("CBpos_mean_cat%d",c),"","@0",*w->var(TString::Format("ReducedMass_sig_mean_cat%d",c)));
-    RooFormulaVar CBpos_sigma(TString::Format("CBpos_sigma_cat%d",c),"","(sqrt(@0*@0*@2*@2)*@1)",RooArgList(*w->var(TString::Format("ReducedMass_sig_sigma_cat%d",c)),*w->var("MG"),*w->var(TString::Format("rooSigmaCorr_cat%d",c)) ) );   
-    RooFormulaVar CBpos_alphaCB(TString::Format("CBpos_alphaCB_cat%d",c),"","@0",*w->var(TString::Format("ReducedMass_sig_alphaCBpos_cat%d",c)) );
-    RooFormulaVar CBneg_alphaCB(TString::Format("CBneg_alphaCB_cat%d",c),"","@0",*w->var(TString::Format("ReducedMass_sig_alphaCBneg_cat%d",c)) );
-    RooFormulaVar CBpos_n(TString::Format("CBpos_n_cat%d",c),"","@0",*w->var(TString::Format("ReducedMass_sig_nCBpos_cat%d",c)) );
-    RooFormulaVar CBneg_n(TString::Format("CBneg_n_cat%d",c),"","@0",*w->var(TString::Format("ReducedMass_sig_nCBneg_cat%d",c)) );
-    RooFormulaVar CBpos_frac(TString::Format("CBpos_frac_cat%d",c),"","@0",*w->var(TString::Format("ReducedMass_sig_frac_cat%d",c)) );
+    // CB - chiara: tornare alla versione di Livia che prende dal file quando avremo modello interpolato
+    RooFormulaVar CBpos_mean(TString::Format("CBpos_mean_cat%d",c),"","@0",*w->var(TString::Format("ConvMass_sig_mean_cat%d",c)) );
+    RooFormulaVar CBpos_sigma(TString::Format("CBpos_sigma_cat%d",c),"","@0",*w->var(TString::Format("Mass_sig_sigma_cat%d",c)) );
+    ////RooFormulaVar CBpos_sigma(TString::Format("CBpos_sigma_cat%d",c),"","(sqrt(@0*@0*@2*@2)*@1)",RooArgList(*w->var(TString::Format("Mass_sig_sigma_cat%d",c)),*w->var("MG"),*w->var(TString::Format("rooSigmaCorr_cat%d",c)) ) );   
+    RooFormulaVar CBpos_alphaCB(TString::Format("CBpos_alphaCB_cat%d",c),"","@0",*w->var(TString::Format("Mass_sig_alphaCBpos_cat%d",c)) );
+    RooFormulaVar CBneg_alphaCB(TString::Format("CBneg_alphaCB_cat%d",c),"","@0",*w->var(TString::Format("Mass_sig_alphaCBneg_cat%d",c)) );
+    RooFormulaVar CBpos_n(TString::Format("CBpos_n_cat%d",c),"","@0",*w->var(TString::Format("Mass_sig_nCBpos_cat%d",c)) );
+    RooFormulaVar CBneg_n(TString::Format("CBneg_n_cat%d",c),"","@0",*w->var(TString::Format("Mass_sig_nCBneg_cat%d",c)) );
+    RooFormulaVar CBpos_frac(TString::Format("CBpos_frac_cat%d",c),"","@0",*w->var(TString::Format("Mass_sig_frac_cat%d",c)) );
 
     RooCBShape ResCBpos(TString::Format("ResCBpos_cat%d",c),TString::Format("ResCBpos_cat%d",c) , *mgg, CBpos_mean, CBpos_sigma,CBpos_alphaCB, CBpos_n) ;
     RooCBShape ResCBneg(TString::Format("ResCBneg_cat%d",c),TString::Format("ResCBneg_cat%d",c) , *mgg, CBpos_mean, CBpos_sigma,CBneg_alphaCB, CBneg_n) ;
-    mgg->setBins(40000, "cache");  
+    mgg->setBins(5000, "cache");  
     
     RooAddPdf ResAddPdf(TString::Format("ResAddPdf_cat%d",c),TString::Format("ResAddPdf_cat%d",c) , RooArgList(ResCBneg, ResCBpos), CBpos_frac);
 
-    // CB to draw
-    RooFormulaVar CBpos_mean_draw(TString::Format("CBpos_mean_draw_cat%d",c),"","@0+@1",RooArgList(*w->var(TString::Format("ReducedMass_sig_mean_cat%d",c)),*w->var("MG")));    
-    RooCBShape ResCBpos_draw(TString::Format("ResCBpos_draw_cat%d",c),TString::Format("ResCBpos_draw_cat%d",c) , *mgg, CBpos_mean_draw, CBpos_sigma, CBpos_alphaCB, CBpos_n) ;
-    RooCBShape ResCBneg_draw(TString::Format("ResCBneg_draw_cat%d",c),TString::Format("ResCBneg_draw_cat%d",c) , *mgg, CBpos_mean_draw, CBpos_sigma, CBneg_alphaCB, CBneg_n) ;
-    RooAddPdf ResAddPdf_draw(TString::Format("ResAddPdf_draw_cat%d",c),TString::Format("ResAddPdf_draw_cat%d",c) , RooArgList(ResCBneg_draw, ResCBpos_draw), CBpos_frac);
+    // BW 
 
-    // BW
-    RooFormulaVar meanBW(TString::Format("meanBW_cat%d",c),"","@0",*w->var("MG"));  
-    RooRealVar sigmaBW_var(TString::Format("sigmaBW_var_cat%d",c), TString::Format("sigmaBW_var_cat%d",c), width);
-    sigmaBW_var.setConstant(); 
-    cout << "import width = " << width << endl;
-    w->import(sigmaBW_var);
-    
-    RooFormulaVar* sigmaBW;
-    // chiara: width<1 => BW width fixed at the nominal value. Width N>1 => BW width fixed at N% of the mass
-    if(width<1) sigmaBW = new RooFormulaVar(TString::Format("sigmaBW_cat%d",c),"","@0",*w->var(TString::Format("sigmaBW_var_cat%d",c))); 
-    else if(width==2)  sigmaBW = new RooFormulaVar(TString::Format("sigmaBW_cat%d",c),"","@0*0.02",*w->var("MG"));   
-    else if(width==5)  sigmaBW = new RooFormulaVar(TString::Format("sigmaBW_cat%d",c),"","@0*0.05",*w->var("MG"));   
-    else if(width==7)  sigmaBW = new RooFormulaVar(TString::Format("sigmaBW_cat%d",c),"","@0*0.07",*w->var("MG"));   
-    else if(width==10) sigmaBW = new RooFormulaVar(TString::Format("sigmaBW_cat%d",c),"","@0*0.10",*w->var("MG"));   
-    RooBreitWigner SigModelBW(TString::Format("BW_cat%d",c),TString::Format("BW_cat%d",c), *mgg, meanBW, *sigmaBW);
+    // chiara: provo libero
+    RooFormulaVar meanBW(TString::Format("massBW_cat%d",c),"","@0",*w->var(TString::Format("meanBW_cat%d",c)) );  
+    RooFormulaVar sigmaBW(TString::Format("widthBW_cat%d",c),"","@0",*w->var(TString::Format("sigmaBW_cat%d",c)) );
+    RooBreitWigner SigModelBW(TString::Format("BW_cat%d",c),TString::Format("BW_cat%d",c), *mgg, meanBW, sigmaBW);
+   /*
+    // chiara era cosi
+    // RooFormulaVar meanBW(TString::Format("meanBW_cat%d",c),"","@0",*w->var("MG"));    
+    // RooRealVar sigmaBW_var(TString::Format("sigmaBW_var_cat%d",c), TString::Format("sigmaBW_var_cat%d",c), width);
+    // sigmaBW_var.setConstant();  
+    // cout << "import width = " << width << endl;
+    // w->import(sigmaBW_var);
+    // RooFormulaVar* sigmaBW;
+    // if(width<1) sigmaBW = new RooFormulaVar(TString::Format("sigmaBW_cat%d",c),"","@0",*w->var(TString::Format("sigmaBW_var_cat%d",c))); 
 
+    // chiara: se voglio allargare alla Livia
+    // else if(width==2)  sigmaBW = new RooFormulaVar(TString::Format("sigmaBW_cat%d",c),"","@0*0.02",*w->var("MG"));   
+    // else if(width==5)  sigmaBW = new RooFormulaVar(TString::Format("sigmaBW_cat%d",c),"","@0*0.05",*w->var("MG"));   
+    // else if(width==7)  sigmaBW = new RooFormulaVar(TString::Format("sigmaBW_cat%d",c),"","@0*0.07",*w->var("MG"));   
+    // else if(width==10) sigmaBW = new RooFormulaVar(TString::Format("sigmaBW_cat%d",c),"","@0*0.10",*w->var("MG"));   
+        
+    // BW with mean and sigma as above
+    // RooBreitWigner SigModelBW(TString::Format("BW_cat%d",c),TString::Format("BW_cat%d",c), *mgg, meanBW, *sigmaBW);
+    */
+      
     // Convolution
     RooFFTConvPdf* ConvolutedRes_CB;
     ConvolutedRes_CB = new RooFFTConvPdf(TString::Format("mggSig_cat%d",c),TString::Format("mggSig_cat%d",c), *mgg,SigModelBW, ResAddPdf);
@@ -660,20 +726,37 @@ void SigModelFitConvBW(RooWorkspace* w, Float_t mass, Double_t width) {
     // std::cout<<"SIG NORM ----->"<<rooFunc_norm->getVal(*w->var("MG"));
 
     // make plot for some cases
-    if(width < 1){       
+    if(1){  // chiara      
+    // if(width < 1){       
+
       sigToFit[c] = (RooDataSet*) w->data(TString::Format("SigWeight_cat%d",c)); 
+      //sigToFit[c].Print("v");
       
-      RooFitResult* fitresults_CB = (RooFitResult* ) ConvolutedRes_CB->fitTo(*sigToFit[c], SumW2Error(kTRUE), RooFit::Save(kTRUE));
+      RooFitResult* fitresults_CB;
+      if (mass==1500)
+	fitresults_CB = (RooFitResult* ) ConvolutedRes_CB->fitTo(*sigToFit[c], SumW2Error(kFALSE), Range(1250, 1700), RooFit::Save(kTRUE));
+      else if (mass==750)
+	fitresults_CB = (RooFitResult* ) ConvolutedRes_CB->fitTo(*sigToFit[c], SumW2Error(kFALSE), Range(400, 1200), RooFit::Save(kTRUE));
+      else if (mass==5000)
+	fitresults_CB = (RooFitResult* ) ConvolutedRes_CB->fitTo(*sigToFit[c], SumW2Error(kFALSE), Range(4000, 5500), RooFit::Save(kTRUE));
+      // RooFitResult* fitresults_CB = (RooFitResult* ) ResAddPdf.fitTo(*sigToFit[c], SumW2Error(kFALSE), Range(1200, 1700), RooFit::Save(kTRUE));
+      // RooFitResult* fitresults_CB = (RooFitResult* ) SigModelBW.fitTo(*sigToFit[c], SumW2Error(kFALSE), Range(1200, 1700), RooFit::Save(kTRUE));
       fitresults_CB->Print("V");
       
-      RooPlot* plotOnlyResPdf = w->var("mgg")->frame(Range(minMassFit-20,maxMassFit+20),Bins(100));
+      RooPlot* plotOnlyResPdf;
+      if (mass==1500) plotOnlyResPdf = w->var("mgg")->frame(Range(1250,1700),Bins(100));
+      else if (mass==750) plotOnlyResPdf = w->var("mgg")->frame(Range(400,1200),Bins(100));
+      else if (mass==5000) plotOnlyResPdf = w->var("mgg")->frame(Range(4000,5500),Bins(100));
       sigToFit[c]->plotOn(plotOnlyResPdf, LineColor(kRed), LineStyle(kDashed));
       double max = plotOnlyResPdf->GetMaximum();
-      
-      RooPlot* plotPhotonsMassAll = w->var("mgg")->frame(Range(minMassFit-20,maxMassFit+20),Bins(100));
+
+      RooPlot* plotPhotonsMassAll;
+      if (mass==1500) plotPhotonsMassAll = w->var("mgg")->frame(Range(1250,1700),Bins(100));
+      else if (mass==750) plotPhotonsMassAll = w->var("mgg")->frame(Range(400,1200),Bins(100));
+      else if (mass==5000) plotPhotonsMassAll = w->var("mgg")->frame(Range(4000,5500),Bins(100));
       sigToFit[c]->plotOn(plotPhotonsMassAll);
       SigModelBW.plotOn(plotPhotonsMassAll, LineColor(kGreen), LineStyle(kDashed));
-      ResAddPdf_draw.plotOn(plotPhotonsMassAll, LineColor(kRed), LineStyle(kDashed));
+      ResAddPdf.plotOn(plotPhotonsMassAll, LineColor(kRed), LineStyle(kDashed));
       ConvolutedRes_CB->plotOn(plotPhotonsMassAll, LineColor(kBlue));
 
       TCanvas* c1 = new TCanvas("c1","PhotonsMass",0,0,800,800);
@@ -699,8 +782,8 @@ void SigModelFitConvBW(RooWorkspace* w, Float_t mass, Double_t width) {
       legmc->SetFillStyle(0);
       legmc->Draw();
       lat->Draw("same");
-      label_cms->Draw("same");
-      label_sqrt->Draw("same");
+      // label_cms->Draw("same");
+      // label_sqrt->Draw("same");
       
       int massI(mass);
       c1->SetLogy();
@@ -782,13 +865,13 @@ void SigModelFitConvBW(RooWorkspace* w, Float_t mass, Double_t width) {
     */
 
     // IMPORTANT: fix all pdf parameters to constant
-    w->defineSet(TString::Format("ConvolutedPdfParam_cat%d",c),RooArgSet( *w->var(TString::Format("ReducedMassCB_sig_sigma_cat%d",c)), 
-									  *w->var(TString::Format("ReducedMassCB_sig_alphaCBpos_cat%d",c)),
-									  *w->var(TString::Format("ReducedMassCB_sig_alphaCBneg_cat%d",c)),
-									  *w->var(TString::Format("ReducedMassCB_sig_nCBpos_cat%d",c)),
-									  *w->var(TString::Format("ReducedMassCB_sig_nCBneg_cat%d",c)),	   
-									  *w->var(TString::Format("ReducedMassCB_sig_frac_cat%d",c)),  
-									  *w->var(TString::Format("ReducedMassCB_sig_mean_cat%d",c)),
+    w->defineSet(TString::Format("ConvolutedPdfParam_cat%d",c),RooArgSet( *w->var(TString::Format("MassCB_sig_sigma_cat%d",c)), 
+									  *w->var(TString::Format("MassCB_sig_alphaCBpos_cat%d",c)),
+									  *w->var(TString::Format("MassCB_sig_alphaCBneg_cat%d",c)),
+									  *w->var(TString::Format("MassCB_sig_nCBpos_cat%d",c)),
+									  *w->var(TString::Format("MassCB_sig_nCBneg_cat%d",c)),	   
+									  *w->var(TString::Format("MassCB_sig_frac_cat%d",c)),  
+									  *w->var(TString::Format("MassCB_sig_mean_cat%d",c)),
 									  *w->var(TString::Format("sigmaBW_var_cat%d",c))));
     
     SetConstantParams(w->set(TString::Format("ConvolutedPdfParam_cat%d",c)));
@@ -796,549 +879,6 @@ void SigModelFitConvBW(RooWorkspace* w, Float_t mass, Double_t width) {
     w->Print("V");
   }
 }
-
-// chiara: sto sistemando questa
-// Fit signal with model with CB convoluted with BW 
-void SigModelFitConvRelBW(RooWorkspace* w, Float_t mass, Double_t width) {
-
-  Float_t MASS(mass); 
-  Float_t minMassFit(mass*0.8);
-  Float_t maxMassFit(mass*1.2); 
-  RooRealVar* mgg = w->var("mgg"); 
-
-  RooDataSet* sigToFit[NCAT];
-
-  // chiara: sistematiche, per il momento commento     
-  // Double_t scaleSyst;
-  // Double_t smearSyst;
-
-  std::cout<<"----------------------------------------------------------------------------------------"<<std::endl;
-  TPaveText* label_cms  = get_labelCMS(0, "2015", true);
-  TPaveText* label_sqrt = get_labelSqrt(0);
-
-  // chiara: questo file va creato
-  TFile* f = new TFile("sigShapeCorrections.root", "READ");
-
-  // Fit Signal 
-  for (int c=0; c<NCAT; ++c) {
-    cout << "---------- Category = " << c << endl;
-
-    // chiara: sicuri che va lasciato commentato?        
-    // sigToFit[c] = (RooDataSet*) w->data(TString::Format("SigWeight_cat%d",c));
-    // w->import(*sigToFit[c]);
-
-    // systematics // chiara: per il momento metto tutto a zero  
-    scaleSyst = 0.;
-    mearSyst  = 0.;
-    
-    // get sigma from TF1 - chiara: questo file va creato 
-    TF1* fcn = (TF1*)f->Get(TString::Format("f%d",c));
-    Float_t massF = (Float_t) (*w->var("MG")).getVal();
-    Float_t sigmaCorr = fcn->Eval(massF);
-    if(massF==1500) sigmaCorr=1;
-    RooRealVar rooSigmaCorr (TString::Format("rooSigmaCorr_cat%d",c), TString::Format("rooSigmaCorr_cat%d",c), sigmaCorr, "");
-    rooSigmaCorr.setConstant();
-    w->import(rooSigmaCorr);
-    ( *w->var(TString::Format("mShift_cat%d",c))).setConstant();
-    ( *w->var(TString::Format("mSmear_cat%d",c))).setConstant();
-
-    // cb
-    RooFormulaVar CBpos_mean_draw(TString::Format("CBpos_mean_draw_cat%d",c),"","@0+@1",RooArgList(*w->var(TString::Format("ReducedMassCB_sig_mean_cat%d",c)),*w->var("MG")));
-    RooFormulaVar CBpos_mean(TString::Format("CBpos_mean_cat%d",c),"",TString::Format("@0+%f*@1", scaleSyst),RooArgList(*w->var(TString::Format("ReducedMassCB_sig_mean_cat%d",c)),*w->var(TString::Format("mShift_cat%d",c))));
-    RooFormulaVar CBpos_sigma(TString::Format("CBpos_sigma_cat%d",c),"",TString::Format("(sqrt(@0*@0*@3*@3+%f*%f*@2)*@1)",smearSyst,smearSyst),RooArgList(*w->var(TString::Format("ReducedMassCB_sig_sigma_cat%d",c)),*w->var("MG"),*w->var(TString::Format("mSmear_cat%d",c)),*w->var(TString::Format("rooSigmaCorr_cat%d",c)) ) );
-    std::cout<<"chiara, check-------------------> SIGMA: "<<CBpos_sigma->getVal()<<"    MASS: "<<(*w->var("MH")).getVal()<<std::endl;
-
-    RooFormulaVar CBpos_alphaCB(TString::Format("CBpos_alphaCB_cat%d",c),"","@0",*w->var(TString::Format("ReducedMassCB_sig_alphaCBpos_cat%d",c)) );
-    RooFormulaVar CBneg_alphaCB(TString::Format("CBneg_alphaCB_cat%d",c),"","@0",*w->var(TString::Format("ReducedMassCB_sig_alphaCBneg_cat%d",c)) );
-    RooFormulaVar CBpos_n(TString::Format("CBpos_n_cat%d",c),"","@0",*w->var(TString::Format("ReducedMassCB_sig_nCBpos_cat%d",c)) );
-    RooFormulaVar CBneg_n(TString::Format("CBneg_n_cat%d",c),"","@0",*w->var(TString::Format("ReducedMassCB_sig_nCBneg_cat%d",c)) );
-    RooFormulaVar CBpos_frac(TString::Format("CBpos_frac_cat%d",c),"","@0",*w->var(TString::Format("ReducedMassCB_sig_frac_cat%d",c)) );
-    
-    RooCBShape ResCBpos_draw(TString::Format("ResCBpos_draw_cat%d",c),TString::Format("ResCBpos_draw_cat%d",c) , *mgg, CBpos_mean_draw, CBpos_sigma, CBpos_alphaCB, CBpos_n) ;
-    RooCBShape ResCBneg_draw(TString::Format("ResCBneg_draw_cat%d",c),TString::Format("ResCBneg_draw_cat%d",c) , *mgg, CBpos_mean_draw, CBpos_sigma, CBneg_alphaCB, CBneg_n) ;
-    RooCBShape ResCBpos(TString::Format("ResCBpos_cat%d",c),TString::Format("ResCBpos_cat%d",c) , *mgg, CBpos_mean, CBpos_sigma,CBpos_alphaCB, CBpos_n) ;
-    RooCBShape ResCBneg(TString::Format("ResCBneg_cat%d",c),TString::Format("ResCBneg_cat%d",c) , *mgg, CBpos_mean, CBpos_sigma,CBneg_alphaCB, CBneg_n) ;
-    mgg->setBins(40000, "cache");  
-
-    RooAddPdf ResAddPdf(TString::Format("ResAddPdf_cat%d",c),TString::Format("ResAddPdf_cat%d",c) , RooArgList(ResCBneg, ResCBpos), CBpos_frac);
-    RooAddPdf ResAddPdf_Inter(TString::Format("ResAddPdf_Inter_cat%d",c),TString::Format("ResAddPdf_Inter_cat%d",c) , RooArgList(ResCBneg, ResCBpos), CBpos_frac);
-    RooAddPdf ResAddPdf_draw(TString::Format("ResAddPdf_draw_cat%d",c),TString::Format("ResAddPdf_draw_cat%d",c) , RooArgList(ResCBneg_draw, ResCBpos_draw), CBpos_frac);
-
-
-    // BW
-    RooFormulaVar meanBW(TString::Format("meanBW_cat%d",c),"","@0",*w->var("MH"));  
-    RooRealVar sigmaBW_var(TString::Format("sigmaBW_var_cat%d",c), TString::Format("sigmaBW_var_cat%d",c), width);
-    std::cout<<" width:--------> "<<width<<std::endl;
-    sigmaBW_var.setConstant();
-    w->import(sigmaBW_var);
-    
-    RooFormulaVar* sigmaBW;
-    if(width<1)        sigmaBW = new RooFormulaVar(TString::Format("sigmaBW_cat%d",c),"","@0",*w->var(TString::Format("sigmaBW_var_cat%d",c))); 
-    else if(width==2)  sigmaBW = new RooFormulaVar(TString::Format("sigmaBW_cat%d",c),"","@0*0.02",*w->var("MH"));   
-    else if(width==5)  sigmaBW = new RooFormulaVar(TString::Format("sigmaBW_cat%d",c),"","@0*0.05",*w->var("MH"));   
-    else if(width==7)  sigmaBW = new RooFormulaVar(TString::Format("sigmaBW_cat%d",c),"","@0*0.07",*w->var("MH"));   
-    else if(width==10) sigmaBW = new RooFormulaVar(TString::Format("sigmaBW_cat%d",c),"","@0*0.10",*w->var("MH"));   
-
-
-    // Convolution
-    RooGenericPdf SigModelBW(TString::Format("BW_cat%d",c),"1 / ( TMath::Power( TMath::Power(@0,2) - TMath::Power(@1,2) , 2 ) + TMath::Power(@1,2)*TMath::Power(@2,2) )", RooArgSet(*mgg, meanBW, *sigmaBW));
-    RooFFTConvPdf*  ConvolutedRes_CB;    
-    ConvolutedRes_CB = new RooFFTConvPdf(TString::Format("mggSig_cat%d",c),TString::Format("mggSig_cat%d",c), *mgg,SigModelBW, ResAddPdf);
-    w->import(*ConvolutedRes_CB);
-    
-    // RooHistFunc* rooFunc_norm = getRooHistFunc(c,w->var("MH"), model );
-    RooHistFunc* rooFunc_norm = getNorm2D(c,w->var("MH"), w->var("MH")->getVal(), width,model);
-    w->import(*rooFunc_norm);
-    std::cout<<"SIG NORM ----->"<<rooFunc_norm->getVal(*w->var("MH"))<<std::endl;
-
-    // RooHistFunc* rooFunc_norm2D_0 = getNorm2D(c,w->var("MH"),w->var("MH")->getVal(), 0);
-    // RooHistFunc* rooFunc_norm2D_2 = getNorm2D(c,w->var("MH"),w->var("MH")->getVal(),2);
-    // RooHistFunc* rooFunc_norm2D_5 = getNorm2D(c,w->var("MH"),w->var("MH")->getVal(),5);
-    // RooHistFunc* rooFunc_norm2D_10 = getNorm2D(c,w->var("MH"),w->var("MH")->getVal(), 10);
-    // std::cout<<"SIG NORM ----->"<<rooFunc_norm2D_0->getVal(*w->var("MH"))<<"      "<<rooFunc_norm2D_2->getVal(*w->var("MH"))<<"  "<<rooFunc_norm2D_5->getVal(*w->var("MH"))<<"      "<<rooFunc_norm2D_10->getVal(*w->var("MH"))<<std::endl;;*/
-    // w->Print("V");
-
-    if(width <2. && mass <= 150){ //if i want to plot the fit
-      sigToFit[c] = (RooDataSet*) w->data(TString::Format("SigWeight_cat%d",c));
-
-      RooFitResult* fitresults_CB = (RooFitResult* ) ConvolutedRes_CB.fitTo(*sigToFit[c], RooFit::Save(kTRUE));
-      fitresults_CB->Print("V");
-      
-      RooPlot* plotOnlyResPdf = w->var("mgg")->frame(Range(minMassFit-20,maxMassFit+20),Bins(100));
-      sigToFit[c]->plotOn(plotOnlyResPdf, LineColor(kRed), LineStyle(kDashed));
-      double max = plotOnlyResPdf->GetMaximum();
-      
-      // Plot to verify everything is ok
-      RooPlot* plotmggAll = w->var("mgg")->frame(Range(minMassFit-20,maxMassFit+20),Bins(100));
-      sigToFit[c]->plotOn(plotmggAll);
-      SigModelBW.plotOn(plotmggAll, LineColor(kGreen), LineStyle(kDashed));
-      //  ResAddPdf_draw.plotOn(plotmggAll, LineColor(kRed), LineStyle(kDashed));
-      ConvolutedRes_CB.plotOn(plotmggAll, LineColor(kBlue));
-
-      TCanvas* c1 = new TCanvas("c1","mgg",0,0,800,800);
-      c1->cd(1);
-      plotPhotonsMassAll->Draw();  
-      plotPhotonsMassAll->GetYaxis()->SetRangeUser(0.01, max*1.2);
-      plotPhotonsMassAll->GetXaxis()->SetTitleFont(42);
-      plotPhotonsMassAll->GetXaxis()->SetTitleSize(0.05);
-      plotPhotonsMassAll->GetYaxis()->SetTitleFont(42);
-      plotPhotonsMassAll->GetYaxis()->SetTitleSize(0.05);
-      TLatex *lat  = new TLatex(0.55,0.9,TString::Format("Cat: %d", c));  
-      lat->SetTextSize(0.038);
-      lat->SetTextAlign(11);
-      lat->SetTextFont(42); 
-      lat->SetNDC();
-
-      TLatex* latex = new TLatex(0.21, 0.76, "#splitline{m_{X}=150 GeV}{#splitline{}{Class 0}}");
-      latex->SetTextSize(0.038);
-      latex->SetTextAlign(11);
-      latex->SetTextFont(42); 
-      latex->SetNDC();
-
-      TLegend *legmc = new TLegend(0.55, 0.69, 0.88, 0.95);
-      legmc->AddEntry(plotPhotonsMassAll->getObject(0),"Simulation","PL");
-      legmc->AddEntry(plotPhotonsMassAll->getObject(1),"BW","L");
-      legmc->AddEntry(plotPhotonsMassAll->getObject(2),"BW #otimes Resolution","L");
-      legmc->SetTextSize(0.0286044);
-      legmc->SetTextFont(42);
-      legmc->SetBorderSize(0);
-      legmc->SetFillStyle(0);
-      legmc->Draw();
-      latex->Draw("same");
-      // label_cms->Draw("same");
-      // label_sqrt->Draw("same");
-      int iPos=11 ;
-      // CMS_lumi( c1,true,iPos );
-
-      int massI(mass);
-      c1->SetLogy();
-     
-      plotPhotonsMassAll->GetXaxis()->SetTitle("m_{#gamma#gamma}[GeV]"); 
-      plotPhotonsMassAll->GetYaxis()->SetTitle("Events/1 GeV");
-     
-      c1->SetLogy(0);
-      c1->SaveAs("plots/prelimSignalCBCconvBW"+TString::Format(("_M%d_cat%d_"+model+".png").c_str(),massI, c));
-      c1->SaveAs("plots/prelimSignalCBCconvBW"+TString::Format(("_M%d_cat%d_"+model+".pdf").c_str(),massI, c));
-      if(c==0){
-	c1->SaveAs("~/www/plotsPAS/prelimSignalCBCconvBW"+TString::Format(("_M%d_cat%d_"+model+".png").c_str(),massI, c));
-	c1->SaveAs("~/www/plotsPAS/prelimSignalCBCconvBW"+TString::Format(("_M%d_cat%d_"+model+".pdf").c_str(),massI, c));
-	c1->SaveAs("~/www/plotsPAS/prelimSignalCBCconvBW"+TString::Format(("_M%d_cat%d_"+model+".C").c_str(),massI, c));
-	c1->SaveAs("~/www/plotsPAS/prelimSignalCBCconvBW"+TString::Format(("_M%d_cat%d_"+model+".root").c_str(),massI, c));
-      }
-      c1->SetLogy();
-      plotPhotonsMassAll->GetYaxis()->SetRangeUser(0.01,max*10. );
-      plotPhotonsMassAll->GetXaxis()->SetRangeUser(210, 290);
-      c1->SaveAs("plots/prelimSignalCBCconvBW"+TString::Format(("_M%d_cat%d_LOG_"+model+".png").c_str(),massI,c));
-      c1->SaveAs("plots/prelimSignalCBCconvBW"+TString::Format(("_M%d_cat%d_LOG_"+model+".pdf").c_str(),massI,c));
-      if(c==0){
-	c1->SaveAs("~/www/plotsPAS/prelimSignalCBCconvBW"+TString::Format(("_M%d_cat%d_LOG_"+model+".png").c_str(),massI,c));
-	c1->SaveAs("~/www/plotsPAS/prelimSignalCBCconvBW"+TString::Format(("_M%d_cat%d_LOG_"+model+".pdf").c_str(),massI,c));
-	c1->SaveAs("~/www/plotsPAS/prelimSignalCBCconvBW"+TString::Format(("_M%d_cat%d_LOG_"+model+".C").c_str(),massI,c));
-	c1->SaveAs("~/www/plotsPAS/prelimSignalCBCconvBW"+TString::Format(("_M%d_cat%d_LOG_"+model+".root").c_str(),massI,c));
-      }
-    }
-
-    //plot signal model at different widths
-    bool plotW = false;
-    if(plotW && c==0){
-      RooRealVar var_01("var_w01", "var_w01", 0.1);
-      var_01.setConstant();	
-      RooFormulaVar sigmaBW_01("w01", "w01","@0", var_01); 
-      //	RooBreitWigner SiBW_01("sigBW_01","sigBW_01" , *mgg, meanBW, sigmaBW_01);
-      RooGenericPdf SiBW_01("sigBW_01","1 / ( TMath::Power( TMath::Power(@0,2) - TMath::Power(@1,2) , 2 ) + TMath::Power(@1,2)*TMath::Power(@2,2) )", RooArgSet(*mgg, meanBW, sigmaBW_01));    
-      RooFFTConvPdf  ConvolutedRes_01("conv01", "conv01", *mgg,SiBW_01, ResAddPdf);
-      
-      RooRealVar var_3("var_w3", "var_w3",3);
-      var_3.setConstant();	
-      RooFormulaVar sigmaBW_3("w3", "w3","@0",  var_3);     
-      //	RooBreitWigner SiBW_3("sigBW_3","sigBW_3" , *mgg, meanBW, sigmaBW_3);
-      RooGenericPdf SiBW_3("sigBW_3","1 / ( TMath::Power( TMath::Power(@0,2) - TMath::Power(@1,2) , 2 ) + TMath::Power(@1,2)*TMath::Power(@2,2) )", RooArgSet(*mgg, meanBW, sigmaBW_3));    
-      RooFFTConvPdf  ConvolutedRes_3("conv3", "conv3", *mgg,SiBW_3, ResAddPdf);
-      
-      RooRealVar var_6("var_w6", "var_w6", 6);
-      var_6.setConstant();	
-      RooFormulaVar sigmaBW_6("w6", "w6","@0", var_6);     
-      //RooBreitWigner SiBW_6("sigBW_6","sigBW_6" , *mgg, meanBW, sigmaBW_6);
-      RooGenericPdf SiBW_6("sigBW_6","1 / ( TMath::Power( TMath::Power(@0,2) - TMath::Power(@1,2) , 2 ) + TMath::Power(@1,2)*TMath::Power(@2,2) )", RooArgSet(*mgg, meanBW, sigmaBW_3));    
-      RooFFTConvPdf  ConvolutedRes_6("conv6", "conv6", *mgg,SiBW_6, ResAddPdf);
-      
-      RooRealVar var_10("var_w10", "var_w10", 10);
-      var_10.setConstant();	
-      RooFormulaVar sigmaBW_10("w10", "w10","@0", var_10);     
-      //	RooBreitWigner SiBW_10("sigBW_10","sigBW_10" , *mgg, meanBW, sigmaBW_10);
-      RooGenericPdf SiBW_10("sigBW_10","1 / ( TMath::Power( TMath::Power(@0,2) - TMath::Power(@1,2) , 2 ) + TMath::Power(@1,2)*TMath::Power(@2,2) )", RooArgSet(*mgg, meanBW, sigmaBW_10));    
-      RooFFTConvPdf  ConvolutedRes_10("conv10", "conv10", *mgg,SiBW_10, ResAddPdf);
-      
-      RooRealVar var_15("var_w15", "var_w15",15);
-      var_15.setConstant();	
-      RooFormulaVar sigmaBW_15("w15", "w15","@0",  var_15);     
-      //	RooBreitWigner SiBW_15("sigBW_15","sigBW_15" , *mgg, meanBW, sigmaBW_15);
-      RooGenericPdf SiBW_15("sigBW_15","1 / ( TMath::Power( TMath::Power(@0,2) - TMath::Power(@1,2) , 2 ) + TMath::Power(@1,2)*TMath::Power(@2,2) )", RooArgSet(*mgg, meanBW, sigmaBW_15));    
-      RooFFTConvPdf  ConvolutedRes_15("conv15", "conv15", *mgg,SiBW_15, ResAddPdf);
-      
-      RooPlot* plotWidths = w->var("mgg")->frame(Range(minMassFit-20,maxMassFit+20),Bins(100));
-      ConvolutedRes_15.plotOn( plotWidths, LineColor(kAzure+3));
-      ConvolutedRes_10.plotOn( plotWidths, LineColor(kAzure+2));
-      ConvolutedRes_6.plotOn( plotWidths, LineColor(kAzure+1));
-      ConvolutedRes_3.plotOn( plotWidths, LineColor(kViolet+1));
-      ConvolutedRes_01.plotOn( plotWidths, LineColor(kViolet-9));
-      plotWidths->Draw();
-      
-      label_cms->Draw("same");
-      label_sqrt->Draw("same");
-      
-      TLegend* leg = new TLegend(0.598851,0.6044755,0.84253,0.928252,"", "brNDC");
-      std::cout<<meanBW->getVal()<<"   --------"<<std::endl;
-      leg->SetBorderSize(0.);
-      leg->SetFillColor(kWhite);
-      leg->SetTextFont(42);
-      plotWidths->GetYaxis()->SetRangeUser(0.001, 1.);
-      plotWidths->GetXaxis()->SetTitle("m_{#gamma #gamma}[GeV]");
-      plotWidths->GetYaxis()->SetTitle(" ");
-      leg->AddEntry(plotWidths->getObject(0), "Width = 15 GeV", "L");
-      leg->AddEntry(plotWidths->getObject(1), "Width = 10 GeV", "L");
-      leg->AddEntry(plotWidths->getObject(2),"Width = 6 GeV", "L");
-      leg->AddEntry(plotWidths->getObject(3),"Width = 3 GeV", "L");
-      leg->AddEntry(plotWidths->getObject(4), "Width = 0.1 GeV", "L");
-      leg->Draw("same");
-      
-      c1->SaveAs("plots/SignalModels_differentWidths.png");
-      c1->SaveAs("plots/SignalModels_differentWidths.pdf");
-      c1->SaveAs("~/www/plotsNota/SignalModels_differentWidths.pdf");
-      c1->SaveAs("~/www/plotsNota/SignalModels_differentWidths.png");
-    }
-
-    // IMPORTANT: fix all pdf parameters to constant
-    w->defineSet(TString::Format("ConvolutedPdfParam_cat%d",c),RooArgSet( *w->var(TString::Format("ReducedMass_sig_sigma_cat%d",c)), 
-									  *w->var(TString::Format("ReducedMass_sig_alphaCBpos_cat%d",c)),
-									  *w->var(TString::Format("ReducedMass_sig_alphaCBneg_cat%d",c)),
-									  *w->var(TString::Format("ReducedMass_sig_Npos_cat%d",c)),
-									  *w->var(TString::Format("ReducedMass_sig_Nneg_cat%d",c)),	   
-									  *w->var(TString::Format("ReducedMass_sig_frac_cat%d",c)),  
-									  *w->var(TString::Format("ReducedMass_sig_mean_cat%d",c)),
-									  //	  *w->var(TString::Format("v1_cat%d",c)),
-									  *w->var(TString::Format("sigmaBW_var_cat%d",c))));
-    
-    SetConstantParams(w->set(TString::Format("ConvolutedPdfParam_cat%d",c)));
-  }
-}
-
-// originale
-/*
-// Fit signal with model with CB convoluted with BW 
-void SigModelFitConvRelBW(RooWorkspace* w, Float_t mass, Double_t width) {
-
-  int iMass = abs(mass); 
-
-  Float_t minMassFit(mass*0.8);
-  Float_t maxMassFit(mass*1.2); 
-
-  RooDataSet* sigToFit[NCAT];
-  
-
-  RooRealVar* mgg = w->var("mgg"); 
-
-  // chiara: sistematiche, per il momento commento     
-  // Double_t scaleSyst;
-  // Double_t smearSyst;
-
-  std::cout<<"----------------------------------------------------------------------------------------"<<std::endl;
-
-  //  mgg->setRange("sigrange",minMassFit-20,maxMassFit+20); 
-
-  TPaveText* label_cms = get_labelCMS(0, "2012", true);
-  TPaveText* label_sqrt = get_labelSqrt(0);
-  TFile* f = new TFile("sigShapeCorrections.root", "READ");
-
-  // Fit Signal 
-  for (int c=0; c<NCAT; ++c) {
-    cout << "---------- Category = " << c << endl;
-
-    // chiara: sicuri che va lasciato commentato?        
-    // sigToFit[c] = (RooDataSet*) w->data(TString::Format("SigWeight_cat%d",c));
-    // w->import(*sigToFit[c]);
-
-    // chiara: sistematiche, per il momento commento  
-    // introduce systs 
-    // if (c==0 || c==1) scaleSyst = 0.005;
-    // if (c==2 || c==3) scaleSyst = 0.007;
-    // if (c==0)         smearSyst = 0.005;
-    // if (c==1)         smearSyst = 0.0058;
-    // if (c==2 || c==3) smearSyst = 0.01;
-
-    // get sigma from TF1:   - chiara: da capire
-    TF1* fcn = (TF1*)f->Get(TString::Format("f%d",c));
-    Float_t massF = (Float_t) (*w->var("MH")).getVal();
-    Float_t sigmaCorr = fcn->Eval(massF);
-    if(massF==150) sigmaCorr=1;
-    RooRealVar rooSigmaCorr (TString::Format("rooSigmaCorr_cat%d",c), TString::Format("rooSigmaCorr_cat%d",c), sigmaCorr, "");
-    rooSigmaCorr.setConstant();
-    w->import(rooSigmaCorr);
-    ( *w->var(TString::Format("mShift_cat%d",c))).setConstant();
-    ( *w->var(TString::Format("mSmear_cat%d",c))).setConstant();
-
-    // cb
-    RooFormulaVar CBpos_mean_draw(TString::Format("CBpos_mean_draw_cat%d",c),"","@0+@1",RooArgList(*w->var(TString::Format("ReducedMass_sig_mean_cat%d",c)),*w->var("MH")));
-    RooFormulaVar CBpos_mean(TString::Format("CBpos_mean_cat%d",c),"",TString::Format("@0+%f*@1", scaleSyst),RooArgList(*w->var(TString::Format("ReducedMass_sig_mean_cat%d",c)),*w->var(TString::Format("mShift_cat%d",c))));
-    RooFormulaVar CBpos_sigma(TString::Format("CBpos_sigma_cat%d",c),"",TString::Format("(sqrt(@0*@0*@3*@3+%f*%f*@2)*@1)",smearSyst,smearSyst),RooArgList(*w->var(TString::Format("ReducedMass_sig_sigma_cat%d",c)),*w->var("MH"),*w->var(TString::Format("mSmear_cat%d",c)),*w->var(TString::Format("rooSigmaCorr_cat%d",c)) ) );
-    //    std::cout<<"-------------------> SIGMA: "<<CBpos_sigma->getVal()<<"    MASS: "<<(*w->var("MH")).getVal()<<std::endl;
-
-    RooFormulaVar CBpos_alphaCB(TString::Format("CBpos_alphaCB_cat%d",c),"","@0",*w->var(TString::Format("ReducedMass_sig_alphaCBpos_cat%d",c)) );
-    RooFormulaVar CBneg_alphaCB(TString::Format("CBneg_alphaCB_cat%d",c),"","@0",*w->var(TString::Format("ReducedMass_sig_alphaCBneg_cat%d",c)) );
-    RooFormulaVar CBpos_n(TString::Format("CBpos_n_cat%d",c),"","@0",*w->var(TString::Format("ReducedMass_sig_Npos_cat%d",c)) );
-    RooFormulaVar CBneg_n(TString::Format("CBneg_n_cat%d",c),"","@0",*w->var(TString::Format("ReducedMass_sig_Nneg_cat%d",c)) );
-    RooFormulaVar CBpos_frac(TString::Format("CBpos_frac_cat%d",c),"","@0",*w->var(TString::Format("ReducedMass_sig_frac_cat%d",c)) );
-    
-    RooCBShape ResCBpos_draw(TString::Format("ResCBpos_draw_cat%d",c),TString::Format("ResCBpos_draw_cat%d",c) , *mgg, CBpos_mean_draw, CBpos_sigma, CBpos_alphaCB, CBpos_n) ;
-    RooCBShape ResCBneg_draw(TString::Format("ResCBneg_draw_cat%d",c),TString::Format("ResCBneg_draw_cat%d",c) , *mgg, CBpos_mean_draw, CBpos_sigma, CBneg_alphaCB, CBneg_n) ;
-    RooCBShape ResCBpos(TString::Format("ResCBpos_cat%d",c),TString::Format("ResCBpos_cat%d",c) , *mgg, CBpos_mean, CBpos_sigma,CBpos_alphaCB, CBpos_n) ;
-    RooCBShape ResCBneg(TString::Format("ResCBneg_cat%d",c),TString::Format("ResCBneg_cat%d",c) , *mgg, CBpos_mean, CBpos_sigma,CBneg_alphaCB, CBneg_n) ;
-    mgg->setBins(40000, "cache");  
-
-    RooAddPdf ResAddPdf(TString::Format("ResAddPdf_cat%d",c),TString::Format("ResAddPdf_cat%d",c) , RooArgList(ResCBneg, ResCBpos), CBpos_frac);
-    RooAddPdf ResAddPdf_Inter(TString::Format("ResAddPdf_Inter_cat%d",c),TString::Format("ResAddPdf_Inter_cat%d",c) , RooArgList(ResCBneg, ResCBpos), CBpos_frac);
-    RooAddPdf ResAddPdf_draw(TString::Format("ResAddPdf_draw_cat%d",c),TString::Format("ResAddPdf_draw_cat%d",c) , RooArgList(ResCBneg_draw, ResCBpos_draw), CBpos_frac);
-
-
-    // BW
-    RooFormulaVar meanBW(TString::Format("meanBW_cat%d",c),"","@0",*w->var("MH"));  
-    RooRealVar sigmaBW_var(TString::Format("sigmaBW_var_cat%d",c), TString::Format("sigmaBW_var_cat%d",c), width);
-    std::cout<<" width:--------> "<<width<<std::endl;
-    sigmaBW_var.setConstant();
-    w->import(sigmaBW_var);
-    
-    RooFormulaVar* sigmaBW;
-    if(width<1)        sigmaBW = new RooFormulaVar(TString::Format("sigmaBW_cat%d",c),"","@0",*w->var(TString::Format("sigmaBW_var_cat%d",c))); 
-    else if(width==2)  sigmaBW = new RooFormulaVar(TString::Format("sigmaBW_cat%d",c),"","@0*0.02",*w->var("MH"));   
-    else if(width==5)  sigmaBW = new RooFormulaVar(TString::Format("sigmaBW_cat%d",c),"","@0*0.05",*w->var("MH"));   
-    else if(width==7)  sigmaBW = new RooFormulaVar(TString::Format("sigmaBW_cat%d",c),"","@0*0.07",*w->var("MH"));   
-    else if(width==10) sigmaBW = new RooFormulaVar(TString::Format("sigmaBW_cat%d",c),"","@0*0.10",*w->var("MH"));   
-
-
-    // Convolution
-    RooGenericPdf SigModelBW(TString::Format("BW_cat%d",c),"1 / ( TMath::Power( TMath::Power(@0,2) - TMath::Power(@1,2) , 2 ) + TMath::Power(@1,2)*TMath::Power(@2,2) )", RooArgSet(*mgg, meanBW, *sigmaBW));
-    RooFFTConvPdf*  ConvolutedRes_CB;    
-    ConvolutedRes_CB = new RooFFTConvPdf(TString::Format("mggSig_cat%d",c),TString::Format("mggSig_cat%d",c), *mgg,SigModelBW, ResAddPdf);
-    w->import(*ConvolutedRes_CB);
-    
-    // RooHistFunc* rooFunc_norm = getRooHistFunc(c,w->var("MH"), model );
-    RooHistFunc* rooFunc_norm = getNorm2D(c,w->var("MH"), w->var("MH")->getVal(), width,model);
-    w->import(*rooFunc_norm);
-    std::cout<<"SIG NORM ----->"<<rooFunc_norm->getVal(*w->var("MH"))<<std::endl;
-
-    // RooHistFunc* rooFunc_norm2D_0 = getNorm2D(c,w->var("MH"),w->var("MH")->getVal(), 0);
-    // RooHistFunc* rooFunc_norm2D_2 = getNorm2D(c,w->var("MH"),w->var("MH")->getVal(),2);
-    // RooHistFunc* rooFunc_norm2D_5 = getNorm2D(c,w->var("MH"),w->var("MH")->getVal(),5);
-    // RooHistFunc* rooFunc_norm2D_10 = getNorm2D(c,w->var("MH"),w->var("MH")->getVal(), 10);
-    // std::cout<<"SIG NORM ----->"<<rooFunc_norm2D_0->getVal(*w->var("MH"))<<"      "<<rooFunc_norm2D_2->getVal(*w->var("MH"))<<"  "<<rooFunc_norm2D_5->getVal(*w->var("MH"))<<"      "<<rooFunc_norm2D_10->getVal(*w->var("MH"))<<std::endl;;*/
-/*
-    // w->Print("V");
-
-    if(width <2. && mass <= 150){ //if i want to plot the fit
-      sigToFit[c] = (RooDataSet*) w->data(TString::Format("SigWeight_cat%d",c));
-
-      RooFitResult* fitresults_CB = (RooFitResult* ) ConvolutedRes_CB.fitTo(*sigToFit[c], RooFit::Save(kTRUE));
-      fitresults_CB->Print("V");
-      
-      RooPlot* plotOnlyResPdf = w->var("mgg")->frame(Range(minMassFit-20,maxMassFit+20),Bins(100));
-      sigToFit[c]->plotOn(plotOnlyResPdf, LineColor(kRed), LineStyle(kDashed));
-      double max = plotOnlyResPdf->GetMaximum();
-      
-      // Plot to verify everything is ok
-      RooPlot* plotmggAll = w->var("mgg")->frame(Range(minMassFit-20,maxMassFit+20),Bins(100));
-      sigToFit[c]->plotOn(plotmggAll);
-      SigModelBW.plotOn(plotmggAll, LineColor(kGreen), LineStyle(kDashed));
-      //  ResAddPdf_draw.plotOn(plotmggAll, LineColor(kRed), LineStyle(kDashed));
-      ConvolutedRes_CB.plotOn(plotmggAll, LineColor(kBlue));
-
-      TCanvas* c1 = new TCanvas("c1","mgg",0,0,800,800);
-      c1->cd(1);
-      plotPhotonsMassAll->Draw();  
-      plotPhotonsMassAll->GetYaxis()->SetRangeUser(0.01, max*1.2);
-      plotPhotonsMassAll->GetXaxis()->SetTitleFont(42);
-      plotPhotonsMassAll->GetXaxis()->SetTitleSize(0.05);
-      plotPhotonsMassAll->GetYaxis()->SetTitleFont(42);
-      plotPhotonsMassAll->GetYaxis()->SetTitleSize(0.05);
-      TLatex *lat  = new TLatex(0.55,0.9,TString::Format("Cat: %d", c));  
-      lat->SetTextSize(0.038);
-      lat->SetTextAlign(11);
-      lat->SetTextFont(42); 
-      lat->SetNDC();
-
-      TLatex* latex = new TLatex(0.21, 0.76, "#splitline{m_{X}=150 GeV}{#splitline{}{Class 0}}");
-      latex->SetTextSize(0.038);
-      latex->SetTextAlign(11);
-      latex->SetTextFont(42); 
-      latex->SetNDC();
-
-      TLegend *legmc = new TLegend(0.55, 0.69, 0.88, 0.95);
-      legmc->AddEntry(plotPhotonsMassAll->getObject(0),"Simulation","PL");
-      legmc->AddEntry(plotPhotonsMassAll->getObject(1),"BW","L");
-      legmc->AddEntry(plotPhotonsMassAll->getObject(2),"BW #otimes Resolution","L");
-      legmc->SetTextSize(0.0286044);
-      legmc->SetTextFont(42);
-      legmc->SetBorderSize(0);
-      legmc->SetFillStyle(0);
-      legmc->Draw();
-      latex->Draw("same");
-      // label_cms->Draw("same");
-      // label_sqrt->Draw("same");
-      int iPos=11 ;
-      // CMS_lumi( c1,true,iPos );
-
-      int massI(mass);
-      c1->SetLogy();
-     
-      plotPhotonsMassAll->GetXaxis()->SetTitle("m_{#gamma#gamma}[GeV]"); 
-      plotPhotonsMassAll->GetYaxis()->SetTitle("Events/1 GeV");
-     
-      c1->SetLogy(0);
-      c1->SaveAs("plots/prelimSignalCBCconvBW"+TString::Format(("_M%d_cat%d_"+model+".png").c_str(),massI, c));
-      c1->SaveAs("plots/prelimSignalCBCconvBW"+TString::Format(("_M%d_cat%d_"+model+".pdf").c_str(),massI, c));
-      if(c==0){
-	c1->SaveAs("~/www/plotsPAS/prelimSignalCBCconvBW"+TString::Format(("_M%d_cat%d_"+model+".png").c_str(),massI, c));
-	c1->SaveAs("~/www/plotsPAS/prelimSignalCBCconvBW"+TString::Format(("_M%d_cat%d_"+model+".pdf").c_str(),massI, c));
-	c1->SaveAs("~/www/plotsPAS/prelimSignalCBCconvBW"+TString::Format(("_M%d_cat%d_"+model+".C").c_str(),massI, c));
-	c1->SaveAs("~/www/plotsPAS/prelimSignalCBCconvBW"+TString::Format(("_M%d_cat%d_"+model+".root").c_str(),massI, c));
-      }
-      c1->SetLogy();
-      plotPhotonsMassAll->GetYaxis()->SetRangeUser(0.01,max*10. );
-      plotPhotonsMassAll->GetXaxis()->SetRangeUser(210, 290);
-      c1->SaveAs("plots/prelimSignalCBCconvBW"+TString::Format(("_M%d_cat%d_LOG_"+model+".png").c_str(),massI,c));
-      c1->SaveAs("plots/prelimSignalCBCconvBW"+TString::Format(("_M%d_cat%d_LOG_"+model+".pdf").c_str(),massI,c));
-      if(c==0){
-	c1->SaveAs("~/www/plotsPAS/prelimSignalCBCconvBW"+TString::Format(("_M%d_cat%d_LOG_"+model+".png").c_str(),massI,c));
-	c1->SaveAs("~/www/plotsPAS/prelimSignalCBCconvBW"+TString::Format(("_M%d_cat%d_LOG_"+model+".pdf").c_str(),massI,c));
-	c1->SaveAs("~/www/plotsPAS/prelimSignalCBCconvBW"+TString::Format(("_M%d_cat%d_LOG_"+model+".C").c_str(),massI,c));
-	c1->SaveAs("~/www/plotsPAS/prelimSignalCBCconvBW"+TString::Format(("_M%d_cat%d_LOG_"+model+".root").c_str(),massI,c));
-      }
-    }
-
-    //plot signal model at different widths
-    bool plotW = false;
-    if(plotW && c==0){
-      RooRealVar var_01("var_w01", "var_w01", 0.1);
-      var_01.setConstant();	
-      RooFormulaVar sigmaBW_01("w01", "w01","@0", var_01); 
-      //	RooBreitWigner SiBW_01("sigBW_01","sigBW_01" , *mgg, meanBW, sigmaBW_01);
-      RooGenericPdf SiBW_01("sigBW_01","1 / ( TMath::Power( TMath::Power(@0,2) - TMath::Power(@1,2) , 2 ) + TMath::Power(@1,2)*TMath::Power(@2,2) )", RooArgSet(*mgg, meanBW, sigmaBW_01));    
-      RooFFTConvPdf  ConvolutedRes_01("conv01", "conv01", *mgg,SiBW_01, ResAddPdf);
-      
-      RooRealVar var_3("var_w3", "var_w3",3);
-      var_3.setConstant();	
-      RooFormulaVar sigmaBW_3("w3", "w3","@0",  var_3);     
-      //	RooBreitWigner SiBW_3("sigBW_3","sigBW_3" , *mgg, meanBW, sigmaBW_3);
-      RooGenericPdf SiBW_3("sigBW_3","1 / ( TMath::Power( TMath::Power(@0,2) - TMath::Power(@1,2) , 2 ) + TMath::Power(@1,2)*TMath::Power(@2,2) )", RooArgSet(*mgg, meanBW, sigmaBW_3));    
-      RooFFTConvPdf  ConvolutedRes_3("conv3", "conv3", *mgg,SiBW_3, ResAddPdf);
-      
-      RooRealVar var_6("var_w6", "var_w6", 6);
-      var_6.setConstant();	
-      RooFormulaVar sigmaBW_6("w6", "w6","@0", var_6);     
-      //RooBreitWigner SiBW_6("sigBW_6","sigBW_6" , *mgg, meanBW, sigmaBW_6);
-      RooGenericPdf SiBW_6("sigBW_6","1 / ( TMath::Power( TMath::Power(@0,2) - TMath::Power(@1,2) , 2 ) + TMath::Power(@1,2)*TMath::Power(@2,2) )", RooArgSet(*mgg, meanBW, sigmaBW_3));    
-      RooFFTConvPdf  ConvolutedRes_6("conv6", "conv6", *mgg,SiBW_6, ResAddPdf);
-      
-      RooRealVar var_10("var_w10", "var_w10", 10);
-      var_10.setConstant();	
-      RooFormulaVar sigmaBW_10("w10", "w10","@0", var_10);     
-      //	RooBreitWigner SiBW_10("sigBW_10","sigBW_10" , *mgg, meanBW, sigmaBW_10);
-      RooGenericPdf SiBW_10("sigBW_10","1 / ( TMath::Power( TMath::Power(@0,2) - TMath::Power(@1,2) , 2 ) + TMath::Power(@1,2)*TMath::Power(@2,2) )", RooArgSet(*mgg, meanBW, sigmaBW_10));    
-      RooFFTConvPdf  ConvolutedRes_10("conv10", "conv10", *mgg,SiBW_10, ResAddPdf);
-      
-      RooRealVar var_15("var_w15", "var_w15",15);
-      var_15.setConstant();	
-      RooFormulaVar sigmaBW_15("w15", "w15","@0",  var_15);     
-      //	RooBreitWigner SiBW_15("sigBW_15","sigBW_15" , *mgg, meanBW, sigmaBW_15);
-      RooGenericPdf SiBW_15("sigBW_15","1 / ( TMath::Power( TMath::Power(@0,2) - TMath::Power(@1,2) , 2 ) + TMath::Power(@1,2)*TMath::Power(@2,2) )", RooArgSet(*mgg, meanBW, sigmaBW_15));    
-      RooFFTConvPdf  ConvolutedRes_15("conv15", "conv15", *mgg,SiBW_15, ResAddPdf);
-      
-      RooPlot* plotWidths = w->var("mgg")->frame(Range(minMassFit-20,maxMassFit+20),Bins(100));
-      ConvolutedRes_15.plotOn( plotWidths, LineColor(kAzure+3));
-      ConvolutedRes_10.plotOn( plotWidths, LineColor(kAzure+2));
-      ConvolutedRes_6.plotOn( plotWidths, LineColor(kAzure+1));
-      ConvolutedRes_3.plotOn( plotWidths, LineColor(kViolet+1));
-      ConvolutedRes_01.plotOn( plotWidths, LineColor(kViolet-9));
-      plotWidths->Draw();
-      
-      label_cms->Draw("same");
-      label_sqrt->Draw("same");
-      
-      TLegend* leg = new TLegend(0.598851,0.6044755,0.84253,0.928252,"", "brNDC");
-      std::cout<<meanBW->getVal()<<"   --------"<<std::endl;
-      leg->SetBorderSize(0.);
-      leg->SetFillColor(kWhite);
-      leg->SetTextFont(42);
-      plotWidths->GetYaxis()->SetRangeUser(0.001, 1.);
-      plotWidths->GetXaxis()->SetTitle("m_{#gamma #gamma}[GeV]");
-      plotWidths->GetYaxis()->SetTitle(" ");
-      leg->AddEntry(plotWidths->getObject(0), "Width = 15 GeV", "L");
-      leg->AddEntry(plotWidths->getObject(1), "Width = 10 GeV", "L");
-      leg->AddEntry(plotWidths->getObject(2),"Width = 6 GeV", "L");
-      leg->AddEntry(plotWidths->getObject(3),"Width = 3 GeV", "L");
-      leg->AddEntry(plotWidths->getObject(4), "Width = 0.1 GeV", "L");
-      leg->Draw("same");
-      
-      c1->SaveAs("plots/SignalModels_differentWidths.png");
-      c1->SaveAs("plots/SignalModels_differentWidths.pdf");
-      c1->SaveAs("~/www/plotsNota/SignalModels_differentWidths.pdf");
-      c1->SaveAs("~/www/plotsNota/SignalModels_differentWidths.png");
-    }
-
-    // IMPORTANT: fix all pdf parameters to constant
-    w->defineSet(TString::Format("ConvolutedPdfParam_cat%d",c),RooArgSet( *w->var(TString::Format("ReducedMass_sig_sigma_cat%d",c)), 
-									  *w->var(TString::Format("ReducedMass_sig_alphaCBpos_cat%d",c)),
-									  *w->var(TString::Format("ReducedMass_sig_alphaCBneg_cat%d",c)),
-									  *w->var(TString::Format("ReducedMass_sig_Npos_cat%d",c)),
-									  *w->var(TString::Format("ReducedMass_sig_Nneg_cat%d",c)),	   
-									  *w->var(TString::Format("ReducedMass_sig_frac_cat%d",c)),  
-									  *w->var(TString::Format("ReducedMass_sig_mean_cat%d",c)),
-									  //	  *w->var(TString::Format("v1_cat%d",c)),
-									  *w->var(TString::Format("sigmaBW_var_cat%d",c))));
-    
-    SetConstantParams(w->set(TString::Format("ConvolutedPdfParam_cat%d",c)));
-  }
-}
-*/
 
 void SigModelFitCBC(RooWorkspace* w, Float_t mass) {
 
@@ -2872,10 +2412,6 @@ void MakeDataCard_1Channel(RooWorkspace* w, const char* fileBaseName, const char
   return;
 }
 
-
-
-
-
 Double_t effSigma(TH1 *hist) {
 
   TAxis *xaxis = hist->GetXaxis();
@@ -2951,403 +2487,6 @@ Double_t effSigma(TH1 *hist) {
   return widmin;
 }
 
-RooHistFunc* getRooHistFunc(int cat, RooRealVar* var, std::string model){
-
-
-  double mass[7] = {150., 200., 250., 300., 400., 600, 800};
-
-  double c0[7];
-  double c1[7];
-  double c2[7];
-  double c3[7];
-  double all[7];
-  //changed 10/04
-  /*  double c0g[5] = {0.00300125 , 0.00377226 , 0.00446634 , 0.0051454 , 0.00592569};
-  double c1g[5] = {0.00416221 , 0.00503098 , 0.00494583 , 0.00483801 , 0.00465511 };
-  double c2g[5] = {0.0015748 , 0.00188656 , 0.00215004 , 0.00246588 , 0.00260045 };
-  double c3g[5] = {0.00209722 , 0.00255168 , 0.0025782 , 0.00251383 , 0.00218195 };
-  double allg[5] = {0.0108564 , 0.0132374 , 0.0141401 , 0.014937 , 0.0153788 };  
-  double c0h[5] = {0.00302 , 0.003772 , 0.0044645 , 0.005133 , 0.00595};
-  double c1h[5] = {0.00414 , 0.004974 , 0.0049136 , 0.0048243 , 0.00463 };
-  double c2h[5] = {0.00158 , 0.001885 , 0.0021557 , 0.0024568 , 0.0026 };
-  double c3h[5] = {0.002092 , 0.002533 , 0.00256584 , 0.0024928 , 0.002173 };
-  double allh[5] = {0.010853 , 0.01316 , 0.0140993 , 0.014881 , 0.0153686};*/
-
-  double c0g[7] = {0.00281259889626 ,0.00360405499841 ,0.0042512557194 ,0.00480861314285 ,0.00555793387016 ,0.00711359319501 ,0.00823700633031};
-  double c1g[7] = { 0.00384737104156 ,0.00409835498596 ,0.00396547370455 ,0.003904278683 ,0.00368952356883 ,0.00312694674604 ,0.00264070618382   };
-  double c2g[7] = {0.00147564281183 ,0.00190380886793 ,0.00200106257462 ,0.00237975631151 ,0.00252602251139 ,0.00252633118101 ,0.00243976040669 };
-  double c3g[7] = {0.00179971742008 ,0.001998562755 ,0.00209254398016 ,0.00195718051131 ,0.00166752834056 ,0.00124744484509 ,0.000929175591328};
-  double allg[7] = { 0.00993533016973 ,0.0116047816073 ,0.0123103359787 ,0.0130498286487 ,0.0134410082909 ,0.0140143159671 ,0.0142466485122};  
-
-  double c0v[7] = {0.00295597,   0.00351098,   0.00404037,   0.00454414,   0.00547479,0.00702859,   0.00817238};
-  double c1v[7] = {0.00402382,   0.00410415,   0.00415866,   0.00418736,   0.00416732,0.00381745,   0.00305454   };
-  double c2v[7] = {0.00144884,   0.00165231,   0.00183088,   0.00198455,   0.0022172,0.00238368 ,  0.00215175 };
-  double c3v[7] = {0.00205624,   0.00204125,   0.00201627,   0.00198131,   0.00188142,0.0015618 ,  0.00108238 };
-  double allv[7] = {0.0104849,   0.0113087,   0.0120462,   0.0126974   0.0137407,0.0147915,   0.0144611   };
-  
-  for(int i = 0; i<7; i++){
-    if (model=="GGH"){
-      c0[i] = c0g[i];
-      c1[i] = c1g[i];
-      c2[i] = c2g[i];
-      c3[i] = c3g[i];
-      all[i] = allg[i];
-
-    }else if(model=="VBF"){
-      c0[i] = c0v[i];
-      c1[i] = c1v[i];
-      c2[i] = c2v[i];
-      c3[i] = c3v[i];
-      all[i] = allv[i];
-
-
-    }
-  }
-  
-  TH1F* h_all = new TH1F("h_all", "h_all", 15, 130., 875.);
-  //m150-400
-  for(int i=0;i<5;i++){
-    std::cout<<"i: "<<i<<" mass: "<<mass[i]<<std::endl;
-    if(cat==0) h_all->SetBinContent(h_all->FindBin(mass[i]),c0[i]);
-    if(cat==1) h_all->SetBinContent(h_all->FindBin(mass[i]),c1[i]);
-    if(cat==2) h_all->SetBinContent(h_all->FindBin(mass[i]),c2[i]);
-    if(cat==3) h_all->SetBinContent(h_all->FindBin(mass[i]),c3[i]);
-    if(cat==4) h_all->SetBinContent(h_all->FindBin(mass[i]),all[i]);
-   
-  }
-  std::cout<<"--------------------------->"<<cat<<std::endl;
-  //m350
-  if(cat==0) h_all->SetBinContent(h_all->FindBin(350),(c0[3]+c0[4])/2);
-  if(cat==1) h_all->SetBinContent(h_all->FindBin(350),(c1[3]+c1[4])/2);
-  if(cat==2) h_all->SetBinContent(h_all->FindBin(350),(c2[3]+c2[4])/2);
-  if(cat==3) h_all->SetBinContent(h_all->FindBin(350),(c3[3]+c3[4])/2);
-  if(cat==4) h_all->SetBinContent(h_all->FindBin(350),(all[3]+all[4])/2);
-
-  //m450-550 
-  double r1mass[3]={450, 500, 550};
-  for(int i = 0; i<3;i++){
-  if(cat==0) h_all->SetBinContent(h_all->FindBin(r1mass[i]),(c0[4]+c0[5])/2);
-  if(cat==1) h_all->SetBinContent(h_all->FindBin(r1mass[i]),(c1[4]+c1[5])/2);
-  if(cat==2) h_all->SetBinContent(h_all->FindBin(r1mass[i]),(c2[4]+c2[5])/2);
-  if(cat==3) h_all->SetBinContent(h_all->FindBin(r1mass[i]),(c3[4]+c3[5])/2);
-  if(cat==4) h_all->SetBinContent(h_all->FindBin(r1mass[i]),(all[4]+all[5])/2);
-  }
-
-  //m600 e 850
-  double highmass[2]={ 600., 850.};
-  for(int i = 0; i<2;i++){
-  if(cat==0) h_all->SetBinContent(h_all->FindBin(highmass[i]),c0[i+5]);
-  if(cat==1) h_all->SetBinContent(h_all->FindBin(highmass[i]),c1[i+5]);
-  if(cat==2) h_all->SetBinContent(h_all->FindBin(highmass[i]),c2[i+5]);
-  if(cat==3) h_all->SetBinContent(h_all->FindBin(highmass[i]),c3[i+5]);
-  if(cat==4) h_all->SetBinContent(h_all->FindBin(highmass[i]),all[i+5]);
-  }
-  
-
-  //m650-800 
-  double r2mass[4]={650, 700, 750, 800};
-  for(int i = 0; i<4;i++){
-  if(cat==0) h_all->SetBinContent(h_all->FindBin(r2mass[i]),(c0[5]+c0[6])/2);
-  if(cat==1) h_all->SetBinContent(h_all->FindBin(r2mass[i]),(c1[5]+c1[6])/2);
-  if(cat==2) h_all->SetBinContent(h_all->FindBin(r2mass[i]),(c2[5]+c2[6])/2);
-  if(cat==3) h_all->SetBinContent(h_all->FindBin(r2mass[i]),(c3[5]+c3[6])/2);
-  if(cat==4) h_all->SetBinContent(h_all->FindBin(r2mass[i]),(all[5]+all[6])/2);
-  }
-
-  for(int i=0;i<16;i++){
-    std::cout<<cat<<std::endl;
-    // std::cout<<mass[i]<<"  "<<h_all->FindBin(mass[i])<<"   "<<c0[i]<<std::endl;
-    std::cout<<i<<"  "<<h_all->GetBinCenter(i)<<"  "<<h_all->GetBinContent(i)<<std::endl;
-
- }
-  TCanvas* c = new TCanvas("c", "c", 1);
-  c->cd();
-  //  TPaveText* label_cms = get_labelCMS(0, false);
-  //TPaveText* label_sqrt = get_labelSqrt(0);  
-  h_all->GetYaxis()->SetRangeUser(0.0001, 0.1);
-  h_all->GetXaxis()->SetTitle("m_{X} [GeV]");
-  h_all->GetYaxis()->SetTitle("Signal Yield/1pb");
-  h_all->Draw();
-
-  RooDataHist* rooData_all = new RooDataHist("rooData_all", "roData_all",*var,h_all);
-  RooHistFunc* rooFunc_all = new RooHistFunc(TString::Format("mggSig_cat%d_norm",cat),TString::Format("mggSig_cat%d_norm",cat), *var,*rooData_all, 3);
-  /*  RooPlot* plot = var->frame();
-  rooData_all->plotOn(plot);
-  rooFunc_all->plotOn(plot);
-  plot->Draw("same");
-  c->SetLogy();
-
-  c->SaveAs("plots/signalYield.png");
-  c->SaveAs("plots/signalYield.pdf");*/
-  
-  return rooFunc_all;
-
-}
-
-
-RooHistFunc* getNorm2D(int cat,RooRealVar* var,double mass, double width, std::string model ){
-  
-  double norm;
-  TFile* f;
-  if(model=="GRAVITON") f= new TFile("effXacc2D_GRAVITON.root", "READ");
-  else f= new TFile("effXacc2D.root", "READ");
-  f->Print();
-  TH2D* h2 = (TH2D*) f->Get(TString::Format("h2_cat%d",cat));
-  int bin = h2->GetYaxis()->FindBin(width);
-  std::cout<<bin<<std::endl;
- 
-  TH1D* h1 = (TH1D*)h2->ProjectionX("py", bin, bin);
-
-  double eff;
-  eff = h1->GetBinContent(h1->FindBin(mass));
-  norm = 1.87004999e-02*eff/100.;
-  for(int i = 0; i<h1->GetNbinsX()+1; i++){
-    std::cout<< i<<" M: "<<h1->GetBinCenter(i)<<"   "<<h1->GetBinContent(i)<<std::endl;
-    h1->SetBinContent(i,1.87004999e-02*h1->GetBinContent(i)/100);
-    //std::cout<<h1->GetBinCenter(i)<<"   "<<h1->GetBinContent(i)<<std::endl;
-  }
-  std::cout<<norm<<std::endl;
-  RooDataHist* rooData_all = new RooDataHist("rooData_all", "roData_all",*var,h1);
-  RooHistFunc* rooFunc_all = new RooHistFunc(TString::Format("mggSig_cat%d_norm",cat),TString::Format("mggSig_cat%d_norm",cat), *var,*rooData_all, 3);
-  // std::cout<<rooFunc_all->getVal(mass)<<std::endl;
-  /* TCanvas* c = new TCanvas("c", "c", 1);
-  c->cd();
-  //  TPaveText* label_cms = get_labelCMS(0, false);
-  //TPaveText* label_sqrt = get_labelSqrt(0);  
-  // h1->GetYaxis()->SetRangeUser(0.0001, 0.1);
-  h1->GetXaxis()->SetTitle("m_{X} [GeV]");
-  h1->GetYaxis()->SetTitle("Signal Yield/1pb");
-  h1->Draw();
-  RooPlot* plot = var->frame();
-  rooData_all->plotOn(plot);
-  rooFunc_all->plotOn(plot);
-  plot->Draw("same");
-  c->SetLogy();
-
-  c->SaveAs(TString::Format("~/www/signalYield_cat%d.png",cat));
-  c->SaveAs(TString::Format("~/www/signalYield_cat%d.pdf",cat));*/
-  return rooFunc_all;
-
-}
-
-// chiara: questi vanno aggiornati
-// min of the mass fit range - values from the bias study
-RooHistFunc* getRooHistFuncFitMIN(int cat, RooRealVar* var){
-
-  double mass[3] = {1500., 3000., 5000.};
-  double c0[3]   = { 500., 2000., 4000.};
-  double c1[3]   = { 500., 2000., 4000.};
-  double c2[3]   = { 500., 2000., 4000.};
-  double c3[3]   = { 500., 2000., 4000.};
-
-  TH1F* h_all = new TH1F("h_all", "h_all", 3, 500, 6000);
-  h_all->GetXaxis()->SetTitle("m_{X} [GeV]");
-  h_all->GetYaxis()->SetTitle("Fit Range: Minimum");
-
-  for (int i=0; i<3; i++) {
-    //if (cat==0) std::cout << cat << " " << mass[i] << " " << h_all->FindBin(mass[i]) << " " << c0[i] << std::endl;
-    //if (cat==1) std::cout << cat << " " << mass[i] << " " << h_all->FindBin(mass[i]) << " " << c1[i] << std::endl;
-    //if (cat==2) std::cout << cat << " " << mass[i] << " " << h_all->FindBin(mass[i]) << " " << c2[i] << std::endl;
-    //if (cat==3) std::cout << cat << " " << mass[i] << " " << h_all->FindBin(mass[i]) << " " << c3[i] << std::endl;
-    //
-    if (cat==0) h_all->SetBinContent(h_all->FindBin(mass[i]),c0[i]);
-    if (cat==1) h_all->SetBinContent(h_all->FindBin(mass[i]),c1[i]);
-    if (cat==2) h_all->SetBinContent(h_all->FindBin(mass[i]),c2[i]);
-    if (cat==3) h_all->SetBinContent(h_all->FindBin(mass[i]),c3[i]);
-  }
-
-  TCanvas* c = new TCanvas("c", "c", 1);
-  c->cd();
-  TPaveText* label_cms  = get_labelCMS(0,"2015", true);
-  TPaveText* label_sqrt = get_labelSqrt(0);  
-  h_all->Draw("");
- 
-  RooDataHist* rooData_all = new RooDataHist("rooData_all","roData_all",*var,h_all);
-  RooHistFunc* rooFunc_all = new RooHistFunc(TString::Format("mggBkg_cat%d_min",cat),TString::Format("mggBkg_cat%d_min",cat), *var,*rooData_all, 3);
-  RooPlot* plot = var->frame();
-  rooData_all->plotOn(plot);
-  rooFunc_all->plotOn(plot);
-  plot->Draw("same");
-  c->SaveAs("plots/Bkg_fitMinimum.png");
-  
-  return rooFunc_all;
-}
-
-// chiara: questi vanno aggiornati
-// min of the mass fit range - extracted from a fit to the values from the bias study
-TF1* getFuncFitMIN(int cat, RooRealVar* var){
-
-  double mass[3] = {1500., 3000., 5000.};
-  double c0[3]   = { 500., 2000., 4000.};
-  double c1[3]   = { 500., 2000., 4000.};
-  double c2[3]   = { 500., 2000., 4000.};
-  double c3[3]   = { 500., 2000., 4000.};
- 
-  TF1* f = new TF1("f", "[0]+[1]*x", 500, 6000);
-  f->SetParameter(0,1000 );
-  f->SetParameter(1, -0.5);
-  f->SetParameter(2, -1000.);
-  
-  TH1F* h_all = new TH1F("h_all", "h_all", 3, 500, 6000);
-  h_all->GetXaxis()->SetTitle("m_{X} [GeV]");
-  h_all->GetYaxis()->SetTitle("Fit Range: Minimum");
-
-  for(int i=0;i<3;i++){
-    if (cat==0) h_all->SetBinContent(h_all->FindBin(mass[i]),c0[i]);
-    if (cat==1) h_all->SetBinContent(h_all->FindBin(mass[i]),c1[i]);
-    if (cat==2) h_all->SetBinContent(h_all->FindBin(mass[i]),c2[i]);
-    if (cat==3) h_all->SetBinContent(h_all->FindBin(mass[i]),c3[i]);
-  }
-
-  TCanvas* c = new TCanvas("c", "c", 1);
-  c->cd();
-  TPaveText* label_cms  = get_labelCMS(0,"2015", false);
-  TPaveText* label_sqrt = get_labelSqrt(0);  
-  h_all->Draw("");
-  h_all->Fit("f");
-  f->Draw("Lsame");
-  c->SaveAs("plots/Bkg_fitMinimum_withFit.png");
-
-  // for(int i=0;i<3;i++){
-  //  if(cat==0) std::cout << "cat = " << cat <<" => mass = " << mass[i] << ", point = " << c0[i] << ", fit = " << f->Eval(mass[i]) << std::endl;
-  //  if(cat==1) std::cout << "cat = " << cat <<" => mass = " << mass[i] << ", point = " << c1[i] << ", fit = " << f->Eval(mass[i]) << std::endl;
-  //  if(cat==2) std::cout << "cat = " << cat <<" => mass = " << mass[i] << ", point = " << c2[i] << ", fit = " << f->Eval(mass[i]) << std::endl;
-  //  if(cat==3) std::cout << "cat = " << cat <<" => mass = " << mass[i] << ", point = " << c3[i] << ", fit = " << f->Eval(mass[i]) << std::endl;
-  // }
-  
-  return f;
-}
-
-// chiara: questi vanno aggiornati
-// max of the mass fit range - values from the bias study
-RooHistFunc* getRooHistFuncFitMAX(int cat, RooRealVar* var){
-
-  double mass[3] = {1500., 3000., 5000.};
-  double c0[3]   = {2500., 4000., 6000.};
-  double c1[3]   = {2500., 4000., 6000.};
-  double c2[3]   = {2500., 4000., 6000.};
-  double c3[3]   = {2500., 4000., 6000.};
-
-  TH1F* h_all = new TH1F("h_all", "h_all", 3, 500, 6000);
-  h_all->GetXaxis()->SetTitle("m_{X} [GeV]");
-  h_all->GetYaxis()->SetTitle("Fit Range: Maximum");
-
-  for(int i=0;i<3;i++){
-    if(cat==0) h_all->SetBinContent(h_all->FindBin(mass[i]),c0[i]);
-    if(cat==1) h_all->SetBinContent(h_all->FindBin(mass[i]),c1[i]);
-    if(cat==2) h_all->SetBinContent(h_all->FindBin(mass[i]),c2[i]);
-    if(cat==3) h_all->SetBinContent(h_all->FindBin(mass[i]),c3[i]);
-    // 
-    // if (cat==0) std::cout << cat << " " << mass[i] << " " << h_all->FindBin(mass[i]) << " " << c0[i] << std::endl;
-    // if (cat==1) std::cout << cat << " " << mass[i] << " " << h_all->FindBin(mass[i]) << " " << c1[i] << std::endl;
-    // if (cat==2) std::cout << cat << " " << mass[i] << " " << h_all->FindBin(mass[i]) << " " << c2[i] << std::endl;
-    // if (cat==3) std::cout << cat << " " << mass[i] << " " << h_all->FindBin(mass[i]) << " " << c3[i] << std::endl;
-  }
-
-  TCanvas* c = new TCanvas("c", "c", 1);
-  c->cd();
-  TPaveText* label_cms = get_labelCMS(0,"2015", false);
-  TPaveText* label_sqrt = get_labelSqrt(0);  
-  h_all->Draw();
-  
-  RooDataHist* rooData_all = new RooDataHist("rooData_all", "roData_all",*var,h_all);
-  RooHistFunc* rooFunc_all = new RooHistFunc(TString::Format("mggBkg_cat%d_max",cat),TString::Format("mggBkg_cat%d_max",cat), *var,*rooData_all, 3);
-
-  RooPlot* plot = var->frame();
-  rooData_all->plotOn(plot);
-  rooFunc_all->plotOn(plot);
-  plot->Draw("same");
-  c->SaveAs("plots/Bkg_fitMaximum.png");
-
-  return rooFunc_all;
-}
-
-// chiara: questi vanno aggiornati
-// max of the mass fit range - extracted from a fit to the values from the bias study
-TF1* getFuncFitMAX(int cat, RooRealVar* var){
-
-  double mass[3] = {1500., 3000., 5000.};
-  double c0[3]   = {2500., 4000., 6000.};
-  double c1[3]   = {2500., 4000., 6000.};
-  double c2[3]   = {2500., 4000., 6000.};
-  double c3[3]   = {2500., 4000., 6000.};  
-
-  TF1* f = new TF1("f", "[0]+[2]*pow(x,[1])", 500, 6000);
-  f->SetParameter(0,1000 );
-  // f->SetParameter(1, -0.5);
-  f->SetParameter(1, 0.5);
-  f->SetParameter(2, -1000.);
-  
-  TH1F* h_all = new TH1F("h_all", "h_all", 3, 500, 6000);
-  h_all->GetXaxis()->SetTitle("m_{X} [GeV]");
-  h_all->GetYaxis()->SetTitle("Fit Range: Maximum");
-  
-  for(int i=0;i<3;i++){
-    if(cat==0) h_all->SetBinContent(h_all->FindBin(mass[i]),c0[i]);
-    if(cat==1) h_all->SetBinContent(h_all->FindBin(mass[i]),c1[i]);
-    if(cat==2) h_all->SetBinContent(h_all->FindBin(mass[i]),c2[i]);
-    if(cat==3) h_all->SetBinContent(h_all->FindBin(mass[i]),c3[i]);
-  }
-
-  TCanvas* c = new TCanvas("c", "c", 1);
-  c->cd();
-  TPaveText* label_cms  = get_labelCMS(0,"2015", false);
-  TPaveText* label_sqrt = get_labelSqrt(0);  
-
-  h_all->Draw();
-  h_all->Fit("f");
-  f->Draw("Lsame");
-  c->SaveAs("plots/Bkg_fitMaximum_withFit.png");
-
-  // for(int i=0;i<3;i++){
-  // if(cat==0) std::cout << "cat = " << cat <<" => mass = " << mass[i] << ", point = " << c0[i] << ", fit = " << f->Eval(mass[i]) << std::endl;
-  // if(cat==1) std::cout << "cat = " << cat <<" => mass = " << mass[i] << ", point = " << c1[i] << ", fit = " << f->Eval(mass[i]) << std::endl;
-  // if(cat==2) std::cout << "cat = " << cat <<" => mass = " << mass[i] << ", point = " << c2[i] << ", fit = " << f->Eval(mass[i]) << std::endl;
-  // if(cat==3) std::cout << "cat = " << cat <<" => mass = " << mass[i] << ", point = " << c3[i] << ", fit = " << f->Eval(mass[i]) << std::endl;
-  // }
- 
-  return f;
-}
-
-// ok
-// plot of the fit mass range - max and min from the fit to the values extracted from the bias study 
-makeRooHistPlot(RooHistFunc* rooFitMin,RooHistFunc* rooFitMax ,TF1* fmin, TF1* fmax, RooRealVar* var){
-
-  TCanvas* cfit = new TCanvas("cfit", "cfit", 1);
-  cfit->cd();
-  
-  RooPlot* p = var->frame();
-  rooFitMin->plotOn(p, LineColor(kAzure+9), LineStyle(kDashed));
-  rooFitMax->plotOn(p, LineColor(kViolet+9));
-  fmax->SetLineColor(kViolet+9);
-  fmax->SetLineWidth(2);
-  fmin->SetLineWidth(2);
-  fmin->SetLineColor(kAzure+9);
-  fmin->SetLineStyle(kDashed);
-  fmax->GetYaxis()->SetRangeUser(0, 6000);
-  fmax->Draw("L");
-  fmin->Draw("Lsame");
-  fmax->GetYaxis()->SetTitle("m_{#gamma#gamma} fit range in GeV");
-  fmax->GetXaxis()->SetTitle("m_{X} [GeV]");
-
-  TLegend* leg = new TLegend(0.52, 0.16, 0.85, 0.35, "", "brNDC");
-  leg->SetTextFont(42);
-  leg->SetBorderSize(0);
-  leg->SetFillStyle(0);
-  leg->AddEntry(fmax, "Fit Range Maximum", "L");
-  leg->AddEntry(fmin, "Fit Range Minimum", "L");
-  
-  TPaveText* label_cms = get_labelCMS(0, "2015", true);
-  TPaveText* label_sqrt = get_labelSqrt(0);
-  // label_cms->Draw("same");
-  // label_sqrt->Draw("same");
-
-  // int iPos=11 ;
-  // CMS_lumi( cfit,true,iPos );
-  cfit->SaveAs("plots/bkg_fitRange.png");
-}
-
-// ok
 // CMS stuffs
 TPaveText* get_labelCMS( int legendQuadrant, std::string year, bool sim) {
 
@@ -3390,7 +2529,6 @@ TPaveText* get_labelCMS( int legendQuadrant, std::string year, bool sim) {
   return cmslabel;
 }
 
-// ok
 TPaveText* get_labelSqrt( int legendQuadrant ) {
 
   if( legendQuadrant!=0 && legendQuadrant!=1 && legendQuadrant!=2 ) {
@@ -3424,3 +2562,4 @@ TPaveText* get_labelSqrt( int legendQuadrant ) {
   label_sqrt->AddText("#sqrt{s} = 13 TeV");
   return label_sqrt;
 }
+
