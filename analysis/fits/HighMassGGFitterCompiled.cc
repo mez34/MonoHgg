@@ -31,7 +31,7 @@ using namespace RooStats;
 
 // ============================================
 // to be modified:
-static const Int_t NCAT = 4;  
+static const Int_t NCAT = 1;  
 Int_t MINmass= 500;
 Int_t MAXmass= 6000;
 std::string filePOSTfix="";
@@ -93,7 +93,7 @@ TPaveText* get_labelCMS( int legendQuadrant, std::string year, bool sim) {
     x2 = 0.42;
   }
  
-  TPaveText* cmslabel = new TPaveText( x1, y1, x2, y2, "brNDC" );
+  TPaveText* cmslabel = new TPaveText( x1, y1, x2, y2, "" );
   cmslabel->SetFillColor(kWhite);
   cmslabel->SetTextSize(0.038);
   if( legendQuadrant==0 ) cmslabel->SetTextAlign(11);
@@ -138,7 +138,7 @@ TPaveText* get_labelSqrt( int legendQuadrant ) {
     y2 = 0.975;
   }
 
-  TPaveText* label_sqrt = new TPaveText(x1,y1,x2,y2, "brNDC");
+  TPaveText* label_sqrt = new TPaveText(x1,y1,x2,y2, "");
   label_sqrt->SetFillColor(kWhite);
   label_sqrt->SetTextSize(0.038);
   label_sqrt->SetTextFont(42);
@@ -301,7 +301,7 @@ void SigModelResponseDoubleCBFit(RooWorkspace* w, Float_t mass, TString coupling
     plotG->GetYaxis()->SetTitleFont(42);
     plotG->GetYaxis()->SetTitleSize(0.04);
 
-    TLegend* legmc = new TLegend(0.6, 0.58, 0.91, 0.91, "", "brNDC");
+    TLegend* legmc = new TLegend(0.6, 0.58, 0.91, 0.91, "", "");
     legmc->SetTextSize(0.0286044);  
     legmc->SetTextFont(42);
     legmc->SetBorderSize(0);
@@ -424,7 +424,7 @@ void SigModelResponseCBCBFit(RooWorkspace* w, Float_t mass, TString coupling) {
     plotG->GetYaxis()->SetTitle("Events");
     plotG->GetYaxis()->SetTitleFont(42);
     plotG->GetYaxis()->SetTitleSize(0.04);
-    TLegend* legmc = new TLegend(0.6, 0.58, 0.91, 0.91, "", "brNDC");
+    TLegend* legmc = new TLegend(0.6, 0.58, 0.91, 0.91, "", "");
     legmc->SetTextSize(0.0286044);  
     legmc->SetTextFont(42);
     legmc->SetBorderSize(0);
@@ -555,7 +555,7 @@ void SigModelResponseReducedCBCBFit(RooWorkspace* w, Float_t mass, TString coupl
     plotG->GetYaxis()->SetTitleFont(42);
     plotG->GetYaxis()->SetTitleSize(0.04);
 
-    TLegend* legmc = new TLegend(0.6, 0.58, 0.91, 0.91, "", "brNDC");
+    TLegend* legmc = new TLegend(0.6, 0.58, 0.91, 0.91, "", "");
     legmc->SetTextSize(0.0286044);  
     legmc->SetTextFont(42);
     legmc->SetBorderSize(0);
@@ -644,7 +644,7 @@ void SigModelResponseReducedDoubleCBFit(RooWorkspace* w, Float_t mass, TString c
     plotG->GetYaxis()->SetTitleFont(42);
     plotG->GetYaxis()->SetTitleSize(0.04);
 
-    TLegend* legmc = new TLegend(0.6, 0.58, 0.91, 0.91, "", "brNDC");
+    TLegend* legmc = new TLegend(0.6, 0.58, 0.91, 0.91, "", "");
     legmc->SetTextSize(0.0286044);  
     legmc->SetTextFont(42);
     legmc->SetBorderSize(0);
@@ -729,7 +729,7 @@ void SigModelBWFit(RooWorkspace* w, Float_t mass, TString coupling) {
   plotG->GetYaxis()->SetTitleFont(42);
   plotG->GetYaxis()->SetTitleSize(0.04);
 
-  TLegend* legmc = new TLegend(0.6, 0.58, 0.91, 0.91, "", "brNDC");
+  TLegend* legmc = new TLegend(0.6, 0.58, 0.91, 0.91, "", "");
   legmc->SetTextSize(0.0286044);  
   legmc->SetTextFont(42);
   legmc->SetBorderSize(0);
@@ -776,7 +776,7 @@ void SigModelBWFit(RooWorkspace* w, Float_t mass, TString coupling) {
 //-------------------------------------------------------------------------
 
 // Fit signal with model with CBCB convoluted with BW
-void SigModelFitConvBW(RooWorkspace* w, Float_t mass, Double_t width) {
+void SigModelFitConvBW(RooWorkspace* w, Float_t mass) {
 
   Float_t MASS(mass);  
 
@@ -848,7 +848,7 @@ void SigModelFitConvBW(RooWorkspace* w, Float_t mass, Double_t width) {
     lat->SetTextFont(42); 
     lat->SetNDC();
     
-    TLegend *legmc = new TLegend(0.55, 0.6, 0.87, 0.88, "brNDC");
+    TLegend *legmc = new TLegend(0.55, 0.6, 0.87, 0.88, "");
     legmc->AddEntry(plotPhotonsMassAll->getObject(0),"Simulation","LPE");
     legmc->AddEntry(plotPhotonsMassAll->getObject(1),"BW","L");
     legmc->AddEntry(plotPhotonsMassAll->getObject(2)," CB + CB ","L");
@@ -890,7 +890,7 @@ void SigModelFitConvBW(RooWorkspace* w, Float_t mass, Double_t width) {
 }
 
 // Fit signal with model with DoubleCB convoluted with BW
-void SigModelFitDoubleCBConvBW(RooWorkspace* w, Float_t mass, Double_t width) {
+void SigModelFitDoubleCBConvBW(RooWorkspace* w, Float_t mass) {
 
   Float_t MASS(mass);  
   
@@ -952,7 +952,7 @@ void SigModelFitDoubleCBConvBW(RooWorkspace* w, Float_t mass, Double_t width) {
     plotPhotonsMassAll->GetYaxis()->SetRangeUser(0.01, max*1.2);
     plotPhotonsMassAll->GetXaxis()->SetRangeUser(210, 290);
     
-    TLegend *legmc = new TLegend(0.6, 0.58, 0.091, 0.91, "brNDC");
+    TLegend *legmc = new TLegend(0.6, 0.58, 0.091, 0.91, "");
     legmc->AddEntry(plotPhotonsMassAll->getObject(0),"Simulation","LPE");
     legmc->AddEntry(plotPhotonsMassAll->getObject(1),"BW","L");
     legmc->AddEntry(plotPhotonsMassAll->getObject(2),"DoubleCB","L");
@@ -1090,7 +1090,7 @@ void MakeBkgWS(RooWorkspace* w, const char* fileBaseName, double mass) {
 }
 */
 
-void runfits(const Float_t mass=1500, string coupling="001", Bool_t dobands = false, Float_t width=0.1) {
+void runfits(const Float_t mass=1500, string coupling="001") {
 
   //******************************************************************//
   //  Steps:
@@ -1138,8 +1138,12 @@ void runfits(const Float_t mass=1500, string coupling="001", Bool_t dobands = fa
   
   cout << endl;
   cout << "Now prepare signal model fit - resolution function x BW" << endl;  
-  SigModelFitDoubleCBConvBW(w, mass, width);
-  // SigModelFitConvBW(w, mass, width);
+  SigModelFitDoubleCBConvBW(w, mass);
+  // SigModelFitConvBW(w, mass);
+
+  cout << endl;
+  cout << "Alternative: generate following nominal BW and fitted doubleCB and build another dataset" << endl;
+  
 
   return;
 }
