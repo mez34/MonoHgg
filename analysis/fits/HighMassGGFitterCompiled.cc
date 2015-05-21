@@ -38,7 +38,7 @@ Int_t MINmass= 500;
 Int_t MAXmass= 6000;
 std::string filePOSTfix="";
 Float_t Lum = 19500.0;    
-bool wantResponse = 1;
+bool wantResponse = 0;
 bool wantGenLevel = 0;
 // ============================================
 
@@ -893,15 +893,16 @@ void SigModelFitConvBW(RooWorkspace* w, Float_t mass) {
     
     
     // IMPORTANT: fix all pdf parameters to constant
-    w->defineSet(TString::Format("ConvolutedPdfParam_cat%d",c),RooArgSet( *w->var(TString::Format("MassCB_sig_sigma_cat%d",c)), 
-									  *w->var(TString::Format("MassCB_sig_alphaCBpos_cat%d",c)),
-									  *w->var(TString::Format("MassCB_sig_alphaCBneg_cat%d",c)),
-									  *w->var(TString::Format("MassCB_sig_nCBpos_cat%d",c)),
-									  *w->var(TString::Format("MassCB_sig_nCBneg_cat%d",c)),	   
-									  *w->var(TString::Format("MassCB_sig_frac_cat%d",c)),  
-									  *w->var(TString::Format("MassCB_sig_mean_cat%d",c)),
-									  *w->var(TString::Format("sigmaBW_var_cat%d",c))));
-    
+    w->defineSet(TString::Format("ConvolutedPdfParam_cat%d",c),RooArgSet( *w->var(TString::Format("Mass_sig_sigma_cat%d",c)), 
+									  *w->var(TString::Format("Mass_sig_alphaCBpos_cat%d",c)),
+									  *w->var(TString::Format("Mass_sig_alphaCBneg_cat%d",c)),
+									  *w->var(TString::Format("Mass_sig_nCBpos_cat%d",c)),
+									  *w->var(TString::Format("Mass_sig_nCBneg_cat%d",c)),	   
+									  *w->var(TString::Format("Mass_sig_frac_cat%d",c)),  
+									  *w->var(TString::Format("ConvMass_sig_mean_cat%d",c)),
+									  *w->var(TString::Format("meanBW_cat%d",c)),
+									  *w->var(TString::Format("sigmaBW_cat%d",c))));
+
     SetConstantParams(w->set(TString::Format("ConvolutedPdfParam_cat%d",c)));
     
     w->Print("V");
@@ -996,15 +997,14 @@ void SigModelFitDoubleCBConvBW(RooWorkspace* w, Float_t mass) {
     
     
     // IMPORTANT: fix all pdf parameters to constant
-    w->defineSet(TString::Format("ConvolutedPdfParam_cat%d",c),RooArgSet( *w->var(TString::Format("MassCB_sig_sigma_cat%d",c)), 
-									  *w->var(TString::Format("MassCB_sig_alphaCBpos_cat%d",c)),
-									  *w->var(TString::Format("MassCB_sig_alphaCBneg_cat%d",c)),
-									  *w->var(TString::Format("MassCB_sig_nCBpos_cat%d",c)),
-									  *w->var(TString::Format("MassCB_sig_nCBneg_cat%d",c)),	   
-									  *w->var(TString::Format("MassCB_sig_frac_cat%d",c)),  
-									  *w->var(TString::Format("MassCB_sig_mean_cat%d",c)),
-									  *w->var(TString::Format("sigmaBW_var_cat%d",c))));
-    
+    w->defineSet(TString::Format("ConvolutedPdfParam_cat%d",c),RooArgSet( *w->var(TString::Format("Sig_sigma_cat%d",c)), 
+									  *w->var(TString::Format("Sig_alpha1_cat%d",c)),
+									  *w->var(TString::Format("Sig_alpha2_cat%d",c)),
+									  *w->var(TString::Format("Sig_n1_cat%d",c)),
+									  *w->var(TString::Format("Sig_n2_cat%d",c)),	   
+									  *w->var(TString::Format("ConvSig_mean_cat%d",c)),
+									  *w->var(TString::Format("sigmaBW_cat%d",c)),
+									  *w->var(TString::Format("meanBW_cat%d",c))));
     SetConstantParams(w->set(TString::Format("ConvolutedPdfParam_cat%d",c)));
     
     w->Print("V");
@@ -1148,19 +1148,17 @@ void SigModelFromToys(RooWorkspace* w, Float_t mass) {
     c1->SaveAs("plots/compareDataset"+TString::Format(("_cat%d_LOG.png"),c));
 
 
-    /*
     // IMPORTANT: fix all pdf parameters to constant
-    w->defineSet(TString::Format("ConvolutedPdfParam_cat%d",c),RooArgSet( *w->var(TString::Format("MassCB_sig_sigma_cat%d",c)), 
-									  *w->var(TString::Format("MassCB_sig_alphaCBpos_cat%d",c)),
-									  *w->var(TString::Format("MassCB_sig_alphaCBneg_cat%d",c)),
-									  *w->var(TString::Format("MassCB_sig_nCBpos_cat%d",c)),
-									  *w->var(TString::Format("MassCB_sig_nCBneg_cat%d",c)),	   
-									  *w->var(TString::Format("MassCB_sig_frac_cat%d",c)),  
-									  *w->var(TString::Format("MassCB_sig_mean_cat%d",c)),
-									  *w->var(TString::Format("sigmaBW_var_cat%d",c))));
+    w->defineSet(TString::Format("ConvolutedPdfParam_cat%d",c),RooArgSet( *w->var(TString::Format("SigF_sigma_cat%d",c)), 
+									  *w->var(TString::Format("SigF_alpha1_cat%d",c)),
+									  *w->var(TString::Format("SigF_alpha2_cat%d",c)),
+									  *w->var(TString::Format("SigF_n1_cat%d",c)),
+									  *w->var(TString::Format("SigF_n2_cat%d",c)),	   
+									  *w->var(TString::Format("SigF_mean_cat%d",c)),
+									  *w->var(TString::Format("sigmaBW_cat%d",c)),
+									  *w->var(TString::Format("meanBW_cat%d",c))));
     
     SetConstantParams(w->set(TString::Format("ConvolutedPdfParam_cat%d",c)));
-    */
     w->Print("V");
   }
 }
@@ -1311,7 +1309,7 @@ void runfits(const Float_t mass=1500, string coupling="001") {
   
   cout << endl;
   cout << "Now prepare signal model fit - resolution function x BW" << endl;  
-  // SigModelFitDoubleCBConvBW(w, mass);
+  SigModelFitDoubleCBConvBW(w, mass);
   // SigModelFitConvBW(w, mass);
 
   cout << endl;
