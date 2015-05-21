@@ -36,7 +36,6 @@ using namespace RooStats;
 static const Int_t NCAT = 4;  
 Int_t MINmass= 500;
 Int_t MAXmass= 6000;
-std::string filePOSTfix="";
 Float_t Lum = 19500.0;    
 bool wantResponse = 0;
 bool wantGenLevel = 0;
@@ -1163,103 +1162,40 @@ void SigModelFromToys(RooWorkspace* w, Float_t mass) {
   }
 }
 
-// Write signal pdfs and datasets into the workspace 
-void MakeSigWS(RooWorkspace* w, const char* fileBaseName, Float_t width, std::string model){
-  
-  TString wsDir = "workspaces/"+filePOSTfix;
-  Int_t ncat = NCAT;
 
+// Write signal pdfs and datasets into the workspace 
+void MakeSigWS(RooWorkspace* w, const char* fileBaseName, Float_t mass, std::string coupling){
+  
+  TString wsDir = "workspaces/";
+  Int_t ncat = NCAT;
+  
   RooWorkspace *wAll = new RooWorkspace("w_all","w_all");  
 
-  //********************************//
-  // Retrieve P.D.F.s
-   //w->Print("V");
+  // Retrieve stuff
+  w->Print("V");
   for (int c=0; c<ncat; ++c) {
-    //  std::cout<<"flag"<<std::endl;
-    wAll->import(*w->pdf("mggSig"+TString::Format("_cat%d",c)));//*w->pdf("mggSigCBCExt"+TString::Format("_cat%d",c))
-    //  std::cout<<"flag"<<std::endl;    
-    //wAll->import(*w->pdf("mggSig"+TString::Format("_Inter_cat%d",c)));//*w->pdf("mggSigCBCExt"+TString::Format("_cat%d",c))
-    //std::cout<<"flag"<<std::endl;
+
+    // convolution
+    wAll->import(*w->pdf("mggSig"+TString::Format("_cat%d",c)));  // this is the convolution
     
-    wAll->import(*w->data(TString::Format("SigWeight_cat%d",c)));
-    //	std::cout<<"flag"<<std::endl;
-    wAll->import(*w->function("mggSig"+TString::Format("_cat%d_norm",c)));
-                                                 
+    // dataset
+    wAll->import(*w->data(TString::Format("SigWeight_cat%d",c)));            // real dataset
+    // wAll->import(*w->data(TString::Format("SigPseudodata_cat%d",c)));     // dataset from toys
   }
-  std::cout << "done with importing signal pdfs" << std::endl;
+  std::cout << "done with importing signal pdf and datasets" << std::endl;
+
   wAll->import(*w->var("massReduced"));
   wAll->import(*w->var("mggGen"));
-  // (2) Systematics on energy scale and resolution 
-  // wAll->factory("CMS_hgg_sig_m0_absShift[1,1.0,1.0]");
-  // wAll->factory("CMS_hgg_sig_m0_absShift_cat0[1,1.0,1.0]");
-  // wAll->factory("CMS_hgg_sig_m0_absShift_cat1[1,1.0,1.0]");
-  // wAll->factory("prod::CMS_hgg_sig_m0_cat0(massggnewvtx_sig_m0_cat0, CMS_hgg_sig_m0_absShift)");
-  // wAll->factory("prod::CMS_hgg_sig_m0_cat1(massggnewvtx_sig_m0_cat1, CMS_hgg_sig_m0_absShift)");
 
-  // (3) Systematics on resolution: create new sigmas
-  // wAll->factory("CMS_hgg_sig_sigmaScale[1,1.0,1.0]");
-  // wAll->factory("CMS_hgg_sig_sigmaScale_cat0[1,1.0,1.0]");
-  // wAll->factory("CMS_hgg_sig_sigmaScale_cat1[1,1.0,1.0]");
-  // wAll->factory("prod::CMS_hgg_sig_sigma_cat0(massggnewvtx_sig_sigma0_cat0, CMS_hgg_sig_sigmaScale)");
-  // wAll->factory("prod::CMS_hgg_sig_gsigma_cat0(massggnewvtx_sig_sigma1_cat0, CMS_hgg_sig_sigmaScale)");
-  // wAll->factory("prod::CMS_hgg_sig_sigma_cat1(massggnewvtx_sig_sigma0_cat1, CMS_hgg_sig_sigmaScale)");
-  // wAll->factory("prod::CMS_hgg_sig_gsigma_cat1(massggnewvtx_sig_sigma1_cat1, CMS_hgg_sig_sigmaScale)")
-
-  TString filename(wsDir+TString(fileBaseName)+TString::Format(("_m%.2f_w%.2f.inputsig_"+model+".root").c_str(),w->var("MH")->getVal(),width));
+  int imass = (int)mass;
+  TString filename(wsDir+TString(fileBaseName)+TString::Format("_m%d",imass)+"_"+TString(coupling)+".root");
+  TFile fileWs(filename,"RECREATE");
+  fileWs.cd();
   wAll->writeToFile(filename);
   cout << "Write signal workspace in: " << filename << " file" << endl;
   
   return;
 }
-
-/*
-// Write background pdfs and datasets into the workspace 
-void MakeBkgWS(RooWorkspace* w, const char* fileBaseName, double mass) {
-
-  TString wsDir = "workspaces/"+filePOSTfix;
-  Int_t ncat = NCAT;  
-
-  RooWorkspace *wAll = new RooWorkspace("w_all","w_all");
-  
-  //********************************
-  // Retrieve the datasets and PDFs
-  RooDataSet* data[NCAT];
- 
-  for (int c=0; c<ncat; ++c) {
-  
-    data[c] = (RooDataSet*) w->data(TString::Format("Data_cat%d",c));
-    ((RooRealVar*) data[c]->get()->find("mgg"))->setBins(320) ;
- 
-    RooDataHist* dataBinned = data[c]->binnedClone();
- 
-    wAll->import(*w->pdf(TString::Format("mggBkg_cat%d",c)));
- 
-    wAll->import(*dataBinned, Rename(TString::Format("data_obs_cat%d",c)));
- 
-    wAll->import(*w->data(TString::Format("Data_cat%d",c)), Rename(TString::Format("data_unbinned_obs_cat%d",c)));
- 
-  }
-  std::cout << "done with importing background pdfs" << std::endl;
-  
-
-  TString filename;
-  filename = (wsDir+TString(fileBaseName)+TString::Format("_m%.2f.root",w->var("MH")->getVal()));
-
-
-  wAll->writeToFile(filename);
-  cout << "Write background workspace in: " << filename << " file" << endl;
-
-  std::cout << std::endl; 
-  std::cout << "observation:" << std::endl;
-  for (int c=0; c<ncat; ++c) {
-    std::cout << "cat " << c << ", " << wAll->data(TString::Format("data_obs_cat%d",c))->sumEntries() << endl;
-    wAll->data(TString::Format("data_obs_cat%d",c))->Print();
-  }
-  std::cout << std::endl;
-  
-  return;
-}
-*/
 
 void runfits(const Float_t mass=1500, string coupling="001") {
 
@@ -1287,7 +1223,6 @@ void runfits(const Float_t mass=1500, string coupling="001") {
   w->var("mggGen")->setMax(MAXmass);
   w->Print("v");
   
-  
   cout << endl; 
   cout << "Now add signal data" << endl;
   AddSigData(w, mass, coupling);   
@@ -1295,9 +1230,7 @@ void runfits(const Float_t mass=1500, string coupling="001") {
   cout << endl; 
   if (wantResponse) {
     cout << "Now prepare signal model fit - resolution function" << endl;  
-    // SigModelResponseCBCBFit(w, mass, coupling);     
     // SigModelResponseDoubleCBFit(w, mass, coupling); 
-    // SigModelResponseReducedCBCBFit(w, mass, coupling);       
     SigModelResponseReducedDoubleCBFit(w, mass, coupling); 
   }    
 
@@ -1310,11 +1243,14 @@ void runfits(const Float_t mass=1500, string coupling="001") {
   cout << endl;
   cout << "Now prepare signal model fit - resolution function x BW" << endl;  
   SigModelFitDoubleCBConvBW(w, mass);
-  // SigModelFitConvBW(w, mass);
 
   cout << endl;
   cout << "Alternative: generate following nominal BW and fitted doubleCB and build another dataset" << endl;
   // SigModelFromToys(w, mass);  
+
+  cout << endl;
+  cout << "Now preparing signal WS" << endl;
+  MakeSigWS(w, fileBaseName, mass, coupling);
 
   return;
 }
