@@ -45,10 +45,10 @@ void makeMCPlots(float lumi, int signalFactor=1)
 
   // chiara
   TString files[NSPECIES];
-  files[0]="data/mergedFinal/RSGravToGG_kMpl-01_M-1500.root";
-  files[1]="data/mergedFinal/QCD.root";
-  files[2]="data/mergedFinal/GJets.root";
-  files[3]="data/mergedFinal/GGJets.root";
+  files[0]="data/newSelection/mergedFinal/RSGravToGG_kMpl-01_M-1500.root";
+  files[1]="data/newSelection/mergedFinal/QCD.root";
+  files[2]="data/newSelection/mergedFinal/GJets.root";
+  files[3]="data/newSelection/mergedFinal/GGJets.root";
 
   TString plotsDir="./diphotPlots/";
 
