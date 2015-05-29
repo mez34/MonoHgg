@@ -237,7 +237,7 @@ void AddSigData(RooWorkspace* w, Float_t mass, TString coupling) {
 
   // -------------------------
   // split in categories, wrt genMass - to study the theory width
-  if (wantGenLevel) {   // chiara: se lo usi nei toys sistema questo switch
+  if (wantGenLevel) { 
     cout << endl;
     cout << endl;
     cout << "preparing dataset with observable mggGen, no split in categories since they're all the same" << endl;
@@ -1021,10 +1021,17 @@ void SigModelFromToys(RooWorkspace* w, Float_t mass) {
   RooDataSet* sigToFit[NCAT];
   RooRealVar* mgg = w->var("mgg"); 
   
-  // Toy dataset
+  // Toy dataset for real work
   RooDataSet* pseudoData[NCAT];
-  RooRealVar* mggGenCB = new RooRealVar("mggGenCB", "M(gg)", -500., 500., "GeV");
-  
+
+  // Toy dataset for checks
+  RooDataSet* pseudoDataCB[NCAT];
+  RooDataSet* pseudoDataBW[NCAT];
+
+  // Other RooRealVar
+  RooRealVar* mggGenCB = new RooRealVar("mggGenCB", "M(gg)", -1., 2., "GeV");      
+  RooRealVar* mggGenBW = new RooRealVar("mggGenBW", "M(gg)", 500., 6000., "GeV");
+
   // Fit to Signal 
   for (int c=0; c<NCAT; ++c) {
     cout << "---------- Category = " << c << endl;
@@ -1041,34 +1048,64 @@ void SigModelFromToys(RooWorkspace* w, Float_t mass) {
     // BW - all parameters fixed to the expected values
     RooFormulaVar meanBW(TString::Format("massBW_cat%d",c),"","@0",*w->var(TString::Format("meanBW_cat%d",c)) );  
     RooFormulaVar sigmaBW(TString::Format("widthBW_cat%d",c),"","@0",*w->var(TString::Format("sigmaBW_cat%d",c)) );
-    RooBreitWigner SigModelBW(TString::Format("BW_cat%d",c),TString::Format("BW_cat%d",c), *mgg, meanBW, sigmaBW);
+    RooBreitWigner SigModelBWG(TString::Format("BWG_cat%d",c),TString::Format("BWG_cat%d",c), *mggGenBW, meanBW, sigmaBW);
 
-    // Original dataset
+    // Original dataset with reco
     sigToFit[c] = (RooDataSet*) w->data(TString::Format("SigWeight_cat%d",c)); 
     int origEntries = sigToFit[c]->numEntries();
 
     // Pseudodata from our generation
-    pseudoData[c] = new RooDataSet("pseudoData","pseudoData", RooArgSet(*mgg));
+    pseudoData[c]   = new RooDataSet("pseudoData",  "pseudoData",   RooArgSet(*mgg));
+    pseudoDataCB[c] = new RooDataSet("pseudoDataCB","pseudoDataCB", RooArgSet(*mggGenCB));
+    pseudoDataBW[c] = new RooDataSet("pseudoDataBW","pseudoDataBW", RooArgSet(*mggGenBW));
+
+    // to check the generation 
+    TH1F *H_orig = new TH1F("H_orig","H_orig",45,1250,1700);
+    TH1F *H_toys = new TH1F("H_toys","H_toys",45,1250,1700);
+    if(mass==750) {
+      H_orig = new TH1F("H_orig","H_orig",14,710,780);
+      H_toys = new TH1F("H_toys","H_toys",14,710,780);
+    }
+    H_orig->Sumw2();
+    H_toys->Sumw2();
+    H_toys->SetTitle("");
+    H_orig->SetTitle("");
+    H_toys->SetLineColor(2);
+    H_orig->SetLineColor(1);
+    H_toys->SetLineWidth(2);
+    H_orig->SetLineWidth(2);
       
     // Generation from the two pdfs
     cout << "generating " << origEntries << " entries" << endl;
     for (int ii=0; ii<origEntries; ii++) {
-      // for (int ii=0; ii<2000; ii++) {
-      if (ii%100==0) cout << ii << endl;
+      if (ii%500==0) cout << ii << endl;
+
       RooDataSet* dataCB = ResponseDoubleCB.generate(*mggGenCB,1);  
-      RooDataSet* dataBW = SigModelBW.generate(*mgg,1);     
+      RooDataSet* dataBW = SigModelBWG.generate(*mggGenBW,1);     
       RooArgSet setCB = *dataCB->get(0);
       RooArgSet setBW = *dataBW->get(0);
       RooRealVar* varCB = (RooRealVar*)setCB.find("mggGenCB");      
-      RooRealVar* varBW = (RooRealVar*)setBW.find("mgg");      
+      RooRealVar* varBW = (RooRealVar*)setBW.find("mggGenBW");      
       float mggCB = varCB->getVal();
       float mggBW = varBW->getVal();
 
-      *mgg = mggCB*mggBW;  
+      *mgg      = mggCB*mggBW;  
+      *mggGenCB = mggCB;  
+      *mggGenBW = mggBW;  
+
       pseudoData[c]->add(RooArgSet(*mgg));  
+      pseudoDataCB[c]->add(RooArgSet(*mggGenCB));  
+      pseudoDataBW[c]->add(RooArgSet(*mggGenBW));  
+
+      // Fill histos
+      RooArgSet setOriginal = *sigToFit[c]->get(ii);
+      RooRealVar* varOriginal = (RooRealVar*)setOriginal.find("mgg");
+      H_orig->Fill(varOriginal->getVal());
+      H_toys->Fill(mggCB*mggBW);
     }
-    pseudoData[c]->Print("V");
+
     w->import(*pseudoData[c],Rename(TString::Format("SigPseudodata_cat%d",c)));
+    pseudoData[c]->Print();
 
     // Now build a new CB centred in 0 and with free parameters
     RooFormulaVar CBmeanF(TString::Format("CBmeanF_cat%d",c),"","@0",*w->var(TString::Format("SigF_mean_cat%d",c)) );
@@ -1079,6 +1116,9 @@ void SigModelFromToys(RooWorkspace* w, Float_t mass) {
     RooFormulaVar CBn2F(TString::Format("CBn2F_cat%d",c),"","@0",*w->var(TString::Format("SigF_n2_cat%d",c)) );
     RooDoubleCB ResponseDoubleCBF(TString::Format("ResponseDoubleCBF_cat%d",c),TString::Format("ResponseDoubleCBF_cat%d",c) , *mgg, CBmeanF, CBsigmaF, CBalpha1F, CBn1F, CBalpha2F, CBn2F);    
     mgg->setBins(5000, "cache");  
+
+    // Now build a BW with all fixed parameters (same as above, correct roorealvar here) 
+    RooBreitWigner SigModelBW(TString::Format("BW_cat%d",c),TString::Format("BW_cat%d",c), *mgg, meanBW, sigmaBW);
 
     // And convolve with the nominal BW - everything fixed
     RooFFTConvPdf* ConvolutedRes;
@@ -1091,13 +1131,16 @@ void SigModelFromToys(RooWorkspace* w, Float_t mass) {
     // Fit and Plot    
     float fitMin = 1250.;
     float fitMax = 1700.;
-    if (mass==750)  {fitMin = 500.;   fitMax = 1200.; }
+    // if (mass==750)  {fitMin = 500.;   fitMax = 1200.; }
+    if (mass==750)  {fitMin = 680.;   fitMax = 800.; }
     if (mass==1500) {fitMin = 1250.;  fitMax = 1700.; }
     if (mass==5000) {fitMin = 4000.;  fitMax = 5500.; }
 
     RooFitResult* fitresults_CB = (RooFitResult* ) ConvolutedRes->fitTo(*pseudoData[c], SumW2Error(kFALSE), Range(fitMin,fitMax), RooFit::Save(kTRUE));
     fitresults_CB->Print("V");
 
+
+    // plot
     RooPlot* plotOnlyResPdf = w->var("mgg")->frame(Range(fitMin,fitMax),Bins(100));
     pseudoData[c]->plotOn(plotOnlyResPdf, LineColor(kRed), LineStyle(kDashed));
     double max = plotOnlyResPdf->GetMaximum();
@@ -1129,10 +1172,12 @@ void SigModelFromToys(RooWorkspace* w, Float_t mass) {
     legmc->Draw();
     c1->SaveAs("plots/signalCBCconvBW"+TString::Format(("_M%d_cat%d_LOG_fromPseudoData.png"),massI,c));
 
-    if(mass==750) plotPhotonsMassAll = w->var("mgg")->frame(Range(600,900),Bins(100));
+    if(mass==750)  plotPhotonsMassAll = w->var("mgg")->frame(Range(710,780),Bins(100));
+    if(mass==1500) plotPhotonsMassAll = w->var("mgg")->frame(Range(1400,1600),Bins(100));
     plotPhotonsMassAll->GetXaxis()->SetTitle("m_{#gamma #gamma}[GeV]");
     plotPhotonsMassAll->SetTitle(TString::Format("DoubleCB conv BW from toys, cat%d",c));
     pseudoData[c]->plotOn(plotPhotonsMassAll);
+    max = plotPhotonsMassAll->GetMaximum();
     SigModelBW.plotOn(plotPhotonsMassAll, LineColor(kGreen), LineStyle(kDashed));
     ResponseDoubleCBF.plotOn(plotPhotonsMassAll, LineColor(kRed), LineStyle(kDashed));
     ConvolutedRes->plotOn(plotPhotonsMassAll, LineColor(kBlue));
@@ -1143,20 +1188,94 @@ void SigModelFromToys(RooWorkspace* w, Float_t mass) {
     legmc->Draw();
     c1->SaveAs("plots/signalCBCconvBW"+TString::Format(("_M%d_cat%d_fromPseudoData.png"),massI, c));
 
+
     // check that the generation was ok
     RooPlot* plotDatasets = w->var("mgg")->frame(Range(fitMin,fitMax),Bins(100));
-    if(mass==750) plotDatasets = w->var("mgg")->frame(Range(500,900),Bins(100));
-    plotDatasets->SetTitle(TString::Format("Test, cat%d",c));
+    if(mass==750) plotDatasets = w->var("mgg")->frame(Range(550,900),Bins(100));
+    c1->cd(1);
+    c1->SetLogy(1);
+    plotDatasets->SetTitle(TString::Format("Pseudodata vs sim, cat%d",c));
     pseudoData[c]->plotOn(plotDatasets,MarkerColor(kRed));
     sigToFit[c]->plotOn(plotDatasets);
+    plotDatasets->Draw();  
+    c1->SaveAs("plots/compareDataset"+TString::Format(("_cat%d_LOG.png"),c));  
+    c1->SetLogy(0);
+    if(mass==750)  plotDatasets = w->var("mgg")->frame(Range(710,780),Bins(100));
+    if(mass==1500) plotDatasets = w->var("mgg")->frame(Range(1400,1600),Bins(100));
+    plotDatasets->SetTitle(TString::Format("Pseudodata vs sim, cat%d",c));
+    pseudoData[c]->plotOn(plotDatasets,MarkerColor(kRed));
+    sigToFit[c]->plotOn(plotDatasets);
+    plotDatasets->Draw();
+    c1->SaveAs("plots/compareDataset"+TString::Format(("_cat%d.png"),c));
+
+    // 2 components separated for checks, CB
+    RooPlot* plotDatasetsCB = mggGenCB->frame(Range(0.7,1.3),Bins(100));
+    c1->cd(1);
+    c1->SetLogy(1);
+    plotDatasetsCB->SetTitle(TString::Format("Pseudodata vs PDF, CB part, cat%d",c));
+    pseudoDataCB[c]->plotOn(plotDatasetsCB,MarkerColor(kRed));
+    ResponseDoubleCB.plotOn(plotDatasetsCB,LineColor(kAzure+1)); 
+    plotDatasetsCB->Draw();  
+    c1->SaveAs("plots/compareDatasetCB"+TString::Format(("_cat%d_LOG.png"),c));  
+    if(mass==750)  plotDatasetsCB = mggGenCB->frame(Range(0.9,1.1),Bins(100));
+    if(mass==1500) plotDatasetsCB = mggGenCB->frame(Range(0.9,1.1),Bins(100));
     c1->cd(1);
     c1->SetLogy(0);
-    plotDatasets->Draw();  
-    c1->SaveAs("plots/compareDataset"+TString::Format(("_cat%d.png"),c));  
-    c1->SetLogy();
-    plotDatasets->Draw();
-    c1->SaveAs("plots/compareDataset"+TString::Format(("_cat%d_LOG.png"),c));
+    plotDatasetsCB->SetTitle(TString::Format("Pseudodata vs PDF, CB part, cat%d",c));
+    pseudoDataCB[c]->plotOn(plotDatasetsCB,MarkerColor(kRed));
+    ResponseDoubleCB.plotOn(plotDatasetsCB,LineColor(kAzure+1)); 
+    plotDatasetsCB->Draw();
+    c1->SaveAs("plots/compareDatasetCB"+TString::Format(("_cat%d.png"),c));    
 
+    // 2 components separated for checks, BW
+    RooPlot* plotDatasetsBW = mggGenBW->frame(Range(fitMin,fitMax),Bins(100));
+    c1->cd(1);
+    c1->SetLogy(1);
+    if(mass==750)  plotDatasetsBW = mggGenBW->frame(Range(745,755),Bins(100));    
+    plotDatasetsBW->SetTitle(TString::Format("Pseudodata vs PDF, BW part, cat%d",c));
+    pseudoDataBW[c]->plotOn(plotDatasetsBW,MarkerColor(kRed));
+    SigModelBWG.plotOn(plotDatasetsBW,LineColor(kGreen+1)); 
+    plotDatasetsBW->Draw();  
+    c1->SaveAs("plots/compareDatasetBW"+TString::Format(("_cat%d_LOG.png"),c));  
+    c1->SetLogy(0);
+    if(mass==750)  plotDatasetsBW = mggGenBW->frame(Range(749,751),Bins(100));    
+    if(mass==1500) plotDatasetsBW = mggGenBW->frame(Range(1400,1600),Bins(100));    
+    plotDatasetsBW->SetTitle(TString::Format("Pseudodata vs PDF, BW part, cat%d",c));
+    pseudoDataBW[c]->plotOn(plotDatasetsBW,MarkerColor(kRed));
+    max = plotDatasetsBW->GetMaximum();
+    plotDatasetsBW->GetYaxis()->SetRangeUser(0.01, max*1.2);
+    SigModelBWG.plotOn(plotDatasetsBW,LineColor(kGreen+1)); 
+    plotDatasetsBW->Draw();
+    c1->SaveAs("plots/compareDatasetBW"+TString::Format(("_cat%d.png"),c));    
+
+    // Ratio plot
+    gStyle->SetOptStat(0);
+    TCanvas *cr = new TCanvas("cr", "cr", 10,10,700,700);
+    cr->SetFillColor(kWhite);
+    cr->Draw();
+    TPad *pad1 = new TPad("main","",0, 0.3, 1.0, 1.0);
+    pad1->SetTopMargin(0.20);
+    pad1->SetBottomMargin(0.02);
+    pad1->SetGrid();
+    TPad *pad2 = new TPad("ratio", "", 0, 0, 1.0, 0.3);
+    pad2->SetTopMargin(0.05);
+    pad2->SetBottomMargin(0.30);
+    pad2->SetGrid();
+    pad1->Draw();
+    pad2->Draw();
+    pad1->cd();
+    H_orig->Draw("hist");
+    H_toys->Draw("samehist");
+    TH1F *H_ratio = (TH1F*)H_orig->Clone();
+    H_ratio->Divide(H_toys);
+    H_ratio->SetLineColor(4);
+    H_ratio->SetLineWidth(2);
+    H_ratio->SetMinimum(0);
+    H_ratio->SetMaximum(3);
+    pad2->cd();
+    H_ratio->Draw("histE");
+    cr->SaveAs("plots/ratioDatasets"+TString::Format(("_cat%d.png"),c));
+    cr->SaveAs("plots/ratioDatasets"+TString::Format(("_cat%d.root"),c));
 
     // IMPORTANT: fix all pdf parameters to constant
     w->defineSet(TString::Format("ConvolutedPdfParam_cat%d",c),RooArgSet( *w->var(TString::Format("SigF_sigma_cat%d",c)), 
@@ -1188,11 +1307,11 @@ void SigModelFromBinnedToys(RooWorkspace* w, Float_t mass, TString coupling) {
   RooRealVar* mggGen = w->var("mggGen");
 
   // RooRealVars to generate
-  RooRealVar* mggGenCB = new RooRealVar("mggGenCB", "M(gg)", -500., 500., "GeV");  
+  RooRealVar* mggGenCB = new RooRealVar("mggGenCB", "M(gg)", -1., 2., "GeV");  
   
-  // Toy dataset to describe the convolution
+  // Toy dataset for real work
   RooDataSet* pseudoData[NCAT];
-  
+
   // RooDataHist with mgg at gen level
   TFile *myRDHistFile = new TFile("outputHits.root","READ");
   TString myName= TString::Format("bSigWeightGen_mass%d",iMass)+TString("_")+coupling;
@@ -1220,10 +1339,26 @@ void SigModelFromBinnedToys(RooWorkspace* w, Float_t mass, TString coupling) {
     RooFormulaVar CBn2(TString::Format("CBn2_cat%d",c),"","@0",*w->var(TString::Format("Sig_n2_cat%d",c)) );
     RooDoubleCB ResponseDoubleCB(TString::Format("ResponseDoubleCB_cat%d",c),TString::Format("ResponseDoubleCB_cat%d",c) , *mggGenCB, CBmean, CBsigma, CBalpha1, CBn1, CBalpha2, CBn2);
 
+
+    // to check the generation
+    TH1F *H_orig = new TH1F("H_orig","H_orig",45,1250,1700);
+    TH1F *H_toys = new TH1F("H_toys","H_toys",45,1250,1700);
+    H_orig->Sumw2();
+    H_toys->Sumw2();
+    H_toys->SetTitle("");
+    H_orig->SetTitle("");
+    H_toys->SetLineColor(2);
+    H_orig->SetLineColor(1);
+    H_toys->SetLineWidth(2);
+    H_orig->SetLineWidth(2);
+    if(mass==750) {
+      H_orig = new TH1F("H_orig","H_orig",40,500,900);
+      H_toys = new TH1F("H_toys","H_toys",40,500,900);
+    }
+
     // Generation from the two pdfs
     cout << "generating " << origEntries << " entries" << endl;
     for (int ii=0; ii<origEntries; ii++) {
-    // for (int ii=0; ii<5000; ii++) {
       if (ii%500==0) cout << ii << endl;
       
       RooDataSet* dataCB = ResponseDoubleCB.generate(*mggGenCB,1);  
@@ -1234,27 +1369,68 @@ void SigModelFromBinnedToys(RooWorkspace* w, Float_t mass, TString coupling) {
       RooRealVar* varBW = (RooRealVar*)setBW.find("mggGen");      
       float mggCB = varCB->getVal();
       float mggBW = varBW->getVal();
+
       *mgg = mggCB*mggBW;  
+
       pseudoData[c]->add(RooArgSet(*mgg));   
+
+      // Fill histos
+      RooArgSet setOriginal = *sigToFitReco[c]->get(ii);
+      RooRealVar* varOriginal = (RooRealVar*)setOriginal.find("mgg");
+      H_orig->Fill(varOriginal->getVal());
+      H_toys->Fill(mggCB*mggBW);
     }
+
     cout << "my pseudodata" << endl;
     pseudoData[c]->Print("V");
     w->import(*pseudoData[c],Rename(TString::Format("SigPseudodata_cat%d",c)));
   
+
+    // check that the generation was ok
     TCanvas* c1 = new TCanvas("c1","PhotonsMass",0,0,800,800);
-    RooPlot* plotDatasets = w->var("mgg")->frame(Range(1250,1700),Bins(100));
-    if(mass==750)  plotDatasets = w->var("mgg")->frame(Range(500,900),Bins(100));
-    if(mass==1500) plotDatasets = w->var("mgg")->frame(Range(1250,1700),Bins(100));
-    plotDatasets->SetTitle(TString::Format("Toys vs data, cat%d",c));
+    RooPlot* plotDatasets = w->var("mgg")->frame(Range(1250,1700),Bins(45));
+    if(mass==750)  plotDatasets = w->var("mgg")->frame(Range(500,900),Bins(40));
+    if(mass==1500) plotDatasets = w->var("mgg")->frame(Range(1250,1700),Bins(45));
+    plotDatasets->SetTitle(TString::Format("Pseudodata vs sim, cat%d",c));
     pseudoData[c]->plotOn(plotDatasets,MarkerColor(kRed));
     sigToFitReco[c]->plotOn(plotDatasets);
     c1->cd(1);
     c1->SetLogy(0);
     plotDatasets->Draw();  
-    c1->SaveAs("plots/compareDataset"+TString::Format(("_cat%d.png"),c));  
+    c1->SaveAs("plots/compareDataset"+TString::Format(("_cat%d_binned.png"),c));  
     c1->SetLogy();
     plotDatasets->Draw();
-    c1->SaveAs("plots/compareDataset"+TString::Format(("_cat%d_LOG.png"),c));
+    c1->SaveAs("plots/compareDataset"+TString::Format(("_cat%d_LOG_binned.png"),c));
+
+
+    // Ratio plot
+    gStyle->SetOptStat(0);
+    TCanvas *cr = new TCanvas("cr", "cr", 10,10,700,700);
+    cr->SetFillColor(kWhite);
+    cr->Draw();
+    TPad *pad1 = new TPad("main","",0, 0.3, 1.0, 1.0);
+    pad1->SetTopMargin(0.20);
+    pad1->SetBottomMargin(0.02);
+    pad1->SetGrid();
+    TPad *pad2 = new TPad("ratio", "", 0, 0, 1.0, 0.3);
+    pad2->SetTopMargin(0.05);
+    pad2->SetBottomMargin(0.30);
+    pad2->SetGrid();
+    pad1->Draw();
+    pad2->Draw();
+    pad1->cd();
+    H_orig->Draw("hist");
+    H_toys->Draw("samehist");
+    pad2->cd();
+    TH1F *H_ratio = (TH1F*)H_orig->Clone();
+    H_ratio->Divide(H_toys);
+    H_ratio->SetLineColor(4);
+    H_ratio->SetLineWidth(2);
+    H_ratio->SetMinimum(0);
+    H_ratio->SetMaximum(3);
+    H_ratio->Draw("histE");
+    cr->SaveAs("plots/ratioDatasets"+TString::Format(("_cat%d_binned.png"),c));
+    cr->SaveAs("plots/ratioDatasets"+TString::Format(("_cat%d_binned.root"),c));
 
     /*
     // Now build a new CB centred in 0 and with free parameters
@@ -1276,7 +1452,7 @@ void SigModelFromBinnedToys(RooWorkspace* w, Float_t mass, TString coupling) {
 
     RooFFTConvPdf* ConvolutedRes;
     ConvolutedRes = new RooFFTConvPdf(TString::Format("mggSig_cat%d",c),TString::Format("mggSig_cat%d",c), *mgg,SigModelBW, ResponseDoubleCBF);
-    w->import(*ConvolutedRes);
+4    w->import(*ConvolutedRes);
     
     // Fit and Plot    
     float fitMin = 1250.;
@@ -1328,20 +1504,6 @@ void SigModelFromBinnedToys(RooWorkspace* w, Float_t mass, TString coupling) {
     plotPhotonsMassAll->GetYaxis()->SetRangeUser(0.01,max*10. );
     plotPhotonsMassAll->GetXaxis()->SetRangeUser(210, 290);
     c1->SaveAs("plots/signalCBCconvBW"+TString::Format(("_M%d_cat%d_LOG_fromPseudoData.png"),massI,c));
-
-
-    // check that the generation was ok
-    RooPlot* plotDatasets = w->var("mgg")->frame(Range(fitMin,fitMax),Bins(100));
-    plotDatasets->SetTitle(TString::Format("Test, cat%d",c));
-    pseudoData[c]->plotOn(plotDatasets,MarkerColor(kRed));
-    sigToFitReco[c]->plotOn(plotDatasets);
-    c1->cd(1);
-    c1->SetLogy(0);
-    plotDatasets->Draw();  
-    c1->SaveAs("plots/compareDataset"+TString::Format(("_cat%d.png"),c));  
-    c1->SetLogy();
-    plotDatasets->Draw();
-    c1->SaveAs("plots/compareDataset"+TString::Format(("_cat%d_LOG.png"),c));
 
 
     // IMPORTANT: fix all pdf parameters to constant
@@ -1446,9 +1608,9 @@ void runfits(const Float_t mass=1500, string coupling="001") {
 
   cout << endl;
   cout << "Alternative: generate following nominal BW and fitted doubleCB and build another dataset" << endl;
-  // SigModelFromToys(w, mass);  
-  SigModelFromBinnedToys(w, mass,coupling); 
-
+  SigModelFromToys(w, mass);  
+  // SigModelFromBinnedToys(w, mass,coupling); 
+  
   cout << endl;
   cout << "Now preparing signal WS" << endl;
   // MakeSigWS(w, fileBaseName, mass, coupling);
