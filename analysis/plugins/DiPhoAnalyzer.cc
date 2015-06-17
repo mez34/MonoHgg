@@ -202,6 +202,7 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
   Handle<vector<flashgg::GenPhotonExtra> > genPhotonsHandle;
   edm::Handle<GenEventInfoProduct> genInfo;
   edm::Handle<View<reco::GenParticle> > genParticles;
+  std::cout<<"sampleID: "<<sampleID<<std::endl;
   if (sampleID>0) {     // MC
     iEvent.getByToken(genPhotonExtraToken_,genPhotonsHandle);
     iEvent.getByLabel(genInfo_,genInfo);   
@@ -244,6 +245,7 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
       pu_weight = GetPUWeight(pu_n);         
   }
   
+  std::cout<<"xsec: "<<xsec_<<std::endl;
   // x-sec * kFact for MC only 
   float totXsec = 1.;
   if (sampleID>0) totXsec = xsec_ * kfac_;
@@ -269,7 +271,7 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 
   // analysis cuts: trigger (chiara: qualcosa per emulare?)
 
-  
+  std::cout<<" diphotonsize: "<<diPhotons->size()<<std::endl;
   // Loop over diphoton candidates
   if (diPhotons->size()>0) {
 
@@ -294,6 +296,8 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 
       preselDipho.push_back(diphotonlooper);
     }
+
+    std::cout<<" presel size: "<<preselDipho.size()<<std::endl;
 
     if (preselDipho.size()>0) {
       h_selection->Fill(1.,perEveW);
@@ -340,12 +344,13 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 	float subleadPhoIso = diphoPtr->subLeadingPhoton()->egPhotonIso();
 	bool  subleadOkEleV = diphoPtr->subLeadingPhoton()->passElectronVeto();
 	bool  subleadSelel  = isGammaSelected( rho, subleadPt, subleadScEta, subleadR9noZS, subleadChIso, subleadNeuIso, subleadPhoIso, subleadHoE, subleadSieienoZS, subleadOkEleV);  
+	std::cout<<leadSelel<<" " <<subleadSelel<<std::endl;
 	if (!leadSelel || !subleadSelel) continue;  
 	// chiara: end comment x efficiencies
 
 	selectedDipho.push_back(theDiphoton);    
       }
-
+      std::cout<<" sel size: "<<selectedDipho.size()<<std::endl;
       if (selectedDipho.size()>0) {
 	h_selection->Fill(2.,perEveW);
 
@@ -359,11 +364,12 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 	  float leadPt    = diphoPtr->leadingPhoton()->et();
 	  float subleadPt = diphoPtr->subLeadingPhoton()->et();
 
-	  if (leadPt<200 || subleadPt<200) continue;             // chiara: x ana: 80; x phys14: 200; x sinc 100
+	  if (leadPt<30 || subleadPt<20) continue;             // chiara: x ana: 80; x phys14: 200; x sinc 100
 
 	  kineDipho.push_back(theDiphoton);
 	}
-	
+	std::cout<<"kine size" <<kineDipho.size()<<std::endl;
+
 	if (kineDipho.size()>0) {
 	  h_selection->Fill(3.,perEveW);
 
@@ -375,7 +381,8 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 	    Ptr<flashgg::DiPhotonCandidate> diphoPtr = diPhotons->ptrAt( theDiphoton );
 	    
 	    float thisSystemMgg = diphoPtr->mass();
-	    if (thisSystemMgg<500 ) continue;    // chiara: x ana: 300; x phys14: 500; x sinc 200 
+	    std::cout<<diphoPtr->mass()<<std::endl;
+	    if (thisSystemMgg<50 ) continue;    // chiara: x ana: 300; x phys14: 500; x sinc 200 
 
 	    massDipho.push_back(theDiphoton);
 	  }
@@ -908,7 +915,7 @@ bool DiPhoAnalyzer::isGammaPresel( float sceta, float pt, float r9, float chiso)
 }
 
 bool DiPhoAnalyzer::isGammaSelected( float rho, float pt, float sceta, float r9, float chiso, float nhiso, float phoiso, float hoe, float sieie, bool passElectronVeto) {
-
+  std::cout<<rho<<" "<<pt<<" "<<sceta<<" "<<r9<<" "<<chiso<<" "<<nhiso<<" "<<phoiso<<" "<<hoe<<" "<<sieie<<" "<<passElectronVeto<<std::endl;
   // classes: 0 = EB highR9, 1 = EB low R9, 2 = EE high R9, 3 = EE lowR9
   int etaclass = fabs(sceta)>1.5;
   int r9class  = r9<0.94;                   
@@ -939,7 +946,7 @@ bool DiPhoAnalyzer::isGammaSelected( float rho, float pt, float sceta, float r9,
   if (hoe> hoe_cut[theclass])           return false;
 
   // electron veto 
-  if (!passElectronVeto) return false;
+//  if (!passElectronVeto) return false;//livia
 
   return true;
 } 
