@@ -24,6 +24,8 @@
 #include "flashgg/DataFormats/interface/DiPhotonCandidate.h"
 #include "flashgg/DataFormats/interface/GenPhotonExtra.h"
 
+#include "DataFormats/PatCandidates/interface/MET.h"
+
 #include "TMath.h"
 #include "TTree.h"
 #include "TVector3.h"
@@ -51,6 +53,15 @@ struct diphoTree_struc_ {
   float pu_n;
   float sumDataset;
   float perEveW;
+  float calomet;
+  float calometPhi;
+  float calometSumEt;
+  float pfmet;
+  float pfmetPhi;
+  float pfmetSumEt;
+  float t1pfmet;
+  float t1pfmetPhi;
+  float t1pfmetSumEt;
   float ptgg;
   float mgg;
   int eventClass;
@@ -137,6 +148,8 @@ private:
   edm::InputTag genInfo_;
   EDGetTokenT<View<reco::GenParticle> > genPartToken_;
 
+  EDGetTokenT<View<pat::MET> > METToken_;
+
   // sample-dependent parameters needed for the analysis
   int dopureweight_;
   int sampleIndex_;
@@ -173,7 +186,8 @@ DiPhoAnalyzer::DiPhoAnalyzer(const edm::ParameterSet& iConfig):
   diPhotonToken_(consumes<View<flashgg::DiPhotonCandidate> >(iConfig.getUntrackedParameter<InputTag> ("DiPhotonTag", InputTag("flashggDiPhotons")))),
   PileUpToken_(consumes<View<PileupSummaryInfo> >(iConfig.getUntrackedParameter<InputTag> ("PileUpTag", InputTag("addPileupInfo")))),
   genPhotonExtraToken_(mayConsume<vector<flashgg::GenPhotonExtra> >(iConfig.getParameter<InputTag>("genPhotonExtraTag"))),
-  genPartToken_(consumes<View<reco::GenParticle> >(iConfig.getUntrackedParameter<InputTag> ("GenParticlesTag", InputTag("flashggPrunedGenParticles"))))
+  genPartToken_(consumes<View<reco::GenParticle> >(iConfig.getUntrackedParameter<InputTag> ("GenParticlesTag", InputTag("flashggPrunedGenParticles")))),
+  METToken_( consumes<View<pat::MET> >( iConfig.getUntrackedParameter<InputTag> ( "METTag", InputTag( "slimmedMETs" ) ) ) )
 { 
   dopureweight_ = iConfig.getUntrackedParameter<int>("dopureweight", 0);
   sampleIndex_  = iConfig.getUntrackedParameter<int>("sampleIndex",0);
@@ -221,6 +235,8 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
   // To keep track of the total number of events
   h_entries->Fill(5);
 
+  Handle<View<pat::MET> > METs;
+  iEvent.getByToken( METToken_, METs );
 
 
   // --------------------------------------------------
@@ -274,7 +290,10 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
   h_selection->Fill(0.,perEveW);
 
 
-  // analysis cuts: trigger (chiara: qualcosa per emulare?)
+  // Get MET
+  if( METs->size() != 1 )
+    { std::cout << "WARNING number of MET is not equal to 1" << std::endl; }
+  Ptr<pat::MET> theMET = METs->ptrAt( 0 );
 
 
   // Loop over diphoton candidates
@@ -457,9 +476,22 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 		float geniso1, geniso2;
 		float genVtxX, genVtxY, genVtxZ;   
 		int eleveto1, eleveto2;
+		float pfmet,pfmetPhi, pfmetSumEt,t1pfmet,t1pfmetPhi, t1pfmetSumEt,calomet,calometPhi, calometSumEt;
 
 		// fully selected event: tree re-initialization                                                                          
 		initTreeStructure();        
+		
+		//met
+		t1pfmet = theMET->pt();
+		t1pfmetPhi = theMET->phi();
+		t1pfmetSumEt = theMET->sumEt();
+		pfmet = theMET->uncorrectedPt();
+		pfmetPhi = theMET->uncorrectedPhi();
+		pfmetSumEt = theMET->uncorrectedSumEt();
+		calomet = theMET->caloMETPt();
+		calometPhi = theMET->caloMETPhi();
+		calometSumEt = theMET->caloMETSumEt();
+
 		
 		//-------> diphoton system properties 
 		ptgg = candDiphoPtr->pt();
@@ -666,6 +698,15 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 		treeDipho_.pu_n = pu_n;
 		treeDipho_.sumDataset = sumDataset;
 		treeDipho_.perEveW = perEveW;
+		treeDipho_.pfmet = pfmet;
+		treeDipho_.pfmet = pfmetPhi;
+		treeDipho_.pfmet = pfmetSumEt;
+		treeDipho_.t1pfmet = t1pfmet;
+		treeDipho_.t1pfmetPhi = t1pfmetPhi;
+		treeDipho_.t1pfmetSumEt = t1pfmetSumEt;
+		treeDipho_.calomet = calomet;
+		treeDipho_.calometPhi = calometPhi;
+		treeDipho_.calometSumEt = calometSumEt;
 		treeDipho_.ptgg = ptgg;
 		treeDipho_.mgg = mgg;
 		treeDipho_.eventClass = eventClass;
@@ -761,6 +802,15 @@ void DiPhoAnalyzer::beginJob() {
   DiPhotonTree->Branch("pu_n",&(treeDipho_.pu_n),"pu_n/F");
   DiPhotonTree->Branch("sumDataset",&(treeDipho_.sumDataset),"sumDataset/F");
   DiPhotonTree->Branch("perEveW",&(treeDipho_.perEveW),"perEveW/F");
+  DiPhotonTree->Branch("pfmet",&(treeDipho_.pfmet),"pfmet/F");
+  DiPhotonTree->Branch("pfmetPhi",&(treeDipho_.pfmetPhi),"pfmetPhi/F");
+  DiPhotonTree->Branch("pfmetSumEt",&(treeDipho_.pfmetSumEt),"pfmetSumEt/F");
+  DiPhotonTree->Branch("t1pfmet",&(treeDipho_.t1pfmet),"t1pfmet/F");
+  DiPhotonTree->Branch("t1pfmetPhi",&(treeDipho_.t1pfmetPhi),"t1pfmetPhi/F");
+  DiPhotonTree->Branch("t1pfmetSumEt",&(treeDipho_.t1pfmetSumEt),"t1pfmetSumEt/F");
+  DiPhotonTree->Branch("calomet",&(treeDipho_.calomet),"calomet/F");
+  DiPhotonTree->Branch("calometPhi",&(treeDipho_.calometPhi),"calometPhi/F");
+  DiPhotonTree->Branch("calometSumEt",&(treeDipho_.calometSumEt),"calometSumEt/F");
   DiPhotonTree->Branch("ptgg",&(treeDipho_.ptgg),"ptgg/F");
   DiPhotonTree->Branch("mgg",&(treeDipho_.mgg),"mgg/F");
   DiPhotonTree->Branch("eventClass",&(treeDipho_.eventClass),"eventClass/I");
@@ -823,6 +873,15 @@ void DiPhoAnalyzer::initTreeStructure() {
   treeDipho_.pu_n = -500.;
   treeDipho_.sumDataset = -500.;
   treeDipho_.perEveW = -500.;
+  treeDipho_.pfmet = -500.;
+  treeDipho_.pfmetPhi = -500.;
+  treeDipho_.pfmetSumEt = -500.;
+  treeDipho_.t1pfmet = -500.;
+  treeDipho_.t1pfmetPhi = -500.;
+  treeDipho_.t1pfmetSumEt = -500.;
+  treeDipho_.calomet = -500.;
+  treeDipho_.calometPhi = -500.;
+  treeDipho_.calometSumEt = -500.;
   treeDipho_.ptgg = -500.;
   treeDipho_.mgg  = -500.;
   treeDipho_.eventClass  = -500;

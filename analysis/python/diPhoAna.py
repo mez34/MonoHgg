@@ -35,6 +35,7 @@ process.TFileService = cms.Service("TFileService",fileName = cms.string("diPhoto
 
 process.diPhoAna = cms.EDAnalyzer('DiPhoAnalyzer',
                                   VertexTag = cms.untracked.InputTag('offlineSlimmedPrimaryVertices'),
+                                  METTag=cms.untracked.InputTag('slimmedMETs'),
                                   genPhotonExtraTag = cms.InputTag("flashggGenPhotonsExtra"),    
                                   DiPhotonTag = cms.untracked.InputTag('flashggDiPhotons'),
                                   reducedBarrelRecHitCollection = cms.InputTag('reducedEgamma','reducedEBRecHits'),
