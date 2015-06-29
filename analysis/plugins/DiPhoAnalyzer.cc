@@ -107,6 +107,7 @@ struct diphoTree_struc_ {
   float genVtxX; 
   float genVtxY; 
   float genVtxZ;
+
 };
 
 class DiPhoAnalyzer : public edm::EDAnalyzer {
@@ -369,11 +370,14 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 	float subleadNeuIso = diphoPtr->subLeadingPhoton()->egNeutralHadronIso()- rho * getNeutralHadronEAForPhotonIso((diphoPtr->subLeadingPhoton()->superCluster())->eta());
 	float subleadPhoIso = diphoPtr->subLeadingPhoton()->egPhotonIso()- rho * getGammaEAForPhotonIso((diphoPtr->subLeadingPhoton()->superCluster())->eta());
 	bool  subleadOkEleV = diphoPtr->subLeadingPhoton()->passElectronVeto();
-	//	bool  subleadSelel  = isGammaSelected( rho, subleadPt, subleadScEta, subleadR9noZS, subleadChIso, subleadNeuIso, subleadPhoIso, subleadHoE, subleadSieienoZS, subleadOkEleV);  
+	//bool  subleadSelel  = isGammaSelected( rho, subleadPt, subleadScEta, subleadR9noZS, subleadChIso, subleadNeuIso, subleadPhoIso, subleadHoE, subleadSieienoZS, subleadOkEleV);  
 	bool  subleadSelel  = testPhotonIsolation( rho, subleadPt, subleadScEta, subleadR9noZS, subleadChIso, subleadNeuIso, subleadPhoIso, subleadHoE, subleadSieienoZS, subleadOkEleV);  
 
-	if (!leadSelel || !subleadSelel) continue;  
+	if (leadSelel || subleadSelel) std::cout<<"passes"<<std::endl;
+	
+	//if (!leadSelel || !subleadSelel ) continue;  
 	// chiara: end comment x efficiencies
+	
 
 	selectedDipho.push_back(theDiphoton);    
       }
