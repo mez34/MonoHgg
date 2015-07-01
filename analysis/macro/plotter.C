@@ -6,8 +6,11 @@
 #include "TFile.h"
 #include "THStack.h"
 #include "TCanvas.h"
+#include "TPad.h"
 #include "TLegend.h"
 #include "TPaveText.h"
+#include "mkPlotsLivia/CMS_lumi.h"
+#include "mkPlotsLivia/CMS_lumi.C"
 
 #include <iostream>
 
@@ -15,20 +18,21 @@
 #define NVARIABLES 18
 
 void plotter( char * name ){
-  gROOT->SetStyle("Plain");
-  gROOT->ProcessLine(".x ./DiphotonStyle.C");
-  //gStyle->SetOptStat(111111);
+//  gROOT->SetStyle("Plain");
+//  gROOT->ProcessLine(".x ./DiphotonStyle.C");
+//  gStyle->SetOptStat(1111111);
 
   TString suffix[NSPECIES];
   suffix[0]=name;
 
+  TString infile = "50kSamples";
 
   // open file and tree
-  TFile *f = new TFile("data/starting/diPhotons_"+suffix[0]+".root");
-  TTree *tev = (TTree*)f->Get("diPhoAna");
+  TFile *f = new TFile("data/"+infile+"/diPhotons_"+suffix[0]+".root");
+  TTree *tev = (TTree*)f->Get("idiPhoAna");
   TTree *tpho = (TTree*)f->Get("diPhoAna/DiPhotonTree");
   // create output file
-  TFile *fOut = new TFile("diPhoPlots/"+suffix[0]+"/diPhotHistos_"+suffix[0]+".root","RECREATE");
+  TFile *fOut = new TFile("diPhoPlots/"+infile+"/"+suffix[0]+"/diPhotHistos_"+suffix[0]+".root","RECREATE");
   
   // variables
   float variable[NVARIABLES];
@@ -65,7 +69,7 @@ void plotter( char * name ){
   nbins[1]=50; 		// pt1
   nbins[2]=100; 	// r91
   nbins[3]=100; 	// sieie1
-  nbins[4]=100; 	// hoe1
+  nbins[4]=250; 	// hoe1
   nbins[5]=100; 	// chiso1
   nbins[6]=100; 	// phoiso1
   nbins[7]=24; 		// neuiso1
@@ -78,7 +82,7 @@ void plotter( char * name ){
   nbins[14]=nbins[6]; 	// phoiso2
   nbins[15]=nbins[7]; 	// neuiso2
   nbins[16]=nbins[8]; 	// eleveto2
-  nbins[17]=50;     	// t1pfmet
+  nbins[17]=100;     	// t1pfmet
 
   float min[NVARIABLES];
   min[0]=0.; 		// mgg
@@ -105,7 +109,7 @@ void plotter( char * name ){
   max[1]=500.; 		// pt1
   max[2]=1.1; 		// r91
   max[3]=0.03; 		// sieie1
-  max[4]=0.025; 	// hoe1
+  max[4]=0.025;	 	// hoe1
   max[5]=2.; 		// chiso1
   max[6]=4.; 		// phoiso1
   max[7]=6.; 		// neuiso1
@@ -118,7 +122,7 @@ void plotter( char * name ){
   max[14]=max[6]; 	// phoiso2
   max[15]=max[7]; 	// neuiso2
   max[16]=max[8]; 	// eleveto2
-  max[17]=500.; 	// t1pfmet
+  max[17]=1000.; 	// t1pfmet
 
   TString xaxisLabel[NVARIABLES];
   xaxisLabel[0]="m(#gamma#gamma) [GeV]";
@@ -152,31 +156,55 @@ void plotter( char * name ){
      else{
        tpho->SetBranchAddress(varname[z],&variable[z]);
      }
-  }// loop over variables
+  }// one histogram for each variable loop
 
+/*  TH1F *isoEB[6];
+  isoEB[0]=new TH1F(variable[5]+"_ptadjustEB_"+suffix[0],varname[5]+"_"+suffix[0],nbins[5],min[5],max[5]);
+  isoEB[1]=new TH1F(variable[6]+"_ptadjustEB_"+suffix[0],varname[6]+"_"+suffix[0],nbins[6],min[6],max[6]);
+  isoEB[2]=new TH1F(variable[7]+"_ptadjustEB_"+suffix[0],varname[7]+"_"+suffix[0],nbins[7],min[7],max[7]);
+  isoEB[3]=new TH1F(variable[13]+"_ptadjustEB_"+suffix[0],varname[13]+"_"+suffix[0],nbins[13],min[13],max[13]);
+  isoEB[4]=new TH1F(variable[14]+"_ptadjustEB_"+suffix[0],varname[14]+"_"+suffix[0],nbins[14],min[14],max[14]);
+  isoEB[5]=new TH1F(variable[15]+"_ptadjustEB_"+suffix[0],varname[15]+"_"+suffix[0],nbins[15],min[15],max[15]);
+  TH1F *isoEE[6];
+  isoEE[0]=new TH1F(variable[5]+"_ptadjustEE_"+suffix[0],varname[5]+"_"+suffix[0],nbins[5],min[5],max[5]);
+  isoEE[1]=new TH1F(variable[6]+"_ptadjustEE_"+suffix[0],varname[6]+"_"+suffix[0],nbins[6],min[6],max[6]);
+  isoEE[2]=new TH1F(variable[7]+"_ptadjustEE_"+suffix[0],varname[7]+"_"+suffix[0],nbins[7],min[7],max[7]);
+  isoEE[3]=new TH1F(variable[13]+"_ptadjustEE_"+suffix[0],varname[13]+"_"+suffix[0],nbins[13],min[13],max[13]);
+  isoEE[4]=new TH1F(variable[14]+"_ptadjustEE_"+suffix[0],varname[14]+"_"+suffix[0],nbins[14],min[14],max[14]);
+  isoEE[5]=new TH1F(variable[15]+"_ptadjustEE_"+suffix[0],varname[15]+"_"+suffix[0],nbins[15],min[15],max[15]);
+*/
  
   int nphotons = (int)tpho->GetEntries();
-  float norm[NVARIABLES];
   for (int i=0; i<nphotons; i++){
     tpho->GetEntry(i);
-    for (int z=0; z<NVARIABLES; z++){
-      if (z==8 || z==16){
-        h[z]->Fill(intvariable[z]);
-      }
-      else{
-	h[z]->Fill(variable[z]);
-      }
-      norm[z] = h[z]->Integral();
-      /*if (norm[z] > 0){
-	h[z]->Scale(1/norm[z]);
-      }
-      else{
-	cerr << "Empty Histogram: " << h[z]->GetName() << endl;
- 	return kError;
-      }*/
-    }
+    if (variable[1] > variable[0]/3 && variable[9] > variable[0]/4){
+      for (int z=0; z<NVARIABLES; z++){
+        if (z==8 || z==16){ // eleveto1 & eleveto2
+          h[z]->Fill(intvariable[z]);
+        }
+        else{
+          h[z]->Fill(variable[z]);
+        }
+
+	// do pt adjustment from the pho id cut
+        /*if (z==5){ // chiso1
+	}
+	if (z==6){ // neuiso1
+        }
+	if (z==7){ // phoiso1
+        }
+	if (z==13){ // chiso2
+        }
+	if (z==14){ // neuiso2
+        }
+	if (z==15){ // phoiso2
+        }*/
+
+      }// loop over variables
+    }// loose pt selection
   }// loop over photons
 
+  double max1;
 
   for (int z=0; z<NVARIABLES; z++){
     fOut->cd();
@@ -184,16 +212,21 @@ void plotter( char * name ){
     TCanvas* c1 = new TCanvas("c1","",1200,800);
     c1->SetLogy(0);
     h[z]->DrawNormalized();
+    max1 = h[z]->GetMaximum();
+    h[z]->SetMaximum(10*max1);
     h[z]->GetXaxis()->SetTitle(xaxisLabel[z]);
-    
+    CMS_lumi( (TPad*)c1->cd(),true,0);   
+ 
     TCanvas* c2 = new TCanvas("c2","",1200,800);
     c2->SetLogy(1);
     h[z]->DrawNormalized();
+    h[z]->SetMaximum(10*max1);
     h[z]->GetXaxis()->SetTitle(xaxisLabel[z]);
+    CMS_lumi( (TPad*)c2->cd(),true,0);
+   
 
-
-    c1->SaveAs("diPhoPlots/"+suffix[0]+"/"+varname[z]+"_"+suffix[0]+".png");
-    c2->SaveAs("diPhoPlots/"+suffix[0]+"/"+varname[z]+"_"+suffix[0]+"_log.png");
+    c1->SaveAs("diPhoPlots/"+infile+"/"+suffix[0]+"/"+varname[z]+"_"+suffix[0]+".png");
+    c2->SaveAs("diPhoPlots/"+infile+"/"+suffix[0]+"/"+varname[z]+"_"+suffix[0]+"_log.png");
   }// loop over variables
 
 

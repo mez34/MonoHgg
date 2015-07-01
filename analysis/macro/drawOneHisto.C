@@ -27,7 +27,8 @@
 #include "TCanvas.h"
 #include "TLegend.h"
 #include "TPaveText.h"
-
+#include "TPad.h"
+#include "mkPlotsLivia/CMS_lumi.C"
 #include <iostream>
 
 void drawOneHisto( char * in_suffix, char * in_varname , int in_nbins, int in_min, int in_max){
@@ -61,15 +62,21 @@ void drawOneHisto( char * in_suffix, char * in_varname , int in_nbins, int in_mi
        h->Fill(variable);
     } // loop over photons
 
+  float realmax = h->GetMaximum();
+
   fOut->cd();
   //make two TCanvas one regular one logy 
   TCanvas* c1 = new TCanvas("c1","",1200,800);
   c1->SetLogy(0);
-  h->Draw();
+  h->DrawNormalized();
+  h->SetMaximum(10*realmax);
+  CMS_lumi( (TPad*)c1->cd(),true,0);
   
   TCanvas* c2 = new TCanvas("c2","",1200,800);
   c2->SetLogy(1);
-  h->Draw();
+  h->DrawNormalized();
+  h->SetMaximum(10*realmax);
+  CMS_lumi( (TPad*)c2->cd(),true,0);
 
   c1->SaveAs("diPhoPlots/"+suffix+"/"+varname+"_"+suffix+".png");
   c2->SaveAs("diPhoPlots/"+suffix+"/"+varname+"_"+suffix+"_log.png");
