@@ -20,7 +20,7 @@
 void plotter( char * name ){
 //  gROOT->SetStyle("Plain");
 //  gROOT->ProcessLine(".x ./DiphotonStyle.C");
-//  gStyle->SetOptStat(1111111);
+//  gStyle->SetOptStat("1101");
 
   TString suffix[NSPECIES];
   suffix[0]=name;
@@ -29,7 +29,7 @@ void plotter( char * name ){
 
   // open file and tree
   TFile *f = new TFile("data/"+infile+"/diPhotons_"+suffix[0]+".root");
-  TTree *tev = (TTree*)f->Get("idiPhoAna");
+  TTree *tev = (TTree*)f->Get("diPhoAna");
   TTree *tpho = (TTree*)f->Get("diPhoAna/DiPhotonTree");
   // create output file
   TFile *fOut = new TFile("diPhoPlots/"+infile+"/"+suffix[0]+"/diPhotHistos_"+suffix[0]+".root","RECREATE");
@@ -68,11 +68,11 @@ void plotter( char * name ){
   nbins[0]=60; 		// mgg
   nbins[1]=50; 		// pt1
   nbins[2]=100; 	// r91
-  nbins[3]=100; 	// sieie1
+  nbins[3]=300; 	// sieie1
   nbins[4]=250; 	// hoe1
-  nbins[5]=100; 	// chiso1
-  nbins[6]=100; 	// phoiso1
-  nbins[7]=24; 		// neuiso1
+  nbins[5]=200; 	// chiso1
+  nbins[6]=200; 	// phoiso1
+  nbins[7]=200; 	// neuiso1
   nbins[8]=100; 	// eleveto1
   nbins[9]=nbins[1];  	// pt2
   nbins[10]=nbins[2]; 	// r92
@@ -90,9 +90,9 @@ void plotter( char * name ){
   min[2]=0.; 		// r91
   min[3]=0.; 		// sieie1
   min[4]=0.; 		// hoe1
-  min[5]=-2.; 		// chiso1
-  min[6]=-4.; 		// phoiso1
-  min[7]=-6.; 		// neuiso1
+  min[5]=-10.; 		// chiso1
+  min[6]=-10.; 		// phoiso1
+  min[7]=-10.; 		// neuiso1
   min[8]=-1.; 		// eleveto1
   min[9]=min[1]; 	// pt2
   min[10]=min[2]; 	// r92
@@ -108,11 +108,11 @@ void plotter( char * name ){
   max[0]=300.; 		// mgg
   max[1]=500.; 		// pt1
   max[2]=1.1; 		// r91
-  max[3]=0.03; 		// sieie1
+  max[3]=0.03;	 	// sieie1
   max[4]=0.025;	 	// hoe1
-  max[5]=2.; 		// chiso1
-  max[6]=4.; 		// phoiso1
-  max[7]=6.; 		// neuiso1
+  max[5]=10.; 		// chiso1
+  max[6]=10.; 		// phoiso1
+  max[7]=10.; 		// neuiso1
   max[8]=1.; 		// eleveto1
   max[9]=max[1]; 	// pt2
   max[10]=max[2]; 	// r92
@@ -177,7 +177,8 @@ void plotter( char * name ){
   int nphotons = (int)tpho->GetEntries();
   for (int i=0; i<nphotons; i++){
     tpho->GetEntry(i);
-    if (variable[1] > variable[0]/3 && variable[9] > variable[0]/4){
+    //if (variable[1] > variable[0]/3 && variable[9] > variable[0]/4)
+    { // pt1 > mgg/3 & pt2 > mgg/4 selection
       for (int z=0; z<NVARIABLES; z++){
         if (z==8 || z==16){ // eleveto1 & eleveto2
           h[z]->Fill(intvariable[z]);
