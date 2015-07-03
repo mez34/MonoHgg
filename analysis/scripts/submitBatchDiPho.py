@@ -23,12 +23,12 @@ def main():
     parser.add_option('-n', '--nfileperjob', action='store', dest='nfileperjob', help='split the jobs with n files read/batch job' , default=1, type='int')
     parser.add_option('-p', '--prefix', action='store', dest='prefix', help='the prefix to be added to the output' , default=defaultoutputdir)
     parser.add_option('-a', '--application', action='store', dest='application', help='the executable to be run' , default='cmsRun')
-    parser.add_option('-d', '--download', action='store', dest='download', help='download the output on a local computer' , default='pccmsrm')
+    parser.add_option('-d', '--download', action='store', dest='download', help='download the output on a local computer' , default='test')
     parser.add_option('-c', '--create', action='store_true',dest='create', help='create only the jobs, do not submit them' , default=False)
     parser.add_option('-t', '--testnjobs', action='store', dest='testnjobs', help='submit only the first n jobs' , default=1000000, type='int')
     parser.add_option('-N', '--neventsjob', action='store', dest='neventsjob', help='split the jobs with n events / batch job' , default=-1, type='int')
     parser.add_option('-T', '--eventsperfile', action='store', dest='eventsperfile', help='number of events per input file' , default=-1, type='int')
-    parser.add_option('--eos', action='store', dest='eos', help='copy the output in the specified EOS path' , default='')
+    parser.add_option('--eos', action='store', dest='eos', help='copy the output in the specified EOS path' , default='/eos/cms/store/group/phys_higgs/soffi/MonoX/MonoH/outpuDiPhotonDumper')
     parser.add_option('--cfg', action='store', dest='cfg', help='the cfg to be run' , default='pippo_cfg.py')
     (opt, args) = parser.parse_args()
 
@@ -50,14 +50,15 @@ def main():
     print "the outputs will be in the directory: "+opt.prefix
 
     if opt.download=='pccmsrm':
-        diskoutputdir = "/cmsrm/pc29_2/crovelli/data/Exo/" 
-    else: diskoutputdir = ''
+        diskoutputdir = "" 
+    else: diskoutputdir = '/afs/cern.ch/work/s/soffi/CMSSW_7_4_0_pre9-DiphoDumper/src/MonoHgg/output'
     diskoutputmain = diskoutputdir+"/"+opt.prefix+"/"+output
 
     os.system("mkdir -p "+opt.prefix+"/"+output)
     os.system("mkdir -p "+opt.prefix+"/"+output+"/log/")
     os.system("mkdir -p "+opt.prefix+"/"+output+"/src/")
     os.system("mkdir -p "+opt.prefix+"/"+output+"/cfg/")
+    os.system("mkdir -p "+diskoutputmain)
     outputroot = diskoutputmain+"/root/"
 
     if (diskoutputdir != "none" and opt.download=='pccmsrm'):
@@ -140,8 +141,10 @@ def main():
             outputfile.write('eval `scramv1 runtime -sh`\n')
             outputfile.write('cd $WORKDIR\n')
             outputfile.write(opt.application+' '+icfgfilename+' \n')
-            if(opt.download=='pccmsrm'): outputfile.write('ls *.root | xargs -i scp -o BatchMode=yes -o StrictHostKeyChecking=no {} pccmsrm29:'+diskoutputmain+'/{}\n')
-            if(opt.eos!=''): outputfile.write('ls *.root | grep -v histProbFunction | xargs -i xrdcp {} root://eoscms/'+opt.eos+'/\n')
+            #if(opt.download=='pccmsrm'): outputfile.write('ls *.root | xargs -i scp -o BatchMode=yes -o StrictHostKeyChecking=no {} pccmsrm29:'+diskoutputmain+'/{}\n')
+#            if(opt.download=='test'): outputfile.write('ls *.root | xargs -i scp -o BatchMode=yes -o StrictHostKeyChecking=no {} soffi@lxplus.cern.ch:'+diskoutputmain+'/{}\n')
+            if(opt.download=='test'): outputfile.write('ls *.root | xargs -i cp {} '+diskoutputmain+'/{}\n')
+    #        if(opt.eos!=''): outputfile.write('ls *.root | grep -v histProbFunction | xargs -i xrdcp {} root://eoscms/'+opt.eos+'/\n')
             outputfile.close
             logfile = opt.prefix+"/"+output+"/log/"+output+"_"+str(ijob)+".log"
             os.system("echo bsub -q "+opt.queue+" -o "+logfile+" source "+pwd+"/"+outputname)
