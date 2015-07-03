@@ -10,22 +10,28 @@
 #include "TPad.h"
 #include "mkPlotsLivia/CMS_lumi.C"
 
+#define NSPECIES 5
+
 void combiner( char * in ){
   TString in_name = in;
-  TString fIn1 = "DMHtoGG";
-  TString fIn2 = "WZHtoGG";
-  TString fIn3 = "QCD";
-  TString fIn4 = "GJets";
-  //TString fIn1 = "DMHtoGG_nosel"; //signal
-  //TString fIn2 = "WZHtoGG_nosel"; 
-  //TString fIn3 = "QCD_nosel";
-  //TString fIn4 = "GJets_nosel";
+  TString fIn[NSPECIES];
+  fIn[0] = "DMHtoGG";
+  fIn[1] = "WZHtoGG";
+  fIn[2] = "QCD";
+  fIn[3] = "GJets";
+  fIn[4] = "GGH";
+  //fIn[0] = "DMHtoGG_nosel"; //signal
+  //fIn[1] = "WZHtoGG_nosel"; 
+  //fIn[2] = "QCD_nosel";
+  //fIn[3] = "GJets_nosel";
+  //fIn[4] = "GGH_nosel";
   
-  overlay(fIn1, fIn2, fIn3, fIn4, in_name);
+  overlay(fIn[0], fIn[1], fIn[2], fIn[3], fIn[4], in_name);
 }
-void overlay( const TString In1, const TString In2, const TString In3, const TString In4, const TString name ){
+void overlay( const TString In1, const TString In2, const TString In3, const TString In4, const TString In5, const TString name ){
   TString location = "diPhoPlots/50kSamples/";
 
+  gStyle->SetHistLineWidth(2);
   //gROOT->SetStyle("Plain");
   //gROOT->ProcessLine(".x ./DiphotonStyle.C");
  
@@ -33,23 +39,27 @@ void overlay( const TString In1, const TString In2, const TString In3, const TSt
   TFile *f2 = new TFile(location+In2+"/diPhotHistos_"+In2+".root");
   TFile *f3 = new TFile(location+In3+"/diPhotHistos_"+In3+".root");
   TFile *f4 = new TFile(location+In4+"/diPhotHistos_"+In4+".root");
+  TFile *f5 = new TFile(location+In5+"/diPhotHistos_"+In5+".root");
 
   TH1D *h_1_1 = (TH1D*) f1->Get(name+"_"+In1);
   TH1D *h_1_2 = (TH1D*) f2->Get(name+"_"+In2);
   TH1D *h_1_3 = (TH1D*) f3->Get(name+"_"+In3);
   TH1D *h_1_4 = (TH1D*) f4->Get(name+"_"+In4);
+  TH1D *h_1_5 = (TH1D*) f5->Get(name+"_"+In5);
 
-  TH1D *h1[4];
+  TH1D *h1[5];
   h1[0]=h_1_1;
   h1[1]=h_1_2;
   h1[2]=h_1_3;
   h1[3]=h_1_4;
+  h1[4]=h_1_5;
 
-  double max1, max2, max3, max4, realmax, tmpmax;
+  double max1, max2, max3, max4, max5, realmax, tmpmax;
   max1=h1[0]->GetMaximum();
   max2=h1[1]->GetMaximum();
   max3=h1[2]->GetMaximum();
   max4=h1[3]->GetMaximum();
+  max5=h1[4]->GetMaximum();
 
   realmax = 0.;
   tmpmax = max1;
@@ -57,32 +67,34 @@ void overlay( const TString In1, const TString In2, const TString In3, const TSt
   else{
     if (max3 > tmpmax) tmpmax=max3;
     else{
-      if (max4 > tmpmax) tmpmax=max4; 
+      if (max4 > tmpmax) tmpmax=max4;
+      else{
+        if (max5 > tmpmax) tmpmax=max5;
+      } 
     }
   }
   realmax=tmpmax;
-  std::cout << realmax << std::endl;
-
 
   TCanvas *c1 = new TCanvas("c1","",1200,800);
   c1->cd();
   c1->SetLogy(1);
 
   h1[0]->SetTitle(name);
-  h1[0]->SetMaximum(10*realmax);
-  h1[0]->DrawNormalized();
   
-  h1[1]->SetLineColor(kRed);
-  h1[1]->SetMaximum(10*realmax);
-  h1[1]->DrawNormalized("same");
+  h1[1]->DrawNormalized();
   
   h1[2]->SetLineColor(kGreen+2);
-  h1[2]->SetMaximum(10*realmax);
   h1[2]->DrawNormalized("same");
   
   h1[3]->SetLineColor(kBlue);
-  h1[3]->SetMaximum(10*realmax);
   h1[3]->DrawNormalized("same");
+
+  h1[4]->SetLineColor(kViolet);
+  h1[4]->DrawNormalized("same");
+
+  h1[0]->SetLineColor(kRed);
+  h1[0]->DrawNormalized("same");
+  h1[0]->SetMaximum(10*realmax);
   
   CMS_lumi( (TPad*)c1->cd(),true,0);
   
@@ -94,6 +106,7 @@ void overlay( const TString In1, const TString In2, const TString In3, const TSt
   l1->AddEntry(h1[1],"WZHtoGG","l");
   l1->AddEntry(h1[2],"QCD","l");
   l1->AddEntry(h1[3],"GJets","l");
+  l1->AddEntry(h1[4],"GGH","l");
   l1->Draw();
 
   c1->SaveAs(location+name+"_comb.png");

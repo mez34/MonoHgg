@@ -87,7 +87,8 @@ void DiphotonStyle()
   //----------------------------------------------------------------------------
   // Stat
   //----------------------------------------------------------------------------
-  DiphotonsStyle->SetOptStat       (1110);
+  DiphotonsStyle->SetOptStat       ("emr");
+//  DiphotonsStyle->SetOptStat       (1110);
   DiphotonsStyle->SetStatBorderSize(   0);
   DiphotonsStyle->SetStatColor     (  10);
   DiphotonsStyle->SetStatFont      (  42);

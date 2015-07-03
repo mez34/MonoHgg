@@ -5,6 +5,12 @@
 # Signals:     sampleID>100
 # Data:        sampleID=0
 
+# WZHtoGG
+
+
+# DMHtoGG
+
+
 # GG+jets
 ./submitBatchDiPho.py --cfg diPhoAnaBATCH.py GGJets_M-1000To2000  0 1 pippo 0.0104901    1  
 ./submitBatchDiPho.py --cfg diPhoAnaBATCH.py GGJets_M-2000To4000  0 2 pippo 0.000439813  1  

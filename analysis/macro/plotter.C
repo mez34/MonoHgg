@@ -19,8 +19,12 @@
 
 void plotter( char * name ){
 //  gROOT->SetStyle("Plain");
+  gStyle->SetOptStat(1110);
+  gStyle->SetStatBorderSize(0);
+  gStyle->SetStatFont(42);
+  gStyle->SetStatX(0.84);  
+  gStyle->SetStatY(0.93);
 //  gROOT->ProcessLine(".x ./DiphotonStyle.C");
-//  gStyle->SetOptStat("1101");
 
   TString suffix[NSPECIES];
   suffix[0]=name;
@@ -177,7 +181,7 @@ void plotter( char * name ){
   int nphotons = (int)tpho->GetEntries();
   for (int i=0; i<nphotons; i++){
     tpho->GetEntry(i);
-    //if (variable[1] > variable[0]/3 && variable[9] > variable[0]/4)
+    if (variable[1] > variable[0]/3 && variable[9] > variable[0]/4)
     { // pt1 > mgg/3 & pt2 > mgg/4 selection
       for (int z=0; z<NVARIABLES; z++){
         if (z==8 || z==16){ // eleveto1 & eleveto2
@@ -216,6 +220,8 @@ void plotter( char * name ){
     max1 = h[z]->GetMaximum();
     h[z]->SetMaximum(10*max1);
     h[z]->GetXaxis()->SetTitle(xaxisLabel[z]);
+    //h[z]->GetXaxis()->SetTitleSize(0.75);
+    //h[z]->GetXaxis()->SetTitleFont(42);
     CMS_lumi( (TPad*)c1->cd(),true,0);   
  
     TCanvas* c2 = new TCanvas("c2","",1200,800);
@@ -223,6 +229,8 @@ void plotter( char * name ){
     h[z]->DrawNormalized();
     h[z]->SetMaximum(10*max1);
     h[z]->GetXaxis()->SetTitle(xaxisLabel[z]);
+    //h[z]->GetXaxis()->SetTitleSize(30);
+    //h[z]->GetXaxis()->SetTitleFont(42);
     CMS_lumi( (TPad*)c2->cd(),true,0);
    
 
