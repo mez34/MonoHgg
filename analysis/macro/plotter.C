@@ -15,7 +15,7 @@
 #include <iostream>
 
 #define NSPECIES 1
-#define NVARIABLES 18
+#define NVARIABLES 19
 
 void plotter( char * name ){
 //  gROOT->SetStyle("Plain");
@@ -29,12 +29,12 @@ void plotter( char * name ){
   TString suffix[NSPECIES];
   suffix[0]=name;
 
-  TString infile = "50kSamples";
+  TString infile = "ALL_nosel";
 
   // open file and tree
   TFile *f = new TFile("data/"+infile+"/diPhotons_"+suffix[0]+".root");
   TTree *tev = (TTree*)f->Get("diPhoAna");
-  TTree *tpho = (TTree*)f->Get("diPhoAna/DiPhotonTree");
+  TTree *tpho = (TTree*)f->Get("DiPhotonTree");
   // create output file
   TFile *fOut = new TFile("diPhoPlots/"+infile+"/"+suffix[0]+"/diPhotHistos_"+suffix[0]+".root","RECREATE");
   
@@ -67,6 +67,7 @@ void plotter( char * name ){
   varname[15]="neuiso2";
   varname[16]="eleveto2";
   varname[17]="t1pfmet";
+  varname[18]="weight";
 
   int nbins[NVARIABLES];
   nbins[0]=60; 		// mgg
@@ -74,9 +75,9 @@ void plotter( char * name ){
   nbins[2]=100; 	// r91
   nbins[3]=300; 	// sieie1
   nbins[4]=250; 	// hoe1
-  nbins[5]=200; 	// chiso1
-  nbins[6]=200; 	// phoiso1
-  nbins[7]=200; 	// neuiso1
+  nbins[5]=150; 	// chiso1
+  nbins[6]=150; 	// phoiso1
+  nbins[7]=150; 	// neuiso1
   nbins[8]=100; 	// eleveto1
   nbins[9]=nbins[1];  	// pt2
   nbins[10]=nbins[2]; 	// r92
@@ -87,6 +88,7 @@ void plotter( char * name ){
   nbins[15]=nbins[7]; 	// neuiso2
   nbins[16]=nbins[8]; 	// eleveto2
   nbins[17]=100;     	// t1pfmet
+  nbins[18]=100; 	// weight
 
   float min[NVARIABLES];
   min[0]=0.; 		// mgg
@@ -94,9 +96,9 @@ void plotter( char * name ){
   min[2]=0.; 		// r91
   min[3]=0.; 		// sieie1
   min[4]=0.; 		// hoe1
-  min[5]=-10.; 		// chiso1
-  min[6]=-10.; 		// phoiso1
-  min[7]=-10.; 		// neuiso1
+  min[5]=-5.; 		// chiso1
+  min[6]=-5.; 		// phoiso1
+  min[7]=-5.; 		// neuiso1
   min[8]=-1.; 		// eleveto1
   min[9]=min[1]; 	// pt2
   min[10]=min[2]; 	// r92
@@ -107,6 +109,7 @@ void plotter( char * name ){
   min[15]=min[7]; 	// neuiso2
   min[16]=min[8]; 	// eleveto2
   min[17]=0.; 		// t1pfmet
+  min[18]=0.; 		// weight
 
   float max[NVARIABLES];
   max[0]=300.; 		// mgg
@@ -114,9 +117,9 @@ void plotter( char * name ){
   max[2]=1.1; 		// r91
   max[3]=0.03;	 	// sieie1
   max[4]=0.025;	 	// hoe1
-  max[5]=10.; 		// chiso1
-  max[6]=10.; 		// phoiso1
-  max[7]=10.; 		// neuiso1
+  max[5]=15.; 		// chiso1
+  max[6]=15.; 		// phoiso1
+  max[7]=15.; 		// neuiso1
   max[8]=1.; 		// eleveto1
   max[9]=max[1]; 	// pt2
   max[10]=max[2]; 	// r92
@@ -127,6 +130,7 @@ void plotter( char * name ){
   max[15]=max[7]; 	// neuiso2
   max[16]=max[8]; 	// eleveto2
   max[17]=1000.; 	// t1pfmet
+  max[18]=100.;		// weight
 
   TString xaxisLabel[NVARIABLES];
   xaxisLabel[0]="m(#gamma#gamma) [GeV]";
@@ -147,7 +151,7 @@ void plotter( char * name ){
   xaxisLabel[15]="NEUiso(#gamma2)";
   xaxisLabel[16]="ele veto(#gamma2)";
   xaxisLabel[17]="type 1 PF MET(#gamma #gamma)";
-  
+  xaxisLabel[18]="weight";  
 
 
   // make histograms
@@ -185,10 +189,10 @@ void plotter( char * name ){
     { // pt1 > mgg/3 & pt2 > mgg/4 selection
       for (int z=0; z<NVARIABLES; z++){
         if (z==8 || z==16){ // eleveto1 & eleveto2
-          h[z]->Fill(intvariable[z]);
+          h[z]->Fill(intvariable[z],variable[18]);
         }
         else{
-          h[z]->Fill(variable[z]);
+          h[z]->Fill(variable[z],variable[18]);
         }
 
 	// do pt adjustment from the pho id cut

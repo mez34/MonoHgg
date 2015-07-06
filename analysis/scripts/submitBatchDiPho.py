@@ -51,7 +51,9 @@ def main():
 
     if opt.download=='pccmsrm':
         diskoutputdir = "" 
-    else: diskoutputdir = '/afs/cern.ch/work/s/soffi/CMSSW_7_4_0_pre9-DiphoDumper/src/MonoHgg/output'
+
+    else: diskoutputdir = '/afs/cern.ch/user/m/mzientek/private/CMSSW_7_4_0_pre9/src/MonoHgg/output'
+    #else: diskoutputdir = '/afs/cern.ch/work/s/soffi/CMSSW_7_4_0_pre9-DiphoDumper/src/MonoHgg/output'
     diskoutputmain = diskoutputdir+"/"+opt.prefix+"/"+output
 
     os.system("mkdir -p "+opt.prefix+"/"+output)

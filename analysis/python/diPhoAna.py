@@ -12,7 +12,7 @@ process.GlobalTag.globaltag = 'POSTLS170_V5::All'
 #process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff")
 #process.GlobalTag.globaltag = 'POSTLS170_V5'
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32( 50000 ) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32( -1 ) )
 
 process.source = cms.Source("PoolSource",
                             fileNames=cms.untracked.vstring(
@@ -252,7 +252,7 @@ process.source = cms.Source("PoolSource",
 process.load("flashgg/MicroAOD/flashggPhotons_cfi")
 process.load("flashgg/MicroAOD/flashggDiPhotons_cfi")
 
-process.TFileService = cms.Service("TFileService",fileName = cms.string("diPhotons_GGH.root"))
+process.TFileService = cms.Service("TFileService",fileName = cms.string("diPhotons_GluGluHgg_nosel.root"))
 
 process.diPhoAna = cms.EDAnalyzer('DiPhoAnalyzer',
                                   VertexTag = cms.untracked.InputTag('offlineSlimmedPrimaryVertices'),

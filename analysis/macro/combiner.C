@@ -15,21 +15,24 @@
 void combiner( char * in ){
   TString in_name = in;
   TString fIn[NSPECIES];
-  fIn[0] = "DMHtoGG";
-  fIn[1] = "WZHtoGG";
-  fIn[2] = "QCD";
-  fIn[3] = "GJets";
-  fIn[4] = "GGH";
-  //fIn[0] = "DMHtoGG_nosel"; //signal
-  //fIn[1] = "WZHtoGG_nosel"; 
-  //fIn[2] = "QCD_nosel";
-  //fIn[3] = "GJets_nosel";
-  //fIn[4] = "GGH_nosel";
+  //fIn[0] = "DMHtoGG";
+  //fIn[1] = "WZHtoGG";
+  //fIn[2] = "QCD";
+  //fIn[3] = "GJets";
+  //fIn[4] = "GGH";
+  fIn[0] = "DMHtoGG_nosel"; //signal
+  fIn[1] = "WZHtoGG_nosel"; 
+  fIn[2] = "QCD_nosel";
+  fIn[3] = "GJets_nosel";
+  fIn[4] = "GGH_nosel";
+
+  bool is_r9 = false;
+  if (in_name=="r91" || in_name=="r92") is_r9 = true;
   
-  overlay(fIn[0], fIn[1], fIn[2], fIn[3], fIn[4], in_name);
+  overlay(fIn[0], fIn[1], fIn[2], fIn[3], fIn[4], in_name, is_r9);
 }
-void overlay( const TString In1, const TString In2, const TString In3, const TString In4, const TString In5, const TString name ){
-  TString location = "diPhoPlots/50kSamples/";
+void overlay( const TString In1, const TString In2, const TString In3, const TString In4, const TString In5, const TString name , bool offsetLegend ){
+  TString location = "diPhoPlots/ALL_nosel/";
 
   gStyle->SetHistLineWidth(2);
   //gROOT->SetStyle("Plain");
@@ -98,7 +101,9 @@ void overlay( const TString In1, const TString In2, const TString In3, const TSt
   
   CMS_lumi( (TPad*)c1->cd(),true,0);
   
-  TLegend *l1 = new TLegend(0.65,0.73,0.83,0.93);
+  if( offsetLegend ) TLegend *l1 = new TLegend(0.20,0.73,0.38,0.93);
+  else 	             TLegend *l1 = new TLegend(0.65,0.73,0.83,0.93);
+
   l1->SetTextFont(42);
   l1->SetFillColor(0);
   l1->SetBorderSize(2);
