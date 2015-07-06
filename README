@@ -1,4 +1,57 @@
-High mass diphoton analysis
+MonoHgg analysis
+
+---------------------------------------
+From MicroAOD to diPhotonAnaTrees 
+(follow what is done here from P. Musella: https://github.com/cms-analysis/flashgg/tree/master/MetaData 
+ and here from C. Rovelli: https://github.com/musella/diphotons/tree/master/fullAnalysisRoma )
+---------------------------------------
+
+1.Once MicroAOD files are produced run these scripts to create the json file (catalogue) and  compute the weights:
+
+   1.1 fggManageSamples.py -C testMonoHLivia -V Phys14MicroAODV3-55-gc1f8d91 import
+   1.2 fggManageSamples.py -C testMonoHLivia review
+   1.3 fggManageSamples.py -C testMonoHLivia check
+
+2. Now the json file can be copied on github in the script/list_*/  directory
+
+3. Extract files and weights to create .list and .weight files in script/list_*/:
+   3.1 Write the proper name of the catalogue in the extract*.py scripts
+   3.2 python extractWeights.py
+   3.3 python extractFiles.py
+
+4. Run in local the diphoton analyzer (from python directory):
+   4.1 Write by hand one microAOD file that can be taken from the json file
+   4.2 Fix by hand xsec and sumDataSet that can be found from the json file corresponding
+   4.3 cmsRun diPhoAna.py
+   
+5. Run in batch the diphoton analyzer (from script directory):
+   
+   5.1 To make it works one needs:
+       - a list of files in script/listV*/ with the name  GJets_HT-100to200
+       - a list of weights in script/listV*/ with the name GJets_HT-100to200
+       - the value of the xsec
+       - the output directory either in eos or in lxpus (this has to be fixed in the submitBatchDiPho.py script by hand)
+ 
+   5.2 Example on how to run: ./submitBatchDiPho.py --cfg diPhoAnaBATCH.py GJets_HT-100to200 0 7 pippo 1534. 1 
+       NB. The name GJets_HT-100to200 has to match the one of the .list and the .weight files.
+       
+
+6. Manage the output trees before making plots (from smacro directory):
+   6.1 Merge the output files with mergeTrees.sh
+   6.2 Add the weights to the trees with addWeightsToTree.cc
+   6.3 Merge the species with mergeSpecies.sh
+   NB. The structure of how to use these scripts can be seen in doAll.sh
+
+7. Produce plots 
+   7.1 Run drawOneHisto.C to plot a single variable for a single sample
+	OR
+   7.1 Run plotter.C to plot all relevant variables for a single sample (with weighting) 
+   7.2 Run combiner.C to plot a single variable for all samples (needs the output of plotter.C)
+    OR use runCombiner.sh that runs combiner.C for all relevant variables for all samples (also needs output of plotter.C)
+
+
+-------------------------------
+Copy the diphoton Analyzer analysis framework from github
 -------------------------------
 
 
