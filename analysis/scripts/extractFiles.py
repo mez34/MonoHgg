@@ -1,5 +1,5 @@
 import re
-hand = open('datasets.json')    # catalogue from Flashgg
+hand = open('lists_50ns/GJet_Pt-20to40.json')    # catalogue from Flashgg
 
 target = open ('list.list','w')     # output with the list of EOS files to be analyzed
 

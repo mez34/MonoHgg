@@ -42,12 +42,12 @@ def main(argv):
       line = lines[i]
       if 'store' in line :
         line = re.sub('                "name": "', '', line)
-        line = re.sub('",', '\n', line)
+        line = re.sub('",', '', line)
         target.write(line)
       if 'weights' in line:
         line = re.sub('                "weights": ', '', line)
         target2.write(line)
-        target2.write('\n')
+        #target2.write('\n')
 
    target.close()        
    target2.close()
