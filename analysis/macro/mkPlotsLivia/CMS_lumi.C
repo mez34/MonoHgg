@@ -3,7 +3,7 @@
 void 
 CMS_lumi( TPad* pad, bool isSIM, int iPosX )
 {   
-  iPeriod=4;
+  int iPeriod=4;
   lumi_8TeV="19.7 fb^{-1}";
   //lumi_8TeV="";
   if(isSIM==true) extraText="Simulation";

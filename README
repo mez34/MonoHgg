@@ -13,11 +13,16 @@ From MicroAOD to diPhotonAnaTrees
    1.3 fggManageSamples.py -C testMonoHLivia check
 
 2. Now the json file can be copied on github in the script/list_*/  directory
+   2.1 If json file is not separated by name can extract smaller json files with:
+       ./runExtractJSONS which calls:
+       python extractJSONS.py -i input.json -o samplename -d outputdir
+       for the samples (currently in RunII_50ns catalog)
 
 3. Extract files and weights to create .list and .weight files in script/list_*/:
    3.1 Write the proper name of the catalogue in the extract*.py scripts
    3.2 python extractWeights.py
    3.3 python extractFiles.py
+   OR ./runExtractFilesAndWeights.sh to do the same thing (takes input list of .json files and outputs weight and files in same list dir.)
 
 4. Run in local the diphoton analyzer (from python directory):
    4.1 Write by hand one microAOD file that can be taken from the json file

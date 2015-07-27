@@ -19,6 +19,8 @@ combiner("neuiso1");
 combiner("neuiso2");
 combiner("phoiso1");
 combiner("phoiso2");
+combiner("pt1");
+combiner("pt2");
 
 .q
 

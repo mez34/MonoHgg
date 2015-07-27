@@ -1,3 +1,9 @@
 #ignore in files
 *.pyc
-
+*.d
+*.so
+**/job*/
+**/list*/
+*.list
+**/data/
+**/diPhoPlots/
