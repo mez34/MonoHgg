@@ -250,34 +250,40 @@ void Plotter::make1DHistos(){
   Float_t phiH[nphotons]    = {-1000}; 
   Float_t phiHMET[nphotons] = {-1000};
 
-  Bool_t passCHIso_EB1 = false;
-  Bool_t passCHIso_EE1 = false;
-  Bool_t passNHIso_EB1 = false;
-  Bool_t passNHIso_EE1 = false;
-  Bool_t passPHIso_EB1 = false;
-  Bool_t passPHIso_EE1 = false;
-  Bool_t passSieie_EB1 = false; 
-  Bool_t passSieie_EE1 = false;
-  Bool_t passHoe_EB1 = false;
-  Bool_t passHoe_EE1 = false;
-  Bool_t passAll_EB1 = false;
-  Bool_t passAll_EE1 = false;
 
-  Bool_t passCHIso_EB2 = false;
-  Bool_t passCHIso_EE2 = false;
-  Bool_t passNHIso_EB2 = false;
-  Bool_t passNHIso_EE2 = false;
-  Bool_t passPHIso_EB2 = false;
-  Bool_t passPHIso_EE2 = false;
-  Bool_t passSieie_EB2 = false; 
-  Bool_t passSieie_EE2 = false;
-  Bool_t passHoe_EB2 = false;
-  Bool_t passHoe_EE2 = false;
-  Bool_t passAll_EB2 = false;
-  Bool_t passAll_EE2 = false;
+  int nphotonsPass=0;
+  int Eff[6][60]={0};
 
-  for (int i=0; i<nphotons; ++i){
+  for (int i=0; i<nphotons; ++i){   
     tpho->GetEntry(i);
+
+    Bool_t passCHIso_EB1 = false;
+    Bool_t passCHIso_EE1 = false;
+    Bool_t passNHIso_EB1 = false;
+    Bool_t passNHIso_EE1 = false;
+    Bool_t passPHIso_EB1 = false;
+    Bool_t passPHIso_EE1 = false;
+    Bool_t passSieie_EB1 = false; 
+    Bool_t passSieie_EE1 = false;
+    Bool_t passHoe_EB1 = false;
+    Bool_t passHoe_EE1 = false;
+    Bool_t passAll_EB1 = false;
+    Bool_t passAll_EE1 = false;
+
+    Bool_t passCHIso_EB2 = false;
+    Bool_t passCHIso_EE2 = false;
+    Bool_t passNHIso_EB2 = false;
+    Bool_t passNHIso_EE2 = false;
+    Bool_t passPHIso_EB2 = false;
+    Bool_t passPHIso_EE2 = false;
+    Bool_t passSieie_EB2 = false; 
+    Bool_t passSieie_EE2 = false;
+    Bool_t passHoe_EB2 = false;
+    Bool_t passHoe_EE2 = false;
+    Bool_t passAll_EB2 = false;
+    Bool_t passAll_EE2 = false;
+   
+    Bool_t passAny = false;
 
     if (variable[23] < 1.479){ // pho1 in EB
        if (variable[5] <= 1.79) passCHIso_EB1 = true;
@@ -328,35 +334,79 @@ void Plotter::make1DHistos(){
         if ((passCHIso_EB2 && passNHIso_EB2 && passPHIso_EB2 && passHoe_EB2) || (passCHIso_EE2 && passNHIso_EE2 && passPHIso_EE2 && passHoe_EE2 )) hVarNmin1[11]->Fill(variable[11],variable[18]);
         if ((passCHIso_EB2 && passNHIso_EB2 && passPHIso_EB2 && passSieie_EB2) || (passCHIso_EE2 && passNHIso_EE2 && passPHIso_EE2 && passSieie_EE2 )) hVarNmin1[12]->Fill(variable[12],variable[18]);
       }
-      else if(z==0 || z==17 || z==18 || z==19 || z==20 || z==29){
+      else if (z==0 || z==17 || z==18 || z==19 || z==20 || z==29){
         if ((passAll_EB1 || passAll_EE1) && (passAll_EB2 || passAll_EE2)) hVarNmin1[z]->Fill(variable[z],variable[18]);
       }
-      else if(z==1 || z==2 || z==21 || z==23 || z==25 || z==27){ // fill "n-1" plots for pho1 if they pass phoID selection
+      else if (z==1 || z==2 || z==21 || z==23 || z==25 || z==27){ // fill "n-1" plots for pho1 if they pass phoID selection
         if (passAll_EB1 || passAll_EE1) hVarNmin1[z]->Fill(variable[z],variable[18]);
       }
       else{ // fill "n-1" plots for pho2 if they pass phoID selection
         if (passAll_EB2 || passAll_EE2) hVarNmin1[z]->Fill(variable[z],variable[18]);
       }
     }// end loop over the variables in the Tree
+
+    passAny = (passAll_EB1 || passAll_EE1 || passAll_EB2 || passAll_EE2);
+    if (passAny) nphotonsPass++;
+    for (int x=0; x<60; x++){
+      if (intvariable[29]==x){ // evnts with nvtx = x
+        Eff[0][x]++;
+        if (passAny) Eff[1][x]++;
+      } 
+      if ((variable[9]>=10*x && variable[9]<10*(x+1)) || ((variable[1]>=10*x && variable[1]<10*(x+1)))){ //pt bins = 10GeV
+        Eff[2][x]++;
+        if (passAny) Eff[3][x]++;
+      }
+      if (((variable[24] >= (-3+(x/10)) && variable[24] < (-3+(x+1)/10)) )||(variable[23] >= (-3+(x/10)) && variable[23]< (-3+(x+1)/10))){ // eta bins = 1/10
+        Eff[4][x]++;
+        if (passAny) Eff[5][x]++;
+      } 
+    }// loop over bins for eff plots      
+   
+
     phiH[i]=TMath::ATan( (variable[1]*TMath::Sin(variable[21]) - variable[9]*TMath::Sin(variable[22])) / (variable[1]*TMath::Cos(variable[21]) - variable[9]*TMath::Cos(variable[22])) );
     phiHMET[i]=phiH[i]-variable[20];
 
     hPhi[0]->Fill(phiH[i],variable[18]);
-    hPhi[0]->GetXaxis()->SetTitle("#phi_H");
     hPhi[1]->Fill(variable[20],variable[18]);
-    hPhi[1]->GetXaxis()->SetTitle("#phi_MET");
     hPhi[2]->Fill(phiHMET[i],variable[18]);
-    hPhi[2]->GetXaxis()->SetTitle("#Delta#phi(H,MET)");
+
 
   }// end loop over all photons
- 
+  Float_t eff[3][60]={0};
+  for (int x=0; x<60; x++){
+    if(Eff[0][x]!=0) eff[0][x]=(Float_t)Eff[1][x]/(Float_t)Eff[0][x];
+    if(Eff[2][x]!=0) eff[1][x]=(Float_t)Eff[3][x]/(Float_t)Eff[2][x];
+    if(Eff[4][x]!=0) eff[2][x]=(Float_t)Eff[5][x]/(Float_t)Eff[4][x];
+    
+    //std::cout << Eff[5][x] << "  " << Eff[4][x] << "  " <<eff[2]<<std::endl;
+
+    hEff[0]->Fill(x,eff[0][x]);   
+    hEff[1]->Fill(10*x,eff[1][x]);   
+    hEff[2]->Fill(-3+(x/10),eff[2][x]);   
+  }
+
   for (int z=0; z<NVARIABLES; ++z){
-    Plotter::DrawWriteSave1DPlot(hVar[z],varname[z]);
-    Plotter::DrawWriteSave1DPlot(hVarNmin1[z],varname[z]+"_n-1");
+    Plotter::DrawWriteSave1DPlot(hVar[z],varname[z],true);
+    Plotter::DrawWriteSave1DPlot(hVarNmin1[z],varname[z]+"_n-1",true);
   } 
-  Plotter::DrawWriteSave1DPlot(hPhi[0],"phiH");
-  Plotter::DrawWriteSave1DPlot(hPhi[1],"phiMET");
-  Plotter::DrawWriteSave1DPlot(hPhi[2],"phiHMET");
+  hPhi[0]->GetXaxis()->SetTitle("#phi_H");
+  hPhi[1]->GetXaxis()->SetTitle("#phi_MET");
+  hPhi[2]->GetXaxis()->SetTitle("#Delta#phi(H,MET)");
+  Plotter::DrawWriteSave1DPlot(hPhi[0],"phiH",true);
+  Plotter::DrawWriteSave1DPlot(hPhi[1],"phiMET",true);
+  Plotter::DrawWriteSave1DPlot(hPhi[2],"phiHMET",true);
+
+  hEff[0]->GetXaxis()->SetTitle("nvtx");
+  hEff[1]->GetXaxis()->SetTitle("p_{T}");
+  hEff[2]->GetXaxis()->SetTitle("#eta");
+  hEff[0]->GetYaxis()->SetTitle("Efficiency to Pass PhoID");
+  hEff[1]->GetYaxis()->SetTitle("Efficiency to Pass PhoID");
+  hEff[2]->GetYaxis()->SetTitle("Efficiency to Pass PhoID");
+  Plotter::DrawWriteSave1DPlot(hEff[0],"Eff_PHOID_PU",false); 
+  Plotter::DrawWriteSave1DPlot(hEff[1],"Eff_PHOID_pt",false); 
+  Plotter::DrawWriteSave1DPlot(hEff[2],"Eff_PHOID_eta",false); 
+
+
 
 }// end Plotter::make1DHistos
 
@@ -465,8 +515,8 @@ void Plotter::make2DHistos(){
     hvPt[z]->GetYaxis()->SetTitle(effvar[z]);
     hvEta[z]->GetYaxis()->SetTitle(effvar[z]);
     hvPU[z]->GetXaxis()->SetTitle("nvtx");
-    hvPt[z]->GetXaxis()->SetTitle("Pt");
-    hvEta[z]->GetXaxis()->SetTitle("Eta");
+    hvPt[z]->GetXaxis()->SetTitle("p_{T}");
+    hvEta[z]->GetXaxis()->SetTitle("#eta");
     Plotter::DrawWriteSave2DPlot(hvPU[z],"PU",effvar[z]); 
     Plotter::DrawWriteSave2DPlot(hvPt[z],"Pt",effvar[z]); 
     Plotter::DrawWriteSave2DPlot(hvEta[z],"Eta",effvar[z]); 
@@ -482,10 +532,17 @@ void Plotter::Fill1DHistos(){
   }
 }// end Plotter::Fill1DHistos
 
-void Plotter::DrawWriteSave1DPlot(TH1F *& h, const TString plotName){
+void Plotter::DrawWriteSave1DPlot(TH1F *& h, const TString plotName, const Bool_t DrawNorm){
+  gStyle->SetOptStat(1110);
+  gStyle->SetStatBorderSize(0);
+  gStyle->SetStatFont(42);
+  gStyle->SetStatX(0.84);
+  gStyle->SetStatY(0.93);
+
   fTH1Canv->cd();
   fTH1Canv->SetLogy(0);
-  h->DrawNormalized();
+  if(DrawNorm) h->DrawNormalized();
+  else h->Draw();
   Plotter::FindMinAndMax(h,0);
   CMS_lumi( (TPad*)fTH1Canv->cd(),true,0);
   h->Write();
@@ -493,7 +550,8 @@ void Plotter::DrawWriteSave1DPlot(TH1F *& h, const TString plotName){
 
   fTH1Canv->SetLogy(1);
   Plotter::FindMinAndMax(h,1);
-  h->DrawNormalized();
+  if(DrawNorm) h->DrawNormalized();
+  else h->Draw();
   CMS_lumi( (TPad*)fTH1Canv->cd(),true,0);
   h->Write();
   fTH1Canv->SaveAs(Form("%s%s/%s_%s_log.png",fName.Data(),species.Data(),plotName.Data(),species.Data()));
@@ -501,6 +559,7 @@ void Plotter::DrawWriteSave1DPlot(TH1F *& h, const TString plotName){
 
 
 void Plotter::DrawWriteSave2DPlot(TH2F *& h, const TString varX, const TString varY){
+  gStyle->SetOptStat(0);
   fTH2Canv->cd();
   fTH2Canv->SetLogy(0);
   h->Draw("colz");

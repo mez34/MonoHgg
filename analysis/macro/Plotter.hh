@@ -27,7 +27,7 @@ public:
   void make2DHistos();
   void Fill1DHistos();
   void FindMinAndMax(TH1F *& h, int plotLog);
-  void DrawWriteSave1DPlot(TH1F *& h, TString plotName); 
+  void DrawWriteSave1DPlot(TH1F *& h, TString plotName, Bool_t DrawNorm); 
   void DrawWriteSave2DPlot(TH2F *& h, TString varX, TString varY); 
 
 private:
