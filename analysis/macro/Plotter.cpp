@@ -423,8 +423,8 @@ void Plotter::make2DHistos(){
 
   for (int z=0; z<N2DVARIABLES; ++z){
     hvPU[z]  = new TH2F(Form("%s_PU_%s",effvar[z].Data(),species.Data()),Form("%s_PU_%s",effvar[z].Data(),species.Data()),60,0,60,range2D[z][0],range2D[z][1],range2D[z][2]);
-    hvPt[z]  = new TH2F(Form("%s_pt_%s",effvar[z].Data(),species.Data()),Form("%s_pt_%s",effvar[z].Data(),species.Data()),60,0,60,range2D[z][0],range2D[z][1],range2D[z][2]);
-    hvEta[z] = new TH2F(Form("%s_eta_%s",effvar[z].Data(),species.Data()),Form("%s_eta_%s",effvar[z].Data(),species.Data()),60,0,60,range2D[z][0],range2D[z][1],range2D[z][2]);
+    hvPt[z]  = new TH2F(Form("%s_pt_%s",effvar[z].Data(),species.Data()),Form("%s_pt_%s",effvar[z].Data(),species.Data()),60,0,600,range2D[z][0],range2D[z][1],range2D[z][2]);
+    hvEta[z] = new TH2F(Form("%s_eta_%s",effvar[z].Data(),species.Data()),Form("%s_eta_%s",effvar[z].Data(),species.Data()),60,-3,3,range2D[z][0],range2D[z][1],range2D[z][2]);
   }
 
   Float_t var2D[N2DVARIABLES];
@@ -445,21 +445,28 @@ void Plotter::make2DHistos(){
     var2D[10]= variable[6];
     var2D[11]= variable[14];
 
-/*    for (int z=0; z<N2DVARIABLES; ++i){
-      hvPU[z]->Fill(variable[29],var2D[z],variable[18]);
+
+    for (int z=0; z<N2DVARIABLES; ++z){
+      hvPU[z]->Fill(intvariable[29],var2D[z],variable[18]);
       if (z==0 || z== 2 || z==4 || z==6 || z==8 || z==10){// first photon
         hvPt[z]->Fill(variable[1],var2D[z],variable[18]);
         hvEta[z]->Fill(variable[23],var2D[z],variable[18]);
       }
-      else{// second photon
+      else{ // second photon
         hvPt[z]->Fill(variable[9],var2D[z],variable[18]);
         hvEta[z]->Fill(variable[24],var2D[z],variable[18]);
       }
-    } */ 
+    }  
   }
 
 
   for (int z=0; z<N2DVARIABLES; ++z){
+    hvPU[z]->GetYaxis()->SetTitle(effvar[z]);
+    hvPt[z]->GetYaxis()->SetTitle(effvar[z]);
+    hvEta[z]->GetYaxis()->SetTitle(effvar[z]);
+    hvPU[z]->GetXaxis()->SetTitle("nvtx");
+    hvPt[z]->GetXaxis()->SetTitle("Pt");
+    hvEta[z]->GetXaxis()->SetTitle("Eta");
     Plotter::DrawWriteSave2DPlot(hvPU[z],"PU",effvar[z]); 
     Plotter::DrawWriteSave2DPlot(hvPt[z],"Pt",effvar[z]); 
     Plotter::DrawWriteSave2DPlot(hvEta[z],"Eta",effvar[z]); 
@@ -501,11 +508,13 @@ void Plotter::DrawWriteSave2DPlot(TH2F *& h, const TString varX, const TString v
   h->Write();
   fTH2Canv->SaveAs(Form("%s%s/%s_%s_%s.png",fName.Data(),species.Data(),varY.Data(),varX.Data(),species.Data()));
 
-  fTH2Canv->SetLogy(1);
+  // FIXME problem with log plots (min always is zero)
+/*  fTH2Canv->SetLogy(1);
+  fTH2Canv->SetLogx(1);  
   h->Draw("colz");
   CMS_lumi( (TPad*)fTH2Canv->cd(),true,0);
   h->Write();
-  fTH2Canv->SaveAs(Form("%s%s/%s_%s_%s_log.png",fName.Data(),species.Data(),varY.Data(),varX.Data(),species.Data()));
+  fTH2Canv->SaveAs(Form("%s%s/%s_%s_%s_log.png",fName.Data(),species.Data(),varY.Data(),varX.Data(),species.Data()));*/
 }// end Plotter::DrawWriteSave2DPlot
 
 void Plotter::FindMinAndMax(TH1F *& h, int plotLog){
