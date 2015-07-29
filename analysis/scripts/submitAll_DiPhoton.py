@@ -1,5 +1,5 @@
 #
-# usage: %prog [opts] --cfg cmssw.py dataset doPUreweighting(0/1) sampleIndex PUweightsFile x-section kFactor
+# usage: %prog [opts] --cfg cmssw.py dataset doPUreweighting(0/1) sampleIndex PUweightsFile x-section(in pb) kFactor
 #
 # Backgrounds: sampleID>0 && sampleID<100
 # Signals:     sampleID>100
@@ -9,24 +9,24 @@
 #50ns samples
 
 ./submitBatchDiPho.py --cfg diPhoAnaBATCH.py Higgs_scalar_nohdecay_gg_1000GeV	0 100 pippo 0.01 1
-./submitBatchDiPho.py --cfg diPhoAnaBATCH.py Higgs_scalar_nohdecay_gg_100GeV	0 100 pippo 0.01 1
-./submitBatchDiPho.py --cfg diPhoAnaBATCH.py Higgs_scalar_nohdecay_gg_10GeV	0 100 pippo 0.01 1
-./submitBatchDiPho.py --cfg diPhoAnaBATCH.py Higgs_scalar_nohdecay_gg_1GeV	0 100 pippo 0.01 1
+./submitBatchDiPho.py --cfg diPhoAnaBATCH.py Higgs_scalar_nohdecay_gg_100GeV	0 101 pippo 0.01 1
+./submitBatchDiPho.py --cfg diPhoAnaBATCH.py Higgs_scalar_nohdecay_gg_10GeV	0 102 pippo 0.01 1
+./submitBatchDiPho.py --cfg diPhoAnaBATCH.py Higgs_scalar_nohdecay_gg_1GeV	0 103 pippo 0.01 1
 
-./submitBatchDiPho.py --cfg diPhoAnaBATCH.py GJet_Pt-20to40    0  1 pippo  218.6108   1  
-./submitBatchDiPho.py --cfg diPhoAnaBATCH.py GJet_Pt-40toInf   0  2 pippo  863.1088   1
+./submitBatchDiPho.py --cfg diPhoAnaBATCH.py GJet_Pt-20to40     		0  1 pippo  218.6108 1  
+./submitBatchDiPho.py --cfg diPhoAnaBATCH.py GJet_Pt-40toInf    		0  2 pippo  863.1088 1
 
-./submitBatchDiPho.py --cfg diPhoAnaBATCH.py QCD_Pt-30to40      0  3 pippo  24300      1
-./submitBatchDiPho.py --cfg diPhoAnaBATCH.py QCD_Pt-30toInf     0  4 pippo  108240     1
-./submitBatchDiPho.py --cfg diPhoAnaBATCH.py QCD_Pt-40toInf     0  5 pippo  259296     1
+./submitBatchDiPho.py --cfg diPhoAnaBATCH.py QCD_Pt-30to40      		0  3 pippo  24300   1
+./submitBatchDiPho.py --cfg diPhoAnaBATCH.py QCD_Pt-30toInf     		0  4 pippo  108240  1
+./submitBatchDiPho.py --cfg diPhoAnaBATCH.py QCD_Pt-40toInf     		0  5 pippo  259296  1
 
-./submitBatchDiPho.py --cfg diPhoAnaBATCH.py ttHJetToGG_M120    0  6 pippo  1          1
-./submitBatchDiPho.py --cfg diPhoAnaBATCH.py ttHJetToGG_M125    0  7 pippo  1          1
-./submitBatchDiPho.py --cfg diPhoAnaBATCH.py ttHJetToGG_M130    0  8 pippo  1          1
+./submitBatchDiPho.py --cfg diPhoAnaBATCH.py ttHJetToGG_M120    		0  6 pippo  1 1
+./submitBatchDiPho.py --cfg diPhoAnaBATCH.py ttHJetToGG_M125    		0  7 pippo  1 1
+./submitBatchDiPho.py --cfg diPhoAnaBATCH.py ttHJetToGG_M130    		0  8 pippo  1 1
 
-./submitBatchDiPho.py --cfg diPhoAnaBATCH.py DoubleEG           0  9 pippo  1          1
-./submitBatchDiPho.py --cfg diPhoAnaBATCH.py EGamma             0 10 pippo  1          1
-./submitBatchDiPho.py --cfg diPhoAnaBATCH.py SinglePhoton       0 11 pippo  1          1
+./submitBatchDiPho.py --cfg diPhoAnaBATCH.py DoubleEG           		0 10000 pippo  1 1
+./submitBatchDiPho.py --cfg diPhoAnaBATCH.py EGamma             		0 10001 pippo  1 1
+./submitBatchDiPho.py --cfg diPhoAnaBATCH.py SinglePhoton       		0 10002 pippo  1 1
  
 
 

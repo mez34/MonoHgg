@@ -13,9 +13,9 @@
 #include "DataFormats/HepMCCandidate/interface/GenParticleFwd.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 #include "DataFormats/Math/interface/deltaR.h"
-#include "DataFormats/EcalRecHit/interface/EcalRecHitCollections.h"
 
-#include "RecoEcal/EgammaCoreTools/interface/EcalClusterLazyTools.h"
+//#include "DataFormats/EcalRecHit/interface/EcalRecHitCollections.h"
+//#include "RecoEcal/EgammaCoreTools/interface/EcalClusterLazyTools.h"
 
 #include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
@@ -139,8 +139,8 @@ private:
 
 
   // collections
-  edm::EDGetTokenT<EcalRecHitCollection> ecalHitEBToken_;
-  edm::EDGetTokenT<EcalRecHitCollection> ecalHitEEToken_;
+  //edm::EDGetTokenT<EcalRecHitCollection> ecalHitEBToken_;
+  //edm::EDGetTokenT<EcalRecHitCollection> ecalHitEEToken_;
   EDGetTokenT<View<reco::Vertex> > vertexToken_;
   EDGetTokenT<edm::View<flashgg::DiPhotonCandidate> > diPhotonToken_; 
   EDGetTokenT<edm::View<PileupSummaryInfo> > PileUpToken_; 
@@ -181,8 +181,10 @@ private:
 DiPhoAnalyzer::DiPhoAnalyzer(const edm::ParameterSet& iConfig):
 
   // collections
-  ecalHitEBToken_(consumes<EcalRecHitCollection>(iConfig.getParameter<edm::InputTag>("reducedBarrelRecHitCollection"))),
-  ecalHitEEToken_(consumes<EcalRecHitCollection>(iConfig.getParameter<edm::InputTag>("reducedEndcapRecHitCollection"))),
+  //reducedBarrelRecHitCollection_ = iConfig.getParameter<edm::InputTag>("reducedBarrelRecHitCollection");
+  //reducedBarrelRecHitCollectionToken_ = mayConsume<EcalRecHitCollection>(reducedBarrelRecHitCollection_);
+  //ecalHitEBToken_(consumes<EcalRecHitCollection>(iConfig.getParameter<edm::InputTag>("reducedBarrelRecHitCollection"))),
+  //ecalHitEEToken_(consumes<EcalRecHitCollection>(iConfig.getParameter<edm::InputTag>("reducedEndcapRecHitCollection"))),
   vertexToken_(consumes<View<reco::Vertex> >(iConfig.getUntrackedParameter<InputTag> ("VertexTag", InputTag("offlineSlimmedPrimaryVertices")))),
   diPhotonToken_(consumes<View<flashgg::DiPhotonCandidate> >(iConfig.getUntrackedParameter<InputTag> ("DiPhotonTag", InputTag("flashggDiPhotons")))),
   PileUpToken_(consumes<View<PileupSummaryInfo> >(iConfig.getUntrackedParameter<InputTag> ("PileUpTag", InputTag("addPileupInfo")))),
@@ -223,7 +225,7 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
   edm::Handle<GenEventInfoProduct> genInfo;
   edm::Handle<View<reco::GenParticle> > genParticles;
  
-  if (sampleID>0) {     // MC
+  if (sampleID>0 && sampleID<10000) {     // MC
     iEvent.getByToken(genPhotonExtraToken_,genPhotonsHandle);
     iEvent.getByLabel(genInfo_,genInfo);   
     iEvent.getByToken( genPartToken_, genParticles );
@@ -231,8 +233,9 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 
 
   // to recompute not-zero-suppressed cluster shapes 
-  noZS::EcalClusterLazyTools *lazyToolnoZS = new noZS::EcalClusterLazyTools(iEvent, iSetup, ecalHitEBToken_, ecalHitEEToken_);
+  //noZS::EcalClusterLazyTools *lazyToolnoZS = new noZS::EcalClusterLazyTools(iEvent, iSetup, ecalHitEBToken_, ecalHitEEToken_);
 
+  //EcalClusterLazyTools lazyTools(iEvent, iSetup, reducedBarrelRecHitCollectionToken_, reducedEndcapRecHitCollectionToken_);
   // To keep track of the total number of events
   h_entries->Fill(5);
 
@@ -255,7 +258,7 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
   // PU weight (for MC only and if requested)
   float pu_weight = 1.;
   float pu_n      = -1.;
-  if (sampleID>0) {     // MC
+  if (sampleID>0 && sampleID<10000) {     // MC
     pu_n = 0.;
     for( unsigned int PVI = 0; PVI < PileupInfos->size(); ++PVI ) {
       Int_t pu_bunchcrossing = PileupInfos->ptrAt( PVI )->getBunchCrossing();
@@ -270,12 +273,12 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
  
   // x-sec * kFact for MC only 
   float totXsec = 1.;
-  if (sampleID>0) totXsec = xsec_ * kfac_;
+  if (sampleID>0 && sampleID<10000) totXsec = xsec_ * kfac_;
 
   // other weights for the dataset
   float sumDataset = 1.;  
   float perEveW    = 1.;
-  if (sampleID>0) { 
+  if (sampleID>0 && sampleID<10000) { 
     sumDataset = sumDataset_;
     const auto & eveWeights = genInfo->weights();
     if(!eveWeights.empty()) perEveW = eveWeights[0];
@@ -309,13 +312,15 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
       float leadScEta  = (diphoPtr->leadingPhoton()->superCluster())->eta();         
       float leadPt     = diphoPtr->leadingPhoton()->et();
       float leadChIso  = diphoPtr->leadingPhoton()->egChargedHadronIso();
-      float leadR9noZS = lazyToolnoZS->e3x3(*(diphoPtr->leadingPhoton()->superCluster()->seed())) / diphoPtr->leadingPhoton()->superCluster()->rawEnergy();
+      float leadR9noZS = diphoPtr->leadingPhoton()->full5x5_r9();
+      //float leadR9noZS = lazyToolnoZS->e3x3(*(diphoPtr->leadingPhoton()->superCluster()->seed())) / diphoPtr->leadingPhoton()->superCluster()->rawEnergy();
       bool leadPresel  = isGammaPresel( leadScEta, leadPt, leadR9noZS, leadChIso); 
 
       float subleadScEta  = (diphoPtr->subLeadingPhoton()->superCluster())->eta();               
       float subleadPt     = diphoPtr->subLeadingPhoton()->et();
       float subleadChIso  = diphoPtr->subLeadingPhoton()->egChargedHadronIso();
-      float subleadR9noZS = lazyToolnoZS->e3x3(*(diphoPtr->subLeadingPhoton()->superCluster()->seed())) / diphoPtr->subLeadingPhoton()->superCluster()->rawEnergy();
+      float subleadR9noZS = diphoPtr->subLeadingPhoton()->full5x5_r9();
+      //float subleadR9noZS = lazyToolnoZS->e3x3(*(diphoPtr->subLeadingPhoton()->superCluster()->seed())) / diphoPtr->subLeadingPhoton()->superCluster()->rawEnergy();
       bool subleadPresel  = isGammaPresel( subleadScEta, subleadPt, subleadR9noZS, subleadChIso); 
       if (!leadPresel || !subleadPresel) continue;   
 
@@ -335,7 +340,7 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 	Ptr<flashgg::DiPhotonCandidate> diphoPtr = diPhotons->ptrAt( theDiphoton );
 	
 	// chiara: init comment x efficiencies
-	std::vector<float> leadCovnoZS    = lazyToolnoZS->localCovariances(*(diphoPtr->leadingPhoton()->superCluster()->seed())) ;
+	/*std::vector<float> leadCovnoZS    = lazyToolnoZS->localCovariances(*(diphoPtr->leadingPhoton()->superCluster()->seed())) ;
 	std::vector<float> subleadCovnoZS = lazyToolnoZS->localCovariances(*(diphoPtr->subLeadingPhoton()->superCluster()->seed())) ;
 	
 	float leadSieienoZS;
@@ -348,11 +353,14 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 	if (!isnan(subleadCovnoZS[0]))
 	  subleadSieienoZS = sqrt (subleadCovnoZS[0]); 
 	else 
-	  continue;
+	  continue;*/
+
 
 	float leadPt     = diphoPtr->leadingPhoton()->et();
 	float leadScEta  = (diphoPtr->leadingPhoton()->superCluster())->eta();   
-	float leadR9noZS = lazyToolnoZS->e3x3(*(diphoPtr->leadingPhoton()->superCluster()->seed())) / diphoPtr->leadingPhoton()->superCluster()->rawEnergy();
+	float leadR9noZS = diphoPtr->leadingPhoton()->full5x5_r9();
+        float leadSieienoZS = diphoPtr->leadingPhoton()->full5x5_sigmaIetaIeta();
+	//float leadR9noZS = lazyToolnoZS->e3x3(*(diphoPtr->leadingPhoton()->superCluster()->seed())) / diphoPtr->leadingPhoton()->superCluster()->rawEnergy();
 	float leadHoE    = diphoPtr->leadingPhoton()->hadTowOverEm();
 	
 	float leadChIso  = diphoPtr->leadingPhoton()->egChargedHadronIso()- rho * getChargedHadronEAForPhotonIso((diphoPtr->leadingPhoton()->superCluster())->eta());
@@ -364,7 +372,9 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 	
 	float subleadPt     = diphoPtr->subLeadingPhoton()->et();
 	float subleadScEta  = (diphoPtr->subLeadingPhoton()->superCluster())->eta();   
-	float subleadR9noZS = lazyToolnoZS->e3x3(*(diphoPtr->subLeadingPhoton()->superCluster()->seed())) / diphoPtr->subLeadingPhoton()->superCluster()->rawEnergy();
+	float subleadR9noZS = diphoPtr->subLeadingPhoton()->full5x5_r9();
+        float subleadSieienoZS = diphoPtr->subLeadingPhoton()->full5x5_sigmaIetaIeta();
+	//float subleadR9noZS = lazyToolnoZS->e3x3(*(diphoPtr->subLeadingPhoton()->superCluster()->seed())) / diphoPtr->subLeadingPhoton()->superCluster()->rawEnergy();
 	float subleadHoE    = diphoPtr->subLeadingPhoton()->hadTowOverEm();
 	float subleadChIso  = diphoPtr->subLeadingPhoton()->egChargedHadronIso()- rho * getChargedHadronEAForPhotonIso((diphoPtr->subLeadingPhoton()->superCluster())->eta());
 	float subleadNeuIso = diphoPtr->subLeadingPhoton()->egNeutralHadronIso()- rho * getNeutralHadronEAForPhotonIso((diphoPtr->subLeadingPhoton()->superCluster())->eta());
@@ -375,7 +385,7 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 
 	if (leadSelel || subleadSelel) std::cout<<"passes"<<std::endl;
 	
-	//if (!leadSelel || !subleadSelel ) continue;  
+	//if (!leadSelel || !subleadSelel ) continue; //applies pho ID selection 
 	// chiara: end comment x efficiencies
 	
 
@@ -502,16 +512,18 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 		mgg  = candDiphoPtr->mass();
 				
 		//-------> individual photon properties
-		std::vector<float> leadCovnoZS = lazyToolnoZS->localCovariances(*(candDiphoPtr->leadingPhoton()->superCluster()->seed())) ;
-		std::vector<float> subleadCovnoZS = lazyToolnoZS->localCovariances(*(candDiphoPtr->subLeadingPhoton()->superCluster()->seed())) ;
+		//std::vector<float> leadCovnoZS = lazyToolnoZS->localCovariances(*(candDiphoPtr->leadingPhoton()->superCluster()->seed())) ;
+		//std::vector<float> subleadCovnoZS = lazyToolnoZS->localCovariances(*(candDiphoPtr->subLeadingPhoton()->superCluster()->seed())) ;
 		
 		pt1       = candDiphoPtr->leadingPhoton()->et();
 		ptOverM1  = pt1/mgg;
 		eta1      = candDiphoPtr->leadingPhoton()->eta();
 		phi1      = candDiphoPtr->leadingPhoton()->phi();
 		sceta1    = (candDiphoPtr->leadingPhoton()->superCluster())->eta();
-		r91       = lazyToolnoZS->e3x3(*(candDiphoPtr->leadingPhoton()->superCluster()->seed())) / candDiphoPtr->leadingPhoton()->superCluster()->rawEnergy();
-		sieie1    = sqrt(leadCovnoZS[0]);
+		r91	  = candDiphoPtr->leadingPhoton()->full5x5_r9();
+		sieie1	  = candDiphoPtr->leadingPhoton()->full5x5_sigmaIetaIeta();
+		//r91       = lazyToolnoZS->e3x3(*(candDiphoPtr->leadingPhoton()->superCluster()->seed())) / candDiphoPtr->leadingPhoton()->superCluster()->rawEnergy();
+		//sieie1    = sqrt(leadCovnoZS[0]);
 		hoe1      = candDiphoPtr->leadingPhoton()->hadTowOverEm();
 		scRawEne1 = candDiphoPtr->leadingPhoton()->superCluster()->rawEnergy();
 		/*	chiso1    = candDiphoPtr->leadingPhoton()->egChargedHadronIso();
@@ -530,8 +542,10 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 		eta2      = candDiphoPtr->subLeadingPhoton()->eta();
 		phi2      = candDiphoPtr->subLeadingPhoton()->phi();
 		sceta2    = (candDiphoPtr->subLeadingPhoton()->superCluster())->eta();
-		r92       = lazyToolnoZS->e3x3(*(candDiphoPtr->subLeadingPhoton()->superCluster()->seed())) / candDiphoPtr->subLeadingPhoton()->superCluster()->rawEnergy();;
-		sieie2    = sqrt(subleadCovnoZS[0]);
+		r92	  = candDiphoPtr->subLeadingPhoton()->full5x5_r9();
+		//r92       = lazyToolnoZS->e3x3(*(candDiphoPtr->subLeadingPhoton()->superCluster()->seed())) / candDiphoPtr->subLeadingPhoton()->superCluster()->rawEnergy();;
+		sieie2	  = candDiphoPtr->subLeadingPhoton()->full5x5_sigmaIetaIeta();
+		//sieie2    = sqrt(subleadCovnoZS[0]);
 		hoe2      = candDiphoPtr->subLeadingPhoton()->hadTowOverEm();
 		scRawEne2 = candDiphoPtr->subLeadingPhoton()->superCluster()->rawEnergy();
 		/*chiso2    = candDiphoPtr->subLeadingPhoton()->egChargedHadronIso();
@@ -575,7 +589,7 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 		genVtxX = -999.;
 		genVtxY = -999.;
 		genVtxZ = -999.;
-		if (sampleID>0) {     // MC
+		if (sampleID>0 && sampleID<10000) {     // MC
 		  for( unsigned int genLoop = 0 ; genLoop < genParticles->size(); genLoop++ ) {
 		    
 		    if( genParticles->ptrAt( genLoop )->pdgId() != 2212 || genParticles->ptrAt( genLoop )->vertex().z() != 0. ) {
@@ -592,7 +606,7 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 		genmatch2 = -999;
 		geniso1   = -999.;
 		geniso2   = -999.;
-		if (sampleID>0) {   
+		if (sampleID>0 && sampleID<10000) {   
 
 		  const auto & genPhotons = *genPhotonsHandle;
 		  
@@ -650,7 +664,7 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 
 		//--------> gen level mgg for signal samples
 		genmgg = -999.;
-		if (sampleID>99) {  // signal only 
+		if (sampleID>99 && sampleID<10000) {  // signal only 
 
 		  for( unsigned int genLoop = 0 ; genLoop < genParticles->size(); genLoop++ ) {
 		    
@@ -769,7 +783,7 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
   }           // at least 1 reco diphoton candidate  
 
   // delete
-  delete lazyToolnoZS;
+  //delete lazyToolnoZS;
 }
 
 void DiPhoAnalyzer::beginJob() {
