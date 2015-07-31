@@ -50,7 +50,7 @@ From MicroAOD to diPhotonAnaTrees
 7. Produce plots 
    7.1 Run drawOneHisto.C to plot a single variable for a single sample
 	OR
-   7.1 Run plotter.C to plot all relevant variables for a single sample (with weighting) 
+   7.1 Compile (with make) and run ./main to plot all relevant variables for a single sample (with weighting) 
    7.2 Run combiner.C to plot a single variable for all samples (needs the output of plotter.C)
     OR use runCombiner.sh that runs combiner.C for all relevant variables for all samples (also needs output of plotter.C)
 
