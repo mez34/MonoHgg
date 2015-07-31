@@ -1,3 +1,5 @@
+// root -l -b -q 'addWeightsToTree.cc(file,lumiForWeight)'
+
 #include <TFile.h>
 #include <TTree.h>
 #include <TBranch.h>

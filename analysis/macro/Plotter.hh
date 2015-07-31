@@ -1,3 +1,6 @@
+#ifndef _plottertools_
+#define _plottertools_
+
 #include "TFile.h"
 #include "TH1F.h"
 #include "TH2F.h"
@@ -12,6 +15,7 @@
 #include "TDirectory.h"
 #include "TLegend.h"
 #include "TPaveText.h"
+#include "TLatex.h"
 
 #include <iostream>
 #include <cmath>
@@ -20,8 +24,9 @@
 
 class Plotter{
 public:
-  Plotter(TString inName, TString outName, TString inSpecies);
-  ~Plotter();
+  Plotter(const TString inName, const TString outName, const TString inSpecies, const Double_t lumi);
+
+  void DoPlots();  
   void getTree();
   void make1DHistos(); 
   void make2DHistos();
@@ -29,6 +34,9 @@ public:
   void FindMinAndMax(TH1F *& h, int plotLog);
   void DrawWriteSave1DPlot(TH1F *& h, TString plotName, Bool_t DrawNorm); 
   void DrawWriteSave2DPlot(TH2F *& h, TString varX, TString varY); 
+  void CMSLumi(TCanvas *& pad, const Int_t iPosX);
+
+  ~Plotter();
 
 private:
   TString 	name;
@@ -38,6 +46,7 @@ private:
   TFile * 	outFile;
   TCanvas * 	fTH1Canv;
   TCanvas * 	fTH2Canv;
+  Double_t 	fLumi;
 
   TTree * 	tpho;
 
@@ -52,3 +61,5 @@ private:
   Int_t		range[nvar][2];
 
 };
+
+#endif

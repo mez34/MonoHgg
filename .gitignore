@@ -1,9 +1,22 @@
 #ignore in files
+*.o
 *.pyc
 *.d
 *.so
-**/job*/
-**/list*/
+._*
+*__.*
+.#*
+
+analysis/macro/main
+
+#ignore output of json parsing
+analysis/scripts/list*/
 *.list
-**/data/
-**/diPhoPlots/
+
+#ignore files created by batch jobs
+analysis/scripts/job*
+
+#ignore data and output plots
+*.root
+analysis/macro/data/
+analysis/macro/diPhoPlots/

@@ -76,7 +76,7 @@ CMS_lumi( TPad* pad, bool isSIM, int iPosX )
       lumiText += "8 TeV";
     }
    
-  cout << lumiText << endl;
+  std::cout << lumiText << std::endl;
 
   TLatex latex;
   latex.SetNDC();

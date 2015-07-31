@@ -1,14 +1,17 @@
 #include "Plotter.hh"
-#include "mkPlotsLivia/CMS_lumi.C"
+//#include "mkPlotsLivia/CMS_lumi.C"
 
-Plotter::Plotter( TString inName, TString outName, TString inSpecies){
+Plotter::Plotter( TString inName, TString outName, TString inSpecies, const Double_t lumi){
 
 
   // Get ROOT file
   name = inName;
   species = inSpecies;
+  //inFile = TFile::Open(Form("%s%s.root",name.Data(),species.Data()));
   inFile = TFile::Open(Form("%s_%s_nosel.root",name.Data(),species.Data()));
   
+  fLumi = lumi;
+
   fName = outName;
   // Make output directory
   FileStat_t dummyFileState;
@@ -33,6 +36,8 @@ Plotter::Plotter( TString inName, TString outName, TString inSpecies){
 
 }// end Plotter::Plotter
 
+
+
 Plotter::~Plotter(){
   // Write and Close output ROOT file
   outFile->Write();
@@ -45,13 +50,21 @@ Plotter::~Plotter(){
   delete fTH2Canv;
 }// end Plotter::~Plotter
 
+
+void Plotter::DoPlots(){
+  Plotter::getTree();
+  Plotter::make1DHistos();
+  Plotter::Fill1DHistos();
+  Plotter::make2DHistos();
+}// end Plotter::DoPlots
+
 void Plotter::getTree(){
   // Open Tree from inFile
   tpho = (TTree*)inFile->Get("DiPhotonTree"); 
 
   // Load variables from Tree
-  variable[NVARIABLES]    = {-1000}; // float for most variables 
-  intvariable[NVARIABLES] = {-1000}; // int for other variables (eleveto, sel, nvtx)
+  variable[NVARIABLES];    //= {-1000}; // float for most variables 
+  intvariable[NVARIABLES]; //= {-1000}; // int for other variables (eleveto, sel, nvtx)
 
   varname[0]="mgg";
   varname[1]="pt1";
@@ -247,8 +260,10 @@ void Plotter::make1DHistos(){
   hEff[2] = new TH1F(Form("Eff_PHID_eta_%s",species.Data()),Form("Eff_PHID_eta_%s",species.Data()),60,-3,3);
 
 
-  Float_t phiH[nphotons]    = {-1000}; 
-  Float_t phiHMET[nphotons] = {-1000};
+  Float_t phiH[nphotons];
+  //phiH[nphotons] = {-1000}; 
+  Float_t phiHMET[nphotons];
+  //phiHMET[nphotons] = {-1000};
 
 
   int nphotonsPass=0;
@@ -541,18 +556,25 @@ void Plotter::DrawWriteSave1DPlot(TH1F *& h, const TString plotName, const Bool_
 
   fTH1Canv->cd();
   fTH1Canv->SetLogy(0);
-  if(DrawNorm) h->DrawNormalized();
+  if(DrawNorm){ 
+    h->DrawNormalized();
+    Plotter::FindMinAndMax(h,0);
+  }
   else h->Draw();
-  Plotter::FindMinAndMax(h,0);
-  CMS_lumi( (TPad*)fTH1Canv->cd(),true,0);
+  h->GetXaxis()->SetTitleFont(42);
+  h->GetXaxis()->SetLabelSize(0.03);
+  h->GetXaxis()->SetTitleSize(0.75);
+  //CMS_lumi( (TPad*)fTH1Canv->cd(),true,0);
   h->Write();
   fTH1Canv->SaveAs(Form("%s%s/%s_%s.png",fName.Data(),species.Data(),plotName.Data(),species.Data()));
 
   fTH1Canv->SetLogy(1);
-  Plotter::FindMinAndMax(h,1);
-  if(DrawNorm) h->DrawNormalized();
+  if(DrawNorm){
+     h->DrawNormalized();
+     Plotter::FindMinAndMax(h,1);
+  }
   else h->Draw();
-  CMS_lumi( (TPad*)fTH1Canv->cd(),true,0);
+  //CMS_lumi( (TPad*)fTH1Canv->cd(),true,0);
   h->Write();
   fTH1Canv->SaveAs(Form("%s%s/%s_%s_log.png",fName.Data(),species.Data(),plotName.Data(),species.Data()));
 }// end Plotter::DrawWriteSave1DPlot
@@ -563,7 +585,7 @@ void Plotter::DrawWriteSave2DPlot(TH2F *& h, const TString varX, const TString v
   fTH2Canv->cd();
   fTH2Canv->SetLogy(0);
   h->Draw("colz");
-  CMS_lumi( (TPad*)fTH2Canv->cd(),true,0);
+  //CMS_lumi( (TPad*)fTH2Canv->cd(),true,0);
   h->Write();
   fTH2Canv->SaveAs(Form("%s%s/%s_%s_%s.png",fName.Data(),species.Data(),varY.Data(),varX.Data(),species.Data()));
 
@@ -571,7 +593,7 @@ void Plotter::DrawWriteSave2DPlot(TH2F *& h, const TString varX, const TString v
 /*  fTH2Canv->SetLogy(1);
   fTH2Canv->SetLogx(1);  
   h->Draw("colz");
-  CMS_lumi( (TPad*)fTH2Canv->cd(),true,0);
+  //CMS_lumi( (TPad*)fTH2Canv->cd(),true,0);
   h->Write();
   fTH2Canv->SaveAs(Form("%s%s/%s_%s_%s_log.png",fName.Data(),species.Data(),varY.Data(),varX.Data(),species.Data()));*/
 }// end Plotter::DrawWriteSave2DPlot
@@ -596,5 +618,109 @@ void Plotter::FindMinAndMax(TH1F *& h, int plotLog){
     h->SetMinimum(0.90*min);
   }
 }// end Plotter::FindMinAndMax
+
+void Plotter::CMSLumi(TCanvas *& canv, const Int_t iPosX){
+  TString cmsText      = "CMS";
+  Double_t cmsTextFont = 61;  // default is helvetic-bold
+  
+  Bool_t writeExtraText  = true;
+  TString extraText      = "Preliminary";
+  Double_t extraTextFont = 52;  // default is helvetica-italics
+
+  TString lumiText = Form("#sqrt{s} = 13 TeV, L = %f fb^{-1}", fLumi);
+  
+  // text sizes and text offsets with respect to the top frame
+  // in unit of the top margin size
+  Double_t lumiTextSize     = 0.6;
+  Double_t lumiTextOffset   = 0.2;
+  Double_t cmsTextSize      = 0.75;
+  Double_t cmsTextOffset    = 0.1;  // only used in outOfFrame version
+
+  Double_t relPosX    = 0.045;
+  Double_t relPosY    = 0.035;
+  Double_t relExtraDY = 1.2;
+ 
+  // ratio of "CMS" and extra text size
+  Double_t extraOverCmsTextSize  = 0.76;
+ 
+  Bool_t outOfFrame    = false;
+  if ( iPosX/10 == 0 ) {
+    outOfFrame = true;
+  }
+
+  Int_t alignY_=3;
+  Int_t alignX_=2;
+  if (iPosX/10 == 0) {alignX_ = 1;}
+  if (iPosX == 0)    {alignY_ = 1;}
+  if (iPosX/10 == 1) {alignX_ = 1;}
+  if (iPosX/10 == 2) {alignX_ = 2;}
+  if (iPosX/10 == 3) {alignX_ = 3;}
+  Int_t align_ = 10*alignX_ + alignY_;
+
+  Double_t H = canv->GetWh();
+  Double_t W = canv->GetWw();
+  Double_t l = canv->GetLeftMargin();
+  Double_t t = canv->GetTopMargin();
+  Double_t r = canv->GetRightMargin();
+  Double_t b = canv->GetBottomMargin();
+  Double_t e = 0.025;
+
+  TLatex latex;
+  latex.SetNDC();
+  latex.SetTextAngle(0);
+  latex.SetTextColor(kBlack);    
+
+  Double_t extraTextSize = extraOverCmsTextSize*cmsTextSize;
+
+  latex.SetTextFont(42);
+  latex.SetTextAlign(31); 
+  latex.SetTextSize(lumiTextSize*t);    
+  latex.DrawLatex(1-r,1-t+lumiTextOffset*t,lumiText);
+
+  if (outOfFrame) {
+    latex.SetTextFont(cmsTextFont);
+    latex.SetTextAlign(11); 
+    latex.SetTextSize(cmsTextSize*t);    
+    latex.DrawLatex(l,1-t+lumiTextOffset*t,cmsText);
+  }
+  
+  Double_t posX_;
+  if (iPosX%10 <= 1) {
+    posX_ =   l + relPosX*(1-l-r);
+  }
+  else if (iPosX%10 == 2) {
+    posX_ =  l + 0.5*(1-l-r);
+  }
+  else if (iPosX%10 == 3) {
+    posX_ =  1-r - relPosX*(1-l-r);
+  }
+
+  Double_t posY_ = 1-t - relPosY*(1-t-b);
+
+  if (!outOfFrame) {
+    latex.SetTextFont(cmsTextFont);
+    latex.SetTextSize(cmsTextSize*t);
+    latex.SetTextAlign(align_);
+    latex.DrawLatex(posX_, posY_, cmsText);
+    
+    if (writeExtraText) {
+      latex.SetTextFont(extraTextFont);
+      latex.SetTextAlign(align_);
+      latex.SetTextSize(extraTextSize*t);
+      latex.DrawLatex(posX_, posY_- relExtraDY*cmsTextSize*t, extraText);
+    }
+  }
+  
+  else if (outOfFrame && writeExtraText){
+    if (iPosX == 0) {
+	posX_ = l +  relPosX*(1-l-r)+0.05;
+	posY_ = 1-t+lumiTextOffset*t;
+    }
+    latex.SetTextFont(extraTextFont);
+    latex.SetTextSize(extraTextSize*t);
+    latex.SetTextAlign(align_);
+    latex.DrawLatex(posX_, posY_, extraText);      
+  }
+}// end Plotter::CMSLumi
 
 
