@@ -1,14 +1,17 @@
 #include "Combiner.hh"
 
-Combiner::Combiner( SamplePairVec Samples, const Double_t inLumi, const ColorMap colorMap, const TString outdir){
+Combiner::Combiner( SamplePairVec Samples, const Double_t inLumi, const ColorMap colorMap, const TString outdir, const Bool_t doNmin1){
+
+  if (doNmin1) addText = "_n-1";
+  else addText="";
 
   lumi	= inLumi;
   fOutDir = outdir;
   TString fOut = "comb";
 
   //MakeOutDirectory(Form("%s%s",fOutDir.Data(),fOut.Data()));
-  fOutFile = new TFile(Form("%s%s/combplots.root",fOutDir.Data(),fOut.Data()),"RECREATE");
-  CheckValidFile(fOutFile, Form("%s%s/combplots.root",fOutDir.Data(),fOut.Data())); 
+  fOutFile = new TFile(Form("%s%s/combplots%s.root",fOutDir.Data(),fOut.Data(),addText.Data()),"RECREATE");
+  CheckValidFile(fOutFile, Form("%s%s/combplots%s.root",fOutDir.Data(),fOut.Data(),addText.Data())); 
 
   for (SamplePairVecIter iter = Samples.begin(); iter != Samples.end(); ++iter){
     if ( (*iter).second == 1 ) {fBkgNames.push_back((*iter).first);} // background
@@ -68,26 +71,27 @@ Combiner::Combiner( SamplePairVec Samples, const Double_t inLumi, const ColorMap
   for (UInt_t th1d = 0; th1d < fNTH1D; th1d++){ // loop over double hists
     fInDataTH1DHists[th1d].resize(fNData); 
     for (UInt_t data = 0; data < fNData; data++) { // init data double hists
-      fInDataTH1DHists[th1d][data] = (TH1D*)fDataFiles[data]->Get(Form("%s_%s",fTH1DNames[th1d].Data(),fDataNames[data].Data()));
+      fInDataTH1DHists[th1d][data] = (TH1D*)fDataFiles[data]->Get(Form("%s_%s%s",fTH1DNames[th1d].Data(),fDataNames[data].Data(),addText.Data()));
       CheckValidTH1D(fInDataTH1DHists[th1d][data],fTH1DNames[th1d],fDataFiles[data]->GetName());
     }
     fInBkgTH1DHists[th1d].resize(fNBkg); 
     for (UInt_t mc = 0; mc < fNBkg; mc++) { // init bkg double hists
-      fInBkgTH1DHists[th1d][mc] = (TH1D*)fBkgFiles[mc]->Get(Form("%s_%s",fTH1DNames[th1d].Data(),fBkgNames[mc].Data()));
+      fInBkgTH1DHists[th1d][mc] = (TH1D*)fBkgFiles[mc]->Get(Form("%s_%s%s",fTH1DNames[th1d].Data(),fBkgNames[mc].Data(),addText.Data()));
+      std::cout << Form("%s_%s%s",fTH1DNames[th1d].Data(),fBkgNames[mc].Data(),addText.Data()) << std::endl; 
       CheckValidTH1D(fInBkgTH1DHists[th1d][mc],fTH1DNames[th1d],fBkgFiles[mc]->GetName());
       fInBkgTH1DHists[th1d][mc]->SetFillColor(fColorMap[fBkgNames[mc]]);
       fInBkgTH1DHists[th1d][mc]->SetLineColor(kBlack);
     }
     fInSigTH1DHists[th1d].resize(fNSig); 
     for (UInt_t mc = 0; mc < fNSig; mc++) { // init sig double hists
-      fInSigTH1DHists[th1d][mc] = (TH1D*)fSigFiles[mc]->Get(Form("%s_%s",fTH1DNames[th1d].Data(),fSigNames[mc].Data()));
+      fInSigTH1DHists[th1d][mc] = (TH1D*)fSigFiles[mc]->Get(Form("%s_%s%s",fTH1DNames[th1d].Data(),fSigNames[mc].Data(),addText.Data()));
+      CheckValidTH1D(fInSigTH1DHists[th1d][mc],fTH1DNames[th1d],fSigFiles[mc]->GetName());
       fInSigTH1DHists[th1d][mc]->SetLineColor(fColorMap[fSigNames[mc]]);
     }
   }
 
   if (fNData > 0) fOutDataTH1DHists.resize(fNTH1D);
   fOutBkgTH1DStacks.resize(fNTH1D);
-  //fOutSigTH1DHists.resize(fNTH1D);
   for (UInt_t th1d = 0; th1d < fNTH1D; th1d++){
     fOutBkgTH1DStacks[th1d] = new THStack("","");
   }
@@ -127,8 +131,12 @@ Combiner::~Combiner(){
     delete fOutTH1DCanvases[th1d];
     
     for (UInt_t data = 0; data < fNData; data++) { delete fInDataTH1DHists[th1d][data]; }
-    for (UInt_t mc = 0; mc < fNBkg; mc++) { delete fInBkgTH1DHists[th1d][mc]; }
-    for (UInt_t mc = 0; mc < fNSig; mc++) { delete fInSigTH1DHists[th1d][mc]; }
+    for (UInt_t mc = 0; mc < fNBkg; mc++) { 
+      delete fInBkgTH1DHists[th1d][mc];
+    }
+    for (UInt_t mc = 0; mc < fNSig; mc++) {
+      delete fInSigTH1DHists[th1d][mc];
+    }
   }
 
   for (UInt_t data = 0; data < fNData; data++) { delete fDataFiles[data]; }
@@ -171,15 +179,18 @@ void Combiner::OverlayPlots(){
   }// end loop over th1d histos
   Combiner::MakeOutputCanvas();
 
-}// end Combiner::StackPlots
+}// end Combiner::OverlayPlots
 
 
 void Combiner::MakeOutputCanvas(){
   for (UInt_t th1d = 0; th1d < fNTH1D; th1d++){
     Bool_t isLogY = true;
+    // do stack plots first
     Combiner::DrawCanvasStack(th1d,isLogY);
     isLogY = false;
     Combiner::DrawCanvasStack(th1d,isLogY);
+    isLogY = true;
+    // do overlay next 
     isLogY = true;
     Combiner::DrawCanvasOverlay(th1d,isLogY);
     isLogY = false;
@@ -196,10 +207,14 @@ void Combiner::DrawCanvasOverlay(const UInt_t th1d, const Bool_t isLogY){
 
    
   for (UInt_t mc = 0; mc < fNSig; mc++){
-    fInSigTH1DHists[th1d][mc]->Scale(1.0/fInSigTH1DHists[th1d][mc]->Integral());
+    if (fInSigTH1DHists[th1d][mc]->Integral() > 0){
+      fInSigTH1DHists[th1d][mc]->Scale(1.0/fInSigTH1DHists[th1d][mc]->Integral());
+    }
   }
   for (UInt_t mc = 0; mc < fNBkg; mc++){
-    fInBkgTH1DHists[th1d][mc]->Scale(1.0/fInBkgTH1DHists[th1d][mc]->Integral());
+    if (fInBkgTH1DHists[th1d][mc]->Integral() > 0 ){
+      fInBkgTH1DHists[th1d][mc]->Scale(1.0/fInBkgTH1DHists[th1d][mc]->Integral());
+    }
     fInBkgTH1DHists[th1d][mc]->SetFillColor(0);
     fInBkgTH1DHists[th1d][mc]->SetLineColor(fColorMap[fBkgNames[mc]]);
   }
@@ -227,9 +242,9 @@ void Combiner::DrawCanvasOverlay(const UInt_t th1d, const Bool_t isLogY){
   fOutTH1DStackPads[th1d]->SetLogy(isLogY);
   fOutTH1DCanvases[th1d]->cd();
 
-  fOutTH1DCanvases[th1d]->SaveAs(Form("%scomb/%s_comb%s.png",fOutDir.Data(),fTH1DNames[th1d].Data(),suffix.Data()));  
+  fOutTH1DCanvases[th1d]->SaveAs(Form("%scomb/%s_comb%s%s.png",fOutDir.Data(),fTH1DNames[th1d].Data(),addText.Data(),suffix.Data()));  
   fOutFile->cd();
-  fOutTH1DCanvases[th1d]->Write(Form("%s%s_comb",fTH1DNames[th1d].Data(),suffix.Data()));
+  fOutTH1DCanvases[th1d]->Write(Form("%s%s_comb%s",fTH1DNames[th1d].Data(),suffix.Data(),addText.Data()));
 
 
 }// end Combiner::DrawCanvasOverlay
@@ -265,9 +280,9 @@ void Combiner::DrawCanvasStack(const UInt_t th1d, const Bool_t isLogY){
   fOutTH1DStackPads[th1d]->SetLogy(isLogY);
   fOutTH1DCanvases[th1d]->cd();
 
-  fOutTH1DCanvases[th1d]->SaveAs(Form("%scomb/%s_stack%s.png",fOutDir.Data(),fTH1DNames[th1d].Data(),suffix.Data()));  
+  fOutTH1DCanvases[th1d]->SaveAs(Form("%scomb/%s_stack%s%s.png",fOutDir.Data(),fTH1DNames[th1d].Data(),addText.Data(),suffix.Data()));  
   fOutFile->cd();
-  fOutTH1DCanvases[th1d]->Write(Form("%s%s",fTH1DNames[th1d].Data(),suffix.Data()));
+  fOutTH1DCanvases[th1d]->Write(Form("%s%s_stack%s",fTH1DNames[th1d].Data(),suffix.Data(),addText.Data()));
 
 }// end Combiner::DrawCanvasStack
 
@@ -314,12 +329,12 @@ Double_t Combiner::GetMinimum(const UInt_t th1d) {
 void Combiner::InitTH1DNames(){
   // higgs & met variables
   fTH1DNames.push_back("mgg");
-/*  fTH1DNames.push_back("ptgg");
-  fTH1DNames.push_back("phi_H");
+  fTH1DNames.push_back("ptgg");
   fTH1DNames.push_back("t1pfmetPhi");
-  fTH1DNames.push_back("phi_HMET");
   fTH1DNames.push_back("t1pfmet");
   fTH1DNames.push_back("nvtx");
+  if (addText!="_n-1"){ fTH1DNames.push_back("phi_H"); }
+  if (addText!="_n-1"){ fTH1DNames.push_back("phi_HMET"); }
 
   // photon variables
   fTH1DNames.push_back("pt1");
@@ -343,5 +358,5 @@ void Combiner::InitTH1DNames(){
   fTH1DNames.push_back("chiso2");
   fTH1DNames.push_back("neuiso1");
   fTH1DNames.push_back("neuiso2");
-*/
+
 }// end Combiner::InitTH1DNames

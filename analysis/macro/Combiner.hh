@@ -41,7 +41,7 @@ typedef std::vector<TCanvas*> TCanvVec;
 
 class Combiner{
 public:
-  Combiner(const SamplePairVec Samples, const Double_t inLumi, const ColorMap colorMap, const TString outname);
+  Combiner(const SamplePairVec Samples, const Double_t inLumi, const ColorMap colorMap, const TString outname, const Bool_t doNmin1);
   void InitTH1DNames();
   void DoComb();
   void OverlayPlots();
@@ -54,6 +54,7 @@ public:
   ~Combiner();
 
 private:
+  TString	addText;
   Double_t 	lumi;
 
   UInt_t	fNData;
@@ -80,10 +81,6 @@ private:
   TH1DVecVec	fInDataTH1DHists;
   TH1DVecVec	fInBkgTH1DHists;
   TH1DVecVec	fInSigTH1DHists;
-
-  TH1DVecVec    fInDataTH1Dn1Hists;
-  TH1DVecVec	fInBkgTH1Dn1Hists;
-  TH1DVecVec	fInSigTH1Dn1Hists;
 
   TH1DVec	fOutBkgTH1DHists;
   TH1DVec	fOutSigTH1DHists;

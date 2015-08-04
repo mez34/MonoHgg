@@ -279,8 +279,8 @@ void Plotter::make1DHistos(){
     Bool_t passNHIso_EE1 = false;
     Bool_t passPHIso_EB1 = false;
     Bool_t passPHIso_EE1 = false;
-    Bool_t passSieie_EB1 = false; 
-    Bool_t passSieie_EE1 = false;
+    Bool_t passSieie_EB1 = true; //FIXME this is bc Sieie dist. not working in signal
+    Bool_t passSieie_EE1 = true; //FIXME
     Bool_t passHoe_EB1 = false;
     Bool_t passHoe_EE1 = false;
     Bool_t passAll_EB1 = false;
@@ -292,8 +292,8 @@ void Plotter::make1DHistos(){
     Bool_t passNHIso_EE2 = false;
     Bool_t passPHIso_EB2 = false;
     Bool_t passPHIso_EE2 = false;
-    Bool_t passSieie_EB2 = false; 
-    Bool_t passSieie_EE2 = false;
+    Bool_t passSieie_EB2 = true; //FIXME
+    Bool_t passSieie_EE2 = true; //FIXME
     Bool_t passHoe_EB2 = false;
     Bool_t passHoe_EE2 = false;
     Bool_t passAll_EB2 = false;

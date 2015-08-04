@@ -55,8 +55,8 @@ int main(){
   GGHGG->DoPlots();
   delete GGHGG;
   std::cout << "Finished GluGluH sample" << std::endl;
-*/
-/*  std::cout << "Working on DMHgg M1000 sample" << std::endl;
+
+  std::cout << "Working on DMHgg M1000 sample" << std::endl;
   Plotter * DMH_M1000= new Plotter("./data/50ns/","./diPhoPlots/50ns/","DMHtoGG_M1000",30);
   DMH_M1000->DoPlots();
   delete DMH_M1000;
@@ -155,8 +155,11 @@ int main(){
 
   // make overlayed and stack plots
   // Combiner( Samples, lumi, colorMap , outDir )
-  Combiner *combAll = new Combiner(Samples,300,colorMap,outDir);
+  Combiner *combAll = new Combiner(Samples,300,colorMap,outDir,false);
   combAll->DoComb();
   delete combAll;   
 
+  Combiner *combAlln1 = new Combiner(Samples,300,colorMap,outDir,true);
+  combAlln1->DoComb();
+  delete combAlln1;   
 }
