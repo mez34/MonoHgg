@@ -1,4 +1,6 @@
 #include "Plotter.hh"
+#include "Style.hh"
+#include "../../../DataFormats/Math/interface/deltaPhi.h"
 //#include "mkPlotsLivia/CMS_lumi.C"
 
 Plotter::Plotter( TString inName, TString outName, TString inSpecies, const Double_t lumi){
@@ -7,8 +9,8 @@ Plotter::Plotter( TString inName, TString outName, TString inSpecies, const Doub
   // Get ROOT file
   name = inName;
   species = inSpecies;
-  //inFile = TFile::Open(Form("%s%s.root",name.Data(),species.Data()));
-  inFile = TFile::Open(Form("%s_%s_nosel.root",name.Data(),species.Data()));
+  inFile = TFile::Open(Form("%s%s.root",name.Data(),species.Data()));
+  //inFile = TFile::Open(Form("%s_%s_nosel.root",name.Data(),species.Data()));
   
   fLumi = lumi;
 
@@ -54,7 +56,6 @@ Plotter::~Plotter(){
 void Plotter::DoPlots(){
   Plotter::getTree();
   Plotter::make1DHistos();
-  Plotter::Fill1DHistos();
   Plotter::make2DHistos();
 }// end Plotter::DoPlots
 
@@ -98,7 +99,7 @@ void Plotter::getTree(){
   varname[29]="nvtx";
 
   for(int z=0; z<NVARIABLES; ++z){
-    if(z==8 || z==16 || z==25 || z==26 || z==27 || z==28 || z==29){ //eleveto, sel, nvtx
+    if(z==8 || z==16 || z>=25 ){ //eleveto, sel, nvtx
        tpho->SetBranchAddress(varname[z],&intvariable[z]);
      }
      else{
@@ -335,7 +336,10 @@ void Plotter::make1DHistos(){
     if (passCHIso_EE2 && passNHIso_EE2 && passPHIso_EE2 && passSieie_EE2 && passHoe_EE2) passAll_EE2 = true;
 
     for (int z=0; z<NVARIABLES; ++z){
-      hVar[z]->Fill(variable[z],variable[18]);
+      if (z==8 || z==16 || z>=25) hVar[z]->Fill(intvariable[z],variable[18]);
+      else{
+        hVar[z]->Fill(variable[z],variable[18]);
+      }
       if (z==3 || z==4 || z==5 || z==6 || z==7 || z==11 || z==12 || z==13 || z==14 || z==15){ //n-1 plots for phoID var
         if ((passNHIso_EB1 && passPHIso_EB1 && passSieie_EB1 && passHoe_EB1) || (passNHIso_EE1 && passPHIso_EE1 && passSieie_EE1 && passHoe_EE1 )) hVarNmin1[5]->Fill(variable[5],variable[18]);
         if ((passCHIso_EB1 && passPHIso_EB1 && passSieie_EB1 && passHoe_EB1) || (passCHIso_EE1 && passPHIso_EE1 && passSieie_EE1 && passHoe_EE1 )) hVarNmin1[7]->Fill(variable[7],variable[18]);
@@ -379,7 +383,8 @@ void Plotter::make1DHistos(){
    
 
     phiH[i]=TMath::ATan( (variable[1]*TMath::Sin(variable[21]) - variable[9]*TMath::Sin(variable[22])) / (variable[1]*TMath::Cos(variable[21]) - variable[9]*TMath::Cos(variable[22])) );
-    phiHMET[i]=phiH[i]-variable[20];
+    phiHMET[i]=deltaPhi(phiH[i],variable[20]);
+    //phiHMET[i]=phiH[i]-variable[20];
 
     hPhi[0]->Fill(phiH[i],variable[18]);
     hPhi[1]->Fill(variable[20],variable[18]);
@@ -539,42 +544,46 @@ void Plotter::make2DHistos(){
 }// end Plotter::make2DHistos
 
 
-void Plotter::Fill1DHistos(){
-  for (Int_t i=0; i<nphotons; i++){
-    for (Int_t z=0; z<NVARIABLES; z++){
-      //hVar[z]->Fill(variable[z],variable[18]); //Fill by weight
-    } 
-  }
-}// end Plotter::Fill1DHistos
-
 void Plotter::DrawWriteSave1DPlot(TH1F *& h, const TString plotName, const Bool_t DrawNorm){
+
+  fTH1Canv->cd();
+
   gStyle->SetOptStat(1110);
   gStyle->SetStatBorderSize(0);
   gStyle->SetStatFont(42);
   gStyle->SetStatX(0.84);
   gStyle->SetStatY(0.93);
 
-  fTH1Canv->cd();
   fTH1Canv->SetLogy(0);
   if(DrawNorm){ 
     h->DrawNormalized();
     Plotter::FindMinAndMax(h,0);
   }
-  else h->Draw();
-  h->GetXaxis()->SetTitleFont(42);
-  h->GetXaxis()->SetLabelSize(0.03);
-  h->GetXaxis()->SetTitleSize(0.75);
-  //CMS_lumi( (TPad*)fTH1Canv->cd(),true,0);
+  else{
+    h->Draw();
+    h->SetMaximum(1.10);
+  }
+
+  //Style::CMSLumi(fTH1Canv,0);
+  Style * cmsLumi = new Style(0.3);
+  cmsLumi->CMSLumi(fTH1Canv,1);
+
+//  h->GetXaxis()->SetTitleFont(42);
+//  h->GetXaxis()->SetLabelSize(0.03);
+//  h->GetXaxis()->SetTitleSize(0.75);
   h->Write();
   fTH1Canv->SaveAs(Form("%s%s/%s_%s.png",fName.Data(),species.Data(),plotName.Data(),species.Data()));
+  delete cmsLumi;
 
   fTH1Canv->SetLogy(1);
   if(DrawNorm){
      h->DrawNormalized();
      Plotter::FindMinAndMax(h,1);
   }
-  else h->Draw();
-  //CMS_lumi( (TPad*)fTH1Canv->cd(),true,0);
+  else{
+    h->Draw();
+    h->SetMaximum(1.1*h->GetMaximum());
+  }
   h->Write();
   fTH1Canv->SaveAs(Form("%s%s/%s_%s_log.png",fName.Data(),species.Data(),plotName.Data(),species.Data()));
 }// end Plotter::DrawWriteSave1DPlot
@@ -585,15 +594,14 @@ void Plotter::DrawWriteSave2DPlot(TH2F *& h, const TString varX, const TString v
   fTH2Canv->cd();
   fTH2Canv->SetLogy(0);
   h->Draw("colz");
-  //CMS_lumi( (TPad*)fTH2Canv->cd(),true,0);
   h->Write();
+  //Plotter::CMS_Lumi(0.3)
   fTH2Canv->SaveAs(Form("%s%s/%s_%s_%s.png",fName.Data(),species.Data(),varY.Data(),varX.Data(),species.Data()));
 
   // FIXME problem with log plots (min always is zero)
 /*  fTH2Canv->SetLogy(1);
   fTH2Canv->SetLogx(1);  
   h->Draw("colz");
-  //CMS_lumi( (TPad*)fTH2Canv->cd(),true,0);
   h->Write();
   fTH2Canv->SaveAs(Form("%s%s/%s_%s_%s_log.png",fName.Data(),species.Data(),varY.Data(),varX.Data(),species.Data()));*/
 }// end Plotter::DrawWriteSave2DPlot
@@ -618,109 +626,5 @@ void Plotter::FindMinAndMax(TH1F *& h, int plotLog){
     h->SetMinimum(0.90*min);
   }
 }// end Plotter::FindMinAndMax
-
-void Plotter::CMSLumi(TCanvas *& canv, const Int_t iPosX){
-  TString cmsText      = "CMS";
-  Double_t cmsTextFont = 61;  // default is helvetic-bold
-  
-  Bool_t writeExtraText  = true;
-  TString extraText      = "Preliminary";
-  Double_t extraTextFont = 52;  // default is helvetica-italics
-
-  TString lumiText = Form("#sqrt{s} = 13 TeV, L = %f fb^{-1}", fLumi);
-  
-  // text sizes and text offsets with respect to the top frame
-  // in unit of the top margin size
-  Double_t lumiTextSize     = 0.6;
-  Double_t lumiTextOffset   = 0.2;
-  Double_t cmsTextSize      = 0.75;
-  Double_t cmsTextOffset    = 0.1;  // only used in outOfFrame version
-
-  Double_t relPosX    = 0.045;
-  Double_t relPosY    = 0.035;
-  Double_t relExtraDY = 1.2;
- 
-  // ratio of "CMS" and extra text size
-  Double_t extraOverCmsTextSize  = 0.76;
- 
-  Bool_t outOfFrame    = false;
-  if ( iPosX/10 == 0 ) {
-    outOfFrame = true;
-  }
-
-  Int_t alignY_=3;
-  Int_t alignX_=2;
-  if (iPosX/10 == 0) {alignX_ = 1;}
-  if (iPosX == 0)    {alignY_ = 1;}
-  if (iPosX/10 == 1) {alignX_ = 1;}
-  if (iPosX/10 == 2) {alignX_ = 2;}
-  if (iPosX/10 == 3) {alignX_ = 3;}
-  Int_t align_ = 10*alignX_ + alignY_;
-
-  Double_t H = canv->GetWh();
-  Double_t W = canv->GetWw();
-  Double_t l = canv->GetLeftMargin();
-  Double_t t = canv->GetTopMargin();
-  Double_t r = canv->GetRightMargin();
-  Double_t b = canv->GetBottomMargin();
-  Double_t e = 0.025;
-
-  TLatex latex;
-  latex.SetNDC();
-  latex.SetTextAngle(0);
-  latex.SetTextColor(kBlack);    
-
-  Double_t extraTextSize = extraOverCmsTextSize*cmsTextSize;
-
-  latex.SetTextFont(42);
-  latex.SetTextAlign(31); 
-  latex.SetTextSize(lumiTextSize*t);    
-  latex.DrawLatex(1-r,1-t+lumiTextOffset*t,lumiText);
-
-  if (outOfFrame) {
-    latex.SetTextFont(cmsTextFont);
-    latex.SetTextAlign(11); 
-    latex.SetTextSize(cmsTextSize*t);    
-    latex.DrawLatex(l,1-t+lumiTextOffset*t,cmsText);
-  }
-  
-  Double_t posX_;
-  if (iPosX%10 <= 1) {
-    posX_ =   l + relPosX*(1-l-r);
-  }
-  else if (iPosX%10 == 2) {
-    posX_ =  l + 0.5*(1-l-r);
-  }
-  else if (iPosX%10 == 3) {
-    posX_ =  1-r - relPosX*(1-l-r);
-  }
-
-  Double_t posY_ = 1-t - relPosY*(1-t-b);
-
-  if (!outOfFrame) {
-    latex.SetTextFont(cmsTextFont);
-    latex.SetTextSize(cmsTextSize*t);
-    latex.SetTextAlign(align_);
-    latex.DrawLatex(posX_, posY_, cmsText);
-    
-    if (writeExtraText) {
-      latex.SetTextFont(extraTextFont);
-      latex.SetTextAlign(align_);
-      latex.SetTextSize(extraTextSize*t);
-      latex.DrawLatex(posX_, posY_- relExtraDY*cmsTextSize*t, extraText);
-    }
-  }
-  
-  else if (outOfFrame && writeExtraText){
-    if (iPosX == 0) {
-	posX_ = l +  relPosX*(1-l-r)+0.05;
-	posY_ = 1-t+lumiTextOffset*t;
-    }
-    latex.SetTextFont(extraTextFont);
-    latex.SetTextSize(extraTextSize*t);
-    latex.SetTextAlign(align_);
-    latex.DrawLatex(posX_, posY_, extraText);      
-  }
-}// end Plotter::CMSLumi
 
 

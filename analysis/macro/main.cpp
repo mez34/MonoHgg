@@ -1,12 +1,4 @@
-#include "Plotter.hh"
-#include "TROOT.h"
 
-#include <iostream>
-
-
-int main(){
-  //gROOT->LoadMacro("Plotter.cpp++g");
-  
   // Compile:
   // make clean
   // make
@@ -19,18 +11,150 @@ int main(){
   // 2nd : output data location
   // 3rd : name of sample 
   // 4th : lumi of data
- 
-//  Plotter test1("./data/50ns/","./diPhoPlots/50ns/","GJets");
 
-  Plotter * test1 = new Plotter("./data/ALL_nosel/diPhotons","./diPhoPlots/ALL_nosel/","DMHtoGG",30);
-  test1->DoPlots();
-  delete test1;
 
-/*  Plotter test2("./data/50ns/","./diPhoPlots/50ns/","QCD");
-  test2.getTree();
-  test2.make1DHistos();
-  test2.make2DHistos();
-  test2.Fill1DHistos();
+#include "Plotter.hh"
+#include "Combiner.hh"
+#include "TROOT.h"
+
+#include <iostream>
+
+typedef std::pair<TString,Double_t>  SampleYieldPair;
+typedef std::vector<SampleYieldPair> SampleYieldPairVec;
+
+static bool sortByYield(const SampleYieldPair& mcpair1, const SampleYieldPair& mcpair2){
+  return mcpair1.second <= mcpair2.second;
+}
+
+int main(){
+
+  TString inDir = "data/50ns/";
+  TString outDir = "diPhoPlots/50ns/";
+  
+  //for CMSSW_7_0_pre9: run with root
+  //gROOT->LoadMacro("Plotter.cpp++g");
+  //Plotter * test1 = new Plotter("./data/ALL_nosel/diPhotons","./diPhoPlots/ALL_nosel/","DMHtoGG",30);
+
+/*
+  std::cout << "Working on GJets sample" << std::endl;
+  Plotter * GJets = new Plotter("./data/50ns/","./diPhoPlots/50ns/","GJets",30);
+  GJets->DoPlots();
+  delete GJets;
+  std::cout << "Finished GJets sample" << std::endl;
+
+  std::cout << "Working on QCD sample" << std::endl;
+  Plotter * QCD = new Plotter("./data/50ns/","./diPhoPlots/50ns/","QCD",30);
+  QCD->DoPlots();
+  delete QCD;
+  std::cout << "Finished QCD sample" << std::endl;
+
+  std::cout << "Working on GluGluH sample" << std::endl;
+  Plotter * GGHGG = new Plotter("./data/50ns/","./diPhoPlots/50ns/","GluGluHToGG",30);
+  GGHGG->DoPlots();
+  delete GGHGG;
+  std::cout << "Finished GluGluH sample" << std::endl;
 */
+/*  std::cout << "Working on DMHgg M1000 sample" << std::endl;
+  Plotter * DMH_M1000= new Plotter("./data/50ns/","./diPhoPlots/50ns/","DMHtoGG_M1000",30);
+  DMH_M1000->DoPlots();
+  delete DMH_M1000;
+  std::cout << "Finished DMHgg M1000 sample" << std::endl;
+
+  std::cout << "Working on DMHgg M100 sample" << std::endl;
+  Plotter * DMH_M100= new Plotter("./data/50ns/","./diPhoPlots/50ns/","DMHtoGG_M100",30);
+  DMH_M100->DoPlots();
+  delete DMH_M100;
+  std::cout << "Finished DMHgg M100 sample" << std::endl;
+
+  std::cout << "Working on DMHgg M10 sample" << std::endl;
+  Plotter * DMH_M10= new Plotter("./data/50ns/","./diPhoPlots/50ns/","DMHtoGG_M10",30);
+  DMH_M10->DoPlots();
+  delete DMH_M10;
+  std::cout << "Finished DMHgg M10 sample" << std::endl;
+
+  std::cout << "Working on DMHgg M1 sample" << std::endl;
+  Plotter * DMH_M1= new Plotter("./data/50ns/","./diPhoPlots/50ns/","DMHtoGG_M1",30);
+  DMH_M1->DoPlots();
+  delete DMH_M1;
+  std::cout << "Finished DMHgg M1 sample" << std::endl;
+*/
+
+  ColorMap colorMap;
+  colorMap["qcd"] 	= kBlue;
+  colorMap["gjets"] 	= kGreen;
+  colorMap["gluglu"]	= kCyan;
+  colorMap["dmhgg1"]	= kMagenta;
+  colorMap["dmhgg2"]	= kMagenta+1;
+  colorMap["dmhgg3"]	= kMagenta+2;
+  colorMap["dmhgg4"]	= kMagenta+3;
+
+  SamplePairVec Samples; // vector to also be used for stack plots
+  Samples.push_back(SamplePair("QCD",1)); 
+  Samples.push_back(SamplePair("GJets",1)); 
+  Samples.push_back(SamplePair("GluGluHToGG",1)); 
+  Samples.push_back(SamplePair("DMHtoGG_M1000",0)); 
+  Samples.push_back(SamplePair("DMHtoGG_M100",0)); 
+  Samples.push_back(SamplePair("DMHtoGG_M10",0)); 
+  Samples.push_back(SamplePair("DMHtoGG_M1",0)); 
+
+  UInt_t nbkg = 0;
+  UInt_t nsig = 0;
+  UInt_t ndata = 0;
+
+  for (SamplePairVecIter iter=Samples.begin(); iter != Samples.end(); ++iter){
+    std::cout << "Analyzing Sample: "<< (*iter).first.Data() << std::endl;
+    if ((*iter).second == 1) {nbkg++;}
+    else if ((*iter).second == 0) {nsig++;}
+    else {ndata++;} 
+  }
+  UInt_t nsamples = nbkg + nsig + ndata;
+
+  SamplePairVec BkgSamples;
+  SamplePairVec SigSamples;
+  SamplePairVec DataSamples;
+  for (UInt_t isample = 0; isample < nsamples; isample++){
+    if (Samples[isample].second == 0) SigSamples.push_back(Samples[isample]);
+    else if (Samples[isample].second == 1) BkgSamples.push_back(Samples[isample]);
+    else  DataSamples.push_back(Samples[isample]);
+  }
+
+  // to sort MC by smallest to largest
+  SampleYieldPairVec tmp_mcyields;
+  for (UInt_t mc = 0; mc < nbkg; mc++) {
+      // open mc file first
+      TString mcfilename = Form("diPhoPlots/50ns/%s/plots_%s.root",BkgSamples[mc].first.Data(),BkgSamples[mc].first.Data());
+      TFile * tmp_mcfile = TFile::Open(mcfilename.Data());
+      // open nvtx plot
+      TH1D * tmpnvtx = (TH1D*)tmp_mcfile->Get(Form("nvtx_%s_n-1",BkgSamples[mc].first.Data()));
+      // get yield and push back with corresponding sample name
+      tmp_mcyields.push_back(SampleYieldPair(BkgSamples[mc].first,tmpnvtx->Integral()));
+
+      delete tmpnvtx;
+      delete tmp_mcfile;
+   }
+
+   std::sort(tmp_mcyields.begin(),tmp_mcyields.end(),sortByYield);
+   std::cout << "Finished sorting MC, now put samples in right order to be processed" << std::endl;
+   BkgSamples.clear();
+    for (UInt_t mc = 0; mc < nbkg; mc++) { // init mc double hists
+      BkgSamples.push_back(SamplePair(tmp_mcyields[mc].first,1));
+    }
+
+  Samples.clear();
+  for (UInt_t data = 0; data < ndata; data++ ) {
+    Samples.push_back(DataSamples[data]);
+  }
+  for (UInt_t mc = 0; mc < nbkg; mc++ ) {
+    Samples.push_back(BkgSamples[mc]);
+  }
+  for (UInt_t mc = 0; mc < nsig; mc++) {
+    Samples.push_back(SigSamples[mc]);
+  }
+
+  // make overlayed and stack plots
+  // Combiner( Samples, lumi, colorMap , outDir )
+  Combiner *combAll = new Combiner(Samples,300,colorMap,outDir);
+  combAll->DoComb();
+  delete combAll;   
 
 }

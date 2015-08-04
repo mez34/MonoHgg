@@ -1,5 +1,7 @@
 #! /bin/sh
-#run combiner.C to make the plots for all variables
+
+#this run combiner.C to make the plots for all variables
+#call by ./runCombiner.C 
 
 root -l -b << EOF
 .L combiner.C

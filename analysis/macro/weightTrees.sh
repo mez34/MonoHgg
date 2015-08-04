@@ -10,7 +10,11 @@ addWeights("data/50ns/GJet_Pt-40toInf.root", $lumi);
 addWeights("data/50ns/QCD_Pt-30to40.root", $lumi);
 addWeights("data/50ns/QCD_Pt-30toInf.root", $lumi);
 addWeights("data/50ns/QCD_Pt-40toInf.root", $lumi);
-
+addWeights("data/50ns/GluGluHToGG.root", $lumi);
+addWeights("data/50ns/DMHtoGG_M1000.root", $lumi);
+addWeights("data/50ns/DMHtoGG_M100.root", $lumi);
+addWeights("data/50ns/DMHtoGG_M10.root", $lumi);
+addWeights("data/50ns/DMHtoGG_M1.root", $lumi);
 .q
 
 EOF

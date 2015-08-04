@@ -10,6 +10,13 @@ hadd data/50ns/QCD_Pt-30to40.root   ../../output/job_2015729_153322/QCD_Pt-30to4
 hadd data/50ns/QCD_Pt-30toInf.root  ../../output/job_2015729_153334/QCD_Pt-30toInf/QCD_Pt-30toInf*.root
 hadd data/50ns/QCD_Pt-40toInf.root  ../../output/job_2015729_153352/QCD_Pt-40toInf/QCD_Pt-40toInf*.root
 
+hadd data/50ns/GluGluHToGG.root ../../output/job_201582_161336/GluGluHToGG/GluGluHToGG*.root
+
+hadd data/50ns/DMHtoGG_M1.root    ../../output/job_201582_161620/Higgs_scalar_nohdecay_gg_1GeV/Higgs_scalar_nohdecay_gg_1GeV_*
+hadd data/50ns/DMHtoGG_M10.root   ../../output/job_201582_161633/Higgs_scalar_nohdecay_gg_10GeV/Higgs_scalar_nohdecay_gg_10GeV_*
+hadd data/50ns/DMHtoGG_M100.root  ../../output/job_201582_161716/Higgs_scalar_nohdecay_gg_100GeV/Higgs_scalar_nohdecay_gg_100GeV_*
+hadd data/50ns/DMHtoGG_M1000.root ../../output/job_201582_161737/Higgs_scalar_nohdecay_gg_1000GeV/Higgs_scalar_nohdecay_gg_1000GeV_*
+
 
 #hadd data/merged/GGJets_M-200To500.root    data/GGJets_M-200To500/GGJets_M-200To500_*root
 #hadd data/merged/GGJets_M-500To1000.root   data/GGJets_M-500To1000/GGJets_M-500To1000_*root

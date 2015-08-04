@@ -30,11 +30,9 @@ public:
   void getTree();
   void make1DHistos(); 
   void make2DHistos();
-  void Fill1DHistos();
   void FindMinAndMax(TH1F *& h, int plotLog);
   void DrawWriteSave1DPlot(TH1F *& h, TString plotName, Bool_t DrawNorm); 
   void DrawWriteSave2DPlot(TH2F *& h, TString varX, TString varY); 
-  void CMSLumi(TCanvas *& pad, const Int_t iPosX);
 
   ~Plotter();
 

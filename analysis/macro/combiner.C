@@ -129,9 +129,9 @@ void overlay( const TString In1, const TString In2, const TString In3, const TSt
 
   h1[0]->SetFillColor(kRed);
   h1[1]->SetFillColor(kYellow);
-  h1[2]->SetFillColor(kGreen+2);
+  h1[2]->SetFillColor(kGreen);
   h1[3]->SetFillColor(kBlue);
-  h1[4]->SetFillColor(kViolet);
+  h1[4]->SetFillColor(kCyan);
 
   h1[0]->SetLineColor(kBlack);
   h1[1]->SetLineColor(kBlack);
@@ -139,7 +139,6 @@ void overlay( const TString In1, const TString In2, const TString In3, const TSt
   h1[3]->SetLineColor(kBlack);
   h1[4]->SetLineColor(kBlack);
  
-  hs->Add(h1[0]);
   hs->Add(h1[1]);
   hs->Add(h1[2]);
   hs->Add(h1[3]);
@@ -150,6 +149,7 @@ void overlay( const TString In1, const TString In2, const TString In3, const TSt
   c2->cd();
   c2->SetLogy(1);
   hs->Draw();
+  h1[0]->Draw("same");
   CMS_lumi( (TPad*)c2->cd(),true,0);
 
   l1->Clear();
