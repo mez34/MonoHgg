@@ -6,14 +6,22 @@
 #include "TLatex.h"
 #include "TSystem.h"
 #include "TString.h"
+#include "TH1D.h"
+#include "TTree.h"
+#include "TFile.h"
+
 
 #include <iostream>
+
+  void MakeOutDirectory(TString outdir);
+  void CheckValidFile(TFile *& file, const TString fname);
+  void CheckValidTree(TTree*& tree, const TString tname, const TString fname);
+  void CheckValidTH1D(TH1D*& plot, const TString pname, const TString fname);
+  void CMSLumi(TCanvas *& canvas, const Int_t iPosX);
 
 class Style{
 public:
   Style(const Double_t inLumi);
-  void CMSLumi(TCanvas *& canvas, const Int_t iPosX);
-  void MakeOutDirectory(TString outdir);
   ~Style();
 
 private:

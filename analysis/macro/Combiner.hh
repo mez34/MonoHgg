@@ -4,7 +4,7 @@
 #include "Style.hh"
 
 #include "TFile.h"
-#include "TH1F.h"
+#include "TH1D.h"
 #include "TH2F.h"
 #include "TString.h"
 #include "TTree.h"
@@ -33,7 +33,9 @@ typedef std::map<TString, TString> TStrMap;
 typedef std::vector<TString>  TStrVec;
 typedef std::vector<TFile*>   TFileVec;
 typedef std::vector<TH1D*>    TH1DVec;
+typedef std::vector<TH1DVec>  TH1DVecVec;
 typedef std::vector<THStack*> THStackVec;
+typedef std::vector<TPad*>    TPadVec;
 typedef std::vector<TLegend*> TLegVec;
 typedef std::vector<TCanvas*> TCanvVec;
 
@@ -44,6 +46,11 @@ public:
   void DoComb();
   void OverlayPlots();
   void StackPlots();
+  void MakeOutputCanvas();
+  void DrawCanvasStack(const UInt_t th1d, const Bool_t isLogY);
+  void DrawCanvasOverlay(const UInt_t th1d, const Bool_t isLogY);
+  Double_t GetMaximum(const UInt_t th1d, const Bool_t stack);
+  Double_t GetMinimum(const UInt_t th1d);
   ~Combiner();
 
 private:
@@ -60,6 +67,9 @@ private:
   TStrVec	fBkgNames;
   TStrVec	fSigNames;
 
+  TPadVec	fOutTH1DStackPads;
+  TPadVec	fOutTH1DRatioPads;
+
   TFileVec	fDataFiles;
   TFileVec	fBkgFiles;
   TFileVec	fSigFiles;
@@ -67,16 +77,16 @@ private:
   ColorMap	fColorMap;
   TStrMap	fSampleTitleMap;
 
-  TH1DVec	fInDataTH1DHists;
-  TH1DVec	fInBkgTH1DHists;
-  TH1DVec	fInSigTH1DHists;
+  TH1DVecVec	fInDataTH1DHists;
+  TH1DVecVec	fInBkgTH1DHists;
+  TH1DVecVec	fInSigTH1DHists;
 
   TH1DVec	fOutBkgTH1DHists;
   TH1DVec	fOutSigTH1DHists;
   TH1DVec	fOutDataTH1DHists;
 
   TH1DVec	fOutTH1DComb;
-  THStackVec    fOutTH1DStacks;
+  THStackVec    fOutBkgTH1DStacks;
   TLegVec	fTH1DLegends;
   TCanvVec	fOutTH1DCanvases;
 

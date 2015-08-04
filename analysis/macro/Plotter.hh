@@ -1,6 +1,8 @@
 #ifndef _plottertools_
 #define _plottertools_
 
+#include "Style.hh"
+
 #include "TFile.h"
 #include "TH1F.h"
 #include "TH2F.h"

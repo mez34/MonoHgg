@@ -9,7 +9,7 @@ Style::~Style(){
   delete canv;
 }// end Style::~Style
 
-void Style::MakeOutDirectory(TString outdir){
+void MakeOutDirectory(TString outdir){
   FileStat_t dummyFileStat;
   if (gSystem->GetPathInfo(outdir.Data(), dummyFileStat) == 1){
     TString mkDir = "mkdir -p ";
@@ -18,7 +18,38 @@ void Style::MakeOutDirectory(TString outdir){
   }
 }
 
-void Style::CMSLumi(TCanvas *& canvas, const Int_t iPosX){
+void CheckValidFile(TFile *& file, const TString fname){
+  if (file == (TFile*) NULL) { // check if valid file
+    std::cout << "Input file is bad pointer: " << fname.Data() << " ...exiting..." << std::endl;
+    exit(1);
+  }
+  else {
+    std::cout << "Successfully opened file: " << fname.Data() << std::endl;
+  }
+}
+
+void CheckValidTree(TTree*& tree, const TString tname, const TString fname){
+  if (tree == (TTree*) NULL) { // check if valid plot
+    std::cout << "Input TTree is bad pointer: " << tname.Data() << " in input file: " << fname.Data() << " ...exiting..." << std::endl;
+    exit(1);
+  }
+  else {
+    std::cout << "Successfully opened tree: " << tname.Data() << " in input file: " << fname.Data() << std::endl;
+  }
+}
+
+void CheckValidTH1D(TH1D*& plot, const TString pname, const TString fname){
+  if (plot == (TH1D*) NULL) { // check if valid plot
+    std::cout << "Input TH1D is bad pointer: " << pname.Data() << " in input file: " << fname.Data() << " ...exiting..." << std::endl;
+    exit(1);
+  }
+  else {
+    //    std::cout << "Successfully initialized plot: " << pname.Data() << " in input file: " << fname.Data() << std::endl;
+  }
+}
+
+void CMSLumi(TCanvas *& canvas, const Int_t iPosX){
+  Double_t inlumi = 300;
   canvas->cd();
   
   TString cmsText      = "CMS";
@@ -28,7 +59,7 @@ void Style::CMSLumi(TCanvas *& canvas, const Int_t iPosX){
   TString extraText      = "Preliminary";
   Double_t extraTextFont = 52;  // default is helvetica-italics
 
-  TString lumiText = Form("#sqrt{s} = 13 TeV, L = %f fb^{-1}", lumi);
+  TString lumiText = Form("#sqrt{s} = 13 TeV, L = %f fb^{-1}", inlumi);
   
   // text sizes and text offsets with respect to the top frame
   // in unit of the top margin size

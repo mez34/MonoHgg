@@ -564,16 +564,16 @@ void Plotter::DrawWriteSave1DPlot(TH1F *& h, const TString plotName, const Bool_
     h->SetMaximum(1.10);
   }
 
-  //Style::CMSLumi(fTH1Canv,0);
-  Style * cmsLumi = new Style(0.3);
-  cmsLumi->CMSLumi(fTH1Canv,1);
+  CMSLumi(fTH1Canv,0);
+  //Style * cmsLumi = new Style(0.3);
+  //cmsLumi->CMSLumi(fTH1Canv,1);
 
 //  h->GetXaxis()->SetTitleFont(42);
 //  h->GetXaxis()->SetLabelSize(0.03);
 //  h->GetXaxis()->SetTitleSize(0.75);
   h->Write();
   fTH1Canv->SaveAs(Form("%s%s/%s_%s.png",fName.Data(),species.Data(),plotName.Data(),species.Data()));
-  delete cmsLumi;
+//  delete cmsLumi;
 
   fTH1Canv->SetLogy(1);
   if(DrawNorm){

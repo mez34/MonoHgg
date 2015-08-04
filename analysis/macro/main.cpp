@@ -80,13 +80,13 @@ int main(){
 */
 
   ColorMap colorMap;
-  colorMap["qcd"] 	= kBlue;
-  colorMap["gjets"] 	= kGreen;
-  colorMap["gluglu"]	= kCyan;
-  colorMap["dmhgg1"]	= kMagenta;
-  colorMap["dmhgg2"]	= kMagenta+1;
-  colorMap["dmhgg3"]	= kMagenta+2;
-  colorMap["dmhgg4"]	= kMagenta+3;
+  colorMap["QCD"] 		= kYellow;
+  colorMap["GJets"] 		= kGreen;
+  colorMap["GluGluHToGG"]	= kCyan;
+  colorMap["DMHtoGG_M1000"]	= kMagenta;
+  colorMap["DMHtoGG_M100"]	= kMagenta+1;
+  colorMap["DMHtoGG_M10"]	= kMagenta+2;
+  colorMap["DMHtoGG_M1"]	= kMagenta+3;
 
   SamplePairVec Samples; // vector to also be used for stack plots
   Samples.push_back(SamplePair("QCD",1)); 
