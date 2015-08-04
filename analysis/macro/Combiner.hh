@@ -81,6 +81,10 @@ private:
   TH1DVecVec	fInBkgTH1DHists;
   TH1DVecVec	fInSigTH1DHists;
 
+  TH1DVecVec    fInDataTH1Dn1Hists;
+  TH1DVecVec	fInBkgTH1Dn1Hists;
+  TH1DVecVec	fInSigTH1Dn1Hists;
+
   TH1DVec	fOutBkgTH1DHists;
   TH1DVec	fOutSigTH1DHists;
   TH1DVec	fOutDataTH1DHists;

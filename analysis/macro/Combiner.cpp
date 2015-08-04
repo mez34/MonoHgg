@@ -25,13 +25,13 @@ Combiner::Combiner( SamplePairVec Samples, const Double_t inLumi, const ColorMap
   // define colorMap and title
   fColorMap = colorMap;
   
-  fSampleTitleMap["QCD"] 	= "QCD";
-  fSampleTitleMap["GJets"]	= "G + Jets";
+  fSampleTitleMap["QCD"] 		= "QCD";
+  fSampleTitleMap["GJets"]		= "G + Jets";
   fSampleTitleMap["GluGluHToGG"]	= "GluGlu #rightarrow H #rightarrow GG";
   fSampleTitleMap["DMHtoGG_M1000"]	= "DM + H #rightarrow GG, M1000GeV";
   fSampleTitleMap["DMHtoGG_M100"]	= "DM + H #rightarrow GG, M100GeV";
   fSampleTitleMap["DMHtoGG_M10"]	= "DM + H #rightarrow GG, M10GeV";
-  fSampleTitleMap["DMHtoGG_M1"]	= "DM + H #rightarrow GG, M1GeV";
+  fSampleTitleMap["DMHtoGG_M1"]		= "DM + H #rightarrow GG, M1GeV";
 
   //for (std::map<TString,TString>::iterator iter = fSampleTitleMap.begin(); iter != fSampleTitleMap.end(); ++iter) {
   //  std::cout << (*iter).first << "  " << (*iter).second << std::endl;
@@ -85,7 +85,7 @@ Combiner::Combiner( SamplePairVec Samples, const Double_t inLumi, const ColorMap
     }
   }
 
-  fOutDataTH1DHists.resize(fNTH1D);
+  if (fNData > 0) fOutDataTH1DHists.resize(fNTH1D);
   fOutBkgTH1DStacks.resize(fNTH1D);
   //fOutSigTH1DHists.resize(fNTH1D);
   for (UInt_t th1d = 0; th1d < fNTH1D; th1d++){
@@ -94,7 +94,7 @@ Combiner::Combiner( SamplePairVec Samples, const Double_t inLumi, const ColorMap
 
   fTH1DLegends.resize(fNTH1D);
   for (UInt_t th1d = 0; th1d < fNTH1D; th1d++){
-    fTH1DLegends[th1d] = new TLegend(0.8,0.75,1.0,1.0); // (x1,y1,x2,y2)
+    fTH1DLegends[th1d] = new TLegend(0.65,0.7,0.9,0.9); // (x1,y1,x2,y2)
     //fTH1DLegends[th1d] = new TLegend(0.65,0.7,0.8,0.9);
     fTH1DLegends[th1d]->SetBorderSize(4);
     fTH1DLegends[th1d]->SetLineColor(kBlack);
@@ -118,7 +118,7 @@ Combiner::~Combiner(){
 
  // delete all pointers
   for (UInt_t th1d = 0; th1d < fNTH1D; th1d++){
-    delete fOutDataTH1DHists[th1d];
+    if (fNData > 0 ) delete fOutDataTH1DHists[th1d];
     //delete fOutBkgTH1DHists[th1d];
     //delete fOutSigTH1DHists[th1d];
     delete fOutBkgTH1DStacks[th1d];
@@ -155,7 +155,7 @@ void Combiner::OverlayPlots(){
         if (data == 0) fOutDataTH1DHists[th1d] = (TH1D*)fInDataTH1DHists[th1d][data]->Clone();
         else fOutDataTH1DHists[th1d]->Add(fInDataTH1DHists[th1d][data]);
       }
-      fTH1DLegends[th1d]->AddEntry(fOutDataTH1DHists[th1d],"Data","pl"); //add data entry to legend
+      //fTH1DLegends[th1d]->AddEntry(fOutDataTH1DHists[th1d],"Data","pl"); //add data entry to legend
     }// end if ndata>0
 
     // bkg : copy histos and add to stacks
@@ -178,9 +178,11 @@ void Combiner::MakeOutputCanvas(){
   for (UInt_t th1d = 0; th1d < fNTH1D; th1d++){
     Bool_t isLogY = true;
     Combiner::DrawCanvasStack(th1d,isLogY);
-    Combiner::DrawCanvasOverlay(th1d,isLogY);
     isLogY = false;
     Combiner::DrawCanvasStack(th1d,isLogY);
+    isLogY = true;
+    Combiner::DrawCanvasOverlay(th1d,isLogY);
+    isLogY = false;
     Combiner::DrawCanvasOverlay(th1d,isLogY);
   }
 }// end Combiner::MakeOutputCanvas
@@ -192,6 +194,16 @@ void Combiner::DrawCanvasOverlay(const UInt_t th1d, const Bool_t isLogY){
   fOutTH1DStackPads[th1d]->Draw();
   fOutTH1DStackPads[th1d]->cd();
 
+   
+  for (UInt_t mc = 0; mc < fNSig; mc++){
+    fInSigTH1DHists[th1d][mc]->Scale(1.0/fInSigTH1DHists[th1d][mc]->Integral());
+  }
+  for (UInt_t mc = 0; mc < fNBkg; mc++){
+    fInBkgTH1DHists[th1d][mc]->Scale(1.0/fInBkgTH1DHists[th1d][mc]->Integral());
+    fInBkgTH1DHists[th1d][mc]->SetFillColor(0);
+    fInBkgTH1DHists[th1d][mc]->SetLineColor(fColorMap[fBkgNames[mc]]);
+  }
+
   Double_t max = -100;
   max = Combiner::GetMaximum(th1d, false);
 
@@ -199,13 +211,13 @@ void Combiner::DrawCanvasOverlay(const UInt_t th1d, const Bool_t isLogY){
   if (isLogY) fInSigTH1DHists[th1d][0]->SetMaximum(max*10);
   else fInSigTH1DHists[th1d][0]->SetMaximum(max*1.1);
   fInSigTH1DHists[th1d][0]->SetTitle("");
-  fInSigTH1DHists[th1d][0]->DrawNormalized();
+  fInSigTH1DHists[th1d][0]->Draw("hist");
 
   for (UInt_t mc = 0; mc < fNBkg; mc++){
-    fInBkgTH1DHists[th1d][mc]->DrawNormalized("SAME");
+    fInBkgTH1DHists[th1d][mc]->Draw("HIST SAME");
   }
   for (UInt_t mc = 0; mc < fNSig; mc++){
-    fInSigTH1DHists[th1d][mc]->DrawNormalized("SAME");
+    fInSigTH1DHists[th1d][mc]->Draw("HIST SAME");
   }
   fTH1DLegends[th1d]->Draw("SAME"); 
 
@@ -238,7 +250,7 @@ void Combiner::DrawCanvasStack(const UInt_t th1d, const Bool_t isLogY){
   fInSigTH1DHists[th1d][0]->SetTitle("");
   fInSigTH1DHists[th1d][0]->Draw();
 
-  fOutDataTH1DHists[th1d]->Draw("PE SAME");
+  if( fNData > 0) fOutDataTH1DHists[th1d]->Draw("PE SAME");
   fOutBkgTH1DStacks[th1d]->Draw("HIST SAME");
 
   for (UInt_t mc = 0; mc < fNSig; mc++){
@@ -263,12 +275,16 @@ Double_t Combiner::GetMaximum(const UInt_t th1d, const Bool_t stack) {
   Double_t max = -100;
 
   std::vector<Double_t> tmpmax;
-  tmpmax.push_back(fOutDataTH1DHists[th1d]->GetBinContent(fOutDataTH1DHists[th1d]->GetMaximumBin()));
+//  tmpmax.push_back(fOutDataTH1DHists[th1d]->GetBinContent(fOutDataTH1DHists[th1d]->GetMaximumBin()));
   for (UInt_t mc = 0; mc < fNSig; mc++){
     tmpmax.push_back( fInSigTH1DHists[th1d][mc]->GetBinContent(fInSigTH1DHists[th1d][mc]->GetMaximumBin()));
   }
   if (stack) tmpmax.push_back(fOutBkgTH1DStacks[th1d]->GetMaximum());
-  else tmpmax.push_back(fOutBkgTH1DStacks[th1d]->GetMaximum("nostack"));
+  else{
+    for (UInt_t mc = 0; mc < fNBkg; mc++){
+      tmpmax.push_back(fInBkgTH1DHists[th1d][mc]->GetBinContent(fInBkgTH1DHists[th1d][mc]->GetMaximumBin()));
+    }
+  }
   //else{
   //  for (UInt_t mc = 0; mc < fNBkg; mc++){
   //    tmpmax.push_back( fInBkgTH1DHists[th1d][mc]->GetBinContent(fInBkgTH1DHists[th1d][mc]->GetMaximumBin()));

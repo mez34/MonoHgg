@@ -28,6 +28,8 @@ static bool sortByYield(const SampleYieldPair& mcpair1, const SampleYieldPair& m
 
 int main(){
 
+// gROOT->ProcessLine(".x ~/.rootlogon.C"); // hack way to set root logon macro ... could put this into Typedef.hh 
+
   TString inDir = "data/50ns/";
   TString outDir = "diPhoPlots/50ns/";
   
