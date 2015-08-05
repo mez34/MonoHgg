@@ -50,7 +50,7 @@ public:
   void DrawCanvasStack(const UInt_t th1d, const Bool_t isLogY);
   void DrawCanvasOverlay(const UInt_t th1d, const Bool_t isLogY);
   Double_t GetMaximum(const UInt_t th1d, const Bool_t stack);
-  Double_t GetMinimum(const UInt_t th1d);
+  Double_t GetMinimum(const UInt_t th1d, const Bool_t stack);
   ~Combiner();
 
 private:

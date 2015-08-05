@@ -221,6 +221,9 @@ void Combiner::DrawCanvasOverlay(const UInt_t th1d, const Bool_t isLogY){
   Double_t max = -100;
   max = Combiner::GetMaximum(th1d, false);
 
+  Double_t minval = 1E9;
+  minval = Combiner::GetMinimum(th1d, false);
+
   // start by drawing the sig first
   if (isLogY) fInSigTH1DHists[th1d][0]->SetMaximum(max*10);
   else fInSigTH1DHists[th1d][0]->SetMaximum(max*1.1);
@@ -256,15 +259,27 @@ void Combiner::DrawCanvasStack(const UInt_t th1d, const Bool_t isLogY){
   fOutTH1DStackPads[th1d]->Draw();
   fOutTH1DStackPads[th1d]->cd();
 
-  Double_t max = -100;
-  max = Combiner::GetMaximum(th1d, true);
 
   for (UInt_t mc = 0; mc < fNSig; mc++){
     fInSigTH1DHists[th1d][mc]->Scale(lumi);
   }
+
+
+  Double_t max = -100;
+  max = Combiner::GetMaximum(th1d, true);
+
+  Double_t minval = 1E20;
+  minval = Combiner::GetMinimum(th1d, true);
+
   // start by drawing the sig first
-  if (isLogY) fInSigTH1DHists[th1d][0]->SetMaximum(max*10);
-  else fInSigTH1DHists[th1d][0]->SetMaximum(max*1.1);
+  if (isLogY){
+    fInSigTH1DHists[th1d][0]->SetMaximum(max*10);
+  //  fInSigTH1DHists[th1d][0]->SetMinimum(minval*0.9);
+  }
+  else{
+    fInSigTH1DHists[th1d][0]->SetMaximum(max*1.1);
+  //  fInSigTH1DHists[th1d][0]->SetMinimum(minval*0.1);
+  }
   fInSigTH1DHists[th1d][0]->SetTitle("");
   fInSigTH1DHists[th1d][0]->Draw("HIST");
 
@@ -308,6 +323,7 @@ Double_t Combiner::GetMaximum(const UInt_t th1d, const Bool_t stack) {
       tmpmax.push_back(fInBkgTH1DHists[th1d][mc]->GetBinContent(fInBkgTH1DHists[th1d][mc]->GetMaximumBin()));
     }
   }
+
   //else{
   //  for (UInt_t mc = 0; mc < fNBkg; mc++){
   //    tmpmax.push_back( fInBkgTH1DHists[th1d][mc]->GetBinContent(fInBkgTH1DHists[th1d][mc]->GetMaximumBin()));
@@ -321,10 +337,26 @@ Double_t Combiner::GetMaximum(const UInt_t th1d, const Bool_t stack) {
   return max;
 }
 
-Double_t Combiner::GetMinimum(const UInt_t th1d) {
+Double_t Combiner::GetMinimum(const UInt_t th1d, const Bool_t stack) {
   // need to loop through to check bin != 0
   Double_t datamin  = 1e9;
-  Bool_t newdatamin = false;
+ 
+  
+  std::vector<Double_t> tmpmin;
+//  tmpmax.push_back(fOutDataTH1DHists[th1d]->GetBinContent(fOutDataTH1DHists[th1d]->GetMaximumBin()));
+  for (UInt_t mc = 0; mc < fNSig; mc++){
+    tmpmin.push_back( fInSigTH1DHists[th1d][mc]->GetBinContent(fInSigTH1DHists[th1d][mc]->GetMinimumBin()));
+  }
+  if (stack) tmpmin.push_back(fOutBkgTH1DStacks[th1d]->GetMinimum());
+  else{
+    for (UInt_t mc = 0; mc < fNBkg; mc++){
+      tmpmin.push_back(fInBkgTH1DHists[th1d][mc]->GetBinContent(fInBkgTH1DHists[th1d][mc]->GetMinimumBin()));
+    }
+  }
+ 
+  for (UInt_t i = 0; i < tmpmin.size(); i++){
+    if ( tmpmin[i] > datamin ) datamin = tmpmin[i];
+  }
 //  for (Int_t bin = 1; bin <= fOutDataTH1DHists[th1d]->GetNbinsX(); bin++){
 //    Float_t tmpmin = fOutDataTH1DHists[th1d]->GetBinContent(bin);
 //    if ((tmpmin < datamin) && (tmpmin > 0)) {
@@ -332,6 +364,8 @@ Double_t Combiner::GetMinimum(const UInt_t th1d) {
 //      newdatamin = true;
 //    }
 //  }
+  return datamin;
+
 }
 
 void Combiner::InitTH1DNames(){
