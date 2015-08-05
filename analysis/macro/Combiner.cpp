@@ -272,7 +272,10 @@ void Combiner::DrawCanvasStack(const UInt_t th1d, const Bool_t isLogY){
   fOutBkgTH1DStacks[th1d]->Draw("HIST SAME");
 
   for (UInt_t mc = 0; mc < fNSig; mc++){
-    fInSigTH1DHists[th1d][mc]->Draw("SAME");
+    fInSigTH1DHists[th1d][mc]->Draw("HIST SAME");
+    if ( mc == fNSig-1 ){ // on last draw redraw axis because they are overwritten by stack
+      fInSigTH1DHists[th1d][mc]->Draw("AXIS SAME");
+    }
   }
 
   fTH1DLegends[th1d]->Draw("SAME"); 
@@ -334,7 +337,7 @@ Double_t Combiner::GetMinimum(const UInt_t th1d) {
 void Combiner::InitTH1DNames(){
   // higgs & met variables
   fTH1DNames.push_back("mgg");
-/*  fTH1DNames.push_back("ptgg");
+  fTH1DNames.push_back("ptgg");
   fTH1DNames.push_back("t1pfmetPhi");
   fTH1DNames.push_back("t1pfmet");
   fTH1DNames.push_back("nvtx");
@@ -363,5 +366,5 @@ void Combiner::InitTH1DNames(){
   fTH1DNames.push_back("chiso2");
   fTH1DNames.push_back("neuiso1");
   fTH1DNames.push_back("neuiso2");
-*/
+
 }// end Combiner::InitTH1DNames
