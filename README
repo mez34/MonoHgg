@@ -48,6 +48,13 @@ From MicroAOD to diPhotonAnaTrees
    NB. The structure of how to use these scripts can be seen in doAll.sh
 
 7. Produce plots 
+   in CMSSW_7_4_6_patch2
+   7.1 make (to compile) 
+   7.2 ./main (to run)
+     main.cpp calls Plotter.cpp (histos for each sample individually) and Combiner.cpp (overlay and stack samples)
+     style set with Style.cpp
+
+   in CMSSW_7_4_0_pre9
    7.1 Run drawOneHisto.C to plot a single variable for a single sample
 	OR
    7.1 Compile (with make) and run ./main to plot all relevant variables for a single sample (with weighting) 
