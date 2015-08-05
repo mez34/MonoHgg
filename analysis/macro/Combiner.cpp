@@ -9,7 +9,7 @@ Combiner::Combiner( SamplePairVec Samples, const Double_t inLumi, const ColorMap
   fOutDir = outdir;
   TString fOut = "comb";
 
-  //MakeOutDirectory(Form("%s%s",fOutDir.Data(),fOut.Data()));
+  MakeOutDirectory(Form("%s%s",fOutDir.Data(),fOut.Data()));
   fOutFile = new TFile(Form("%s%s/combplots%s.root",fOutDir.Data(),fOut.Data(),addText.Data()),"RECREATE");
   CheckValidFile(fOutFile, Form("%s%s/combplots%s.root",fOutDir.Data(),fOut.Data(),addText.Data())); 
 
@@ -77,7 +77,6 @@ Combiner::Combiner( SamplePairVec Samples, const Double_t inLumi, const ColorMap
     fInBkgTH1DHists[th1d].resize(fNBkg); 
     for (UInt_t mc = 0; mc < fNBkg; mc++) { // init bkg double hists
       fInBkgTH1DHists[th1d][mc] = (TH1D*)fBkgFiles[mc]->Get(Form("%s_%s%s",fTH1DNames[th1d].Data(),fBkgNames[mc].Data(),addText.Data()));
-      std::cout << Form("%s_%s%s",fTH1DNames[th1d].Data(),fBkgNames[mc].Data(),addText.Data()) << std::endl; 
       CheckValidTH1D(fInBkgTH1DHists[th1d][mc],fTH1DNames[th1d],fBkgFiles[mc]->GetName());
       fInBkgTH1DHists[th1d][mc]->SetFillColor(fColorMap[fBkgNames[mc]]);
       fInBkgTH1DHists[th1d][mc]->SetLineColor(kBlack);
@@ -98,7 +97,7 @@ Combiner::Combiner( SamplePairVec Samples, const Double_t inLumi, const ColorMap
 
   fTH1DLegends.resize(fNTH1D);
   for (UInt_t th1d = 0; th1d < fNTH1D; th1d++){
-    fTH1DLegends[th1d] = new TLegend(0.65,0.7,0.9,0.9); // (x1,y1,x2,y2)
+    fTH1DLegends[th1d] = new TLegend(0.70,0.7,0.9,0.89); // (x1,y1,x2,y2)
     //fTH1DLegends[th1d] = new TLegend(0.65,0.7,0.8,0.9);
     fTH1DLegends[th1d]->SetBorderSize(4);
     fTH1DLegends[th1d]->SetLineColor(kBlack);
@@ -168,6 +167,7 @@ void Combiner::OverlayPlots(){
 
     // bkg : copy histos and add to stacks
     for (UInt_t mc = 0; mc < fNBkg; mc++){
+      fInBkgTH1DHists[th1d][mc]->Scale(lumi);
       fOutBkgTH1DStacks[th1d]->Add(fInBkgTH1DHists[th1d][mc]);
       fTH1DLegends[th1d]->AddEntry(fInBkgTH1DHists[th1d][mc],fSampleTitleMap[fBkgNames[mc]],"lf");
     } 
@@ -201,7 +201,6 @@ void Combiner::MakeOutputCanvas(){
 void Combiner::DrawCanvasOverlay(const UInt_t th1d, const Bool_t isLogY){
   gStyle->SetOptStat(0);
   fOutTH1DCanvases[th1d]->cd();
-  CMSLumi(fOutTH1DCanvases[th1d],30);
   fOutTH1DStackPads[th1d]->Draw();
   fOutTH1DStackPads[th1d]->cd();
 
@@ -242,6 +241,8 @@ void Combiner::DrawCanvasOverlay(const UInt_t th1d, const Bool_t isLogY){
   fOutTH1DStackPads[th1d]->SetLogy(isLogY);
   fOutTH1DCanvases[th1d]->cd();
 
+  CMSLumi(fOutTH1DCanvases[th1d],0,lumi);
+
   fOutTH1DCanvases[th1d]->SaveAs(Form("%scomb/%s_comb%s%s.png",fOutDir.Data(),fTH1DNames[th1d].Data(),addText.Data(),suffix.Data()));  
   fOutFile->cd();
   fOutTH1DCanvases[th1d]->Write(Form("%s%s_comb%s",fTH1DNames[th1d].Data(),suffix.Data(),addText.Data()));
@@ -252,18 +253,20 @@ void Combiner::DrawCanvasOverlay(const UInt_t th1d, const Bool_t isLogY){
 void Combiner::DrawCanvasStack(const UInt_t th1d, const Bool_t isLogY){
   gStyle->SetOptStat(0);
   fOutTH1DCanvases[th1d]->cd();
-  CMSLumi(fOutTH1DCanvases[th1d],30);
   fOutTH1DStackPads[th1d]->Draw();
   fOutTH1DStackPads[th1d]->cd();
 
   Double_t max = -100;
   max = Combiner::GetMaximum(th1d, true);
 
+  for (UInt_t mc = 0; mc < fNSig; mc++){
+    fInSigTH1DHists[th1d][mc]->Scale(lumi);
+  }
   // start by drawing the sig first
   if (isLogY) fInSigTH1DHists[th1d][0]->SetMaximum(max*10);
   else fInSigTH1DHists[th1d][0]->SetMaximum(max*1.1);
   fInSigTH1DHists[th1d][0]->SetTitle("");
-  fInSigTH1DHists[th1d][0]->Draw();
+  fInSigTH1DHists[th1d][0]->Draw("HIST");
 
   if( fNData > 0) fOutDataTH1DHists[th1d]->Draw("PE SAME");
   fOutBkgTH1DStacks[th1d]->Draw("HIST SAME");
@@ -279,6 +282,8 @@ void Combiner::DrawCanvasStack(const UInt_t th1d, const Bool_t isLogY){
 
   fOutTH1DStackPads[th1d]->SetLogy(isLogY);
   fOutTH1DCanvases[th1d]->cd();
+
+  CMSLumi(fOutTH1DCanvases[th1d],0,lumi);
 
   fOutTH1DCanvases[th1d]->SaveAs(Form("%scomb/%s_stack%s%s.png",fOutDir.Data(),fTH1DNames[th1d].Data(),addText.Data(),suffix.Data()));  
   fOutFile->cd();
@@ -329,7 +334,7 @@ Double_t Combiner::GetMinimum(const UInt_t th1d) {
 void Combiner::InitTH1DNames(){
   // higgs & met variables
   fTH1DNames.push_back("mgg");
-  fTH1DNames.push_back("ptgg");
+/*  fTH1DNames.push_back("ptgg");
   fTH1DNames.push_back("t1pfmetPhi");
   fTH1DNames.push_back("t1pfmet");
   fTH1DNames.push_back("nvtx");
@@ -358,5 +363,5 @@ void Combiner::InitTH1DNames(){
   fTH1DNames.push_back("chiso2");
   fTH1DNames.push_back("neuiso1");
   fTH1DNames.push_back("neuiso2");
-
+*/
 }// end Combiner::InitTH1DNames

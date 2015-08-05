@@ -564,7 +564,7 @@ void Plotter::DrawWriteSave1DPlot(TH1F *& h, const TString plotName, const Bool_
     h->SetMaximum(1.10);
   }
 
-  CMSLumi(fTH1Canv,0);
+  CMSLumi(fTH1Canv,0,fLumi);
   //Style * cmsLumi = new Style(0.3);
   //cmsLumi->CMSLumi(fTH1Canv,1);
 
