@@ -112,7 +112,7 @@ int main(){
     else {ndata++;} 
   }
   UInt_t nsamples = nbkg + nsig + ndata;
-
+ 
   SamplePairVec BkgSamples;
   SamplePairVec SigSamples;
   SamplePairVec DataSamples;
@@ -122,7 +122,7 @@ int main(){
     else  DataSamples.push_back(Samples[isample]);
   }
 
-  // to sort MC by smallest to largest
+  // to sort MC by smallest to largest for nice stacked plots
   SampleYieldPairVec tmp_mcyields;
   for (UInt_t mc = 0; mc < nbkg; mc++) {
       // open mc file first
