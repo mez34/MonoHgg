@@ -14,9 +14,9 @@ Combiner::Combiner( SamplePairVec Samples, const Double_t inLumi, const ColorMap
   CheckValidFile(fOutFile, Form("%s%s/combplots%s.root",fOutDir.Data(),fOut.Data(),addText.Data())); 
 
   for (SamplePairVecIter iter = Samples.begin(); iter != Samples.end(); ++iter){
-    if ( (*iter).second == 1 ) {fBkgNames.push_back((*iter).first);} // background
-    if ( (*iter).second == 0 ) {fSigNames.push_back((*iter).first);} // signal
-    else {fDataNames.push_back((*iter).first);}			     // data
+    if ( (*iter).second == 1 ) {fBkgNames.push_back((*iter).first);}      // background
+    else if ( (*iter).second == 0 ) {fSigNames.push_back((*iter).first);} // signal
+    else {fDataNames.push_back((*iter).first);}			          // data
   }
   
   fNData = fDataNames.size();
@@ -371,7 +371,7 @@ Double_t Combiner::GetMinimum(const UInt_t th1d, const Bool_t stack) {
 void Combiner::InitTH1DNames(){
   // higgs & met variables
   fTH1DNames.push_back("mgg");
-  fTH1DNames.push_back("ptgg");
+/*  fTH1DNames.push_back("ptgg");
   fTH1DNames.push_back("t1pfmetPhi");
   fTH1DNames.push_back("t1pfmet");
   fTH1DNames.push_back("nvtx");
@@ -400,5 +400,5 @@ void Combiner::InitTH1DNames(){
   fTH1DNames.push_back("chiso2");
   fTH1DNames.push_back("neuiso1");
   fTH1DNames.push_back("neuiso2");
-
+*/
 }// end Combiner::InitTH1DNames
