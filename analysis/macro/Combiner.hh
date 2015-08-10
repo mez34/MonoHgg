@@ -49,6 +49,7 @@ public:
   void MakeOutputCanvas();
   void DrawCanvasStack(const UInt_t th1d, const Bool_t isLogY);
   void DrawCanvasOverlay(const UInt_t th1d, const Bool_t isLogY);
+  void MakeRatioPlots();
   Double_t GetMaximum(const UInt_t th1d, const Bool_t stack);
   Double_t GetMinimum(const UInt_t th1d, const Bool_t stack);
   ~Combiner();
@@ -85,6 +86,7 @@ private:
   TH1DVec	fOutBkgTH1DHists;
   TH1DVec	fOutSigTH1DHists;
   TH1DVec	fOutDataTH1DHists;
+  TH1DVec	fOutRatioTH1DHists;
 
   TH1DVec	fOutTH1DComb;
   THStackVec    fOutBkgTH1DStacks;

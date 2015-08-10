@@ -68,6 +68,7 @@ Combiner::Combiner( SamplePairVec Samples, const Double_t inLumi, const ColorMap
   fInBkgTH1DHists.resize(fNTH1D);
   fInSigTH1DHists.resize(fNTH1D);
 
+
   for (UInt_t th1d = 0; th1d < fNTH1D; th1d++){ // loop over double hists
     fInDataTH1DHists[th1d].resize(fNData); 
     for (UInt_t data = 0; data < fNData; data++) { // init data double hists
@@ -89,6 +90,7 @@ Combiner::Combiner( SamplePairVec Samples, const Double_t inLumi, const ColorMap
     }
   }
 
+  // output histos
   if (fNData > 0) fOutDataTH1DHists.resize(fNTH1D);
   fOutBkgTH1DStacks.resize(fNTH1D);
   for (UInt_t th1d = 0; th1d < fNTH1D; th1d++){
@@ -98,7 +100,6 @@ Combiner::Combiner( SamplePairVec Samples, const Double_t inLumi, const ColorMap
   fTH1DLegends.resize(fNTH1D);
   for (UInt_t th1d = 0; th1d < fNTH1D; th1d++){
     fTH1DLegends[th1d] = new TLegend(0.70,0.7,0.9,0.89); // (x1,y1,x2,y2)
-    //fTH1DLegends[th1d] = new TLegend(0.65,0.7,0.8,0.9);
     fTH1DLegends[th1d]->SetBorderSize(4);
     fTH1DLegends[th1d]->SetLineColor(kBlack);
   }
@@ -114,6 +115,10 @@ Combiner::Combiner( SamplePairVec Samples, const Double_t inLumi, const ColorMap
     fOutTH1DStackPads[th1d]->SetBottomMargin(0); // upper and lower pad are joined
   }
 
+  // for ratio plots
+  fOutBkgTH1DHists.resize(fNTH1D);
+  if (fNData > 0) fOutRatioTH1DHists.resize(fNTH1D); 
+
 }// end Combiner::Combiner
 
 Combiner::~Combiner(){
@@ -122,14 +127,15 @@ Combiner::~Combiner(){
  // delete all pointers
   for (UInt_t th1d = 0; th1d < fNTH1D; th1d++){
     if (fNData > 0 ) delete fOutDataTH1DHists[th1d];
-    //delete fOutBkgTH1DHists[th1d];
-    //delete fOutSigTH1DHists[th1d];
+    delete fOutBkgTH1DHists[th1d];
     delete fOutBkgTH1DStacks[th1d];
     delete fTH1DLegends[th1d];
     delete fOutTH1DStackPads[th1d];
     delete fOutTH1DCanvases[th1d];
     
-    for (UInt_t data = 0; data < fNData; data++) { delete fInDataTH1DHists[th1d][data]; }
+    for (UInt_t data = 0; data < fNData; data++) { 
+      delete fInDataTH1DHists[th1d][data];
+    }
     for (UInt_t mc = 0; mc < fNBkg; mc++) { 
       delete fInBkgTH1DHists[th1d][mc];
     }
@@ -170,6 +176,12 @@ void Combiner::OverlayPlots(){
       fInBkgTH1DHists[th1d][mc]->Scale(lumi);
       fOutBkgTH1DStacks[th1d]->Add(fInBkgTH1DHists[th1d][mc]);
       fTH1DLegends[th1d]->AddEntry(fInBkgTH1DHists[th1d][mc],fSampleTitleMap[fBkgNames[mc]],"lf");
+      if (mc == 0){
+        fOutBkgTH1DHists[th1d] = (TH1D*)fInBkgTH1DHists[th1d][mc]->Clone();
+      }
+      else{
+        fOutBkgTH1DHists[th1d]->Add(fInBkgTH1DHists[th1d][mc]);
+      }
     } 
   
     // sig: just add to legend
@@ -283,7 +295,7 @@ void Combiner::DrawCanvasStack(const UInt_t th1d, const Bool_t isLogY){
   fInSigTH1DHists[th1d][0]->SetTitle("");
   fInSigTH1DHists[th1d][0]->Draw("HIST");
 
-  if( fNData > 0) fOutDataTH1DHists[th1d]->Draw("PE SAME");
+  if (fNData > 0) fOutDataTH1DHists[th1d]->Draw("PE SAME");
   fOutBkgTH1DStacks[th1d]->Draw("HIST SAME");
 
   for (UInt_t mc = 0; mc < fNSig; mc++){
@@ -299,6 +311,12 @@ void Combiner::DrawCanvasStack(const UInt_t th1d, const Bool_t isLogY){
   if (isLogY) suffix="_log";
 
   fOutTH1DStackPads[th1d]->SetLogy(isLogY);
+
+  if (fNData > 0){
+    Combiner::MakeRatioPlots();
+  } 
+
+
   fOutTH1DCanvases[th1d]->cd();
 
   CMSLumi(fOutTH1DCanvases[th1d],0,lumi);
@@ -309,11 +327,26 @@ void Combiner::DrawCanvasStack(const UInt_t th1d, const Bool_t isLogY){
 
 }// end Combiner::DrawCanvasStack
 
+
+void Combiner::MakeRatioPlots(){
+
+  for (UInt_t th1d = 0; th1d < fNTH1D; th1d++){ // double hists
+    fOutRatioTH1DHists[th1d] = (TH1D*)fOutDataTH1DHists[th1d]->Clone();
+    fOutRatioTH1DHists[th1d]->Divide(fOutBkgTH1DHists[th1d]);  
+    fOutRatioTH1DHists[th1d]->SetLineColor(kBlack);
+    fOutRatioTH1DHists[th1d]->SetMinimum(-0.1);  // Define Y ..
+    fOutRatioTH1DHists[th1d]->SetMaximum(2.1);   // .. range
+    fOutRatioTH1DHists[th1d]->SetStats(0);      // No statistics on lower plot
+    fOutRatioTH1DHists[th1d]->GetYaxis()->SetTitle("Data/MC");
+  }
+
+}// end Combiner::MakeRatioPlots
+
 Double_t Combiner::GetMaximum(const UInt_t th1d, const Bool_t stack) {
   Double_t max = -100;
 
   std::vector<Double_t> tmpmax;
-//  tmpmax.push_back(fOutDataTH1DHists[th1d]->GetBinContent(fOutDataTH1DHists[th1d]->GetMaximumBin()));
+  if (fNData > 0) tmpmax.push_back(fOutDataTH1DHists[th1d]->GetBinContent(fOutDataTH1DHists[th1d]->GetMaximumBin()));
   for (UInt_t mc = 0; mc < fNSig; mc++){
     tmpmax.push_back( fInSigTH1DHists[th1d][mc]->GetBinContent(fInSigTH1DHists[th1d][mc]->GetMaximumBin()));
   }
@@ -337,6 +370,7 @@ Double_t Combiner::GetMaximum(const UInt_t th1d, const Bool_t stack) {
   return max;
 }
 
+
 Double_t Combiner::GetMinimum(const UInt_t th1d, const Bool_t stack) {
   // need to loop through to check bin != 0
   Double_t datamin  = 1e9;
@@ -355,7 +389,7 @@ Double_t Combiner::GetMinimum(const UInt_t th1d, const Bool_t stack) {
   }
  
   for (UInt_t i = 0; i < tmpmin.size(); i++){
-    if ( tmpmin[i] > datamin ) datamin = tmpmin[i];
+    if ( tmpmin[i] < datamin ) datamin = tmpmin[i];
   }
 //  for (Int_t bin = 1; bin <= fOutDataTH1DHists[th1d]->GetNbinsX(); bin++){
 //    Float_t tmpmin = fOutDataTH1DHists[th1d]->GetBinContent(bin);
