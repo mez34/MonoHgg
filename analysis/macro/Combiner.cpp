@@ -22,8 +22,9 @@ Combiner::Combiner( SamplePairVec Samples, const Double_t inLumi, const ColorMap
   fNData = fDataNames.size();
   fNBkg  = fBkgNames.size();
   fNSig  = fSigNames.size();
+
   Combiner::InitTH1DNames();
-  fNTH1D = fTH1DNames.size(); // 2x for regular and n-1 plots
+  fNTH1D = fTH1DNames.size(); 
 
   // define colorMap and title
   fColorMap = colorMap;
@@ -40,84 +41,7 @@ Combiner::Combiner( SamplePairVec Samples, const Double_t inLumi, const ColorMap
   //  std::cout << (*iter).first << "  " << (*iter).second << std::endl;
   //}
 
-  // open input files into TFileVec for data
-  fDataFiles.resize(fNData);
-  for (UInt_t data = 0; data < fNData; data++) {
-    TString datafile = Form("%s%s/plots_%s.root",fOutDir.Data(),fDataNames[data].Data(),fDataNames[data].Data());
-    fDataFiles[data] = TFile::Open(datafile.Data());
-    CheckValidFile(fDataFiles[data],datafile);
-  }
-
-  // open input files into TFileVec for bkg
-  fBkgFiles.resize(fNBkg);
-  for (UInt_t mc = 0; mc < fNBkg; mc++) {
-    TString bkgfile = Form("%s%s/plots_%s.root",fOutDir.Data(),fBkgNames[mc].Data(),fBkgNames[mc].Data());
-    fBkgFiles[mc] = TFile::Open(bkgfile.Data());
-    CheckValidFile(fBkgFiles[mc],bkgfile);
-  }
-
-  // open input files into TFileVec for bkg
-  fSigFiles.resize(fNSig);
-  for (UInt_t mc = 0; mc < fNSig; mc++) {
-    TString sigfile = Form("%s%s/plots_%s.root",fOutDir.Data(),fSigNames[mc].Data(),fSigNames[mc].Data());
-    fSigFiles[mc] = TFile::Open(sigfile.Data());
-    CheckValidFile(fSigFiles[mc],sigfile);
-  }
-
-  fInDataTH1DHists.resize(fNTH1D);
-  fInBkgTH1DHists.resize(fNTH1D);
-  fInSigTH1DHists.resize(fNTH1D);
-
-
-  for (UInt_t th1d = 0; th1d < fNTH1D; th1d++){ // loop over double hists
-    fInDataTH1DHists[th1d].resize(fNData); 
-    for (UInt_t data = 0; data < fNData; data++) { // init data double hists
-      fInDataTH1DHists[th1d][data] = (TH1D*)fDataFiles[data]->Get(Form("%s_%s%s",fTH1DNames[th1d].Data(),fDataNames[data].Data(),addText.Data()));
-      CheckValidTH1D(fInDataTH1DHists[th1d][data],fTH1DNames[th1d],fDataFiles[data]->GetName());
-    }
-    fInBkgTH1DHists[th1d].resize(fNBkg); 
-    for (UInt_t mc = 0; mc < fNBkg; mc++) { // init bkg double hists
-      fInBkgTH1DHists[th1d][mc] = (TH1D*)fBkgFiles[mc]->Get(Form("%s_%s%s",fTH1DNames[th1d].Data(),fBkgNames[mc].Data(),addText.Data()));
-      CheckValidTH1D(fInBkgTH1DHists[th1d][mc],fTH1DNames[th1d],fBkgFiles[mc]->GetName());
-      fInBkgTH1DHists[th1d][mc]->SetFillColor(fColorMap[fBkgNames[mc]]);
-      fInBkgTH1DHists[th1d][mc]->SetLineColor(kBlack);
-    }
-    fInSigTH1DHists[th1d].resize(fNSig); 
-    for (UInt_t mc = 0; mc < fNSig; mc++) { // init sig double hists
-      fInSigTH1DHists[th1d][mc] = (TH1D*)fSigFiles[mc]->Get(Form("%s_%s%s",fTH1DNames[th1d].Data(),fSigNames[mc].Data(),addText.Data()));
-      CheckValidTH1D(fInSigTH1DHists[th1d][mc],fTH1DNames[th1d],fSigFiles[mc]->GetName());
-      fInSigTH1DHists[th1d][mc]->SetLineColor(fColorMap[fSigNames[mc]]);
-    }
-  }
-
-  // output histos
-  if (fNData > 0) fOutDataTH1DHists.resize(fNTH1D);
-  fOutBkgTH1DStacks.resize(fNTH1D);
-  for (UInt_t th1d = 0; th1d < fNTH1D; th1d++){
-    fOutBkgTH1DStacks[th1d] = new THStack("","");
-  }
-
-  fTH1DLegends.resize(fNTH1D);
-  for (UInt_t th1d = 0; th1d < fNTH1D; th1d++){
-    fTH1DLegends[th1d] = new TLegend(0.70,0.7,0.9,0.89); // (x1,y1,x2,y2)
-    fTH1DLegends[th1d]->SetBorderSize(4);
-    fTH1DLegends[th1d]->SetLineColor(kBlack);
-  }
-
-  fOutTH1DCanvases.resize(fNTH1D);
-  for (UInt_t th1d = 0; th1d < fNTH1D; th1d++){
-    fOutTH1DCanvases[th1d] = new TCanvas(fTH1DNames[th1d].Data(),"");
-    fOutTH1DCanvases[th1d]->cd();
-  }
-  fOutTH1DStackPads.resize(fNTH1D);
-  for (UInt_t th1d = 0; th1d < fNTH1D; th1d++){
-    fOutTH1DStackPads[th1d] = new TPad("","",0,0.3,1.0,0.99);
-    fOutTH1DStackPads[th1d]->SetBottomMargin(0); // upper and lower pad are joined
-  }
-
-  // for ratio plots
-  fOutBkgTH1DHists.resize(fNTH1D);
-  if (fNData > 0) fOutRatioTH1DHists.resize(fNTH1D); 
+  Combiner::InitCanvAndHists();
 
 }// end Combiner::Combiner
 
@@ -126,22 +50,20 @@ Combiner::~Combiner(){
 
  // delete all pointers
   for (UInt_t th1d = 0; th1d < fNTH1D; th1d++){
-    if (fNData > 0 ) delete fOutDataTH1DHists[th1d];
+    //if (fNData > 0 ){
+      delete fOutDataTH1DHists[th1d];
+      delete fOutTH1DRatioPads[th1d];
+      delete fOutTH1DRatioLines[th1d];
+    //}
     delete fOutBkgTH1DHists[th1d];
     delete fOutBkgTH1DStacks[th1d];
     delete fTH1DLegends[th1d];
     delete fOutTH1DStackPads[th1d];
     delete fOutTH1DCanvases[th1d];
     
-    for (UInt_t data = 0; data < fNData; data++) { 
-      delete fInDataTH1DHists[th1d][data];
-    }
-    for (UInt_t mc = 0; mc < fNBkg; mc++) { 
-      delete fInBkgTH1DHists[th1d][mc];
-    }
-    for (UInt_t mc = 0; mc < fNSig; mc++) {
-      delete fInSigTH1DHists[th1d][mc];
-    }
+    for (UInt_t data = 0; data < fNData; data++) { delete fInDataTH1DHists[th1d][data]; }
+    for (UInt_t mc = 0; mc < fNBkg; mc++) { delete fInBkgTH1DHists[th1d][mc]; }
+    for (UInt_t mc = 0; mc < fNSig; mc++) { delete fInSigTH1DHists[th1d][mc]; }
   }
 
   for (UInt_t data = 0; data < fNData; data++) { delete fDataFiles[data]; }
@@ -153,7 +75,6 @@ Combiner::~Combiner(){
 }// end Combiner::~Combiner
 
 void Combiner::DoComb(){
-
   Combiner::OverlayPlots();
 }// end Combiner::DoComb
 
@@ -161,15 +82,14 @@ void Combiner::DoComb(){
 void Combiner::OverlayPlots(){
   // copy th1d plots into output hists/stacks
   for (UInt_t th1d = 0; th1d < fNTH1D; th1d++){
-
     // data : copy first histogram & add all others too it 
-    if (fNData > 0){
+    //if (fNData > 0){
       for (UInt_t data = 0; data < fNData; data++){
-        if (data == 0) fOutDataTH1DHists[th1d] = (TH1D*)fInDataTH1DHists[th1d][data]->Clone();
+        if (data == 0) fOutDataTH1DHists[th1d] = (TH1D*)fInDataTH1DHists[th1d][data]->Clone(); 
         else fOutDataTH1DHists[th1d]->Add(fInDataTH1DHists[th1d][data]);
       }
-      //fTH1DLegends[th1d]->AddEntry(fOutDataTH1DHists[th1d],"Data","pl"); //add data entry to legend
-    }// end if ndata>0
+     if (fNData > 0)  fTH1DLegends[th1d]->AddEntry(fOutDataTH1DHists[th1d],"Data","pl"); //add data entry to legend
+   // }// end if ndata>0
 
     // bkg : copy histos and add to stacks
     for (UInt_t mc = 0; mc < fNBkg; mc++){
@@ -196,12 +116,15 @@ void Combiner::OverlayPlots(){
 
 void Combiner::MakeOutputCanvas(){
   for (UInt_t th1d = 0; th1d < fNTH1D; th1d++){
-    Bool_t isLogY = true;
+
     // do stack plots first
+    Bool_t isLogY = true;
     Combiner::DrawCanvasStack(th1d,isLogY);
     isLogY = false;
     Combiner::DrawCanvasStack(th1d,isLogY);
     isLogY = true;
+    
+    if (fNData > 0) fOutTH1DRatioPads[th1d]->Clear(); //delete the ratio plot for overlay plots
     // do overlay next 
     isLogY = true;
     Combiner::DrawCanvasOverlay(th1d,isLogY);
@@ -215,7 +138,6 @@ void Combiner::DrawCanvasOverlay(const UInt_t th1d, const Bool_t isLogY){
   fOutTH1DCanvases[th1d]->cd();
   fOutTH1DStackPads[th1d]->Draw();
   fOutTH1DStackPads[th1d]->cd();
-
    
   for (UInt_t mc = 0; mc < fNSig; mc++){
     if (fInSigTH1DHists[th1d][mc]->Integral() > 0){
@@ -233,12 +155,10 @@ void Combiner::DrawCanvasOverlay(const UInt_t th1d, const Bool_t isLogY){
   Double_t max = -100;
   max = Combiner::GetMaximum(th1d, false);
 
-  Double_t minval = 1E9;
-  minval = Combiner::GetMinimum(th1d, false);
-
   // start by drawing the sig first
   if (isLogY) fInSigTH1DHists[th1d][0]->SetMaximum(max*10);
   else fInSigTH1DHists[th1d][0]->SetMaximum(max*1.1);
+
   fInSigTH1DHists[th1d][0]->SetTitle("");
   fInSigTH1DHists[th1d][0]->Draw("hist");
 
@@ -276,7 +196,6 @@ void Combiner::DrawCanvasStack(const UInt_t th1d, const Bool_t isLogY){
     fInSigTH1DHists[th1d][mc]->Scale(lumi);
   }
 
-
   Double_t max = -100;
   max = Combiner::GetMaximum(th1d, true);
 
@@ -284,18 +203,15 @@ void Combiner::DrawCanvasStack(const UInt_t th1d, const Bool_t isLogY){
   minval = Combiner::GetMinimum(th1d, true);
 
   // start by drawing the sig first
-  if (isLogY){
-    fInSigTH1DHists[th1d][0]->SetMaximum(max*10);
-  //  fInSigTH1DHists[th1d][0]->SetMinimum(minval*0.9);
-  }
-  else{
-    fInSigTH1DHists[th1d][0]->SetMaximum(max*1.1);
-  //  fInSigTH1DHists[th1d][0]->SetMinimum(minval*0.1);
-  }
+  if (isLogY) fInSigTH1DHists[th1d][0]->SetMaximum(max*10);
+  else fInSigTH1DHists[th1d][0]->SetMaximum(max*1.1);
+  //if (fNData > 0) fInSigTH1DHists[th1d][0]->SetMinimum(minval);
   fInSigTH1DHists[th1d][0]->SetTitle("");
   fInSigTH1DHists[th1d][0]->Draw("HIST");
 
-  if (fNData > 0) fOutDataTH1DHists[th1d]->Draw("PE SAME");
+  if (fNData > 0){
+    fOutDataTH1DHists[th1d]->Draw("PE SAME");
+  }
   fOutBkgTH1DStacks[th1d]->Draw("HIST SAME");
 
   for (UInt_t mc = 0; mc < fNSig; mc++){
@@ -312,12 +228,33 @@ void Combiner::DrawCanvasStack(const UInt_t th1d, const Bool_t isLogY){
 
   fOutTH1DStackPads[th1d]->SetLogy(isLogY);
 
-  if (fNData > 0){
-    Combiner::MakeRatioPlots();
+  fOutTH1DCanvases[th1d]->cd();
+
+  // if (fNData > 0){
+  Combiner::MakeRatioPlots();
+  Combiner::MakeRatioLine(th1d);
+  //}
+
+  if (fNData > 0){ // draw ratio plots
+    fOutTH1DRatioPads[th1d]->Draw();
+    fOutTH1DRatioPads[th1d]->cd();
+
+    fOutRatioTH1DHists[th1d]->Draw("EP"); // draw first so line can appear
+    fOutTH1DRatioLines[th1d]->Draw("SAME");
+
+    fOutRatioTH1DHists[th1d]->GetYaxis()->SetNdivisions(505);
+
+    fOutRatioTH1DHists[th1d]->GetXaxis()->SetLabelSize(0.11);
+    fOutRatioTH1DHists[th1d]->GetXaxis()->SetTitleSize(0.15);
+    fOutRatioTH1DHists[th1d]->GetXaxis()->SetTickSize(0.11);
+
+    fOutRatioTH1DHists[th1d]->GetYaxis()->SetLabelSize(0.11);
+    fOutRatioTH1DHists[th1d]->GetYaxis()->SetTitleSize(0.15);
+    fOutRatioTH1DHists[th1d]->GetYaxis()->SetTitleOffset(0.5);
+
+    fOutRatioTH1DHists[th1d]->Draw("EP SAME");
   } 
 
-
-  fOutTH1DCanvases[th1d]->cd();
 
   CMSLumi(fOutTH1DCanvases[th1d],0,lumi);
 
@@ -327,16 +264,30 @@ void Combiner::DrawCanvasStack(const UInt_t th1d, const Bool_t isLogY){
 
 }// end Combiner::DrawCanvasStack
 
+void Combiner::MakeRatioLine(const UInt_t th1d){
+  // have line held at ratio of 1.0 over whole x range
+  fOutTH1DRatioLines[th1d]->SetX1(fOutRatioTH1DHists[th1d]->GetXaxis()->GetXmin());
+  fOutTH1DRatioLines[th1d]->SetY1(1.0);
+  fOutTH1DRatioLines[th1d]->SetX2(fOutRatioTH1DHists[th1d]->GetXaxis()->GetXmax());
+  fOutTH1DRatioLines[th1d]->SetY2(1.0);
+
+  // customize appearance
+  fOutTH1DRatioLines[th1d]->SetLineColor(kRed);
+  fOutTH1DRatioLines[th1d]->SetLineWidth(2);
+
+}// end Combiner::MakeRatioLine
 
 void Combiner::MakeRatioPlots(){
 
   for (UInt_t th1d = 0; th1d < fNTH1D; th1d++){ // double hists
-    fOutRatioTH1DHists[th1d] = (TH1D*)fOutDataTH1DHists[th1d]->Clone();
+    if (fNData > 0) fOutRatioTH1DHists[th1d] = (TH1D*)fOutDataTH1DHists[th1d]->Clone();
+    else fOutRatioTH1DHists[th1d] = (TH1D*)fOutBkgTH1DHists[th1d]->Clone();
+    fOutRatioTH1DHists[th1d]->SetTitle("");
     fOutRatioTH1DHists[th1d]->Divide(fOutBkgTH1DHists[th1d]);  
     fOutRatioTH1DHists[th1d]->SetLineColor(kBlack);
     fOutRatioTH1DHists[th1d]->SetMinimum(-0.1);  // Define Y ..
     fOutRatioTH1DHists[th1d]->SetMaximum(2.1);   // .. range
-    fOutRatioTH1DHists[th1d]->SetStats(0);      // No statistics on lower plot
+    fOutRatioTH1DHists[th1d]->SetStats(0);       // No statistics on lower plot
     fOutRatioTH1DHists[th1d]->GetYaxis()->SetTitle("Data/MC");
   }
 
@@ -346,7 +297,7 @@ Double_t Combiner::GetMaximum(const UInt_t th1d, const Bool_t stack) {
   Double_t max = -100;
 
   std::vector<Double_t> tmpmax;
-  if (fNData > 0) tmpmax.push_back(fOutDataTH1DHists[th1d]->GetBinContent(fOutDataTH1DHists[th1d]->GetMaximumBin()));
+  if (fNData > 0 && stack) tmpmax.push_back(fOutDataTH1DHists[th1d]->GetBinContent(fOutDataTH1DHists[th1d]->GetMaximumBin()));
   for (UInt_t mc = 0; mc < fNSig; mc++){
     tmpmax.push_back( fInSigTH1DHists[th1d][mc]->GetBinContent(fInSigTH1DHists[th1d][mc]->GetMaximumBin()));
   }
@@ -357,55 +308,123 @@ Double_t Combiner::GetMaximum(const UInt_t th1d, const Bool_t stack) {
     }
   }
 
-  //else{
-  //  for (UInt_t mc = 0; mc < fNBkg; mc++){
-  //    tmpmax.push_back( fInBkgTH1DHists[th1d][mc]->GetBinContent(fInBkgTH1DHists[th1d][mc]->GetMaximumBin()));
-  //  }
-  //}
-
   for (UInt_t i = 0; i < tmpmax.size(); i++){
     if ( tmpmax[i] > max ) max = tmpmax[i];
   }
 
   return max;
-}
-
+}// end Combiner::GetMaximum
 
 Double_t Combiner::GetMinimum(const UInt_t th1d, const Bool_t stack) {
   // need to loop through to check bin != 0
   Double_t datamin  = 1e9;
- 
-  
-  std::vector<Double_t> tmpmin;
-//  tmpmax.push_back(fOutDataTH1DHists[th1d]->GetBinContent(fOutDataTH1DHists[th1d]->GetMaximumBin()));
-  for (UInt_t mc = 0; mc < fNSig; mc++){
-    tmpmin.push_back( fInSigTH1DHists[th1d][mc]->GetBinContent(fInSigTH1DHists[th1d][mc]->GetMinimumBin()));
+
+  if (fNData > 0){ 
+    for (Int_t bin = 1; bin <= fOutDataTH1DHists[th1d]->GetNbinsX(); bin++){
+      Float_t tmpmin = fOutDataTH1DHists[th1d]->GetBinContent(bin);
+      if ((tmpmin < datamin) && (tmpmin > 0)) {
+        datamin    = tmpmin;
+      }
+    } 
   }
-  if (stack) tmpmin.push_back(fOutBkgTH1DStacks[th1d]->GetMinimum());
-  else{
-    for (UInt_t mc = 0; mc < fNBkg; mc++){
-      tmpmin.push_back(fInBkgTH1DHists[th1d][mc]->GetBinContent(fInBkgTH1DHists[th1d][mc]->GetMinimumBin()));
+  return datamin;
+}// end Combiner::GetMinimum
+
+void Combiner::InitCanvAndHists(){
+  // open input files into TFileVec for data
+  fDataFiles.resize(fNData);
+  for (UInt_t data = 0; data < fNData; data++) {
+    TString datafile = Form("%s%s/plots_%s.root",fOutDir.Data(),fDataNames[data].Data(),fDataNames[data].Data());
+    fDataFiles[data] = TFile::Open(datafile.Data());
+    CheckValidFile(fDataFiles[data],datafile);
+  }
+
+  // open input files into TFileVec for bkg
+  fBkgFiles.resize(fNBkg);
+  for (UInt_t mc = 0; mc < fNBkg; mc++) {
+    TString bkgfile = Form("%s%s/plots_%s.root",fOutDir.Data(),fBkgNames[mc].Data(),fBkgNames[mc].Data());
+    fBkgFiles[mc] = TFile::Open(bkgfile.Data());
+    CheckValidFile(fBkgFiles[mc],bkgfile);
+  }
+
+  // open input files into TFileVec for bkg
+  fSigFiles.resize(fNSig);
+  for (UInt_t mc = 0; mc < fNSig; mc++) {
+    TString sigfile = Form("%s%s/plots_%s.root",fOutDir.Data(),fSigNames[mc].Data(),fSigNames[mc].Data());
+    fSigFiles[mc] = TFile::Open(sigfile.Data());
+    CheckValidFile(fSigFiles[mc],sigfile);
+  }
+
+  fInDataTH1DHists.resize(fNTH1D);
+  fInBkgTH1DHists.resize(fNTH1D);
+  fInSigTH1DHists.resize(fNTH1D);
+
+  for (UInt_t th1d = 0; th1d < fNTH1D; th1d++){ // loop over double hists
+    fInDataTH1DHists[th1d].resize(fNData); 
+    for (UInt_t data = 0; data < fNData; data++) { // init data double hists
+      fInDataTH1DHists[th1d][data] = (TH1D*)fDataFiles[data]->Get(Form("%s_%s%s",fTH1DNames[th1d].Data(),fDataNames[data].Data(),addText.Data()));
+      CheckValidTH1D(fInDataTH1DHists[th1d][data],fTH1DNames[th1d],fDataFiles[data]->GetName());
+    }
+    fInBkgTH1DHists[th1d].resize(fNBkg); 
+    for (UInt_t mc = 0; mc < fNBkg; mc++) { // init bkg double hists
+      fInBkgTH1DHists[th1d][mc] = (TH1D*)fBkgFiles[mc]->Get(Form("%s_%s%s",fTH1DNames[th1d].Data(),fBkgNames[mc].Data(),addText.Data()));
+      CheckValidTH1D(fInBkgTH1DHists[th1d][mc],fTH1DNames[th1d],fBkgFiles[mc]->GetName());
+      fInBkgTH1DHists[th1d][mc]->SetFillColor(fColorMap[fBkgNames[mc]]);
+      fInBkgTH1DHists[th1d][mc]->SetLineColor(kBlack);
+    }
+    fInSigTH1DHists[th1d].resize(fNSig); 
+    for (UInt_t mc = 0; mc < fNSig; mc++) { // init sig double hists
+      fInSigTH1DHists[th1d][mc] = (TH1D*)fSigFiles[mc]->Get(Form("%s_%s%s",fTH1DNames[th1d].Data(),fSigNames[mc].Data(),addText.Data()));
+      CheckValidTH1D(fInSigTH1DHists[th1d][mc],fTH1DNames[th1d],fSigFiles[mc]->GetName());
+      fInSigTH1DHists[th1d][mc]->SetLineColor(fColorMap[fSigNames[mc]]);
     }
   }
- 
-  for (UInt_t i = 0; i < tmpmin.size(); i++){
-    if ( tmpmin[i] < datamin ) datamin = tmpmin[i];
-  }
-//  for (Int_t bin = 1; bin <= fOutDataTH1DHists[th1d]->GetNbinsX(); bin++){
-//    Float_t tmpmin = fOutDataTH1DHists[th1d]->GetBinContent(bin);
-//    if ((tmpmin < datamin) && (tmpmin > 0)) {
-//      datamin    = tmpmin;
-//      newdatamin = true;
-//    }
-//  }
-  return datamin;
 
-}
+  // output histos
+  fOutDataTH1DHists.resize(fNTH1D);
+  fOutBkgTH1DStacks.resize(fNTH1D);
+  for (UInt_t th1d = 0; th1d < fNTH1D; th1d++){
+    fOutBkgTH1DStacks[th1d] = new THStack("","");
+  }
+
+  fTH1DLegends.resize(fNTH1D);
+  for (UInt_t th1d = 0; th1d < fNTH1D; th1d++){
+    fTH1DLegends[th1d] = new TLegend(0.70,0.7,0.9,0.89); // (x1,y1,x2,y2)
+    fTH1DLegends[th1d]->SetBorderSize(4);
+    fTH1DLegends[th1d]->SetLineColor(kBlack);
+  }
+
+  fOutTH1DCanvases.resize(fNTH1D);
+  fOutTH1DStackPads.resize(fNTH1D);
+  fOutBkgTH1DHists.resize(fNTH1D);
+  //if (fNData > 0){
+    fOutRatioTH1DHists.resize(fNTH1D); 
+    fOutTH1DRatioLines.resize(fNTH1D);
+    fOutTH1DRatioPads.resize(fNTH1D);
+  //} 
+
+  for (UInt_t th1d = 0; th1d < fNTH1D; th1d++){
+    fOutTH1DCanvases[th1d] = new TCanvas(fTH1DNames[th1d].Data(),"");
+    fOutTH1DCanvases[th1d]->cd();
+
+    fOutTH1DStackPads[th1d] = new TPad("","",0,0.3,1.0,0.99);
+    fOutTH1DStackPads[th1d]->SetBottomMargin(0); // upper and lower pad are joined
+
+    //if (fNData > 0){// for lower pad with ratio plot
+      fOutTH1DRatioPads[th1d] = new TPad("","",0,0.05,1.0,0.3);
+      fOutTH1DRatioPads[th1d]->SetTopMargin(0);
+      fOutTH1DRatioPads[th1d]->SetBottomMargin(0.2);
+      fOutTH1DRatioLines[th1d] = new TLine();
+    //}
+  }
+}// end Combiner::InitCanvAndHists
+
+
 
 void Combiner::InitTH1DNames(){
   // higgs & met variables
   fTH1DNames.push_back("mgg");
-/*  fTH1DNames.push_back("ptgg");
+  fTH1DNames.push_back("ptgg");
   fTH1DNames.push_back("t1pfmetPhi");
   fTH1DNames.push_back("t1pfmet");
   fTH1DNames.push_back("nvtx");
@@ -434,5 +453,5 @@ void Combiner::InitTH1DNames(){
   fTH1DNames.push_back("chiso2");
   fTH1DNames.push_back("neuiso1");
   fTH1DNames.push_back("neuiso2");
-*/
+
 }// end Combiner::InitTH1DNames

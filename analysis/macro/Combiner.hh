@@ -19,6 +19,7 @@
 #include "TPaveText.h"
 #include "TLatex.h"
 #include "THStack.h"
+#include "TLine.h"
 
 #include <iostream>
 #include <cmath>
@@ -38,10 +39,12 @@ typedef std::vector<THStack*> THStackVec;
 typedef std::vector<TPad*>    TPadVec;
 typedef std::vector<TLegend*> TLegVec;
 typedef std::vector<TCanvas*> TCanvVec;
+typedef std::vector<TLine*>   TLineVec;
 
 class Combiner{
 public:
   Combiner(const SamplePairVec Samples, const Double_t inLumi, const ColorMap colorMap, const TString outname, const Bool_t doNmin1);
+  void InitCanvAndHists();
   void InitTH1DNames();
   void DoComb();
   void OverlayPlots();
@@ -50,6 +53,7 @@ public:
   void DrawCanvasStack(const UInt_t th1d, const Bool_t isLogY);
   void DrawCanvasOverlay(const UInt_t th1d, const Bool_t isLogY);
   void MakeRatioPlots();
+  void MakeRatioLine(const UInt_t th1d);
   Double_t GetMaximum(const UInt_t th1d, const Bool_t stack);
   Double_t GetMinimum(const UInt_t th1d, const Bool_t stack);
   ~Combiner();
@@ -87,6 +91,7 @@ private:
   TH1DVec	fOutSigTH1DHists;
   TH1DVec	fOutDataTH1DHists;
   TH1DVec	fOutRatioTH1DHists;
+  TLineVec	fOutTH1DRatioLines;
 
   TH1DVec	fOutTH1DComb;
   THStackVec    fOutBkgTH1DStacks;
