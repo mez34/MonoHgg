@@ -38,7 +38,14 @@ int main(){
   //gROOT->LoadMacro("Plotter.cpp++g");
   //Plotter * test1 = new Plotter("./data/ALL_nosel/diPhotons","./diPhoPlots/ALL_nosel/","DMHtoGG",30);
 
+  /*std::cout << "Working on FakeData sample" << std::endl;
+  Plotter * FakeData = new Plotter("./data/50ns/","./diPhoPlots/50ns/","FakeData",30);
+  FakeData->DoPlots();
+  delete FakeData;
+  std::cout << "Finished FakeData sample" << std::endl;
+*/
 /*
+
   std::cout << "Working on GJets sample" << std::endl;
   Plotter * GJets = new Plotter("./data/50ns/","./diPhoPlots/50ns/","GJets",30);
   GJets->DoPlots();
@@ -99,6 +106,7 @@ int main(){
   Samples.push_back(SamplePair("DMHtoGG_M100",0)); 
   Samples.push_back(SamplePair("DMHtoGG_M10",0)); 
   Samples.push_back(SamplePair("DMHtoGG_M1",0)); 
+  //Samples.push_back(SamplePair("FakeData",5));
 
   UInt_t nbkg = 0;
   UInt_t nsig = 0;

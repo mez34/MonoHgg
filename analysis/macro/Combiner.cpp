@@ -195,6 +195,15 @@ void Combiner::DrawCanvasStack(const UInt_t th1d, const Bool_t isLogY){
   for (UInt_t mc = 0; mc < fNSig; mc++){
     fInSigTH1DHists[th1d][mc]->Scale(lumi);
   }
+  for (UInt_t data = 0; data < fNData; data++){
+    //std::cout << fDataNames[data].Data() << std::endl;
+//    if (Form("%s",fDataNames[data].Data()) == "FakeData"){
+      if ( fDataNames[data].Data() == "FakeData" ) std::cout << "worked!" << std::endl;
+      else std::cout << "hahahaha"<< std::endl;
+      fOutDataTH1DHists[th1d]->Scale(lumi);
+   // }
+  }
+
 
   Double_t max = -100;
   max = Combiner::GetMaximum(th1d, true);
@@ -209,10 +218,11 @@ void Combiner::DrawCanvasStack(const UInt_t th1d, const Bool_t isLogY){
   fInSigTH1DHists[th1d][0]->SetTitle("");
   fInSigTH1DHists[th1d][0]->Draw("HIST");
 
+  fOutBkgTH1DStacks[th1d]->Draw("HIST SAME");
+
   if (fNData > 0){
     fOutDataTH1DHists[th1d]->Draw("PE SAME");
   }
-  fOutBkgTH1DStacks[th1d]->Draw("HIST SAME");
 
   for (UInt_t mc = 0; mc < fNSig; mc++){
     fInSigTH1DHists[th1d][mc]->Draw("HIST SAME");
@@ -297,10 +307,10 @@ Double_t Combiner::GetMaximum(const UInt_t th1d, const Bool_t stack) {
   Double_t max = -100;
 
   std::vector<Double_t> tmpmax;
-  if (fNData > 0 && stack) tmpmax.push_back(fOutDataTH1DHists[th1d]->GetBinContent(fOutDataTH1DHists[th1d]->GetMaximumBin()));
   for (UInt_t mc = 0; mc < fNSig; mc++){
     tmpmax.push_back( fInSigTH1DHists[th1d][mc]->GetBinContent(fInSigTH1DHists[th1d][mc]->GetMaximumBin()));
   }
+  if (fNData > 0 && stack) tmpmax.push_back(fOutDataTH1DHists[th1d]->GetBinContent(fOutDataTH1DHists[th1d]->GetMaximumBin()));
   if (stack) tmpmax.push_back(fOutBkgTH1DStacks[th1d]->GetMaximum());
   else{
     for (UInt_t mc = 0; mc < fNBkg; mc++){
