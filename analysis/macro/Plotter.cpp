@@ -10,24 +10,21 @@ Plotter::Plotter( TString inName, TString outName, TString inSpecies, const Doub
   name = inName;
   species = inSpecies;
   inFile = TFile::Open(Form("%s%s.root",name.Data(),species.Data()));
-  //inFile = TFile::Open(Form("%s_%s_nosel.root",name.Data(),species.Data()));
+  CheckValidFile(inFile,Form("%s%s.root",name.Data(),species.Data()));
   
   fLumi = lumi;
 
   fName = outName;
   // Make output directory
-  FileStat_t dummyFileState;
+
   TString FullPath = fName.Data();
   FullPath+=species.Data();
   FullPath+="/";
-  if (gSystem->GetPathInfo(FullPath.Data(), dummyFileState) == 1){
-    TString mkDir = "mkdir -p ";
-    mkDir += FullPath.Data();
-    gSystem->Exec(mkDir.Data());
-  }
+  MakeOutDirectory(FullPath.Data());
 
   // Make output ROOT file
   outFile = new TFile(Form("%s/%s/plots_%s.root",fName.Data(),species.Data(),species.Data()),"RECREATE");
+  CheckValidFile(outFile,Form("%s/%s/plots_%s.root",fName.Data(),species.Data(),species.Data()));
 
   // Make TCanvas
   fTH1Canv = new TCanvas();
@@ -36,8 +33,11 @@ Plotter::Plotter( TString inName, TString outName, TString inSpecies, const Doub
   NVARIABLES = 30;
   N2DVARIABLES = 12;
 
-}// end Plotter::Plotter
+  Plotter::InitPhotonIDSel();
+  NSEL = selvar.size();
 
+  Plotter::InitTreeVar();
+}// end Plotter::Plotter
 
 
 Plotter::~Plotter(){
@@ -62,41 +62,9 @@ void Plotter::DoPlots(){
 void Plotter::getTree(){
   // Open Tree from inFile
   tpho = (TTree*)inFile->Get("DiPhotonTree"); 
-
   // Load variables from Tree
   variable[NVARIABLES];    //= {-1000}; // float for most variables 
   intvariable[NVARIABLES]; //= {-1000}; // int for other variables (eleveto, sel, nvtx)
-
-  varname[0]="mgg";
-  varname[1]="pt1";
-  varname[2]="r91";
-  varname[3]="sieie1";
-  varname[4]="hoe1";
-  varname[5]="chiso1";
-  varname[6]="phoiso1";
-  varname[7]="neuiso1";
-  varname[8]="eleveto1";
-  varname[9]="pt2";
-  varname[10]="r92";
-  varname[11]="sieie2";
-  varname[12]="hoe2";
-  varname[13]="chiso2";
-  varname[14]="phoiso2";
-  varname[15]="neuiso2";
-  varname[16]="eleveto2";
-  varname[17]="t1pfmet";
-  varname[18]="weight";
-  varname[19]="ptgg";
-  varname[20]="t1pfmetPhi";
-  varname[21]="phi1";
-  varname[22]="phi2";
-  varname[23]="eta1";
-  varname[24]="eta2";
-  varname[25]="presel1";
-  varname[26]="presel2";
-  varname[27]="sel1";
-  varname[28]="sel2";
-  varname[29]="nvtx";
 
   for(int z=0; z<NVARIABLES; ++z){
     if(z==8 || z==16 || z>=25 ){ //eleveto, sel, nvtx
@@ -105,6 +73,10 @@ void Plotter::getTree(){
      else{
        tpho->SetBranchAddress(varname[z],&variable[z]);
      }
+  }
+
+  for(int x=0; x<NSEL; ++x){
+   //tpho->SetBranchAddress(selvar[x].Data(),&selvarval );
   }
  
   nphotons = (int)tpho->GetEntries();
@@ -626,5 +598,54 @@ void Plotter::FindMinAndMax(TH1F *& h, int plotLog){
     h->SetMinimum(0.90*min);
   }
 }// end Plotter::FindMinAndMax
+
+void Plotter::InitTreeVar(){
+
+  varname[0]="mgg";
+  varname[1]="pt1";
+  varname[2]="r91";
+  varname[3]="sieie1";
+  varname[4]="hoe1";
+  varname[5]="chiso1";
+  varname[6]="phoiso1";
+  varname[7]="neuiso1";
+  varname[8]="eleveto1";
+  varname[9]="pt2";
+  varname[10]="r92";
+  varname[11]="sieie2";
+  varname[12]="hoe2";
+  varname[13]="chiso2";
+  varname[14]="phoiso2";
+  varname[15]="neuiso2";
+  varname[16]="eleveto2";
+  varname[17]="t1pfmet";
+  varname[18]="weight";
+  varname[19]="ptgg";
+  varname[20]="t1pfmetPhi";
+  varname[21]="phi1";
+  varname[22]="phi2";
+  varname[23]="eta1";
+  varname[24]="eta2";
+  varname[25]="presel1";
+  varname[26]="presel2";
+  varname[27]="sel1";
+  varname[28]="sel2";
+  varname[29]="nvtx";
+}// end Plotter::InitTreeVar
+
+void Plotter::InitPhotonIDSel(){
+  selvar.push_back("passCHiso1"); 
+  selvar.push_back("passCHiso2");
+  selvar.push_back("passNHiso1"); 
+  selvar.push_back("passNHiso2");
+  selvar.push_back("passPHiso1"); 
+  selvar.push_back("passPHiso2");
+  selvar.push_back("passSieie1");
+  selvar.push_back("passSieie2");
+  selvar.push_back("passHoe1");
+  selvar.push_back("passHoe2");
+}// end Plotter::InitPhotonIDSel
+
+
 
 

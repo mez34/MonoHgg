@@ -24,9 +24,14 @@
 
 #define nvar 30 //nvar has to be equal to NVARIABLES
 
+
+typedef std::vector<TString> 		TStrVec;
+typedef std::pair<TString, Int_t>	SelPair;
+
 class Plotter{
 public:
   Plotter(const TString inName, const TString outName, const TString inSpecies, const Double_t lumi);
+  ~Plotter();
 
   void DoPlots();  
   void getTree();
@@ -36,7 +41,8 @@ public:
   void DrawWriteSave1DPlot(TH1F *& h, TString plotName, Bool_t DrawNorm); 
   void DrawWriteSave2DPlot(TH2F *& h, TString varX, TString varY); 
 
-  ~Plotter();
+  void InitTreeVar();
+  void InitPhotonIDSel();
 
 private:
   TString 	name;
@@ -53,12 +59,16 @@ private:
   Int_t		NVARIABLES;
   Int_t		N2DVARIABLES;
   Int_t		nphotons;
+  Int_t		NSEL;
 
   Float_t	variable[nvar];
   Int_t		intvariable[nvar];
   TString 	varname[nvar];
   Int_t		nbins[nvar];
   Int_t		range[nvar][2];
+
+  TStrVec	selvar;
+  SelPair	selvarPair; 
 
 };
 
