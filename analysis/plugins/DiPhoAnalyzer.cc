@@ -107,7 +107,16 @@ struct diphoTree_struc_ {
   float genVtxX; 
   float genVtxY; 
   float genVtxZ;
-
+  int passCHiso1;
+  int passCHiso2;
+  int passNHiso1; 
+  int passNHiso2;
+  int passPHiso1;
+  int passPHiso2;
+  int passSieie1;
+  int passSieie2;
+  int passHoe1;
+  int passHoe2;
 };
 
 class DiPhoAnalyzer : public edm::EDAnalyzer {
@@ -132,11 +141,16 @@ private:
   bool isGammaPresel( float sceta, float pt, float r9, float chiso);
   bool isGammaSelected( float rho, float pt, float sceta, float r9, float chiso, float nhiso, float phoiso, float hoe, float sieie, bool passElectronVeto);
   int effectiveAreaRegion(float sceta);
-  bool testPhotonIsolation(float rho,float pt, float sceta, float r9, float chiso, float nhiso, float phoiso , float hoe, float sieie, bool passElectronVeto);
+  bool testPhotonIsolation(int passSieie, int passCHiso, int passNHiso, int passPHiso, int passHoe);
+  //bool testPhotonIsolation(float rho,float pt, float sceta, float r9, float chiso, float nhiso, float phoiso , float hoe, float sieie, bool passElectronVeto);
   double getGammaEAForPhotonIso(float sceta);
   double getChargedHadronEAForPhotonIso(float sceta);
   double getNeutralHadronEAForPhotonIso(float sceta);
-
+  int passSieieCuts(float sceta, float sieie);
+  int passCHisoCuts(float sceta, float chiso, float pt);
+  int passNHisoCuts(float sceta, float nhiso, float pt);
+  int passPHisoCuts(float sceta, float phiso, float pt);
+  int passHoeCuts(float sceta, float hoe);
 
   // collections
   //edm::EDGetTokenT<EcalRecHitCollection> ecalHitEBToken_;
@@ -313,14 +327,12 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
       float leadPt     = diphoPtr->leadingPhoton()->et();
       float leadChIso  = diphoPtr->leadingPhoton()->egChargedHadronIso();
       float leadR9noZS = diphoPtr->leadingPhoton()->full5x5_r9();
-      //float leadR9noZS = lazyToolnoZS->e3x3(*(diphoPtr->leadingPhoton()->superCluster()->seed())) / diphoPtr->leadingPhoton()->superCluster()->rawEnergy();
       bool leadPresel  = isGammaPresel( leadScEta, leadPt, leadR9noZS, leadChIso); 
 
       float subleadScEta  = (diphoPtr->subLeadingPhoton()->superCluster())->eta();               
       float subleadPt     = diphoPtr->subLeadingPhoton()->et();
       float subleadChIso  = diphoPtr->subLeadingPhoton()->egChargedHadronIso();
       float subleadR9noZS = diphoPtr->subLeadingPhoton()->full5x5_r9();
-      //float subleadR9noZS = lazyToolnoZS->e3x3(*(diphoPtr->subLeadingPhoton()->superCluster()->seed())) / diphoPtr->subLeadingPhoton()->superCluster()->rawEnergy();
       bool subleadPresel  = isGammaPresel( subleadScEta, subleadPt, subleadR9noZS, subleadChIso); 
       if (!leadPresel || !subleadPresel) continue;   
 
@@ -358,30 +370,40 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 
 	float leadPt     = diphoPtr->leadingPhoton()->et();
 	float leadScEta  = (diphoPtr->leadingPhoton()->superCluster())->eta();   
-	float leadR9noZS = diphoPtr->leadingPhoton()->full5x5_r9();
+	//float leadR9noZS = diphoPtr->leadingPhoton()->full5x5_r9();
         float leadSieienoZS = diphoPtr->leadingPhoton()->full5x5_sigmaIetaIeta();
-	//float leadR9noZS = lazyToolnoZS->e3x3(*(diphoPtr->leadingPhoton()->superCluster()->seed())) / diphoPtr->leadingPhoton()->superCluster()->rawEnergy();
 	float leadHoE    = diphoPtr->leadingPhoton()->hadTowOverEm();
 	
 	float leadChIso  = diphoPtr->leadingPhoton()->egChargedHadronIso()- rho * getChargedHadronEAForPhotonIso((diphoPtr->leadingPhoton()->superCluster())->eta());
 	float leadNeuIso = diphoPtr->leadingPhoton()->egNeutralHadronIso()- rho * getNeutralHadronEAForPhotonIso((diphoPtr->leadingPhoton()->superCluster())->eta());
 	float leadPhoIso = diphoPtr->leadingPhoton()->egPhotonIso()- rho * getGammaEAForPhotonIso((diphoPtr->leadingPhoton()->superCluster())->eta());
-	bool  leadOkEleV = diphoPtr->leadingPhoton()->passElectronVeto();
+	//bool  leadOkEleV = diphoPtr->leadingPhoton()->passElectronVeto();
 	//bool  leadSelel  = isGammaSelected( rho, leadPt, leadScEta, leadR9noZS, leadChIso, leadNeuIso, leadPhoIso, leadHoE, leadSieienoZS, leadOkEleV); 
-	bool  leadSelel  = testPhotonIsolation( rho, leadPt, leadScEta, leadR9noZS, leadChIso, leadNeuIso, leadPhoIso, leadHoE, leadSieienoZS, leadOkEleV); 
-	
+	//bool  leadSelel  = testPhotonIsolation( rho, leadPt, leadScEta, leadR9noZS, leadChIso, leadNeuIso, leadPhoIso, leadHoE, leadSieienoZS, leadOkEleV); 
+	int passLeadSieie = passSieieCuts( leadScEta, leadSieienoZS );
+        int passLeadCHiso = passCHisoCuts( leadScEta, leadChIso, leadPt );
+        int passLeadNHiso = passNHisoCuts( leadScEta, leadNeuIso, leadPt );
+        int passLeadPHiso = passPHisoCuts( leadScEta, leadPhoIso, leadPt );
+	int passLeadHoe   = passHoeCuts( leadScEta, leadHoE );
+        bool leadSelel    = testPhotonIsolation( passLeadSieie, passLeadCHiso, passLeadNHiso, passLeadPHiso, passLeadHoe ); 
+
 	float subleadPt     = diphoPtr->subLeadingPhoton()->et();
 	float subleadScEta  = (diphoPtr->subLeadingPhoton()->superCluster())->eta();   
-	float subleadR9noZS = diphoPtr->subLeadingPhoton()->full5x5_r9();
+	//float subleadR9noZS = diphoPtr->subLeadingPhoton()->full5x5_r9();
         float subleadSieienoZS = diphoPtr->subLeadingPhoton()->full5x5_sigmaIetaIeta();
-	//float subleadR9noZS = lazyToolnoZS->e3x3(*(diphoPtr->subLeadingPhoton()->superCluster()->seed())) / diphoPtr->subLeadingPhoton()->superCluster()->rawEnergy();
 	float subleadHoE    = diphoPtr->subLeadingPhoton()->hadTowOverEm();
 	float subleadChIso  = diphoPtr->subLeadingPhoton()->egChargedHadronIso()- rho * getChargedHadronEAForPhotonIso((diphoPtr->subLeadingPhoton()->superCluster())->eta());
 	float subleadNeuIso = diphoPtr->subLeadingPhoton()->egNeutralHadronIso()- rho * getNeutralHadronEAForPhotonIso((diphoPtr->subLeadingPhoton()->superCluster())->eta());
 	float subleadPhoIso = diphoPtr->subLeadingPhoton()->egPhotonIso()- rho * getGammaEAForPhotonIso((diphoPtr->subLeadingPhoton()->superCluster())->eta());
-	bool  subleadOkEleV = diphoPtr->subLeadingPhoton()->passElectronVeto();
+	//bool  subleadOkEleV = diphoPtr->subLeadingPhoton()->passElectronVeto();
 	//bool  subleadSelel  = isGammaSelected( rho, subleadPt, subleadScEta, subleadR9noZS, subleadChIso, subleadNeuIso, subleadPhoIso, subleadHoE, subleadSieienoZS, subleadOkEleV);  
-	bool  subleadSelel  = testPhotonIsolation( rho, subleadPt, subleadScEta, subleadR9noZS, subleadChIso, subleadNeuIso, subleadPhoIso, subleadHoE, subleadSieienoZS, subleadOkEleV);  
+	//bool  subleadSelel  = testPhotonIsolation( rho, subleadPt, subleadScEta, subleadR9noZS, subleadChIso, subleadNeuIso, subleadPhoIso, subleadHoE, subleadSieienoZS, subleadOkEleV);  
+	int passSubLeadSieie = passSieieCuts( subleadScEta, subleadSieienoZS );
+        int passSubLeadCHiso = passCHisoCuts( subleadScEta, subleadChIso, subleadPt );
+        int passSubLeadNHiso = passNHisoCuts( subleadScEta, subleadNeuIso, subleadPt );
+        int passSubLeadPHiso = passPHisoCuts( subleadScEta, subleadPhoIso, subleadPt );
+	int passSubLeadHoe   = passHoeCuts( subleadScEta, subleadHoE );
+        bool subleadSelel    = testPhotonIsolation( passSubLeadSieie, passSubLeadCHiso, passSubLeadNHiso, passSubLeadPHiso, passSubLeadHoe ); 
 
 	if (leadSelel || subleadSelel) std::cout<<"passes"<<std::endl;
 	
@@ -491,6 +513,7 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 		float genVtxX, genVtxY, genVtxZ;   
 		int eleveto1, eleveto2;
 		float pfmet,pfmetPhi, pfmetSumEt,t1pfmet,t1pfmetPhi, t1pfmetSumEt,calomet,calometPhi, calometSumEt;
+                int passCHiso1, passCHiso2, passNHiso1, passNHiso2, passPHiso1, passPHiso2, passSieie1, passSieie2, passHoe1, passHoe2;
 
 		// fully selected event: tree re-initialization                                                                          
 		initTreeStructure();        
@@ -535,7 +558,7 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 
 		eleveto1  = 0;
 		if (candDiphoPtr->leadingPhoton()->passElectronVeto()) eleveto1 = 1;
-		bool eleveto1b = candDiphoPtr->leadingPhoton()->passElectronVeto();
+		//bool eleveto1b = candDiphoPtr->leadingPhoton()->passElectronVeto();
 
 		pt2       = candDiphoPtr->subLeadingPhoton()->et();
 		ptOverM2  = pt2/mgg;
@@ -557,14 +580,29 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 	
 		eleveto2  = 0;
 		if (candDiphoPtr->subLeadingPhoton()->passElectronVeto()) eleveto2 = 1;
-		bool eleveto2b = candDiphoPtr->subLeadingPhoton()->passElectronVeto();
+		//bool eleveto2b = candDiphoPtr->subLeadingPhoton()->passElectronVeto();
 
 		//-------> photon selection (should be on, may be useful for extra studies
 		presel1 = isGammaPresel( sceta1, pt1, r91, chiso1 ); 
 		presel2 = isGammaPresel( sceta2, pt2, r92, chiso2 ); 
 		//	sel1 = isGammaSelected( rho, pt1, sceta1, r91, chiso1, neuiso1, phoiso1, hoe1, sieie1, eleveto1b ); 
-		sel1 = testPhotonIsolation( rho, pt1, sceta1, r91, chiso1, neuiso1, phoiso1, hoe1, sieie1, eleveto1b ); 
-		sel2 = testPhotonIsolation( rho, pt2, sceta2, r92, chiso2, neuiso2, phoiso2, hoe2, sieie2, eleveto2b ); 
+		//sel1 = testPhotonIsolation( rho, pt1, sceta1, r91, chiso1, neuiso1, phoiso1, hoe1, sieie1, eleveto1b ); 
+		//sel2 = testPhotonIsolation( rho, pt2, sceta2, r92, chiso2, neuiso2, phoiso2, hoe2, sieie2, eleveto2b ); 
+
+
+                //-------> pass each photon ID cut separately
+		passSieie1 = passSieieCuts( sceta1, sieie1);
+		passSieie2 = passSieieCuts( sceta2, sieie2);
+                passCHiso1 = passCHisoCuts( sceta1, chiso1, pt1);
+                passCHiso2 = passCHisoCuts( sceta2, chiso2, pt2);
+		passNHiso1 = passNHisoCuts( sceta1, neuiso1, pt1);
+		passNHiso2 = passNHisoCuts( sceta2, neuiso2, pt2);
+		passPHiso1 = passPHisoCuts( sceta1, phoiso1, pt1);
+		passPHiso2 = passPHisoCuts( sceta2, phoiso2, pt2);
+		passHoe1   = passHoeCuts( sceta1, hoe1);
+		passHoe2   = passHoeCuts( sceta2, hoe2);
+		sel1 = testPhotonIsolation( passSieie1, passCHiso1, passNHiso1, passPHiso1, passHoe1 );
+		sel2 = testPhotonIsolation( passSieie2, passCHiso2, passNHiso2, passPHiso2, passHoe2 );
 
 		//-------> event class
 		float maxEta = sceta1;
@@ -770,7 +808,17 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 		treeDipho_.genVtxX = genVtxX;
 		treeDipho_.genVtxY = genVtxY;
 		treeDipho_.genVtxZ = genVtxZ;
-		
+		treeDipho_.passCHiso1 = passCHiso1;
+		treeDipho_.passCHiso2 = passCHiso2;
+		treeDipho_.passNHiso1 = passNHiso1;
+		treeDipho_.passNHiso2 = passNHiso2;
+		treeDipho_.passPHiso1 = passPHiso1;
+		treeDipho_.passPHiso2 = passPHiso2;
+		treeDipho_.passSieie1 = passSieie1;
+		treeDipho_.passSieie2 = passSieie2;
+		treeDipho_.passHoe1 = passHoe1;
+		treeDipho_.passHoe2 = passHoe2;	
+	
 		// Filling the trees
 		DiPhotonTree->Fill();
 		
@@ -874,6 +922,16 @@ void DiPhoAnalyzer::beginJob() {
   DiPhotonTree->Branch("genVtxX",&(treeDipho_.genVtxX),"genVtxX/F");
   DiPhotonTree->Branch("genVtxY",&(treeDipho_.genVtxY),"genVtxY/F");
   DiPhotonTree->Branch("genVtxZ",&(treeDipho_.genVtxZ),"genVtxZ/F");
+  DiPhotonTree->Branch("passCHiso1",&(treeDipho_.passCHiso1),"passCHiso1/I");
+  DiPhotonTree->Branch("passCHiso2",&(treeDipho_.passCHiso2),"passCHiso2/I");
+  DiPhotonTree->Branch("passNHiso1",&(treeDipho_.passNHiso1),"passNHiso1/I");
+  DiPhotonTree->Branch("passNHiso2",&(treeDipho_.passNHiso2),"passNHiso2/I");
+  DiPhotonTree->Branch("passPHiso1",&(treeDipho_.passPHiso1),"passPHiso1/I");
+  DiPhotonTree->Branch("passPHiso2",&(treeDipho_.passPHiso2),"passPHiso2/I");
+  DiPhotonTree->Branch("passSieie1",&(treeDipho_.passSieie1),"passSieie1/I");
+  DiPhotonTree->Branch("passSieie2",&(treeDipho_.passSieie2),"passSieie2/I");
+  DiPhotonTree->Branch("passHoe1",&(treeDipho_.passHoe1),"passHoe1/I");
+  DiPhotonTree->Branch("passHoe2",&(treeDipho_.passHoe2),"passHoe2/I");
 }
 
 void DiPhoAnalyzer::endJob() { }
@@ -945,6 +1003,16 @@ void DiPhoAnalyzer::initTreeStructure() {
   treeDipho_.genVtxX = -500.;
   treeDipho_.genVtxY = -500.;
   treeDipho_.genVtxZ = -500.;
+  treeDipho_.passCHiso1 = -500;
+  treeDipho_.passCHiso2 = -500;
+  treeDipho_.passNHiso1 = -500;
+  treeDipho_.passNHiso2 = -500;
+  treeDipho_.passPHiso1 = -500;
+  treeDipho_.passPHiso2 = -500;
+  treeDipho_.passSieie1 = -500;
+  treeDipho_.passSieie2 = -500;
+  treeDipho_.passHoe1 = -500;
+  treeDipho_.passHoe2 = -500;
 }
 
 void DiPhoAnalyzer::SetPuWeights(std::string puWeightFile) {
@@ -1040,13 +1108,54 @@ else if (fabs(eta) >= 2.4) return 0.1484;
 else return 0.;
 }
 
+int DiPhoAnalyzer::passSieieCuts(float sceta, float sieie){
+  int passes = -500;
+  if (fabs(sceta)<1.479 && sieie>0.010) passes = 1;
+  else if (sieie>0.0267) passes = 1;
+  else passes = 0;
+  return passes;
+}
+int DiPhoAnalyzer::passCHisoCuts(float sceta, float chiso, float pt){
+  int passes = -500;
+  if (fabs(sceta)<1.479 && chiso>1.79) passes = 1;
+  else if (chiso>1.09) passes = 1;
+  else passes = 0;
+  return passes;
+}
+int DiPhoAnalyzer::passNHisoCuts(float sceta, float nhiso, float pt){
+  int passes = -500;
+  if (fabs(sceta)<1.479 && nhiso > 0.16+exp(0.0028*pt+0.5408)) passes = 1;
+  else if (nhiso > 4.31+ 0.0172*pt) passes = 1;
+  else passes = 0;
+  return passes;
+}
+int DiPhoAnalyzer::passPHisoCuts(float sceta, float phiso, float pt){
+  int passes = -500;
+  if (fabs(sceta)<1.479 && phiso > 1.9+0.0014*pt) passes = 1;
+  else if (phiso > 1.90+0.0091*pt) passes = 1;
+  else passes = 0;
+  return passes;
+}
+int DiPhoAnalyzer::passHoeCuts(float sceta, float hoe){
+  int passes = -500;
+  if (fabs(sceta)<1.479 && hoe>0.012) passes = 1;
+  else if (hoe>0.023) passes = 1;
+  else passes = 0;
+  return passes;
+}
 
-bool DiPhoAnalyzer::testPhotonIsolation(float rho,float pt, float sceta, float r9, float chiso, float nhiso, float phoiso , float hoe, float sieie, bool passElectronVeto) {
+bool DiPhoAnalyzer::testPhotonIsolation(int passSieie, int passCHiso, int passNHiso, int passPHiso, int passHoe){
+  if (passSieie == 1 && passHoe == 1 && passCHiso == 1 && passNHiso == 1 && passPHiso == 1) return true;
+  else return false;
+}
+
+/*
+  bool DiPhoAnalyzer::testPhotonIsolation(float rho,float pt, float sceta, float r9, float chiso, float nhiso, float phoiso , float hoe, float sieie, bool passElectronVeto) {
   double corrCHIso = chiso;
   double corrNHIso = nhiso;
   double corrPHIso = phoiso;
 
- if (abs(sceta)<1.479) {
+ if (fabs(sceta)<1.479) {
    if (corrCHIso > 1.79) return false;
    if (corrNHIso > 0.16+exp(0.0028*pt+0.5408)) return false;
    if (corrPHIso > 1.9+0.0014*pt) return false;
@@ -1061,11 +1170,10 @@ bool DiPhoAnalyzer::testPhotonIsolation(float rho,float pt, float sceta, float r
    if (hoe>0.023) return false;
  }
  
- 
  // electron veto 
 //  if (!passElectronVeto) return false;//livia
  return true;
-}
+} */
 
 
 
