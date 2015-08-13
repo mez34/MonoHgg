@@ -553,6 +553,8 @@ void Plotter::DrawWriteSave1DPlot(TH1F *& h, const TString plotName, const Bool_
   gStyle->SetStatX(0.84);
   gStyle->SetStatY(0.93);
 
+  h->SetTitle(0);
+
   fTH1Canv->SetLogy(0);
   if(DrawNorm){ 
     h->DrawNormalized();
@@ -593,6 +595,7 @@ void Plotter::DrawWriteSave2DPlot(TH2F *& h, const TString varX, const TString v
   fTH2Canv->cd();
   fTH2Canv->SetLogy(0);
   h->Draw("colz");
+  h->SetTitle(0);
   h->Write();
   //Plotter::CMS_Lumi(0.3)
   fTH2Canv->SaveAs(Form("%s%s/%s_%s_%s.png",fName.Data(),species.Data(),varY.Data(),varX.Data(),species.Data()));
