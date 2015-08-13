@@ -68,8 +68,7 @@ private:
   Int_t		range[nvar][2];
 
   TStrVec	selvar;
-  SelPair	selvarPair; 
-
+  Int_t		selvarPair[10];
 };
 
 #endif

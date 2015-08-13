@@ -46,10 +46,11 @@ Plotter::~Plotter(){
   outFile->Close(); 
 
   std::cout<<"Finished & Deleting"<<std::endl;
-  delete inFile;
-  delete outFile;
   delete fTH1Canv;
   delete fTH2Canv;
+  delete outFile;
+  delete inFile;
+
 }// end Plotter::~Plotter
 
 
@@ -66,7 +67,12 @@ void Plotter::getTree(){
   variable[NVARIABLES];    //= {-1000}; // float for most variables 
   intvariable[NVARIABLES]; //= {-1000}; // int for other variables (eleveto, sel, nvtx)
 
+  selvarPair[NSEL]; 
   for(int z=0; z<NVARIABLES; ++z){
+/*    if(z < NSEL){
+      tpho->SetBranchAddress(selvar[z].Data(),&selvarPair[z]);
+    }
+*/
     if(z==8 || z==16 || z>=25 ){ //eleveto, sel, nvtx
        tpho->SetBranchAddress(varname[z],&intvariable[z]);
      }
@@ -75,10 +81,12 @@ void Plotter::getTree(){
      }
   }
 
-  for(int x=0; x<NSEL; ++x){
-   //tpho->SetBranchAddress(selvar[x].Data(),&selvarval );
-  }
  
+/*
+  for(UInt_t x=0; x<NSEL; ++x){
+    tpho->SetBranchAddress(selvar[x].Data(),&selvarPair[x]);
+  }
+ */
   nphotons = (int)tpho->GetEntries();
 
 }// end Plotter::getTree
@@ -232,6 +240,9 @@ void Plotter::make1DHistos(){
   hEff[1] = new TH1F(Form("Eff_PHID_pt_%s",species.Data()),Form("Eff_PHID_pt_%s",species.Data()),60,0,600);
   hEff[2] = new TH1F(Form("Eff_PHID_eta_%s",species.Data()),Form("Eff_PHID_eta_%s",species.Data()),60,-3,3);
 
+  //plot Mgg and MET with some photonIDsel and cut on other var
+  TH1F *hMET = new TH1F(Form("t1pfMet_selMgg_%s",species.Data()),Form("t1pfMet_selMgg_%s",species.Data()),100,0,1000);
+  TH1F *hMgg = new TH1F(Form("mgg_selt1pfMet_%s",species.Data()),Form("mgg_selt1pfMet_%s",species.Data()),60,0,300);
 
   Float_t phiH[nphotons];
   //phiH[nphotons] = {-1000}; 
@@ -244,6 +255,16 @@ void Plotter::make1DHistos(){
 
   for (int i=0; i<nphotons; ++i){   
     tpho->GetEntry(i);
+
+/*
+    Bool_t passCHiso1 = false;
+    Bool_t passCHiso2 = false;
+    if (selvarPair[0]==1) passCHiso1 = true; 
+    if (selvarPair[0]==1) passCHiso2 = true; 
+*/
+
+
+
 
     Bool_t passCHIso_EB1 = false;
     Bool_t passCHIso_EE1 = false;
@@ -326,7 +347,11 @@ void Plotter::make1DHistos(){
         if ((passCHIso_EB2 && passNHIso_EB2 && passPHIso_EB2 && passSieie_EB2) || (passCHIso_EE2 && passNHIso_EE2 && passPHIso_EE2 && passSieie_EE2 )) hVarNmin1[12]->Fill(variable[12],variable[18]);
       }
       else if (z==0 || z==17 || z==18 || z==19 || z==20 || z==29){
-        if ((passAll_EB1 || passAll_EE1) && (passAll_EB2 || passAll_EE2)) hVarNmin1[z]->Fill(variable[z],variable[18]);
+        if ((passAll_EB1 || passAll_EE1) && (passAll_EB2 || passAll_EE2)){// both pho1 and pho2 pass
+	  hVarNmin1[z]->Fill(variable[z],variable[18]);
+          if (variable[0] > 120.0 && variable[0] < 130.0) hMET->Fill(variable[17],variable[18]);
+	  if (variable[17] > 250.0) hMgg->Fill(variable[0],variable[18]); 
+	}
       }
       else if (z==1 || z==2 || z==21 || z==23 || z==25 || z==27){ // fill "n-1" plots for pho1 if they pass phoID selection
         if (passAll_EB1 || passAll_EE1) hVarNmin1[z]->Fill(variable[z],variable[18]);
@@ -376,6 +401,10 @@ void Plotter::make1DHistos(){
     hEff[1]->Fill(10*x,eff[1][x]);   
     hEff[2]->Fill(-3+(x/10),eff[2][x]);   
   }
+  hMgg->GetXaxis()->SetTitle("mgg");
+  Plotter::DrawWriteSave1DPlot(hMgg,"mgg_selt1pfMet",true);
+  hMET->GetXaxis()->SetTitle("t1pfmet");
+  Plotter::DrawWriteSave1DPlot(hMET,"t1pfMet_selMgg",true);
 
   for (int z=0; z<NVARIABLES; ++z){
     Plotter::DrawWriteSave1DPlot(hVar[z],varname[z],true);
@@ -397,8 +426,6 @@ void Plotter::make1DHistos(){
   Plotter::DrawWriteSave1DPlot(hEff[0],"Eff_PHOID_PU",false); 
   Plotter::DrawWriteSave1DPlot(hEff[1],"Eff_PHOID_pt",false); 
   Plotter::DrawWriteSave1DPlot(hEff[2],"Eff_PHOID_eta",false); 
-
-
 
 }// end Plotter::make1DHistos
 
