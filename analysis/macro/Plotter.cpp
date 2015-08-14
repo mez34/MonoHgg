@@ -94,7 +94,7 @@ void Plotter::getTree(){
 
 void Plotter::make1DHistos(){
 
-  nbins[0]=60; 		// mgg
+  nbins[0]=50; 		// mgg
   nbins[1]=50; 		// pt1
   nbins[2]=100; 	// r91
   nbins[3]=300; 	// sieie1
@@ -125,7 +125,7 @@ void Plotter::make1DHistos(){
   nbins[28]=nbins[25];	// sel2
   nbins[29]=60;		// nvtx
 
-  range[0][0]=0.; 		// mgg
+  range[0][0]=50.; 		// mgg
   range[1][0]=0.; 		// pt1
   range[2][0]=0.; 		// r91
   range[3][0]=0.; 		// sieie1
@@ -259,8 +259,24 @@ void Plotter::make1DHistos(){
 /*
     Bool_t passCHiso1 = false;
     Bool_t passCHiso2 = false;
+    Bool_t passNHiso1 = false;
+    Bool_t passNHiso2 = false;
+    Bool_t passPHiso1 = false;
+    Bool_t passPHiso2 = false;
+    Bool_t passSieie1 = false;
+    Bool_t passSieie2 = false;
+    Bool_t passHoe1 = false;
+    Bool_t passHoe2 = false;
     if (selvarPair[0]==1) passCHiso1 = true; 
-    if (selvarPair[0]==1) passCHiso2 = true; 
+    if (selvarPair[1]==1) passCHiso2 = true; 
+    if (selvarPair[2]==1) passNHiso1 = true;
+    if (selvarPair[3]==1) passNHiso2 = true;
+    if (selvarPair[4]==1) passPHiso1 = true;
+    if (selvarPair[5]==1) passPHiso2 = true;
+    if (selvarPair[6]==1) passSieie1 = true;
+    if (selvarPair[7]==1) passSieie2 = true;
+    if (selvarPair[8]==1) passHoe1 = true; 
+    if (selvarPair[9]==1) passHoe1 = true; 
 */
 
 
@@ -496,6 +512,8 @@ void Plotter::make2DHistos(){
     hvEta[z] = new TH2F(Form("%s_eta_%s",effvar[z].Data(),species.Data()),Form("%s_eta_%s",effvar[z].Data(),species.Data()),60,-3,3,range2D[z][0],range2D[z][1],range2D[z][2]);
   }
 
+  TH2F *hMggvMet = new TH2F(Form("mgg_t1pfMet_%s",species.Data()),Form("mgg_t1pfMet_%s",species.Data()),100,0,1000,50,50,300);
+
   Float_t var2D[N2DVARIABLES];
 
   for (int i=0; i<nphotons; ++i){
@@ -514,6 +532,7 @@ void Plotter::make2DHistos(){
     var2D[10]= variable[6];
     var2D[11]= variable[14];
 
+    hMggvMet->Fill(variable[17],variable[0],variable[18]);
 
     for (int z=0; z<N2DVARIABLES; ++z){
       hvPU[z]->Fill(intvariable[29],var2D[z],variable[18]);
@@ -539,7 +558,12 @@ void Plotter::make2DHistos(){
     Plotter::DrawWriteSave2DPlot(hvPU[z],"PU",effvar[z]); 
     Plotter::DrawWriteSave2DPlot(hvPt[z],"Pt",effvar[z]); 
     Plotter::DrawWriteSave2DPlot(hvEta[z],"Eta",effvar[z]); 
-  } 
+  }
+
+  hMggvMet->GetXaxis()->SetTitle("t1pfMet [GeV]");
+  hMggvMet->GetYaxis()->SetTitle("M(#gamma#gamma) [GeV]");
+  Plotter::DrawWriteSave2DPlot(hMggvMet,"t1pfMet","mgg");
+ 
 }// end Plotter::make2DHistos
 
 
@@ -556,8 +580,10 @@ void Plotter::DrawWriteSave1DPlot(TH1F *& h, const TString plotName, const Bool_
   h->SetTitle(0);
 
   fTH1Canv->SetLogy(0);
-  if(DrawNorm){ 
-    h->DrawNormalized();
+  if(DrawNorm){
+    if( h->Integral()!=0){ 
+      h->DrawNormalized();
+    }
     Plotter::FindMinAndMax(h,0);
   }
   else{

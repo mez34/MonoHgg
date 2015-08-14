@@ -34,6 +34,8 @@ int main(){
   TString inDir = "data/50ns/";
   TString outDir = "diPhoPlots/50ns/";
 
+  bool doFakeData = false;
+  bool doTest = true;
   bool doPlots = false;
   bool doComb = false;
   
@@ -42,62 +44,64 @@ int main(){
   //gROOT->LoadMacro("Plotter.cpp++g");
   //Plotter * test1 = new Plotter("./data/ALL_nosel/diPhotons","./diPhoPlots/ALL_nosel/","DMHtoGG",30);
 
-  std::cout << "Working on test sample" << std::endl;
-  Plotter * test = new Plotter("./data/50ns/","./diPhoPlots/50ns/","test",30);
-  test->DoPlots();
-  delete test;
-  std::cout << "Finished test sample" << std::endl;
+  if (doTest){
+    std::cout << "Working on test sample" << std::endl;
+    Plotter * test = new Plotter("./data/50ns/","./diPhoPlots/50ns/","test",30);
+    test->DoPlots();
+    delete test;
+    std::cout << "Finished test sample" << std::endl;
+  }
+  if (doFakeData){
+    std::cout << "Working on FakeData sample" << std::endl;
+    Plotter * FakeData = new Plotter("./data/50ns/","./diPhoPlots/50ns/","FakeData",30);
+    FakeData->DoPlots();
+    delete FakeData;
+    std::cout << "Finished FakeData sample" << std::endl;
+  }
 
-  /*std::cout << "Working on FakeData sample" << std::endl;
-  Plotter * FakeData = new Plotter("./data/50ns/","./diPhoPlots/50ns/","FakeData",30);
-  FakeData->DoPlots();
-  delete FakeData;
-  std::cout << "Finished FakeData sample" << std::endl;
-*/
-/*
-
-  std::cout << "Working on GJets sample" << std::endl;
-  Plotter * GJets = new Plotter("./data/50ns/","./diPhoPlots/50ns/","GJets",30);
-  GJets->DoPlots();
-  delete GJets;
-  std::cout << "Finished GJets sample" << std::endl;
-
-  std::cout << "Working on QCD sample" << std::endl;
-  Plotter * QCD = new Plotter("./data/50ns/","./diPhoPlots/50ns/","QCD",30);
-  QCD->DoPlots();
-  delete QCD;
-  std::cout << "Finished QCD sample" << std::endl;
-
-  std::cout << "Working on GluGluH sample" << std::endl;
-  Plotter * GGHGG = new Plotter("./data/50ns/","./diPhoPlots/50ns/","GluGluHToGG",30);
-  GGHGG->DoPlots();
-  delete GGHGG;
-  std::cout << "Finished GluGluH sample" << std::endl;
-
-  std::cout << "Working on DMHgg M1000 sample" << std::endl;
-  Plotter * DMH_M1000= new Plotter("./data/50ns/","./diPhoPlots/50ns/","DMHtoGG_M1000",30);
-  DMH_M1000->DoPlots();
-  delete DMH_M1000;
-  std::cout << "Finished DMHgg M1000 sample" << std::endl;
-
-  std::cout << "Working on DMHgg M100 sample" << std::endl;
-  Plotter * DMH_M100= new Plotter("./data/50ns/","./diPhoPlots/50ns/","DMHtoGG_M100",30);
-  DMH_M100->DoPlots();
-  delete DMH_M100;
-  std::cout << "Finished DMHgg M100 sample" << std::endl;
-
-  std::cout << "Working on DMHgg M10 sample" << std::endl;
-  Plotter * DMH_M10= new Plotter("./data/50ns/","./diPhoPlots/50ns/","DMHtoGG_M10",30);
-  DMH_M10->DoPlots();
-  delete DMH_M10;
-  std::cout << "Finished DMHgg M10 sample" << std::endl;
-
-  std::cout << "Working on DMHgg M1 sample" << std::endl;
-  Plotter * DMH_M1= new Plotter("./data/50ns/","./diPhoPlots/50ns/","DMHtoGG_M1",30);
-  DMH_M1->DoPlots();
-  delete DMH_M1;
-  std::cout << "Finished DMHgg M1 sample" << std::endl;
-*/
+  if (doPlots){
+    std::cout << "Working on GJets sample" << std::endl;
+    Plotter * GJets = new Plotter("./data/50ns/","./diPhoPlots/50ns/","GJets",30);
+    GJets->DoPlots();
+    delete GJets;
+    std::cout << "Finished GJets sample" << std::endl;
+  
+    std::cout << "Working on QCD sample" << std::endl;
+    Plotter * QCD = new Plotter("./data/50ns/","./diPhoPlots/50ns/","QCD",30);
+    QCD->DoPlots();
+    delete QCD;
+    std::cout << "Finished QCD sample" << std::endl;
+  
+    std::cout << "Working on GluGluH sample" << std::endl;
+    Plotter * GGHGG = new Plotter("./data/50ns/","./diPhoPlots/50ns/","GluGluHToGG",30);
+    GGHGG->DoPlots();
+    delete GGHGG;
+    std::cout << "Finished GluGluH sample" << std::endl;
+  
+    std::cout << "Working on DMHgg M1000 sample" << std::endl;
+    Plotter * DMH_M1000= new Plotter("./data/50ns/","./diPhoPlots/50ns/","DMHtoGG_M1000",30);
+    DMH_M1000->DoPlots();
+    delete DMH_M1000;
+    std::cout << "Finished DMHgg M1000 sample" << std::endl;
+  
+    std::cout << "Working on DMHgg M100 sample" << std::endl;
+    Plotter * DMH_M100= new Plotter("./data/50ns/","./diPhoPlots/50ns/","DMHtoGG_M100",30);
+    DMH_M100->DoPlots();
+    delete DMH_M100;
+    std::cout << "Finished DMHgg M100 sample" << std::endl;
+  
+    std::cout << "Working on DMHgg M10 sample" << std::endl;
+    Plotter * DMH_M10= new Plotter("./data/50ns/","./diPhoPlots/50ns/","DMHtoGG_M10",30);
+    DMH_M10->DoPlots();
+    delete DMH_M10;
+    std::cout << "Finished DMHgg M10 sample" << std::endl;
+  
+    std::cout << "Working on DMHgg M1 sample" << std::endl;
+    Plotter * DMH_M1= new Plotter("./data/50ns/","./diPhoPlots/50ns/","DMHtoGG_M1",30);
+    DMH_M1->DoPlots();
+    delete DMH_M1;
+    std::cout << "Finished DMHgg M1 sample" << std::endl;
+  }
 
   if (doComb){
     ColorMap colorMap;
@@ -117,7 +121,7 @@ int main(){
     Samples.push_back(SamplePair("DMHtoGG_M100",0)); 
     Samples.push_back(SamplePair("DMHtoGG_M10",0)); 
     Samples.push_back(SamplePair("DMHtoGG_M1",0)); 
-    //Samples.push_back(SamplePair("FakeData",5));
+    if (doFakeData) Samples.push_back(SamplePair("FakeData",5));
   
     UInt_t nbkg = 0;
     UInt_t nsig = 0;

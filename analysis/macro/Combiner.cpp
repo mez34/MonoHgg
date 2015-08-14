@@ -435,9 +435,11 @@ void Combiner::InitTH1DNames(){
   // higgs & met variables
   fTH1DNames.push_back("mgg");
   fTH1DNames.push_back("ptgg");
+  fTH1DNames.push_back("nvtx"); 
   fTH1DNames.push_back("t1pfmetPhi");
   fTH1DNames.push_back("t1pfmet");
-  fTH1DNames.push_back("nvtx");
+  if (addText!="_n-1"){ fTH1DNames.push_back("mgg_selt1pfMet"); }
+  if (addText!="_n-1"){ fTH1DNames.push_back("t1pfMet_selMgg"); }
   if (addText!="_n-1"){ fTH1DNames.push_back("phi_H"); }
   if (addText!="_n-1"){ fTH1DNames.push_back("phi_HMET"); }
 
