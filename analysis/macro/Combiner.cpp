@@ -106,6 +106,7 @@ void Combiner::OverlayPlots(){
   
     // sig: just add to legend
     for (UInt_t mc = 0; mc < fNSig; mc++){
+      fInSigTH1DHists[th1d][mc]->Scale(lumi);
       fTH1DLegends[th1d]->AddEntry(fInSigTH1DHists[th1d][mc],fSampleTitleMap[fSigNames[mc]],"l");
     }
   }// end loop over th1d histos
@@ -117,6 +118,14 @@ void Combiner::OverlayPlots(){
 void Combiner::MakeOutputCanvas(){
   for (UInt_t th1d = 0; th1d < fNTH1D; th1d++){
 
+
+/*
+     for (UInt_t mc = 0; mc < fNBkg; mc++){
+      std::cout << th1d << " before " << fInBkgTH1DHists[th1d][mc]->GetMaximum() << std::endl;
+      fInBkgTH1DHists[th1d][mc]->Scale(lumi);
+    }
+    if (fNData > 0) fOutDataTH1DHists[th1d]->Scale(lumi);
+*/
     // do stack plots first
     Bool_t isLogY = true;
     Combiner::DrawCanvasStack(th1d,isLogY);
@@ -140,11 +149,13 @@ void Combiner::DrawCanvasOverlay(const UInt_t th1d, const Bool_t isLogY){
   fOutTH1DStackPads[th1d]->cd();
    
   for (UInt_t mc = 0; mc < fNSig; mc++){
+    std::cout << "sig_int  " << mc << " = "<< fInSigTH1DHists[th1d][mc]->Integral() << std::endl;
     if (fInSigTH1DHists[th1d][mc]->Integral() > 0){
       fInSigTH1DHists[th1d][mc]->Scale(1.0/fInSigTH1DHists[th1d][mc]->Integral());
     }
   }
   for (UInt_t mc = 0; mc < fNBkg; mc++){
+    std::cout << "bkg_int  "<< mc <<" = "  << fInBkgTH1DHists[th1d][mc]->Integral() << std::endl;
     if (fInBkgTH1DHists[th1d][mc]->Integral() > 0 ){
       fInBkgTH1DHists[th1d][mc]->Scale(1.0/fInBkgTH1DHists[th1d][mc]->Integral());
     }
@@ -192,7 +203,7 @@ void Combiner::DrawCanvasStack(const UInt_t th1d, const Bool_t isLogY){
   fOutTH1DStackPads[th1d]->cd();
 
 
-  for (UInt_t mc = 0; mc < fNSig; mc++){
+ /* for (UInt_t mc = 0; mc < fNSig; mc++){
     fInSigTH1DHists[th1d][mc]->Scale(lumi);
   }
   for (UInt_t data = 0; data < fNData; data++){
@@ -202,14 +213,17 @@ void Combiner::DrawCanvasStack(const UInt_t th1d, const Bool_t isLogY){
       else std::cout << "hahahaha"<< std::endl;
       fOutDataTH1DHists[th1d]->Scale(lumi);
    // }
-  }
+  }*/
 
 
   Double_t max = -100;
   max = Combiner::GetMaximum(th1d, true);
 
+  //std::cout << th1d << " " << max << std::endl;
+
   Double_t minval = 1E20;
   minval = Combiner::GetMinimum(th1d, true);
+
 
   // start by drawing the sig first
   if (isLogY) fInSigTH1DHists[th1d][0]->SetMaximum(max*10);
@@ -271,6 +285,20 @@ void Combiner::DrawCanvasStack(const UInt_t th1d, const Bool_t isLogY){
   fOutTH1DCanvases[th1d]->SaveAs(Form("%scomb/%s_stack%s%s.png",fOutDir.Data(),fTH1DNames[th1d].Data(),addText.Data(),suffix.Data()));  
   fOutFile->cd();
   fOutTH1DCanvases[th1d]->Write(Form("%s%s_stack%s",fTH1DNames[th1d].Data(),suffix.Data(),addText.Data()));
+
+  /*
+  for (UInt_t mc = 0; mc < fNSig; mc++){
+    fInSigTH1DHists[th1d][mc]->Scale(1/lumi);
+  }
+  for (UInt_t data = 0; data < fNData; data++){
+    //std::cout << fDataNames[data].Data() << std::endl;
+//    if (Form("%s",fDataNames[data].Data()) == "FakeData"){
+      if ( fDataNames[data].Data() == "FakeData" ) std::cout << "worked!" << std::endl;
+      else std::cout << "hahahaha"<< std::endl;
+      fOutDataTH1DHists[th1d]->Scale(1/lumi);
+   // }
+  }
+  */
 
 }// end Combiner::DrawCanvasStack
 
@@ -402,6 +430,8 @@ void Combiner::InitCanvAndHists(){
     fTH1DLegends[th1d] = new TLegend(0.70,0.7,0.9,0.89); // (x1,y1,x2,y2)
     fTH1DLegends[th1d]->SetBorderSize(4);
     fTH1DLegends[th1d]->SetLineColor(kBlack);
+    fTH1DLegends[th1d]->SetTextSize(0.03);
+    fTH1DLegends[th1d]->SetLineWidth(2);
   }
 
   fOutTH1DCanvases.resize(fNTH1D);
@@ -434,36 +464,36 @@ void Combiner::InitCanvAndHists(){
 void Combiner::InitTH1DNames(){
   // higgs & met variables
   fTH1DNames.push_back("mgg");
-  fTH1DNames.push_back("ptgg");
-  fTH1DNames.push_back("nvtx"); 
-  fTH1DNames.push_back("t1pfmetPhi");
+//  fTH1DNames.push_back("ptgg");
+//  fTH1DNames.push_back("nvtx"); 
+//  fTH1DNames.push_back("t1pfmetPhi");
   fTH1DNames.push_back("t1pfmet");
   if (addText!="_n-1"){ fTH1DNames.push_back("mgg_selt1pfMet"); }
   if (addText!="_n-1"){ fTH1DNames.push_back("t1pfMet_selMgg"); }
-  if (addText!="_n-1"){ fTH1DNames.push_back("phi_H"); }
-  if (addText!="_n-1"){ fTH1DNames.push_back("phi_HMET"); }
-
-  // photon variables
-  fTH1DNames.push_back("pt1");
-  fTH1DNames.push_back("pt2");
-  fTH1DNames.push_back("eta1");
-  fTH1DNames.push_back("eta2");
-  fTH1DNames.push_back("phi1");
-  fTH1DNames.push_back("phi2");
-
-  fTH1DNames.push_back("r91");
-  fTH1DNames.push_back("r92");
-
-  // photon ID variables
-  fTH1DNames.push_back("hoe1");
-  fTH1DNames.push_back("hoe2");
-  fTH1DNames.push_back("sieie1");
-  fTH1DNames.push_back("sieie2");
-  fTH1DNames.push_back("phoiso1");
-  fTH1DNames.push_back("phoiso2");
-  fTH1DNames.push_back("chiso1");
-  fTH1DNames.push_back("chiso2");
-  fTH1DNames.push_back("neuiso1");
-  fTH1DNames.push_back("neuiso2");
+//  if (addText!="_n-1"){ fTH1DNames.push_back("phi_H"); }
+//  if (addText!="_n-1"){ fTH1DNames.push_back("phi_HMET"); }
+//
+//  // photon variables
+//  fTH1DNames.push_back("pt1");
+//  fTH1DNames.push_back("pt2");
+//  fTH1DNames.push_back("eta1");
+//  fTH1DNames.push_back("eta2");
+//  fTH1DNames.push_back("phi1");
+//  fTH1DNames.push_back("phi2");
+//
+//  fTH1DNames.push_back("r91");
+//  fTH1DNames.push_back("r92");
+//
+//  // photon ID variables
+//  fTH1DNames.push_back("hoe1");
+//  fTH1DNames.push_back("hoe2");
+//  fTH1DNames.push_back("sieie1");
+//  fTH1DNames.push_back("sieie2");
+//  fTH1DNames.push_back("phoiso1");
+//  fTH1DNames.push_back("phoiso2");
+//  fTH1DNames.push_back("chiso1");
+//  fTH1DNames.push_back("chiso2");
+//  fTH1DNames.push_back("neuiso1");
+//  fTH1DNames.push_back("neuiso2");
 
 }// end Combiner::InitTH1DNames

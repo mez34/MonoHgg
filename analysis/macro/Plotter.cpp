@@ -5,7 +5,6 @@
 
 Plotter::Plotter( TString inName, TString outName, TString inSpecies, const Double_t lumi){
 
-
   // Get ROOT file
   name = inName;
   species = inSpecies;
@@ -41,23 +40,26 @@ Plotter::Plotter( TString inName, TString outName, TString inSpecies, const Doub
 
 
 Plotter::~Plotter(){
-  // Write and Close output ROOT file
-  outFile->Write();
-  outFile->Close(); 
 
   std::cout<<"Finished & Deleting"<<std::endl;
   delete fTH1Canv;
   delete fTH2Canv;
-  delete outFile;
   delete inFile;
+
+  // Write and Close output ROOT file
+  delete outFile;
 
 }// end Plotter::~Plotter
 
 
 void Plotter::DoPlots(){
   Plotter::getTree();
+  std::cout << "Here1" << std::endl;
   Plotter::make1DHistos();
+  std::cout << "Here2" << std::endl;
   Plotter::make2DHistos();
+  
+  outFile->Write();
 }// end Plotter::DoPlots
 
 void Plotter::getTree(){
@@ -69,10 +71,10 @@ void Plotter::getTree(){
 
   selvarPair[NSEL]; 
   for(int z=0; z<NVARIABLES; ++z){
-/*    if(z < NSEL){
+    if(z < NSEL){
       tpho->SetBranchAddress(selvar[z].Data(),&selvarPair[z]);
     }
-*/
+
     if(z==8 || z==16 || z>=25 ){ //eleveto, sel, nvtx
        tpho->SetBranchAddress(varname[z],&intvariable[z]);
      }
@@ -220,6 +222,7 @@ void Plotter::make1DHistos(){
   xaxisLabel[29]="nvtx";
 
 
+
   TH1F *hVar[NVARIABLES];
   TH1F *hVarNmin1[NVARIABLES];
   for (int z=0; z<NVARIABLES; ++z){
@@ -235,14 +238,14 @@ void Plotter::make1DHistos(){
   hPhi[1] = new TH1F(Form("phi_MET_%s",species.Data()),Form("phi_MET_%s",species.Data()),80,-4,4);
   hPhi[2] = new TH1F(Form("phi_HMET_%s",species.Data()),Form("phi_HMET_%s",species.Data()),80,-4,4);
 
-  TH1F *hEff[3]; // eff of pho ID vs PU, pt, eta
+/*  TH1F *hEff[3]; // eff of pho ID vs PU, pt, eta
   hEff[0] = new TH1F(Form("Eff_PHID_PU_%s",species.Data()),Form("Eff_PHID_PU_%s",species.Data()),60,0,60);
   hEff[1] = new TH1F(Form("Eff_PHID_pt_%s",species.Data()),Form("Eff_PHID_pt_%s",species.Data()),60,0,600);
   hEff[2] = new TH1F(Form("Eff_PHID_eta_%s",species.Data()),Form("Eff_PHID_eta_%s",species.Data()),60,-3,3);
-
+*/
   //plot Mgg and MET with some photonIDsel and cut on other var
   TH1F *hMET = new TH1F(Form("t1pfMet_selMgg_%s",species.Data()),Form("t1pfMet_selMgg_%s",species.Data()),100,0,1000);
-  TH1F *hMgg = new TH1F(Form("mgg_selt1pfMet_%s",species.Data()),Form("mgg_selt1pfMet_%s",species.Data()),60,0,300);
+  TH1F *hMgg = new TH1F(Form("mgg_selt1pfMet_%s",species.Data()),Form("mgg_selt1pfMet_%s",species.Data()),50,50,300);
 
   Float_t phiH[nphotons];
   //phiH[nphotons] = {-1000}; 
@@ -250,135 +253,75 @@ void Plotter::make1DHistos(){
   //phiHMET[nphotons] = {-1000};
 
 
+
   int nphotonsPass=0;
-  int Eff[6][60]={0};
+  //int Eff[6][60]={0};
 
   for (int i=0; i<nphotons; ++i){   
     tpho->GetEntry(i);
 
-/*
+    for (UInt_t z=0; z<NVARIABLES; z++){
+      if (z==8 || z==16 || z>=25) hVar[z]->Fill(intvariable[z],variable[18]);
+      else hVar[z]->Fill(variable[z],variable[18]);
+    }
+
     Bool_t passCHiso1 = false;
     Bool_t passCHiso2 = false;
     Bool_t passNHiso1 = false;
     Bool_t passNHiso2 = false;
     Bool_t passPHiso1 = false;
     Bool_t passPHiso2 = false;
-    Bool_t passSieie1 = false;
-    Bool_t passSieie2 = false;
+    Bool_t passSieie1 = true;
+    Bool_t passSieie2 = true;
     Bool_t passHoe1 = false;
     Bool_t passHoe2 = false;
-    if (selvarPair[0]==1) passCHiso1 = true; 
-    if (selvarPair[1]==1) passCHiso2 = true; 
-    if (selvarPair[2]==1) passNHiso1 = true;
-    if (selvarPair[3]==1) passNHiso2 = true;
-    if (selvarPair[4]==1) passPHiso1 = true;
-    if (selvarPair[5]==1) passPHiso2 = true;
-    if (selvarPair[6]==1) passSieie1 = true;
-    if (selvarPair[7]==1) passSieie2 = true;
-    if (selvarPair[8]==1) passHoe1 = true; 
-    if (selvarPair[9]==1) passHoe1 = true; 
-*/
+    Bool_t passAll1 = false;
+    Bool_t passAll2 = false;
+    Bool_t passBoth = false;
 
+    if (selvarPair[0]==0) passCHiso1 = true; 
+    if (selvarPair[1]==0) passCHiso2 = true; 
+    if (selvarPair[2]==0) passNHiso1 = true;
+    if (selvarPair[3]==0) passNHiso2 = true;
+    if (selvarPair[4]==0) passPHiso1 = true;
+    if (selvarPair[5]==0) passPHiso2 = true;
+    if (selvarPair[6]==0) passSieie1 = true;
+    if (selvarPair[7]==0) passSieie2 = true;
+    if (selvarPair[8]==0) passHoe1 = true; 
+    if (selvarPair[9]==0) passHoe2 = true; 
 
+    if (passCHiso1 && passNHiso1 && passPHiso1 && passSieie1 && passHoe1) passAll1 = true;
+    if (passCHiso2 && passNHiso2 && passPHiso2 && passSieie2 && passHoe2) passAll2 = true;
+    if (passAll1 && passAll2) passBoth = true;
 
+    if (passCHiso1 && passNHiso1 && passPHiso1 && passHoe1)   hVarNmin1[3]->Fill(variable[3],variable[18]);
+    if (passCHiso1 && passNHiso1 && passPHiso1 && passSieie1) hVarNmin1[4]->Fill(variable[4],variable[18]);
+    if (passNHiso1 && passPHiso1 && passSieie1 && passHoe1)   hVarNmin1[5]->Fill(variable[5],variable[18]);
+    if (passCHiso1 && passNHiso1 && passSieie1 && passHoe1)   hVarNmin1[6]->Fill(variable[6],variable[18]);
+    if (passCHiso1 && passPHiso1 && passSieie1 && passHoe1)   hVarNmin1[7]->Fill(variable[7],variable[18]);
+    if (passCHiso2 && passNHiso2 && passPHiso2 && passHoe2)   hVarNmin1[11]->Fill(variable[11],variable[18]);
+    if (passCHiso2 && passNHiso2 && passPHiso2 && passSieie2) hVarNmin1[12]->Fill(variable[12],variable[18]);
+    if (passNHiso2 && passPHiso2 && passSieie2 && passHoe2)   hVarNmin1[13]->Fill(variable[13],variable[18]);
+    if (passCHiso2 && passNHiso2 && passSieie2 && passHoe2)   hVarNmin1[14]->Fill(variable[14],variable[18]);
+    if (passCHiso2 && passPHiso2 && passSieie2 && passHoe2)   hVarNmin1[15]->Fill(variable[15],variable[18]);
 
-    Bool_t passCHIso_EB1 = false;
-    Bool_t passCHIso_EE1 = false;
-    Bool_t passNHIso_EB1 = false;
-    Bool_t passNHIso_EE1 = false;
-    Bool_t passPHIso_EB1 = false;
-    Bool_t passPHIso_EE1 = false;
-    Bool_t passSieie_EB1 = true; //FIXME this is bc Sieie dist. not working in signal
-    Bool_t passSieie_EE1 = true; //FIXME
-    Bool_t passHoe_EB1 = false;
-    Bool_t passHoe_EE1 = false;
-    Bool_t passAll_EB1 = false;
-    Bool_t passAll_EE1 = false;
-
-    Bool_t passCHIso_EB2 = false;
-    Bool_t passCHIso_EE2 = false;
-    Bool_t passNHIso_EB2 = false;
-    Bool_t passNHIso_EE2 = false;
-    Bool_t passPHIso_EB2 = false;
-    Bool_t passPHIso_EE2 = false;
-    Bool_t passSieie_EB2 = true; //FIXME
-    Bool_t passSieie_EE2 = true; //FIXME
-    Bool_t passHoe_EB2 = false;
-    Bool_t passHoe_EE2 = false;
-    Bool_t passAll_EB2 = false;
-    Bool_t passAll_EE2 = false;
-   
-    Bool_t passAny = false;
-
-    if (variable[23] < 1.479){ // pho1 in EB
-       if (variable[5] <= 1.79) passCHIso_EB1 = true;
-       if (variable[7] <= (0.16+TMath::Exp(0.0028*variable[1]+0.5408))) passNHIso_EB1 = true;
-       if (variable[6] <= 1.9+0.0014*variable[1]) passPHIso_EB1 = true;
-       if (variable[3] <= 0.010) passSieie_EB1 = true;
-       if (variable[4] <= 0.012) passHoe_EB1 = true;      
-    }
-    else{ // pho1 in EE
-       if (variable[5] <= 1.09) passCHIso_EE1 = true;
-       if (variable[7] <= (4.31+TMath::Exp(0.0172*variable[1]))) passNHIso_EE1 = true;
-       if (variable[6] <= 1.9+0.0091*variable[1]) passPHIso_EE1 = true;
-       if (variable[3] <= 0.0267) passSieie_EE1 = true;
-       if (variable[4] <= 0.023) passHoe_EE1 = true;      
-    }
-    if (variable[24] < 1.479){ // pho2 in EB
-       if (variable[13] <= 1.79) passCHIso_EB2 = true;
-       if (variable[15] <= (0.16+TMath::Exp(0.02028*variable[9]+0.5408))) passNHIso_EB2 = true;
-       if (variable[14] <= 1.9+0.0014*variable[9]) passPHIso_EB2 = true;
-       if (variable[11] <= 0.010) passSieie_EB2 = true;
-       if (variable[12] <= 0.012) passHoe_EB2 = true;      
-    }
-    else{ // pho2 in EE
-       if (variable[13] <= 1.09) passCHIso_EE2 = true;
-       if (variable[15] <= (4.31+TMath::Exp(0.0172*variable[9]))) passNHIso_EE2 = true;
-       if (variable[14] <= 1.9+0.0091*variable[9]) passPHIso_EE2 = true;
-       if (variable[11] <= 0.0267) passSieie_EE2 = true;
-       if (variable[12] <= 0.023) passHoe_EE2 = true;      
+    for (UInt_t z=0; z<NVARIABLES; z++){
+      if (z==1 || z==2 || z==8 || z==21 || z==23 || z==25 || z==27){// plot pho1 variables
+        if (passAll1) hVarNmin1[z]->Fill(variable[z],variable[18]);
+      }
+      if (z==9 || z==10 || z==16 || z==22 || z==24 || z==26 || z==28){// plot pho2 variables
+        if (passAll2) hVarNmin1[z]->Fill(variable[z],variable[18]);
+      }
+      if (z==0 || z==17 || z==18 || z==19 || z==20 || z==29){// plot pho1&2 variables
+        if (passBoth) hVarNmin1[z]->Fill(variable[z],variable[18]);
+      }
     }
 
-    if (passCHIso_EB1 && passNHIso_EB1 && passPHIso_EB1 && passSieie_EB1 && passHoe_EB1) passAll_EB1 = true;
-    if (passCHIso_EE1 && passNHIso_EE1 && passPHIso_EE1 && passSieie_EE1 && passHoe_EE1) passAll_EE1 = true;
-    if (passCHIso_EB2 && passNHIso_EB2 && passPHIso_EB2 && passSieie_EB2 && passHoe_EB2) passAll_EB2 = true;
-    if (passCHIso_EE2 && passNHIso_EE2 && passPHIso_EE2 && passSieie_EE2 && passHoe_EE2) passAll_EE2 = true;
-
-    for (int z=0; z<NVARIABLES; ++z){
-      if (z==8 || z==16 || z>=25) hVar[z]->Fill(intvariable[z],variable[18]);
-      else{
-        hVar[z]->Fill(variable[z],variable[18]);
-      }
-      if (z==3 || z==4 || z==5 || z==6 || z==7 || z==11 || z==12 || z==13 || z==14 || z==15){ //n-1 plots for phoID var
-        if ((passNHIso_EB1 && passPHIso_EB1 && passSieie_EB1 && passHoe_EB1) || (passNHIso_EE1 && passPHIso_EE1 && passSieie_EE1 && passHoe_EE1 )) hVarNmin1[5]->Fill(variable[5],variable[18]);
-        if ((passCHIso_EB1 && passPHIso_EB1 && passSieie_EB1 && passHoe_EB1) || (passCHIso_EE1 && passPHIso_EE1 && passSieie_EE1 && passHoe_EE1 )) hVarNmin1[7]->Fill(variable[7],variable[18]);
-        if ((passCHIso_EB1 && passNHIso_EB1 && passSieie_EB1 && passHoe_EB1) || (passCHIso_EE1 && passNHIso_EE1 && passSieie_EE1 && passHoe_EE1 )) hVarNmin1[6]->Fill(variable[6],variable[18]);
-        if ((passCHIso_EB1 && passNHIso_EB1 && passPHIso_EB1 && passHoe_EB1) || (passCHIso_EE1 && passNHIso_EE1 && passPHIso_EE1 && passHoe_EE1 )) hVarNmin1[3]->Fill(variable[3],variable[18]);
-        if ((passCHIso_EB1 && passNHIso_EB1 && passPHIso_EB1 && passSieie_EB1) || (passCHIso_EE1 && passNHIso_EE1 && passPHIso_EE1 && passSieie_EE1 )) hVarNmin1[3]->Fill(variable[4],variable[18]);
-
-        if ((passNHIso_EB2 && passPHIso_EB2 && passSieie_EB2 && passHoe_EB2) || (passNHIso_EE2 && passPHIso_EE2 && passSieie_EE2 && passHoe_EE2 )) hVarNmin1[13]->Fill(variable[13],variable[18]);
-        if ((passCHIso_EB2 && passPHIso_EB2 && passSieie_EB2 && passHoe_EB2) || (passCHIso_EE2 && passPHIso_EE2 && passSieie_EE2 && passHoe_EE2 )) hVarNmin1[15]->Fill(variable[15],variable[18]);
-        if ((passCHIso_EB2 && passNHIso_EB2 && passSieie_EB2 && passHoe_EB2) || (passCHIso_EE2 && passNHIso_EE2 && passSieie_EE2 && passHoe_EE2 )) hVarNmin1[14]->Fill(variable[14],variable[18]);
-        if ((passCHIso_EB2 && passNHIso_EB2 && passPHIso_EB2 && passHoe_EB2) || (passCHIso_EE2 && passNHIso_EE2 && passPHIso_EE2 && passHoe_EE2 )) hVarNmin1[11]->Fill(variable[11],variable[18]);
-        if ((passCHIso_EB2 && passNHIso_EB2 && passPHIso_EB2 && passSieie_EB2) || (passCHIso_EE2 && passNHIso_EE2 && passPHIso_EE2 && passSieie_EE2 )) hVarNmin1[12]->Fill(variable[12],variable[18]);
-      }
-      else if (z==0 || z==17 || z==18 || z==19 || z==20 || z==29){
-        if ((passAll_EB1 || passAll_EE1) && (passAll_EB2 || passAll_EE2)){// both pho1 and pho2 pass
-	  hVarNmin1[z]->Fill(variable[z],variable[18]);
-          if (variable[0] > 120.0 && variable[0] < 130.0) hMET->Fill(variable[17],variable[18]);
-	  if (variable[17] > 250.0) hMgg->Fill(variable[0],variable[18]); 
-	}
-      }
-      else if (z==1 || z==2 || z==21 || z==23 || z==25 || z==27){ // fill "n-1" plots for pho1 if they pass phoID selection
-        if (passAll_EB1 || passAll_EE1) hVarNmin1[z]->Fill(variable[z],variable[18]);
-      }
-      else{ // fill "n-1" plots for pho2 if they pass phoID selection
-        if (passAll_EB2 || passAll_EE2) hVarNmin1[z]->Fill(variable[z],variable[18]);
-      }
-    }// end loop over the variables in the Tree
-
-    passAny = (passAll_EB1 || passAll_EE1 || passAll_EB2 || passAll_EE2);
-    if (passAny) nphotonsPass++;
+    if (variable[0] > 120.0 && variable[0] < 130.0) hMET->Fill(variable[17],variable[18]);
+    if (variable[17] > 100.0) hMgg->Fill(variable[0],variable[18]); 
+ 
+   /*
+   if (passAny) nphotonsPass++;
     for (int x=0; x<60; x++){
       if (intvariable[29]==x){ // evnts with nvtx = x
         Eff[0][x]++;
@@ -393,7 +336,7 @@ void Plotter::make1DHistos(){
         if (passAny) Eff[5][x]++;
       } 
     }// loop over bins for eff plots      
-   
+*/   
 
     phiH[i]=TMath::ATan( (variable[1]*TMath::Sin(variable[21]) - variable[9]*TMath::Sin(variable[22])) / (variable[1]*TMath::Cos(variable[21]) - variable[9]*TMath::Cos(variable[22])) );
     phiHMET[i]=deltaPhi(phiH[i],variable[20]);
@@ -405,18 +348,22 @@ void Plotter::make1DHistos(){
 
 
   }// end loop over all photons
-  Float_t eff[3][60]={0};
+
+
+  /*Float_t eff[3][60]={0};
   for (int x=0; x<60; x++){
     if(Eff[0][x]!=0) eff[0][x]=(Float_t)Eff[1][x]/(Float_t)Eff[0][x];
     if(Eff[2][x]!=0) eff[1][x]=(Float_t)Eff[3][x]/(Float_t)Eff[2][x];
     if(Eff[4][x]!=0) eff[2][x]=(Float_t)Eff[5][x]/(Float_t)Eff[4][x];
     
     //std::cout << Eff[5][x] << "  " << Eff[4][x] << "  " <<eff[2]<<std::endl;
-
+ 
     hEff[0]->Fill(x,eff[0][x]);   
     hEff[1]->Fill(10*x,eff[1][x]);   
     hEff[2]->Fill(-3+(x/10),eff[2][x]);   
   }
+  */
+
   hMgg->GetXaxis()->SetTitle("mgg");
   Plotter::DrawWriteSave1DPlot(hMgg,"mgg_selt1pfMet",true);
   hMET->GetXaxis()->SetTitle("t1pfmet");
@@ -426,6 +373,7 @@ void Plotter::make1DHistos(){
     Plotter::DrawWriteSave1DPlot(hVar[z],varname[z],true);
     Plotter::DrawWriteSave1DPlot(hVarNmin1[z],varname[z]+"_n-1",true);
   } 
+
   hPhi[0]->GetXaxis()->SetTitle("#phi_H");
   hPhi[1]->GetXaxis()->SetTitle("#phi_MET");
   hPhi[2]->GetXaxis()->SetTitle("#Delta#phi(H,MET)");
@@ -433,7 +381,7 @@ void Plotter::make1DHistos(){
   Plotter::DrawWriteSave1DPlot(hPhi[1],"phiMET",true);
   Plotter::DrawWriteSave1DPlot(hPhi[2],"phiHMET",true);
 
-  hEff[0]->GetXaxis()->SetTitle("nvtx");
+  /*hEff[0]->GetXaxis()->SetTitle("nvtx");
   hEff[1]->GetXaxis()->SetTitle("p_{T}");
   hEff[2]->GetXaxis()->SetTitle("#eta");
   hEff[0]->GetYaxis()->SetTitle("Efficiency to Pass PhoID");
@@ -442,7 +390,7 @@ void Plotter::make1DHistos(){
   Plotter::DrawWriteSave1DPlot(hEff[0],"Eff_PHOID_PU",false); 
   Plotter::DrawWriteSave1DPlot(hEff[1],"Eff_PHOID_pt",false); 
   Plotter::DrawWriteSave1DPlot(hEff[2],"Eff_PHOID_eta",false); 
-
+*/
 }// end Plotter::make1DHistos
 
 void Plotter::make2DHistos(){
@@ -580,10 +528,12 @@ void Plotter::DrawWriteSave1DPlot(TH1F *& h, const TString plotName, const Bool_
   h->SetTitle(0);
 
   fTH1Canv->SetLogy(0);
+
   if(DrawNorm){
-    if( h->Integral()!=0){ 
-      h->DrawNormalized();
-    }
+    //if( h->Integral()!=0){ 
+    //  h->DrawNormalized();
+    //}
+    h->Draw();
     Plotter::FindMinAndMax(h,0);
   }
   else{
@@ -594,18 +544,33 @@ void Plotter::DrawWriteSave1DPlot(TH1F *& h, const TString plotName, const Bool_
   CMSLumi(fTH1Canv,0,fLumi);
   //Style * cmsLumi = new Style(0.3);
   //cmsLumi->CMSLumi(fTH1Canv,1);
+ 
 
 //  h->GetXaxis()->SetTitleFont(42);
 //  h->GetXaxis()->SetLabelSize(0.03);
 //  h->GetXaxis()->SetTitleSize(0.75);
+
+  //std::cout << "Hereiam" << std::endl;
+  if (h == (TH1F*) NULL) {std::cout << "WOW" << std::endl;}
+  if (outFile == (TFile*) NULL) {std::cout << "WOW" << std::endl;}
+  //for (int i = 1; i <= h->GetNbinsX(); i++){
+  //  std::cout << h->GetBinContent(i) << std::endl;
+  //}
   h->Write();
+  //std::cout << "Here" << std::endl;
+  if (fTH1Canv == (TCanvas*) NULL) {std::cout << "WOW" << std::endl;}
+  //std::cout << Form("%s%s/%s_%s.png",fName.Data(),species.Data(),plotName.Data(),species.Data()) << std::endl;
+  fTH1Canv->cd();
   fTH1Canv->SaveAs(Form("%s%s/%s_%s.png",fName.Data(),species.Data(),plotName.Data(),species.Data()));
 //  delete cmsLumi;
 
+  //std::cout << "Here" << std::endl;
+
   fTH1Canv->SetLogy(1);
-  if(DrawNorm){
-     h->DrawNormalized();
-     Plotter::FindMinAndMax(h,1);
+  if (DrawNorm){
+    if (h->Integral() != 0){ h->DrawNormalized(); }
+    else { h->Draw(); }
+    Plotter::FindMinAndMax(h,1);
   }
   else{
     h->Draw();
