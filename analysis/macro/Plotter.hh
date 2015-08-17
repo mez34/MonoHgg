@@ -42,6 +42,7 @@ public:
   void DrawWriteSave2DPlot(TH2F *& h, TString varX, TString varY); 
 
   void InitTreeVar();
+  void InitTreeEffVar();
   void InitPhotonIDSel();
 
 private:
@@ -52,23 +53,30 @@ private:
   TFile * 	outFile;
   TCanvas * 	fTH1Canv;
   TCanvas * 	fTH2Canv;
+
   Double_t 	fLumi;
 
   TTree * 	tpho;
-
-  Int_t		NVARIABLES;
-  Int_t		N2DVARIABLES;
   Int_t		nphotons;
-  Int_t		NSEL;
 
+  TStrVec 	varname;
+  TStrVec	xaxisLabel;
+  Int_t		NVARIABLES;
   Float_t	variable[nvar];
+
+  TStrVec       effvar;	
+  Int_t		N2DVARIABLES;
   Int_t		intvariable[nvar];
-  TString 	varname[nvar];
+
+  TStrVec	selvar;
+  Int_t		NSEL;
+  Int_t		selvarPair[10];
+
+
   Int_t		nbins[nvar];
   Int_t		range[nvar][2];
 
-  TStrVec	selvar;
-  Int_t		selvarPair[10];
+
 };
 
 #endif

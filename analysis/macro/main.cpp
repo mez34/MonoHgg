@@ -35,9 +35,9 @@ int main(){
   TString outDir = "diPhoPlots/50ns/";
 
   bool doFakeData = false;
-  bool doTest = false;
+  bool doTest = true;
   bool doPlots = false;
-  bool doComb = true;
+  bool doComb = false;
   
   
   //for CMSSW_7_0_pre9: run with root
