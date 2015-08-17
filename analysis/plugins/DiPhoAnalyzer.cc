@@ -374,9 +374,9 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
         float leadSieienoZS = diphoPtr->leadingPhoton()->full5x5_sigmaIetaIeta();
 	float leadHoE    = diphoPtr->leadingPhoton()->hadTowOverEm();
 	
-	float leadChIso  = diphoPtr->leadingPhoton()->egChargedHadronIso()- rho * getChargedHadronEAForPhotonIso((diphoPtr->leadingPhoton()->superCluster())->eta());
-	float leadNeuIso = diphoPtr->leadingPhoton()->egNeutralHadronIso()- rho * getNeutralHadronEAForPhotonIso((diphoPtr->leadingPhoton()->superCluster())->eta());
-	float leadPhoIso = diphoPtr->leadingPhoton()->egPhotonIso()- rho * getGammaEAForPhotonIso((diphoPtr->leadingPhoton()->superCluster())->eta());
+	float leadChIso  = TMath::Max(diphoPtr->leadingPhoton()->egChargedHadronIso()- rho * getChargedHadronEAForPhotonIso((diphoPtr->leadingPhoton()->superCluster())->eta()),0.);
+	float leadNeuIso = TMath::Max(diphoPtr->leadingPhoton()->egNeutralHadronIso()- rho * getNeutralHadronEAForPhotonIso((diphoPtr->leadingPhoton()->superCluster())->eta()),0.);
+	float leadPhoIso = TMath::Max(diphoPtr->leadingPhoton()->egPhotonIso()- rho * getGammaEAForPhotonIso((diphoPtr->leadingPhoton()->superCluster())->eta()),0.);
 	//bool  leadOkEleV = diphoPtr->leadingPhoton()->passElectronVeto();
 	//bool  leadSelel  = isGammaSelected( rho, leadPt, leadScEta, leadR9noZS, leadChIso, leadNeuIso, leadPhoIso, leadHoE, leadSieienoZS, leadOkEleV); 
 	//bool  leadSelel  = testPhotonIsolation( rho, leadPt, leadScEta, leadR9noZS, leadChIso, leadNeuIso, leadPhoIso, leadHoE, leadSieienoZS, leadOkEleV); 
@@ -392,9 +392,9 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 	//float subleadR9noZS = diphoPtr->subLeadingPhoton()->full5x5_r9();
         float subleadSieienoZS = diphoPtr->subLeadingPhoton()->full5x5_sigmaIetaIeta();
 	float subleadHoE    = diphoPtr->subLeadingPhoton()->hadTowOverEm();
-	float subleadChIso  = diphoPtr->subLeadingPhoton()->egChargedHadronIso()- rho * getChargedHadronEAForPhotonIso((diphoPtr->subLeadingPhoton()->superCluster())->eta());
-	float subleadNeuIso = diphoPtr->subLeadingPhoton()->egNeutralHadronIso()- rho * getNeutralHadronEAForPhotonIso((diphoPtr->subLeadingPhoton()->superCluster())->eta());
-	float subleadPhoIso = diphoPtr->subLeadingPhoton()->egPhotonIso()- rho * getGammaEAForPhotonIso((diphoPtr->subLeadingPhoton()->superCluster())->eta());
+	float subleadChIso  = TMath::Max(diphoPtr->subLeadingPhoton()->egChargedHadronIso()- rho * getChargedHadronEAForPhotonIso((diphoPtr->subLeadingPhoton()->superCluster())->eta()),0.);
+	float subleadNeuIso = TMath::Max(diphoPtr->subLeadingPhoton()->egNeutralHadronIso()- rho * getNeutralHadronEAForPhotonIso((diphoPtr->subLeadingPhoton()->superCluster())->eta()),0.);
+	float subleadPhoIso = TMath::Max(diphoPtr->subLeadingPhoton()->egPhotonIso()- rho * getGammaEAForPhotonIso((diphoPtr->subLeadingPhoton()->superCluster())->eta()),0.);
 	//bool  subleadOkEleV = diphoPtr->subLeadingPhoton()->passElectronVeto();
 	//bool  subleadSelel  = isGammaSelected( rho, subleadPt, subleadScEta, subleadR9noZS, subleadChIso, subleadNeuIso, subleadPhoIso, subleadHoE, subleadSieienoZS, subleadOkEleV);  
 	//bool  subleadSelel  = testPhotonIsolation( rho, subleadPt, subleadScEta, subleadR9noZS, subleadChIso, subleadNeuIso, subleadPhoIso, subleadHoE, subleadSieienoZS, subleadOkEleV);  
@@ -1077,75 +1077,75 @@ bool DiPhoAnalyzer::isGammaPresel( float sceta, float pt, float r9, float chiso)
 }
 
 double DiPhoAnalyzer::getChargedHadronEAForPhotonIso(float eta) {
-if (fabs(eta) < 1.0) return 0.0234;
-else if (fabs(eta) >= 1.0 && fabs(eta) < 1.479) return 0.0189;
-else if (fabs(eta) >= 1.479 && fabs(eta) < 2.0 ) return 0.0171;
-else if (fabs(eta) >= 2.0 && fabs(eta) < 2.2 ) return 0.0129;
-else if (fabs(eta) >= 2.2 && fabs(eta) < 2.3 ) return 0.0110;
-else if (fabs(eta) >= 2.3 && fabs(eta) < 2.4 ) return 0.0074;
-else if (fabs(eta) >= 2.4) return 0.035;
+if (fabs(eta) < 1.0) return 0.0158;
+else if (fabs(eta) >= 1.0 && fabs(eta) < 1.479) return 0.0143;
+else if (fabs(eta) >= 1.479 && fabs(eta) < 2.0 ) return 0.0115;
+else if (fabs(eta) >= 2.0 && fabs(eta) < 2.2 ) return 0.0094;
+else if (fabs(eta) >= 2.2 && fabs(eta) < 2.3 ) return 0.0095;
+else if (fabs(eta) >= 2.3 && fabs(eta) < 2.4 ) return 0.0068;
+else if (fabs(eta) >= 2.4) return 0.0053;
 else return 0.;
 }
 double DiPhoAnalyzer::getNeutralHadronEAForPhotonIso(float eta) {
-if (fabs(eta) < 1.0) return 0.0053;
-else if (fabs(eta) >= 1.0 && fabs(eta) < 1.479) return 0.0103;
-else if (fabs(eta) >= 1.479 && fabs(eta) < 2.0 ) return 0.0057;
-else if (fabs(eta) >= 2.0 && fabs(eta) < 2.2 ) return 0.0070;
-else if (fabs(eta) >= 2.2 && fabs(eta) < 2.3 ) return 0.0152;
-else if (fabs(eta) >= 2.3 && fabs(eta) < 2.4 ) return 0.0232;
-else if (fabs(eta) >= 2.4) return 0.1709;
+if (fabs(eta) < 1.0) return 0.0143;
+else if (fabs(eta) >= 1.0 && fabs(eta) < 1.479) return 0.0210;
+else if (fabs(eta) >= 1.479 && fabs(eta) < 2.0 ) return 0.0147;
+else if (fabs(eta) >= 2.0 && fabs(eta) < 2.2 ) return 0.0082;
+else if (fabs(eta) >= 2.2 && fabs(eta) < 2.3 ) return 0.0124;
+else if (fabs(eta) >= 2.3 && fabs(eta) < 2.4 ) return 0.0186;
+else if (fabs(eta) >= 2.4) return 0.0320;
 else return 0.;
 }
 
 double DiPhoAnalyzer::getGammaEAForPhotonIso(float eta) {
-if (fabs(eta) < 1.0) return 0.078;
-else if (fabs(eta) >= 1.0 && fabs(eta) < 1.479) return 0.0629;
-else if (fabs(eta) >= 1.479 && fabs(eta) < 2.0 ) return 0.0264;
-else if (fabs(eta) >= 2.0 && fabs(eta) < 2.2 ) return 0.0462;
-else if (fabs(eta) >= 2.2 && fabs(eta) < 2.3 ) return 0.0740;
-else if (fabs(eta) >= 2.3 && fabs(eta) < 2.4 ) return 0.0924;
-else if (fabs(eta) >= 2.4) return 0.1484;
+if (fabs(eta) < 1.0) return 0.0725;
+else if (fabs(eta) >= 1.0 && fabs(eta) < 1.479) return 0.0604;
+else if (fabs(eta) >= 1.479 && fabs(eta) < 2.0 ) return 0.0320;
+else if (fabs(eta) >= 2.0 && fabs(eta) < 2.2 ) return 0.0512;
+else if (fabs(eta) >= 2.2 && fabs(eta) < 2.3 ) return 0.0766;
+else if (fabs(eta) >= 2.3 && fabs(eta) < 2.4 ) return 0.0949;
+else if (fabs(eta) >= 2.4) return 0.1160;
 else return 0.;
 }
 
 int DiPhoAnalyzer::passSieieCuts(float sceta, float sieie){
   int passes = -500;
-  if (fabs(sceta)<1.479 && sieie>0.010) passes = 1;
-  else if (sieie>0.0267) passes = 1;
-  else passes = 0;
+  if (fabs(sceta)<1.479 && sieie>0.0100) passes = 0;
+  else if (sieie>0.0267) passes = 0;
+  else passes = 1;
   return passes;
 }
 int DiPhoAnalyzer::passCHisoCuts(float sceta, float chiso, float pt){
   int passes = -500;
-  if (fabs(sceta)<1.479 && chiso>1.79) passes = 1;
-  else if (chiso>1.09) passes = 1;
-  else passes = 0;
+  if (fabs(sceta)<1.479 && chiso>1.31) passes = 0;
+  else if (chiso>1.25) passes = 0;
+  else passes = 1;
   return passes;
 }
 int DiPhoAnalyzer::passNHisoCuts(float sceta, float nhiso, float pt){
   int passes = -500;
-  if (fabs(sceta)<1.479 && nhiso > 0.16+exp(0.0028*pt+0.5408)) passes = 1;
-  else if (nhiso > 4.31+ 0.0172*pt) passes = 1;
-  else passes = 0;
+  if (fabs(sceta)<1.479 && nhiso > 0.60+exp(0.0044*pt+0.5809)) passes = 0;
+  else if (nhiso > 1.65 + exp(0.0040*pt+0.9402)) passes = 0;
+  else passes = 1;
   return passes;
 }
 int DiPhoAnalyzer::passPHisoCuts(float sceta, float phiso, float pt){
   int passes = -500;
-  if (fabs(sceta)<1.479 && phiso > 1.9+0.0014*pt) passes = 1;
-  else if (phiso > 1.90+0.0091*pt) passes = 1;
-  else passes = 0;
+  if (fabs(sceta)<1.479 && phiso > 1.33+0.0043*pt) passes = 0;
+  else if (phiso > 1.02+0.0041*pt) passes = 0;
+  else passes = 1;
   return passes;
 }
 int DiPhoAnalyzer::passHoeCuts(float sceta, float hoe){
   int passes = -500;
-  if (fabs(sceta)<1.479 && hoe>0.012) passes = 1;
-  else if (hoe>0.023) passes = 1;
-  else passes = 0;
+  if (fabs(sceta)<1.479 && hoe>0.05) passes = 0;
+  else if (hoe>0.05) passes = 0;
+  else passes = 1;
   return passes;
 }
 
 bool DiPhoAnalyzer::testPhotonIsolation(int passSieie, int passCHiso, int passNHiso, int passPHiso, int passHoe){
-  if (passSieie == 1 && passHoe == 1 && passCHiso == 1 && passNHiso == 1 && passPHiso == 1) return true;
+  if (passSieie == 1 && passHoe == 1 && passCHiso == 1 && passNHiso == 1 && passPHiso == 1) return true; //passes all selection
   else return false;
 }
 
@@ -1201,6 +1201,8 @@ bool DiPhoAnalyzer::isGammaSelected( float rho, float pt, float sceta, float r9,
   int theEAregion = effectiveAreaRegion(sceta);
   float corrChIso = chiso - rho*chIsoAE[theEAregion];
   float corrPhIso = phoiso - rho*phIsoAE[theEAregion];
+  //float corrChIso = std::max(chiso - rho*chIsoAE[theEAregion],0.);
+  //float corrPhIso = std::max(phoiso - rho*phIsoAE[theEAregion],0.);
   // float corrNhIso = nhiso - rho*nhIsoAE[theEAregion];   
 
   if (corrChIso > chiso_cut[theclass])  return false;
