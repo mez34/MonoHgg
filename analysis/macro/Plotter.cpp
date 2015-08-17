@@ -9,8 +9,11 @@ Plotter::Plotter( TString inName, TString outName, TString inSpecies, const Doub
   name = inName;
   species = inSpecies;
   inFile = TFile::Open(Form("%s%s.root",name.Data(),species.Data()));
-  CheckValidFile(inFile,Form("%s%s.root",name.Data(),species.Data()));
-  
+  CheckValidFile(inFile,Form("%s%s.root",name.Data(),species.Data()));  
+  // Open Tree from inFile
+  tpho = (TTree*)inFile->Get("DiPhotonTree"); 
+  CheckValidTree(tpho,"DiPhotonTree",Form("%s%s.root",name.Data(),species.Data()));
+
   fLumi = lumi;
 
   // Make output directory
@@ -28,47 +31,288 @@ Plotter::Plotter( TString inName, TString outName, TString inSpecies, const Doub
   fTH1Canv = new TCanvas();
   fTH2Canv = new TCanvas();
 
+  // set all the branch addresses appropriately
+  Plotter::SetBranchAddresses();
+
   // Initialize all of the variables
-  Plotter::InitTreeVar();
+  /*Plotter::InitTreeVar();
   NVARIABLES = varname.size();
   Plotter::InitTreeEffVar();
   N2DVARIABLES = effvar.size();
   Plotter::InitPhotonIDSel();
   NSEL = selvar.size();
+  */
 
 }// end Plotter::Plotter
 
 
 Plotter::~Plotter(){
-
-  std::cout<<"Finished & Deleting"<<std::endl;
+  std::cout << "Finished & Deleting" <<std::endl;
+  std::cout << "Deleting Canvases" <<std::endl;
   delete fTH1Canv;
-  std::cout << "blah1"<<std::endl;
   delete fTH2Canv;
-  std::cout << "blah2"<<std::endl;
+  std::cout << "Deleting inTree" <<std::endl;
+  delete tpho;
+  std::cout << "Deleting inFile" <<std::endl;
   delete inFile;
-  std::cout << "blah3"<<std::endl;
-
   // Write and Close output ROOT file
+  //Plotter::DeleteBranches();
+  std::cout << "Delete histos" <<std::endl;
+  Plotter::DeleteHists();
+  std::cout << "Deleting outFile" <<std::endl;
   delete outFile;
-
-  std::cout << "blah4"<<std::endl;
+  std::cout << "Finished Deleting" <<std::endl;
 }// end Plotter::~Plotter
 
 
 void Plotter::DoPlots(){
-  Plotter::getTree();
+  Plotter::SetUpPlots();
+ 
+  nphotons = tpho->GetEntries(); 
+  for (UInt_t entry = 0; entry < nphotons; entry++){
+    tpho->GetEntry(entry);
+
+    // calculate the weight
+    Double_t Weight = weight;
+
+    //Fill histograms
+    fTH1DMap["mgg"]->Fill(mgg,Weight);
+    fTH1DMap["nvtx"]->Fill(nvtx,Weight);
+    fTH1DMap["ptgg"]->Fill(ptgg,Weight);
+    fTH1DMap["pt1"]->Fill(pt1,Weight);
+    fTH1DMap["pt2"]->Fill(pt2,Weight);
+    fTH1DMap["t1pfmet"]->Fill(t1pfmet,Weight);
+    fTH1DMap["t1pfmetphi"]->Fill(t1pfmetphi,Weight);
+    fTH1DMap["phi1"]->Fill(phi1,Weight);
+    fTH1DMap["phi2"]->Fill(phi2,Weight);
+    fTH1DMap["eta1"]->Fill(eta1,Weight);
+    fTH1DMap["eta2"]->Fill(eta2,Weight);
+    fTH1DMap["chiso1"]->Fill(chiso1,Weight);
+    fTH1DMap["chiso2"]->Fill(chiso2,Weight);
+    fTH1DMap["neuiso1"]->Fill(neuiso1,Weight);
+    fTH1DMap["neuiso2"]->Fill(neuiso2,Weight);
+    fTH1DMap["phoiso1"]->Fill(phoiso1,Weight);
+    fTH1DMap["phoiso2"]->Fill(phoiso2,Weight);
+    fTH1DMap["sieie1"]->Fill(sieie1,Weight);
+    fTH1DMap["sieie2"]->Fill(sieie2,Weight);
+    fTH1DMap["hoe1"]->Fill(hoe1,Weight);
+    fTH1DMap["hoe2"]->Fill(hoe2,Weight);
+    fTH1DMap["r91"]->Fill(r91,Weight);
+    fTH1DMap["r92"]->Fill(r92,Weight);
+
+    Bool_t passCH1 = false;
+    Bool_t passCH2 = false;
+    Bool_t passNH1 = false;
+    Bool_t passNH2 = false;
+    Bool_t passPH1 = false;
+    Bool_t passPH2 = false;
+    Bool_t passS1 = true;
+    Bool_t passS2 = true;
+    Bool_t passHE1 = false;
+    Bool_t passHE2 = false;
+    Bool_t passAll1 = false;
+    Bool_t passAll2 = false;
+    Bool_t passBoth = false;
+
+    if (passCHiso1=0) passCH1 = true; 
+    if (passCHiso2=0) passCH2 = true; 
+    if (passNHiso1=0) passNH1 = true;
+    if (passNHiso2=0) passNH2 = true;
+    if (passPHiso1=0) passPH1 = true;
+    if (passPHiso2=0) passPH2 = true;
+    if (passSieie1=0) passS1 = true;
+    if (passSieie2=0) passS2 = true;
+    if (passHoe1=0)   passHE1 = true; 
+    if (passHoe2=0)   passHE2 = true; 
+
+    if (passCH1 && passNH1 && passPH1 && passS1 && passHE1) passAll1 = true;
+    if (passCH2 && passNH2 && passPH2 && passS2 && passHE2) passAll2 = true;
+    if (passAll1 && passAll2) passBoth = true;
+
+    if (passCH1 && passNH1 && passPH1 && passS1)  fTH1DMap["hoe1_n-1"]->Fill(hoe1,Weight); 
+    if (passCH1 && passNH1 && passPH1 && passHE1) fTH1DMap["sieie1_n-1"]->Fill(sieie1,Weight);
+    if (passCH1 && passNH1 && passHE1 && passS1)  fTH1DMap["phoiso1_n-1"]->Fill(phoiso1,Weight);
+    if (passCH1 && passPH1 && passHE1 && passS1)  fTH1DMap["neuiso1_n-1"]->Fill(neuiso1,Weight);
+    if (passPH1 && passNH1 && passHE1 && passS1)  fTH1DMap["chiso1_n-1"]->Fill(chiso1,Weight);
+
+  }// end loop over entries in tree
+
+  Plotter::SavePlots();
+
+
+/*  Plotter::getTree();
   std::cout << "Here1" << std::endl;
   Plotter::make1DHistos();
   std::cout << "Here2" << std::endl;
   Plotter::make2DHistos();
   
-  outFile->Write();
+  outFile->Write(); */
 }// end Plotter::DoPlots
 
+
+void Plotter::SetUpPlots(){
+  // fill all plots from tree
+  fTH1DMap["nvtx"]	= Plotter::MakeTH1DPlot("nvtx","",60,0.,60.,"nvtx","");
+  fTH1DMap["mgg"]	= Plotter::MakeTH1DPlot("mgg","",60,50.,300.,"m_{#gamma#gamma} (GeV)","");  
+  fTH1DMap["ptgg"]	= Plotter::MakeTH1DPlot("ptgg","",100,0.,1000.,"p_{T,#gamma#gamma} (GeV)","");
+  fTH1DMap["t1pfmet"]	= Plotter::MakeTH1DPlot("t1pfmet","",100,0.,1000,"t1PF MET (GeV)","");
+  fTH1DMap["t1pfmetphi"]= Plotter::MakeTH1DPlot("t1pfmetphi","",80,-4.,4.,"MET #phi","");
+  fTH1DMap["phi1"]	= Plotter::MakeTH1DPlot("phi1","",80,-4.,4.,"#phi(#gamma1)","");
+  fTH1DMap["phi2"]	= Plotter::MakeTH1DPlot("phi2","",80,-4.,4.,"#phi(#gamma2)","");
+  fTH1DMap["eta1"]	= Plotter::MakeTH1DPlot("eta1","",100,-5.,5.,"#eta(#gamma1)","");
+  fTH1DMap["eta2"]	= Plotter::MakeTH1DPlot("eta2","",100,-5.,5.,"#eta(#gamma2)","");
+  fTH1DMap["pt1"]	= Plotter::MakeTH1DPlot("pt1","",50,0.,500.,"p_{T,#gamma1} (GeV)","");
+  fTH1DMap["pt2"]	= Plotter::MakeTH1DPlot("pt2","",50,0.,500.,"p_{T,#gamma2} (GeV)","");
+  fTH1DMap["chiso1"]	= Plotter::MakeTH1DPlot("chiso1","",150,-5.,15.,"CHiso(#gamma1)","");
+  fTH1DMap["chiso2"]	= Plotter::MakeTH1DPlot("chiso2","",150,-5.,15.,"CHiso(#gamma2)","");
+  fTH1DMap["neuiso1"]	= Plotter::MakeTH1DPlot("neuiso1","",150,-5.,15.,"NHiso(#gamma1)","");
+  fTH1DMap["neuiso2"]	= Plotter::MakeTH1DPlot("neuiso2","",150,-5.,15.,"NHiso(#gamma2)","");
+  fTH1DMap["phoiso1"]	= Plotter::MakeTH1DPlot("phoiso1","",150,-5.,15.,"PHiso(#gamma1)",""); 
+  fTH1DMap["phoiso2"]	= Plotter::MakeTH1DPlot("phoiso2","",150,-5.,15.,"PHiso(#gamma2)",""); 
+  fTH1DMap["sieie1"]	= Plotter::MakeTH1DPlot("sieie1","",300,0.,0.03,"#sigma_{i#eta i#eta}(#gamma1)",""); 
+  fTH1DMap["sieie2"]	= Plotter::MakeTH1DPlot("sieie2","",300,0.,0.03,"#sigma_{i#eta i#eta}(#gamma2)",""); 
+  fTH1DMap["hoe1"]	= Plotter::MakeTH1DPlot("hoe1","",250,0.,0.025,"H/E(#gamma1)","");
+  fTH1DMap["hoe2"]	= Plotter::MakeTH1DPlot("hoe2","",250,0.,0.025,"H/E(#gamma2)","");
+  fTH1DMap["r91"]	= Plotter::MakeTH1DPlot("r91","",100,0.,1.1,"R9(#gamma1)","");
+  fTH1DMap["r92"]	= Plotter::MakeTH1DPlot("r92","",100,0.,1.1,"R9(#gamma2)","");
+
+  //n minus 1 plots
+  fTH1DMap["nvtx_n-1"]		= Plotter::MakeTH1DPlot("nvtx_n-1","",60,0.,60.,"nvtx","");
+  fTH1DMap["mgg_n-1"]		= Plotter::MakeTH1DPlot("mgg_n-1","",60,50.,300.,"m_{#gamma#gamma} (GeV)","");  
+  fTH1DMap["ptgg_n-1"]		= Plotter::MakeTH1DPlot("ptgg_n-1","",100,0.,1000.,"p_{T,#gamma#gamma} (GeV)","");
+  fTH1DMap["t1pfmet_n-1"]	= Plotter::MakeTH1DPlot("t1pfmet_n-1","",100,0.,1000,"t1PF MET (GeV)","");
+  fTH1DMap["t1pfmetphi_n-1"]	= Plotter::MakeTH1DPlot("t1pfmetphi_n-1","",80,-4.,4.,"MET #phi","");
+  fTH1DMap["phi1_n-1"]		= Plotter::MakeTH1DPlot("phi1_n-1","",80,-4.,4.,"#phi(#gamma1)","");
+  fTH1DMap["phi2_n-1"]		= Plotter::MakeTH1DPlot("phi2_n-1","",80,-4.,4.,"#phi(#gamma2)","");
+  fTH1DMap["eta1_n-1"]		= Plotter::MakeTH1DPlot("eta1_n-1","",100,-5.,5.,"#eta(#gamma1)","");
+  fTH1DMap["eta2_n1-"]		= Plotter::MakeTH1DPlot("eta2_n-1","",100,-5.,5.,"#eta(#gamma2)","");
+  fTH1DMap["pt1_n-1"]		= Plotter::MakeTH1DPlot("pt1_n-1","",50,0.,500.,"p_{T,#gamma1} (GeV)","");
+  fTH1DMap["pt2_n-1"]		= Plotter::MakeTH1DPlot("pt2_n-1","",50,0.,500.,"p_{T,#gamma2} (GeV)","");
+  fTH1DMap["chiso1_n-1"]	= Plotter::MakeTH1DPlot("chiso1_n-1","",150,-5.,15.,"CHiso(#gamma1)","");
+  fTH1DMap["chiso2_n-1"]	= Plotter::MakeTH1DPlot("chiso2_n-1","",150,-5.,15.,"CHiso(#gamma2)","");
+  fTH1DMap["neuiso1_n-1"]	= Plotter::MakeTH1DPlot("neuiso1_n-1","",150,-5.,15.,"NHiso(#gamma1)","");
+  fTH1DMap["neuiso2_n-1"]	= Plotter::MakeTH1DPlot("neuiso2_n-1","",150,-5.,15.,"NHiso(#gamma2)","");
+  fTH1DMap["phoiso1_n-1"]	= Plotter::MakeTH1DPlot("phoiso1_n-1","",150,-5.,15.,"PHiso(#gamma1)",""); 
+  fTH1DMap["phoiso2_n-1"]	= Plotter::MakeTH1DPlot("phoiso2_n-1","",150,-5.,15.,"PHiso(#gamma2)",""); 
+  fTH1DMap["sieie1_n-1"]	= Plotter::MakeTH1DPlot("sieie1_n-1","",300,0.,0.03,"#sigma_{i#eta i#eta}(#gamma1)",""); 
+  fTH1DMap["sieie2_n-1"]	= Plotter::MakeTH1DPlot("sieie2_n-1","",300,0.,0.03,"#sigma_{i#eta i#eta}(#gamma2)",""); 
+  fTH1DMap["hoe1_n-1"]		= Plotter::MakeTH1DPlot("hoe1_n-1","",250,0.,0.025,"H/E(#gamma1)","");
+  fTH1DMap["hoe2_n-1"]		= Plotter::MakeTH1DPlot("hoe2_n-1","",250,0.,0.025,"H/E(#gamma2)","");
+  fTH1DMap["r91_n-1"]		= Plotter::MakeTH1DPlot("r91_n-1","",100,0.,1.1,"R9(#gamma1)","");
+  fTH1DMap["r92_n-1"]		= Plotter::MakeTH1DPlot("r92_n-1","",100,0.,1.1,"R9(#gamma2)","");
+
+}// end Plotter::SetUpPlots
+
+TH1D * Plotter::MakeTH1DPlot(const TString hname, const TString htitle, const Int_t nbins, const Double_t xlow, const Double_t xhigh, const TString xtitle, const TString ytitle){
+  TH1D * hist = new TH1D(hname.Data(),htitle.Data(),nbins,xlow,xhigh);
+  hist->GetXaxis()->SetTitle(xtitle.Data());
+  hist->GetYaxis()->SetTitle(ytitle.Data());
+  return hist;
+}// end Plotter::MakeTH1DPlot
+
+void Plotter::DoAnalysis(){
+
+}// end Plotter::DoAnalysis
+
+void Plotter::SavePlots(){
+  outFile->cd();
+
+  TCanvas * canv = new TCanvas();
+
+  for (TH1DMapIter mapiter = fTH1DMap.begin(); mapiter != fTH1DMap.end(); mapiter++){
+
+    if ((*mapiter).second == (TH1D*) NULL)	{std::cout << "TH1D Null" << std::endl;}
+    if (outFile == (TFile*) NULL)		{std::cout << "OutFile Null" << std::endl;}
+    if (canv == (TCanvas*) NULL)		{std::cout << "Canvas Null" << std::endl;}
+
+    (*mapiter).second->Write(); // save histos to root file 
+    canv->cd();
+    (*mapiter).second->Draw("HIST");
+
+    canv->SetLogy(0);
+    canv->SaveAs(Form("%s%s/%s.png",fName.Data(),species.Data(),(*mapiter).first.Data()));
+
+    canv->SetLogy(1);
+    canv->SaveAs(Form("%s%s/%s_log.png",fName.Data(),species.Data(),(*mapiter).first.Data())); 
+  }// end of loop over mapiter
+  delete canv;
+
+}// end Plotter::SavePlots
+
+void Plotter::DeleteHists(){
+  for (TH1DMapIter mapiter = fTH1DMap.begin(); mapiter != fTH1DMap.end(); mapiter++){
+    delete ((*mapiter).second);
+  }
+  fTH1DMap.clear();
+}// end Plotter::DeleteHists
+
+void Plotter::SetBranchAddresses(){
+  tpho->SetBranchAddress("weight", &weight,  &b_weight);
+  tpho->SetBranchAddress("nvtx",   &nvtx,    &b_nvtx);
+  tpho->SetBranchAddress("mgg",    &mgg,     &b_mgg);
+  tpho->SetBranchAddress("ptgg",   &ptgg,    &b_ptgg);
+  tpho->SetBranchAddress("t1pfmet", &t1pfmet, &b_t1pfmet);   
+  tpho->SetBranchAddress("t1pfmetPhi", &t1pfmetphi, &b_t1pfmetPhi);   
+  tpho->SetBranchAddress("pt1", &pt1, &b_pt1);   
+  tpho->SetBranchAddress("pt2", &pt2, &b_pt2);   
+  tpho->SetBranchAddress("chiso1", &chiso1, &b_chiso1);   
+  tpho->SetBranchAddress("chiso2", &chiso2, &b_chiso2);   
+  tpho->SetBranchAddress("neuiso1", &neuiso1, &b_neuiso1);   
+  tpho->SetBranchAddress("neuiso2", &neuiso2, &b_neuiso2);   
+  tpho->SetBranchAddress("phoiso1", &phoiso1, &b_phoiso1);   
+  tpho->SetBranchAddress("phoiso2", &phoiso2, &b_phoiso2);   
+  tpho->SetBranchAddress("sieie1", &sieie1, &b_sieie1);   
+  tpho->SetBranchAddress("sieie2", &sieie2, &b_sieie2);   
+  tpho->SetBranchAddress("hoe1", &hoe1, &b_hoe1);   
+  tpho->SetBranchAddress("hoe2", &hoe2, &b_hoe2);   
+  tpho->SetBranchAddress("r91", &r91, &b_r91);   
+  tpho->SetBranchAddress("r92", &r92, &b_r92);   
+  tpho->SetBranchAddress("phi1", &phi1, &b_phi1);   
+  tpho->SetBranchAddress("phi2", &phi2, &b_phi2);   
+  tpho->SetBranchAddress("eta1", &eta1, &b_eta1);   
+  tpho->SetBranchAddress("eta2", &eta2, &b_eta2);   
+  tpho->SetBranchAddress("passCHiso1", &passCHiso1, &b_passCHiso1);   
+  tpho->SetBranchAddress("passCHiso2", &passCHiso2, &b_passCHiso2);   
+  tpho->SetBranchAddress("passNHiso1", &passNHiso1, &b_passNHiso1);   
+  tpho->SetBranchAddress("passNHiso2", &passNHiso2, &b_passNHiso2);   
+  tpho->SetBranchAddress("passPHiso1", &passPHiso1, &b_passNHiso1);   
+  tpho->SetBranchAddress("passPHiso2", &passPHiso2, &b_passNHiso2);   
+  tpho->SetBranchAddress("passSieie1", &passSieie1, &b_passSieie1);
+  tpho->SetBranchAddress("passSieie2", &passSieie2, &b_passSieie2);
+  tpho->SetBranchAddress("passHoe1", &passHoe1, &b_passHoe1);
+  tpho->SetBranchAddress("passHoe2", &passHoe2, &b_passHoe2);
+
+  //tpho->SetBranchAddress("", &, &b_);
+  
+}// end Plotter::SetBranchAddresses
+
+
+void Plotter::DeleteBranches(){
+  delete b_weight;
+  delete b_nvtx;
+  delete b_mgg;
+  delete b_ptgg;
+  delete b_pt1;
+  delete b_pt2;
+}// end Plotter::DeleteBranches
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// DELETE AFTER THIS FIXME
+
 void Plotter::getTree(){
-  // Open Tree from inFile
-  tpho = (TTree*)inFile->Get("DiPhotonTree"); 
+
   // Load variables from Tree
   variable[NVARIABLES];    //= {-1000}; // float for most variables 
   intvariable[NVARIABLES]; //= {-1000}; // int for other variables (eleveto, sel, nvtx)
@@ -86,20 +330,11 @@ void Plotter::getTree(){
        tpho->SetBranchAddress(varname[z].Data(),&variable[z]);
      }
   }
-
   nphotons = (int)tpho->GetEntries();
-
 }// end Plotter::getTree
 
 
 void Plotter::make1DHistos(){
-
-
-
-
-
-
-
   TH1F *hVar[NVARIABLES];
   TH1F *hVarNmin1[NVARIABLES];
   for (int z=0; z<NVARIABLES; ++z){
@@ -271,10 +506,6 @@ void Plotter::make1DHistos(){
 }// end Plotter::make1DHistos
 
 void Plotter::make2DHistos(){
-
-  Float_t evar[N2DVARIABLES];
-  
-
 
   Int_t range2D[N2DVARIABLES][3]; //nbins,min,max for each 2D variable to plot
   range2D[0][0]= nbins[4]; 
@@ -484,6 +715,11 @@ void Plotter::FindMinAndMax(TH1F *& h, int plotLog){
     h->SetMinimum(0.90*min);
   }
 }// end Plotter::FindMinAndMax
+
+
+
+
+
 
 void Plotter::InitTreeVar(){
   varname.push_back("mgg");
