@@ -164,7 +164,16 @@ void Plotter::DoPlots(){
       fTH1DMap["ptgg_n-1"]->Fill(ptgg,Weight);  
       fTH1DMap["t1pfmet_n-1"]->Fill(t1pfmet,Weight);  
       fTH1DMap["t1pfmetphi_n-1"]->Fill(t1pfmetphi,Weight);  
+      if (mgg >= 120 && mgg <= 130) fTH1DMap["t1pfmet_selmgg"]->Fill(t1pfmet,Weight); 
+      if (t1pfmet >= 100) fTH1DMap["mgg_selt1pfmet"]->Fill(mgg,Weight); 
     }
+
+    // calculate phi of the Higgs
+    Float_t phigg = TMath::ATan((pt1*TMath::Sin(phi1) - pt2*TMath::Sin(phi2)) / (pt1*TMath::Cos(phi1) - pt2*TMath::Cos(phi2)));
+    fTH1DMap["phigg"]->Fill(phigg,Weight);
+    // calculate delta phi of Higgs & MET
+    Float_t dphi_ggmet = deltaPhi(phigg,t1pfmetphi);
+    fTH1DMap["dphi_ggmet"]->Fill(dphi_ggmet,Weight);
 
   }// end loop over entries in tree
 
@@ -209,11 +218,11 @@ void Plotter::SetUpPlots(){
   fTH1DMap["r91"]	= Plotter::MakeTH1DPlot("r91","",100,0.,1.1,"R9(#gamma1)","");
   fTH1DMap["r92"]	= Plotter::MakeTH1DPlot("r92","",100,0.,1.1,"R9(#gamma2)","");
 
-  //n minus 1 plots
+  // n minus 1 plots
   fTH1DMap["nvtx_n-1"]		= Plotter::MakeTH1DPlot("nvtx_n-1","",60,0.,60.,"nvtx","");
   fTH1DMap["mgg_n-1"]		= Plotter::MakeTH1DPlot("mgg_n-1","",60,50.,300.,"m_{#gamma#gamma} (GeV)","");  
   fTH1DMap["ptgg_n-1"]		= Plotter::MakeTH1DPlot("ptgg_n-1","",100,0.,1000.,"p_{T,#gamma#gamma} (GeV)","");
-  fTH1DMap["t1pfmet_n-1"]	= Plotter::MakeTH1DPlot("t1pfmet_n-1","",100,0.,1000,"t1PF MET (GeV)","");
+  fTH1DMap["t1pfmet_n-1"]	= Plotter::MakeTH1DPlot("t1pfmet_n-1","",100,0.,1000.,"t1PF MET (GeV)","");
   fTH1DMap["t1pfmetphi_n-1"]	= Plotter::MakeTH1DPlot("t1pfmetphi_n-1","",80,-4.,4.,"MET #phi","");
   fTH1DMap["phi1_n-1"]		= Plotter::MakeTH1DPlot("phi1_n-1","",80,-4.,4.,"#phi(#gamma1)","");
   fTH1DMap["phi2_n-1"]		= Plotter::MakeTH1DPlot("phi2_n-1","",80,-4.,4.,"#phi(#gamma2)","");
@@ -233,6 +242,12 @@ void Plotter::SetUpPlots(){
   fTH1DMap["hoe2_n-1"]		= Plotter::MakeTH1DPlot("hoe2_n-1","",250,0.,0.025,"H/E(#gamma2)","");
   fTH1DMap["r91_n-1"]		= Plotter::MakeTH1DPlot("r91_n-1","",100,0.,1.1,"R9(#gamma1)","");
   fTH1DMap["r92_n-1"]		= Plotter::MakeTH1DPlot("r92_n-1","",100,0.,1.1,"R9(#gamma2)","");
+
+  // special plots
+  fTH1DMap["phigg"]		= Plotter::MakeTH1DPlot("phigg","",80,-4.,4.,"#phi(#gamma#gamma)","");
+  fTH1DMap["dphi_ggmet"]	= Plotter::MakeTH1DPlot("dphi_ggmet","",80,-4.,4.,"#Delta#phi(#gamma#gamma,MET)","");
+  fTH1DMap["t1pfmet_selmgg"]	= Plotter::MakeTH1DPlot("t1pfmet_selmgg","",100,0.,1000.,"t1PF MET (GeV)","");
+  fTH1DMap["mgg_selt1pfmet"]	= Plotter::MakeTH1DPlot("mgg_selt1pfmet","",100,0.,1000.,"m_{#gamma#gamma} (GeV)","");
 
 }// end Plotter::SetUpPlots
 
