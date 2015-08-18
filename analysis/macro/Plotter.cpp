@@ -28,8 +28,8 @@ Plotter::Plotter( TString inName, TString outName, TString inSpecies, const Doub
   CheckValidFile(outFile,Form("%s/%s/plots_%s.root",fName.Data(),species.Data(),species.Data()));
 
   // Make TCanvas
-  fTH1Canv = new TCanvas();
-  fTH2Canv = new TCanvas();
+  fTH1Canv = new TCanvas(); //FIXME DELETE THIS
+  fTH2Canv = new TCanvas(); //FIXME DELETE THIS
 
   // set all the branch addresses appropriately
   Plotter::SetBranchAddresses();
@@ -48,9 +48,9 @@ Plotter::Plotter( TString inName, TString outName, TString inSpecies, const Doub
 
 Plotter::~Plotter(){
   std::cout << "Finished & Deleting" <<std::endl;
-  std::cout << "Deleting Canvases" <<std::endl;
-  delete fTH1Canv;
-  delete fTH2Canv;
+  //std::cout << "Deleting Canvases" <<std::endl;
+  delete fTH1Canv; //FIXME DELETE THIS
+  delete fTH2Canv; //FIXME DELETE THIS
   std::cout << "Deleting inTree" <<std::endl;
   delete tpho;
   std::cout << "Deleting inFile" <<std::endl;
@@ -99,6 +99,9 @@ void Plotter::DoPlots(){
     fTH1DMap["hoe2"]->Fill(hoe2,Weight);
     fTH1DMap["r91"]->Fill(r91,Weight);
     fTH1DMap["r92"]->Fill(r92,Weight);
+
+    fTH2DMap["mgg_PU"]->Fill(nvtx,mgg,Weight);
+
 
     Bool_t passCH1 = false;
     Bool_t passCH2 = false;
@@ -249,14 +252,26 @@ void Plotter::SetUpPlots(){
   fTH1DMap["t1pfmet_selmgg"]	= Plotter::MakeTH1DPlot("t1pfmet_selmgg","",100,0.,1000.,"t1PF MET (GeV)","");
   fTH1DMap["mgg_selt1pfmet"]	= Plotter::MakeTH1DPlot("mgg_selt1pfmet","",100,0.,1000.,"m_{#gamma#gamma} (GeV)","");
 
+  // 2D plots
+  fTH2DMap["mgg_PU"]	= Plotter::MakeTH2DPlot("mgg_PU","",60,0.,60.,60,50.,300.,"nvtx","m_{#gamma#gamma} (GeV)");
+
 }// end Plotter::SetUpPlots
 
 TH1D * Plotter::MakeTH1DPlot(const TString hname, const TString htitle, const Int_t nbins, const Double_t xlow, const Double_t xhigh, const TString xtitle, const TString ytitle){
   TH1D * hist = new TH1D(hname.Data(),htitle.Data(),nbins,xlow,xhigh);
   hist->GetXaxis()->SetTitle(xtitle.Data());
   hist->GetYaxis()->SetTitle(ytitle.Data());
+  hist->Sumw2();
   return hist;
 }// end Plotter::MakeTH1DPlot
+
+TH2D * Plotter::MakeTH2DPlot(const TString hname, const TString htitle, const Int_t xnbins, const Double_t xlow, const Double_t xhigh, const Int_t ynbins, const Double_t ylow, const Double_t yhigh, const TString xtitle, const TString ytitle){
+  TH2D * hist = new TH2D(hname.Data(),htitle.Data(),xnbins,xlow,xhigh,ynbins,ylow,yhigh);
+  hist->GetXaxis()->SetTitle(xtitle.Data());
+  hist->GetYaxis()->SetTitle(ytitle.Data());
+  return hist;
+}// end Plotter::MakeTH2DPlot
+
 
 void Plotter::DoAnalysis(){
 
@@ -282,8 +297,26 @@ void Plotter::SavePlots(){
 
     canv->SetLogy(1);
     canv->SaveAs(Form("%s%s/%s_log.png",fName.Data(),species.Data(),(*mapiter).first.Data())); 
-  }// end of loop over mapiter
+  }// end of loop over mapiter for 1d plots
   delete canv;
+
+  TCanvas * canv2d = new TCanvas();
+
+  for (TH2DMapIter mapiter = fTH2DMap.begin(); mapiter != fTH2DMap.end(); mapiter++){
+    if ((*mapiter).second == (TH2D*) NULL)	{std::cout << "TH2D Null" << std::endl;}
+    if (outFile == (TFile*) NULL)		{std::cout << "OutFile Null" << std::endl;}
+    if (canv == (TCanvas*) NULL)		{std::cout << "Canvas Null" << std::endl;}
+
+    (*mapiter).second->Write(); // save histos to root file 
+    canv2d->cd();
+    (*mapiter).second->Draw("colz");
+    canv2d->SetLogy(0);
+    canv2d->SaveAs(Form("%s%s/%s.png",fName.Data(),species.Data(),(*mapiter).first.Data()));
+  }// end of loop over mapiter for 2d plots
+  delete canv2d;
+
+
+
 
 }// end Plotter::SavePlots
 
@@ -292,6 +325,12 @@ void Plotter::DeleteHists(){
     delete ((*mapiter).second);
   }
   fTH1DMap.clear();
+
+  for (TH2DMapIter mapiter = fTH2DMap.begin(); mapiter != fTH2DMap.end(); mapiter++){
+    delete ((*mapiter).second);
+  }
+  fTH2DMap.clear();
+
 }// end Plotter::DeleteHists
 
 void Plotter::SetBranchAddresses(){

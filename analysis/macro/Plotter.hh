@@ -4,8 +4,8 @@
 #include "Style.hh"
 
 #include "TFile.h"
-#include "TH1F.h"
-#include "TH2F.h"
+#include "TH1.h"
+#include "TH2.h"
 #include "TString.h"
 #include "TTree.h"
 #include "TCanvas.h"
@@ -34,6 +34,9 @@ public:
 typedef std::vector<TString> 		TStrVec;
 typedef std::map<TString,TH1D*>		TH1DMap;
 typedef TH1DMap::iterator		TH1DMapIter;
+typedef std::map<TString,TH2D*>		TH2DMap;
+typedef TH2DMap::iterator		TH2DMapIter;
+
 
 class Plotter{
 public:
@@ -51,6 +54,7 @@ public:
   void SetBranchAddresses();
   void SetUpPlots();
   TH1D * MakeTH1DPlot(const TString hname, const TString htitle, const Int_t nbins, const Double_t xlow, const Double_t xhigh, const TString xtitle, const TString ytitle);
+  TH2D * MakeTH2DPlot(const TString hname, const TString htitle, const Int_t xnbins, const Double_t xlow, const Double_t xhigh, const Int_t ynbins, const Double_t ylow, const Double_t yhigh, const TString xtitle, const TString ytitle);
   void DoAnalysis();
   void SavePlots(); 
 
@@ -67,8 +71,6 @@ private:
   TString 	species;
   TFile * 	inFile;
   TFile * 	outFile;
-  TCanvas * 	fTH1Canv;
-  TCanvas * 	fTH2Canv;
 
   Double_t 	fLumi;
 
@@ -76,8 +78,11 @@ private:
   Int_t		nphotons;
 
   TH1DMap	fTH1DMap;
+  TH2DMap	fTH2DMap;
 
 //
+  TCanvas * 	fTH1Canv;
+  TCanvas * 	fTH2Canv;
   TStrVec 	varname;
   TStrVec	xaxisLabel;
   Int_t		NVARIABLES;
