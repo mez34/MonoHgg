@@ -125,14 +125,13 @@ void Plotter::DoPlots(){
     if (passHoe1==0)   passHE1 = true; 
     if (passHoe2==0)   passHE2 = true; 
 
-    std::cout << passCH1 <<" "<< passNH1 <<" "<< passPH1 <<" "<< passHE1 <<" "<< passS1 << std::endl; 
-    std::cout << passCH2 <<" "<< passNH2 <<" "<< passPH2 <<" "<< passHE2 <<" "<< passS2 << std::endl; 
-
     if (passCH1 && passNH1 && passPH1 && passS1 && passHE1) passAll1 = true;
     if (passCH2 && passNH2 && passPH2 && passS2 && passHE2) passAll2 = true;
     if (passAll1 && passAll2) passBoth = true;
 
-    std::cout << passAll1 <<" "<< passAll2 <<" "<< passBoth << std::endl;
+    //std::cout << passCH1 <<" "<< passNH1 <<" "<< passPH1 <<" "<< passHE1 <<" "<< passS1 << std::endl; 
+    //std::cout << passCH2 <<" "<< passNH2 <<" "<< passPH2 <<" "<< passHE2 <<" "<< passS2 << std::endl; 
+    //std::cout << passAll1 <<" "<< passAll2 <<" "<< passBoth << std::endl;
 
     //fill n-1 plots for the photon ID selection variables
     if (passCH1 && passNH1 && passPH1 && passS1)  fTH1DMap["hoe1_n-1"]->Fill(hoe1,Weight); 
@@ -146,7 +145,7 @@ void Plotter::DoPlots(){
     if (passCH2 && passNH2 && passHE2 && passS2)  fTH1DMap["phoiso2_n-1"]->Fill(phoiso2,Weight);
     if (passCH2 && passPH2 && passHE2 && passS2)  fTH1DMap["neuiso2_n-1"]->Fill(neuiso2,Weight);
     if (passPH2 && passNH2 && passHE2 && passS2)  fTH1DMap["chiso2_n-1"]->Fill(chiso2,Weight);
-/*
+
     if (passAll1){// fill pho1 plots if these photons pass phoID
       fTH1DMap["pt1_n-1"]->Fill(pt1,Weight);
       fTH1DMap["r91_n-1"]->Fill(r91,Weight);
@@ -158,15 +157,14 @@ void Plotter::DoPlots(){
       fTH1DMap["r92_n-1"]->Fill(r92,Weight);
       fTH1DMap["phi2_n-1"]->Fill(phi2,Weight);
       fTH1DMap["eta2_n-1"]->Fill(eta2,Weight);
-    }
+    } 
     if (passBoth){
-      fTH1DMap["nvtx"]->Fill(nvtx,Weight);
+      fTH1DMap["nvtx_n-1"]->Fill(nvtx,Weight);
       fTH1DMap["mgg_n-1"]->Fill(mgg,Weight);  
       fTH1DMap["ptgg_n-1"]->Fill(ptgg,Weight);  
       fTH1DMap["t1pfmet_n-1"]->Fill(t1pfmet,Weight);  
       fTH1DMap["t1pfmetphi_n-1"]->Fill(t1pfmetphi,Weight);  
     }
-*/
 
   }// end loop over entries in tree
 
@@ -220,7 +218,7 @@ void Plotter::SetUpPlots(){
   fTH1DMap["phi1_n-1"]		= Plotter::MakeTH1DPlot("phi1_n-1","",80,-4.,4.,"#phi(#gamma1)","");
   fTH1DMap["phi2_n-1"]		= Plotter::MakeTH1DPlot("phi2_n-1","",80,-4.,4.,"#phi(#gamma2)","");
   fTH1DMap["eta1_n-1"]		= Plotter::MakeTH1DPlot("eta1_n-1","",100,-5.,5.,"#eta(#gamma1)","");
-  fTH1DMap["eta2_n1-"]		= Plotter::MakeTH1DPlot("eta2_n-1","",100,-5.,5.,"#eta(#gamma2)","");
+  fTH1DMap["eta2_n-1"]		= Plotter::MakeTH1DPlot("eta2_n-1","",100,-5.,5.,"#eta(#gamma2)","");
   fTH1DMap["pt1_n-1"]		= Plotter::MakeTH1DPlot("pt1_n-1","",50,0.,500.,"p_{T,#gamma1} (GeV)","");
   fTH1DMap["pt2_n-1"]		= Plotter::MakeTH1DPlot("pt2_n-1","",50,0.,500.,"p_{T,#gamma2} (GeV)","");
   fTH1DMap["chiso1_n-1"]	= Plotter::MakeTH1DPlot("chiso1_n-1","",150,-5.,15.,"CHiso(#gamma1)","");
