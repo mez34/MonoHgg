@@ -114,39 +114,74 @@ void Plotter::DoPlots(){
     Bool_t passAll2 = false;
     Bool_t passBoth = false;
 
-    if (passCHiso1=0) passCH1 = true; 
-    if (passCHiso2=0) passCH2 = true; 
-    if (passNHiso1=0) passNH1 = true;
-    if (passNHiso2=0) passNH2 = true;
-    if (passPHiso1=0) passPH1 = true;
-    if (passPHiso2=0) passPH2 = true;
-    if (passSieie1=0) passS1 = true;
-    if (passSieie2=0) passS2 = true;
-    if (passHoe1=0)   passHE1 = true; 
-    if (passHoe2=0)   passHE2 = true; 
+    if (passCHiso1==0) passCH1 = true; 
+    if (passCHiso2==0) passCH2 = true; 
+    if (passNHiso1==0) passNH1 = true;
+    if (passNHiso2==0) passNH2 = true;
+    if (passPHiso1==0) passPH1 = true;
+    if (passPHiso2==0) passPH2 = true;
+    if (passSieie1==0) passS1 = true;
+    if (passSieie2==0) passS2 = true;
+    if (passHoe1==0)   passHE1 = true; 
+    if (passHoe2==0)   passHE2 = true; 
+
+    std::cout << passCH1 <<" "<< passNH1 <<" "<< passPH1 <<" "<< passHE1 <<" "<< passS1 << std::endl; 
+    std::cout << passCH2 <<" "<< passNH2 <<" "<< passPH2 <<" "<< passHE2 <<" "<< passS2 << std::endl; 
 
     if (passCH1 && passNH1 && passPH1 && passS1 && passHE1) passAll1 = true;
     if (passCH2 && passNH2 && passPH2 && passS2 && passHE2) passAll2 = true;
     if (passAll1 && passAll2) passBoth = true;
 
+    std::cout << passAll1 <<" "<< passAll2 <<" "<< passBoth << std::endl;
+
+    //fill n-1 plots for the photon ID selection variables
     if (passCH1 && passNH1 && passPH1 && passS1)  fTH1DMap["hoe1_n-1"]->Fill(hoe1,Weight); 
     if (passCH1 && passNH1 && passPH1 && passHE1) fTH1DMap["sieie1_n-1"]->Fill(sieie1,Weight);
     if (passCH1 && passNH1 && passHE1 && passS1)  fTH1DMap["phoiso1_n-1"]->Fill(phoiso1,Weight);
     if (passCH1 && passPH1 && passHE1 && passS1)  fTH1DMap["neuiso1_n-1"]->Fill(neuiso1,Weight);
     if (passPH1 && passNH1 && passHE1 && passS1)  fTH1DMap["chiso1_n-1"]->Fill(chiso1,Weight);
 
+    if (passCH2 && passNH2 && passPH2 && passS2)  fTH1DMap["hoe2_n-1"]->Fill(hoe2,Weight); 
+    if (passCH2 && passNH2 && passPH2 && passHE2) fTH1DMap["sieie2_n-1"]->Fill(sieie2,Weight);
+    if (passCH2 && passNH2 && passHE2 && passS2)  fTH1DMap["phoiso2_n-1"]->Fill(phoiso2,Weight);
+    if (passCH2 && passPH2 && passHE2 && passS2)  fTH1DMap["neuiso2_n-1"]->Fill(neuiso2,Weight);
+    if (passPH2 && passNH2 && passHE2 && passS2)  fTH1DMap["chiso2_n-1"]->Fill(chiso2,Weight);
+/*
+    if (passAll1){// fill pho1 plots if these photons pass phoID
+      fTH1DMap["pt1_n-1"]->Fill(pt1,Weight);
+      fTH1DMap["r91_n-1"]->Fill(r91,Weight);
+      fTH1DMap["phi1_n-1"]->Fill(phi1,Weight);
+      fTH1DMap["eta1_n-1"]->Fill(eta1,Weight);
+    }
+    if (passAll2){// fill pho2 plots if these photons pass phoID
+      fTH1DMap["pt2_n-1"]->Fill(pt2,Weight);
+      fTH1DMap["r92_n-1"]->Fill(r92,Weight);
+      fTH1DMap["phi2_n-1"]->Fill(phi2,Weight);
+      fTH1DMap["eta2_n-1"]->Fill(eta2,Weight);
+    }
+    if (passBoth){
+      fTH1DMap["nvtx"]->Fill(nvtx,Weight);
+      fTH1DMap["mgg_n-1"]->Fill(mgg,Weight);  
+      fTH1DMap["ptgg_n-1"]->Fill(ptgg,Weight);  
+      fTH1DMap["t1pfmet_n-1"]->Fill(t1pfmet,Weight);  
+      fTH1DMap["t1pfmetphi_n-1"]->Fill(t1pfmetphi,Weight);  
+    }
+*/
+
   }// end loop over entries in tree
 
   Plotter::SavePlots();
 
 
-/*  Plotter::getTree();
+/* //OLD IMPLEMENTATION:
+  Plotter::getTree();
   std::cout << "Here1" << std::endl;
   Plotter::make1DHistos();
   std::cout << "Here2" << std::endl;
   Plotter::make2DHistos();
-  
   outFile->Write(); */
+
+
 }// end Plotter::DoPlots
 
 
