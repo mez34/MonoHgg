@@ -74,7 +74,7 @@ private:
   Double_t 	fLumi;
 
   TTree * 	tpho;
-  Int_t		nphotons;
+  Int_t		nentries;
 
   TH1DMap	fTH1DMap;
   TH2DMap	fTH2DMap;

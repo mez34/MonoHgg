@@ -68,10 +68,10 @@ Plotter::~Plotter(){
 void Plotter::DoPlots(){
   Plotter::SetUpPlots();
  
-  nphotons = tpho->GetEntries(); 
-  //fTH1DMap["eff_sel"]->Fill(0,nphotons);
+  nentries = tpho->GetEntries(); 
+  fTH1DMap["eff_sel"]->Fill(0.,nentries);
 
-  for (UInt_t entry = 0; entry < nphotons; entry++){
+  for (UInt_t entry = 0; entry < nentries; entry++){
     tpho->GetEntry(entry);
 
     // calculate the weight
@@ -173,11 +173,27 @@ void Plotter::DoPlots(){
       if (t1pfmet >= 100) fTH1DMap["mgg_selt1pfmet"]->Fill(mgg,Weight); 
     }
 
-    //if (passCH1 || passCH2) fTH1DMap["eff_sel"]->Fill(1,1);
-    //if ((passCH1 || passCH2) && (passNH1 || passNH2)) fTH1DMap["eff_sel"]->Fill(2,1);
-    //if ((passCH1 || passCH2) && (passNH1 || passNH2) && (passPH1 || passPH2)) fTH1DMap["eff_sel"]->Fill(3,1);
-    //if ((passCH1 || passCH2) && (passNH1 || passNH2) && (passPH1 || passPH2) && (passS1 || passS2)) fTH1DMap["eff_sel"]->Fill(4,1);
-    //if ((passCH1 || passCH2) && (passNH1 || passNH2) && (passPH1 || passPH2) && (passS1 || passS2) && (passHE1 || passHE2)) fTH1DMap["eff_sel"]->Fill(5,1);
+    if (passCH1 && passCH2){
+      fTH1DMap["eff_sel"]->Fill(1.,1);
+      if (passNH1 && passNH2){
+        fTH1DMap["eff_sel"]->Fill(2.,1);
+        if (passPH1 && passPH2){
+          fTH1DMap["eff_sel"]->Fill(3.,1);
+          if (passS1 && passS2){ 
+	    fTH1DMap["eff_sel"]->Fill(4.,1);
+     	    if (passHE1 && passHE2){
+	      fTH1DMap["eff_sel"]->Fill(5.,1);
+	      if (mgg >= 120 && mgg <= 130){
+		fTH1DMap["eff_sel"]->Fill(6.,1);
+		if (t1pfmet >= 100){
+		  fTH1DMap["eff_sel"]->Fill(7.,1);
+		}
+	      }
+	    }
+ 	  }
+	}
+      }
+    }
 
     // calculate phi of the Higgs
     Float_t phigg = TMath::ATan((pt1*TMath::Sin(phi1) - pt2*TMath::Sin(phi2)) / (pt1*TMath::Cos(phi1) - pt2*TMath::Cos(phi2)));
@@ -187,6 +203,15 @@ void Plotter::DoPlots(){
     fTH1DMap["dphi_ggmet"]->Fill(dphi_ggmet,Weight);
 
   }// end loop over entries in tree
+
+  fTH1DMap["eff_sel"]->GetXaxis()->SetBinLabel(1,"nentries");
+  fTH1DMap["eff_sel"]->GetXaxis()->SetBinLabel(2,"passCHiso");
+  fTH1DMap["eff_sel"]->GetXaxis()->SetBinLabel(3,"passNHiso");
+  fTH1DMap["eff_sel"]->GetXaxis()->SetBinLabel(4,"passPHiso");
+  fTH1DMap["eff_sel"]->GetXaxis()->SetBinLabel(5,"passSieie");
+  fTH1DMap["eff_sel"]->GetXaxis()->SetBinLabel(6,"passHoe");
+  fTH1DMap["eff_sel"]->GetXaxis()->SetBinLabel(7,"passMgg");
+  fTH1DMap["eff_sel"]->GetXaxis()->SetBinLabel(8,"passMet");  
 
   Plotter::SavePlots();
 
@@ -259,12 +284,12 @@ void Plotter::SetUpPlots(){
   fTH1DMap["dphi_ggmet"]	= Plotter::MakeTH1DPlot("dphi_ggmet","",80,-4.,4.,"#Delta#phi(#gamma#gamma,MET)","");
   fTH1DMap["t1pfmet_selmgg"]	= Plotter::MakeTH1DPlot("t1pfmet_selmgg","",100,0.,1000.,"t1PF MET (GeV)","");
   fTH1DMap["mgg_selt1pfmet"]	= Plotter::MakeTH1DPlot("mgg_selt1pfmet","",100,0.,1000.,"m_{#gamma#gamma} (GeV)","");
-  fTH1DMap["eff_sel"]		= Plotter::MakeTH1DPlot("eff_sel","",10,0.,10.,"","");
 
   // efficiency plots
-  //fTH1DMap["eff_PU"]
-  //fTH1DMap["eff_pt"]
-  //fTH1DMap["eff_eta"]
+  fTH1DMap["eff_sel"]	= Plotter::MakeTH1DPlot("eff_sel","",10,0.,10.,"","");
+  fTH1DMap["eff_PU"]	= Plotter::MakeTH1DPlot("eff_PU","",60,0.,60.,"","");
+  fTH1DMap["eff_pt"]    = Plotter::MakeTH1DPlot("eff_pt","",60,0.,600.,"","");
+  fTH1DMap["eff_eta"]	= Plotter::MakeTH1DPlot("eff_eta","",60,-3.,3.,"","");
 
 
 
