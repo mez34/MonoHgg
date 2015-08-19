@@ -160,7 +160,7 @@ int main(){
         TString mcfilename = Form("diPhoPlots/50ns/%s/plots_%s.root",BkgSamples[mc].first.Data(),BkgSamples[mc].first.Data());
         TFile * tmp_mcfile = TFile::Open(mcfilename.Data());
         // open nvtx plot
-        TH1D * tmpnvtx = (TH1D*)tmp_mcfile->Get(Form("nvtx_%s_n-1",BkgSamples[mc].first.Data()));
+        TH1D * tmpnvtx = (TH1D*)tmp_mcfile->Get("nvtx_n-1");
         // get yield and push back with corresponding sample name
         tmp_mcyields.push_back(SampleYieldPair(BkgSamples[mc].first,tmpnvtx->Integral()));
   

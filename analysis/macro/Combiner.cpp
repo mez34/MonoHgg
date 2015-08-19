@@ -400,19 +400,19 @@ void Combiner::InitCanvAndHists(){
   for (UInt_t th1d = 0; th1d < fNTH1D; th1d++){ // loop over double hists
     fInDataTH1DHists[th1d].resize(fNData); 
     for (UInt_t data = 0; data < fNData; data++) { // init data double hists
-      fInDataTH1DHists[th1d][data] = (TH1D*)fDataFiles[data]->Get(Form("%s_%s%s",fTH1DNames[th1d].Data(),fDataNames[data].Data(),addText.Data()));
+      fInDataTH1DHists[th1d][data] = (TH1D*)fDataFiles[data]->Get(Form("%s_%s",fTH1DNames[th1d].Data(),addText.Data()));
       CheckValidTH1D(fInDataTH1DHists[th1d][data],fTH1DNames[th1d],fDataFiles[data]->GetName());
     }
     fInBkgTH1DHists[th1d].resize(fNBkg); 
     for (UInt_t mc = 0; mc < fNBkg; mc++) { // init bkg double hists
-      fInBkgTH1DHists[th1d][mc] = (TH1D*)fBkgFiles[mc]->Get(Form("%s_%s%s",fTH1DNames[th1d].Data(),fBkgNames[mc].Data(),addText.Data()));
+      fInBkgTH1DHists[th1d][mc] = (TH1D*)fBkgFiles[mc]->Get(Form("%s_%s",fTH1DNames[th1d].Data(),addText.Data()));
       CheckValidTH1D(fInBkgTH1DHists[th1d][mc],fTH1DNames[th1d],fBkgFiles[mc]->GetName());
       fInBkgTH1DHists[th1d][mc]->SetFillColor(fColorMap[fBkgNames[mc]]);
       fInBkgTH1DHists[th1d][mc]->SetLineColor(kBlack);
     }
     fInSigTH1DHists[th1d].resize(fNSig); 
     for (UInt_t mc = 0; mc < fNSig; mc++) { // init sig double hists
-      fInSigTH1DHists[th1d][mc] = (TH1D*)fSigFiles[mc]->Get(Form("%s_%s%s",fTH1DNames[th1d].Data(),fSigNames[mc].Data(),addText.Data()));
+      fInSigTH1DHists[th1d][mc] = (TH1D*)fSigFiles[mc]->Get(Form("%s_%s",fTH1DNames[th1d].Data(),addText.Data()));
       CheckValidTH1D(fInSigTH1DHists[th1d][mc],fTH1DNames[th1d],fSigFiles[mc]->GetName());
       fInSigTH1DHists[th1d][mc]->SetLineColor(fColorMap[fSigNames[mc]]);
     }
@@ -466,10 +466,10 @@ void Combiner::InitTH1DNames(){
   fTH1DNames.push_back("mgg");
 //  fTH1DNames.push_back("ptgg");
 //  fTH1DNames.push_back("nvtx"); 
-//  fTH1DNames.push_back("t1pfmetPhi");
+//  fTH1DNames.push_back("t1pfmetphi");
   fTH1DNames.push_back("t1pfmet");
-  if (addText!="_n-1"){ fTH1DNames.push_back("mgg_selt1pfMet"); }
-  if (addText!="_n-1"){ fTH1DNames.push_back("t1pfMet_selMgg"); }
+  if (addText!="_n-1"){ fTH1DNames.push_back("mgg_selt1pfmet"); }
+  if (addText!="_n-1"){ fTH1DNames.push_back("t1pfmet_selmgg"); }
 //  if (addText!="_n-1"){ fTH1DNames.push_back("phi_H"); }
 //  if (addText!="_n-1"){ fTH1DNames.push_back("phi_HMET"); }
 //
