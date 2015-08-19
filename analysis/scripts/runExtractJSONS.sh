@@ -1,6 +1,9 @@
 #! /bin/sh
 #run extractJSONS.py for all samples in file
 
+python extractJSONS.py -i datasets_746_sig1000.json -o Higgs_scalar_nohdecay_gg_1000GeV	-d lists_sig
+
+
 #signal MC
 python extractJSONS.py -i datasets_746sig.json	-o Higgs_scalar_nohdecay_gg_1000GeV 	-d lists_sig1
 python extractJSONS.py -i datasets_746sig.json	-o Higgs_scalar_nohdecay_gg_100GeV 	-d lists_sig1

@@ -28,13 +28,13 @@ Plotter::Plotter( TString inName, TString outName, TString inSpecies, const Doub
   CheckValidFile(outFile,Form("%s/%s/plots_%s.root",fName.Data(),species.Data(),species.Data()));
 
   // Make TCanvas
-  fTH1Canv = new TCanvas(); //FIXME DELETE THIS
-  fTH2Canv = new TCanvas(); //FIXME DELETE THIS
+  //  fTH1Canv = new TCanvas(); //FIXME DELETE THIS
+  // fTH2Canv = new TCanvas(); //FIXME DELETE THIS
 
   // set all the branch addresses appropriately
   Plotter::SetBranchAddresses();
 
-  // Initialize all of the variables
+  // Initialize all of the variables FIXME DELETE THIS
   /*Plotter::InitTreeVar();
   NVARIABLES = varname.size();
   Plotter::InitTreeEffVar();
@@ -49,8 +49,8 @@ Plotter::Plotter( TString inName, TString outName, TString inSpecies, const Doub
 Plotter::~Plotter(){
   std::cout << "Finished & Deleting" <<std::endl;
   //std::cout << "Deleting Canvases" <<std::endl;
-  delete fTH1Canv; //FIXME DELETE THIS
-  delete fTH2Canv; //FIXME DELETE THIS
+ // delete fTH1Canv; //FIXME DELETE THIS
+ // delete fTH2Canv; //FIXME DELETE THIS
   std::cout << "Deleting inTree" <<std::endl;
   delete tpho;
   std::cout << "Deleting inFile" <<std::endl;
@@ -69,6 +69,8 @@ void Plotter::DoPlots(){
   Plotter::SetUpPlots();
  
   nphotons = tpho->GetEntries(); 
+  //fTH1DMap["eff_sel"]->Fill(0,nphotons);
+
   for (UInt_t entry = 0; entry < nphotons; entry++){
     tpho->GetEntry(entry);
 
@@ -103,30 +105,30 @@ void Plotter::DoPlots(){
     fTH2DMap["mgg_PU"]->Fill(nvtx,mgg,Weight);
 
 
-    Bool_t passCH1 = false;
-    Bool_t passCH2 = false;
-    Bool_t passNH1 = false;
-    Bool_t passNH2 = false;
-    Bool_t passPH1 = false;
-    Bool_t passPH2 = false;
-    Bool_t passS1 = true;
-    Bool_t passS2 = true;
-    Bool_t passHE1 = false;
-    Bool_t passHE2 = false;
+    Bool_t passCH1  = false;
+    Bool_t passCH2  = false;
+    Bool_t passNH1  = false;
+    Bool_t passNH2  = false;
+    Bool_t passPH1  = false;
+    Bool_t passPH2  = false;
+    Bool_t passS1   = false;
+    Bool_t passS2   = false;
+    Bool_t passHE1  = false;
+    Bool_t passHE2  = false;
     Bool_t passAll1 = false;
     Bool_t passAll2 = false;
     Bool_t passBoth = false;
 
-    if (passCHiso1==0) passCH1 = true; 
-    if (passCHiso2==0) passCH2 = true; 
-    if (passNHiso1==0) passNH1 = true;
-    if (passNHiso2==0) passNH2 = true;
-    if (passPHiso1==0) passPH1 = true;
-    if (passPHiso2==0) passPH2 = true;
-    if (passSieie1==0) passS1 = true;
-    if (passSieie2==0) passS2 = true;
-    if (passHoe1==0)   passHE1 = true; 
-    if (passHoe2==0)   passHE2 = true; 
+    if (passCHiso1==1) passCH1 = true; 
+    if (passCHiso2==1) passCH2 = true; 
+    if (passNHiso1==1) passNH1 = true;
+    if (passNHiso2==1) passNH2 = true;
+    if (passPHiso1==1) passPH1 = true;
+    if (passPHiso2==1) passPH2 = true;
+    if (passSieie1==1) passS1  = true;
+    if (passSieie2==1) passS2  = true;
+    if (passHoe1==1)   passHE1 = true; 
+    if (passHoe2==1)   passHE2 = true; 
 
     if (passCH1 && passNH1 && passPH1 && passS1 && passHE1) passAll1 = true;
     if (passCH2 && passNH2 && passPH2 && passS2 && passHE2) passAll2 = true;
@@ -171,6 +173,12 @@ void Plotter::DoPlots(){
       if (t1pfmet >= 100) fTH1DMap["mgg_selt1pfmet"]->Fill(mgg,Weight); 
     }
 
+    //if (passCH1 || passCH2) fTH1DMap["eff_sel"]->Fill(1,1);
+    //if ((passCH1 || passCH2) && (passNH1 || passNH2)) fTH1DMap["eff_sel"]->Fill(2,1);
+    //if ((passCH1 || passCH2) && (passNH1 || passNH2) && (passPH1 || passPH2)) fTH1DMap["eff_sel"]->Fill(3,1);
+    //if ((passCH1 || passCH2) && (passNH1 || passNH2) && (passPH1 || passPH2) && (passS1 || passS2)) fTH1DMap["eff_sel"]->Fill(4,1);
+    //if ((passCH1 || passCH2) && (passNH1 || passNH2) && (passPH1 || passPH2) && (passS1 || passS2) && (passHE1 || passHE2)) fTH1DMap["eff_sel"]->Fill(5,1);
+
     // calculate phi of the Higgs
     Float_t phigg = TMath::ATan((pt1*TMath::Sin(phi1) - pt2*TMath::Sin(phi2)) / (pt1*TMath::Cos(phi1) - pt2*TMath::Cos(phi2)));
     fTH1DMap["phigg"]->Fill(phigg,Weight);
@@ -183,7 +191,7 @@ void Plotter::DoPlots(){
   Plotter::SavePlots();
 
 
-/* //OLD IMPLEMENTATION:
+/* //OLD IMPLEMENTATION: FIXME DELETE THIS
   Plotter::getTree();
   std::cout << "Here1" << std::endl;
   Plotter::make1DHistos();
@@ -251,9 +259,20 @@ void Plotter::SetUpPlots(){
   fTH1DMap["dphi_ggmet"]	= Plotter::MakeTH1DPlot("dphi_ggmet","",80,-4.,4.,"#Delta#phi(#gamma#gamma,MET)","");
   fTH1DMap["t1pfmet_selmgg"]	= Plotter::MakeTH1DPlot("t1pfmet_selmgg","",100,0.,1000.,"t1PF MET (GeV)","");
   fTH1DMap["mgg_selt1pfmet"]	= Plotter::MakeTH1DPlot("mgg_selt1pfmet","",100,0.,1000.,"m_{#gamma#gamma} (GeV)","");
+  fTH1DMap["eff_sel"]		= Plotter::MakeTH1DPlot("eff_sel","",10,0.,10.,"","");
+
+  // efficiency plots
+  //fTH1DMap["eff_PU"]
+  //fTH1DMap["eff_pt"]
+  //fTH1DMap["eff_eta"]
+
+
 
   // 2D plots
+  
   fTH2DMap["mgg_PU"]	= Plotter::MakeTH2DPlot("mgg_PU","",60,0.,60.,60,50.,300.,"nvtx","m_{#gamma#gamma} (GeV)");
+  //fTH2DMap["mgg_ptgg"]  = Plotter::MakeTH2DPlot("mgg_ptgg","",50,0.,500.,);
+
 
 }// end Plotter::SetUpPlots
 
@@ -273,16 +292,14 @@ TH2D * Plotter::MakeTH2DPlot(const TString hname, const TString htitle, const In
 }// end Plotter::MakeTH2DPlot
 
 
-void Plotter::DoAnalysis(){
-
-}// end Plotter::DoAnalysis
-
 void Plotter::SavePlots(){
   outFile->cd();
 
   TCanvas * canv = new TCanvas();
 
+
   for (TH1DMapIter mapiter = fTH1DMap.begin(); mapiter != fTH1DMap.end(); mapiter++){
+    canv->Clear();
 
     if ((*mapiter).second == (TH1D*) NULL)	{std::cout << "TH1D Null" << std::endl;}
     if (outFile == (TFile*) NULL)		{std::cout << "OutFile Null" << std::endl;}
@@ -291,6 +308,8 @@ void Plotter::SavePlots(){
     (*mapiter).second->Write(); // save histos to root file 
     canv->cd();
     (*mapiter).second->Draw("HIST");
+
+    CMSLumi(canv,0,fLumi);
 
     canv->SetLogy(0);
     canv->SaveAs(Form("%s%s/%s.png",fName.Data(),species.Data(),(*mapiter).first.Data()));
@@ -303,6 +322,8 @@ void Plotter::SavePlots(){
   TCanvas * canv2d = new TCanvas();
 
   for (TH2DMapIter mapiter = fTH2DMap.begin(); mapiter != fTH2DMap.end(); mapiter++){
+    canv->Clear();
+
     if ((*mapiter).second == (TH2D*) NULL)	{std::cout << "TH2D Null" << std::endl;}
     if (outFile == (TFile*) NULL)		{std::cout << "OutFile Null" << std::endl;}
     if (canv == (TCanvas*) NULL)		{std::cout << "Canvas Null" << std::endl;}
@@ -310,6 +331,9 @@ void Plotter::SavePlots(){
     (*mapiter).second->Write(); // save histos to root file 
     canv2d->cd();
     (*mapiter).second->Draw("colz");
+
+    CMSLumi(canv2d,0,fLumi);
+
     canv2d->SetLogy(0);
     canv2d->SaveAs(Form("%s%s/%s.png",fName.Data(),species.Data(),(*mapiter).first.Data()));
   }// end of loop over mapiter for 2d plots
@@ -398,7 +422,7 @@ void Plotter::DeleteBranches(){
 
 // DELETE AFTER THIS FIXME
 
-void Plotter::getTree(){
+/*void Plotter::getTree(){
 
   // Load variables from Tree
   variable[NVARIABLES];    //= {-1000}; // float for most variables 
@@ -419,8 +443,8 @@ void Plotter::getTree(){
   }
   nphotons = (int)tpho->GetEntries();
 }// end Plotter::getTree
-
-
+*/
+/*
 void Plotter::make1DHistos(){
   TH1F *hVar[NVARIABLES];
   TH1F *hVarNmin1[NVARIABLES];
@@ -437,11 +461,11 @@ void Plotter::make1DHistos(){
   hPhi[1] = new TH1F(Form("phi_MET_%s",species.Data()),Form("phi_MET_%s",species.Data()),80,-4,4);
   hPhi[2] = new TH1F(Form("phi_HMET_%s",species.Data()),Form("phi_HMET_%s",species.Data()),80,-4,4);
 
-/*  TH1F *hEff[3]; // eff of pho ID vs PU, pt, eta
+  TH1F *hEff[3]; // eff of pho ID vs PU, pt, eta
   hEff[0] = new TH1F(Form("Eff_PHID_PU_%s",species.Data()),Form("Eff_PHID_PU_%s",species.Data()),60,0,60);
   hEff[1] = new TH1F(Form("Eff_PHID_pt_%s",species.Data()),Form("Eff_PHID_pt_%s",species.Data()),60,0,600);
   hEff[2] = new TH1F(Form("Eff_PHID_eta_%s",species.Data()),Form("Eff_PHID_eta_%s",species.Data()),60,-3,3);
-*/
+
   //plot Mgg and MET with some photonIDsel and cut on other var
   TH1F *hMET = new TH1F(Form("t1pfMet_selMgg_%s",species.Data()),Form("t1pfMet_selMgg_%s",species.Data()),100,0,1000);
   TH1F *hMgg = new TH1F(Form("mgg_selt1pfMet_%s",species.Data()),Form("mgg_selt1pfMet_%s",species.Data()),50,50,300);
@@ -519,7 +543,7 @@ void Plotter::make1DHistos(){
     if (variable[0] > 120.0 && variable[0] < 130.0) hMET->Fill(variable[17],variable[18]);
     if (variable[17] > 100.0) hMgg->Fill(variable[0],variable[18]); 
  
-   /*
+   
    if (passAny) nphotonsPass++;
     for (int x=0; x<60; x++){
       if (intvariable[29]==x){ // evnts with nvtx = x
@@ -535,7 +559,7 @@ void Plotter::make1DHistos(){
         if (passAny) Eff[5][x]++;
       } 
     }// loop over bins for eff plots      
-*/   
+  
 
     phiH[i]=TMath::ATan( (variable[1]*TMath::Sin(variable[21]) - variable[9]*TMath::Sin(variable[22])) / (variable[1]*TMath::Cos(variable[21]) - variable[9]*TMath::Cos(variable[22])) );
     phiHMET[i]=deltaPhi(phiH[i],variable[20]);
@@ -549,7 +573,7 @@ void Plotter::make1DHistos(){
   }// end loop over all photons
 
 
-  /*Float_t eff[3][60]={0};
+  Float_t eff[3][60]={0};
   for (int x=0; x<60; x++){
     if(Eff[0][x]!=0) eff[0][x]=(Float_t)Eff[1][x]/(Float_t)Eff[0][x];
     if(Eff[2][x]!=0) eff[1][x]=(Float_t)Eff[3][x]/(Float_t)Eff[2][x];
@@ -561,7 +585,7 @@ void Plotter::make1DHistos(){
     hEff[1]->Fill(10*x,eff[1][x]);   
     hEff[2]->Fill(-3+(x/10),eff[2][x]);   
   }
-  */
+  
 
   hMgg->GetXaxis()->SetTitle("mgg");
   Plotter::DrawWriteSave1DPlot(hMgg,"mgg_selt1pfMet",true);
@@ -580,7 +604,7 @@ void Plotter::make1DHistos(){
   Plotter::DrawWriteSave1DPlot(hPhi[1],"phiMET",true);
   Plotter::DrawWriteSave1DPlot(hPhi[2],"phiHMET",true);
 
-  /*hEff[0]->GetXaxis()->SetTitle("nvtx");
+  hEff[0]->GetXaxis()->SetTitle("nvtx");
   hEff[1]->GetXaxis()->SetTitle("p_{T}");
   hEff[2]->GetXaxis()->SetTitle("#eta");
   hEff[0]->GetYaxis()->SetTitle("Efficiency to Pass PhoID");
@@ -589,9 +613,11 @@ void Plotter::make1DHistos(){
   Plotter::DrawWriteSave1DPlot(hEff[0],"Eff_PHOID_PU",false); 
   Plotter::DrawWriteSave1DPlot(hEff[1],"Eff_PHOID_pt",false); 
   Plotter::DrawWriteSave1DPlot(hEff[2],"Eff_PHOID_eta",false); 
-*/
-}// end Plotter::make1DHistos
 
+}// end Plotter::make1DHistos
+*/
+
+/*
 void Plotter::make2DHistos(){
 
   Int_t range2D[N2DVARIABLES][3]; //nbins,min,max for each 2D variable to plot
@@ -696,8 +722,8 @@ void Plotter::make2DHistos(){
   Plotter::DrawWriteSave2DPlot(hMggvMet,"t1pfMet","mgg");
  
 }// end Plotter::make2DHistos
-
-
+*/
+/*
 void Plotter::DrawWriteSave1DPlot(TH1F *& h, const TString plotName, const Bool_t DrawNorm){
 
   fTH1Canv->cd();
@@ -762,8 +788,8 @@ void Plotter::DrawWriteSave1DPlot(TH1F *& h, const TString plotName, const Bool_
   h->Write();
   fTH1Canv->SaveAs(Form("%s%s/%s_%s_log.png",fName.Data(),species.Data(),plotName.Data(),species.Data()));
 }// end Plotter::DrawWriteSave1DPlot
-
-
+*/
+/*
 void Plotter::DrawWriteSave2DPlot(TH2F *& h, const TString varX, const TString varY){
   gStyle->SetOptStat(0);
   fTH2Canv->cd();
@@ -775,13 +801,13 @@ void Plotter::DrawWriteSave2DPlot(TH2F *& h, const TString varX, const TString v
   fTH2Canv->SaveAs(Form("%s%s/%s_%s_%s.png",fName.Data(),species.Data(),varY.Data(),varX.Data(),species.Data()));
 
   // FIXME problem with log plots (min always is zero)
-/*  fTH2Canv->SetLogy(1);
+  fTH2Canv->SetLogy(1);
   fTH2Canv->SetLogx(1);  
   h->Draw("colz");
   h->Write();
-  fTH2Canv->SaveAs(Form("%s%s/%s_%s_%s_log.png",fName.Data(),species.Data(),varY.Data(),varX.Data(),species.Data()));*/
+  fTH2Canv->SaveAs(Form("%s%s/%s_%s_%s_log.png",fName.Data(),species.Data(),varY.Data(),varX.Data(),species.Data()));*
 }// end Plotter::DrawWriteSave2DPlot
-
+*/
 void Plotter::FindMinAndMax(TH1F *& h, int plotLog){
   Float_t max = h->GetMaximum();
   if (plotLog==1) h->SetMaximum(10*max);
@@ -807,7 +833,7 @@ void Plotter::FindMinAndMax(TH1F *& h, int plotLog){
 
 
 
-
+/*
 void Plotter::InitTreeVar(){
   varname.push_back("mgg");
   varname.push_back("pt1");
@@ -994,6 +1020,6 @@ void Plotter::InitPhotonIDSel(){
   selvar.push_back("passHoe2");
 }// end Plotter::InitPhotonIDSel
 
-
+*/
 
 
