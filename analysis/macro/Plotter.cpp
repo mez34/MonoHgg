@@ -287,16 +287,13 @@ void Plotter::SetUpPlots(){
 
   // efficiency plots
   fTH1DMap["eff_sel"]	= Plotter::MakeTH1DPlot("eff_sel","",10,0.,10.,"","");
-  fTH1DMap["eff_PU"]	= Plotter::MakeTH1DPlot("eff_PU","",60,0.,60.,"","");
-  fTH1DMap["eff_pt"]    = Plotter::MakeTH1DPlot("eff_pt","",60,0.,600.,"","");
-  fTH1DMap["eff_eta"]	= Plotter::MakeTH1DPlot("eff_eta","",60,-3.,3.,"","");
-
-
+  //fTH1DMap["eff_PU"]	= Plotter::MakeTH1DPlot("eff_PU","",60,0.,60.,"","");
+  //fTH1DMap["eff_pt"]    = Plotter::MakeTH1DPlot("eff_pt","",60,0.,600.,"","");
+  //fTH1DMap["eff_eta"]	= Plotter::MakeTH1DPlot("eff_eta","",60,-3.,3.,"","");
 
   // 2D plots
-  
   fTH2DMap["mgg_PU"]	= Plotter::MakeTH2DPlot("mgg_PU","",60,0.,60.,60,50.,300.,"nvtx","m_{#gamma#gamma} (GeV)");
-  //fTH2DMap["mgg_ptgg"]  = Plotter::MakeTH2DPlot("mgg_ptgg","",50,0.,500.,);
+  //fTH2DMap["mgg_ptgg"]  = Plotter::MakeTH2DPlot("mgg_ptgg","",50,0.,500.,60,50.,300.,"p_{T,#gamma#gamma} (GeV)","m_{#gamma#gamma}");
 
 
 }// end Plotter::SetUpPlots

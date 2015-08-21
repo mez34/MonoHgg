@@ -35,9 +35,9 @@ int main(){
   TString outDir = "diPhoPlots/50ns/";
 
   bool doFakeData = false;
-  bool doTest = true;
+  bool doTest = false;
   bool doPlots = false;
-  bool doComb = false;
+  bool doComb = true;
   
   
   //for CMSSW_7_0_pre9: run with root
@@ -59,22 +59,13 @@ int main(){
     std::cout << "Finished FakeData sample" << std::endl;
   }
 
-  if (false){
-    std::cout << "Working on GJets1 sample" << std::endl;
+ if (doPlots){
+    std::cout << "Working on GJets sample" << std::endl;
     Plotter * GJets = new Plotter("./data/50ns/","./diPhoPlots/50ns/","GJets",30);
     GJets->DoPlots();
     delete GJets;
     std::cout << "Finished GJets sample" << std::endl;
-/*
-    std::cout << "Working on GJets2 sample" << std::endl;
-    Plotter * GJets2 = new Plotter("./data/50ns/","./diPhoPlots/50ns/","GJets_Pt-40toInf",30);
-    GJets2->DoPlots();
-    delete GJets2;
-    std::cout << "Finished GJets2 sample" << std::endl;
-*/
-  }
 
- if (doPlots){
     std::cout << "Working on QCD sample" << std::endl;
     Plotter * QCD = new Plotter("./data/50ns/","./diPhoPlots/50ns/","QCD",30);
     QCD->DoPlots();
@@ -105,11 +96,13 @@ int main(){
     delete DMH_M10;
     std::cout << "Finished DMHgg M10 sample" << std::endl;
   
+/*
     std::cout << "Working on DMHgg M1 sample" << std::endl;
     Plotter * DMH_M1 = new Plotter("./data/50ns/","./diPhoPlots/50ns/","DMHtoGG_M1",30);
     DMH_M1->DoPlots();
     delete DMH_M1;
     std::cout << "Finished DMHgg M1 sample" << std::endl;
+*/
   }
 
   if (doComb){
