@@ -37,7 +37,7 @@ Combiner::Combiner( SamplePairVec Samples, const Double_t inLumi, const ColorMap
   fSampleTitleMap["DMHtoGG_M1000"]	= "DM + H #rightarrow GG, M1000GeV";
   fSampleTitleMap["DMHtoGG_M100"]	= "DM + H #rightarrow GG, M100GeV";
   fSampleTitleMap["DMHtoGG_M10"]	= "DM + H #rightarrow GG, M10GeV";
-  fSampleTitleMap["DMHtoGG_M1"]		= "DM + H #rightarrow GG, M1GeV";
+  //fSampleTitleMap["DMHtoGG_M1"]		= "DM + H #rightarrow GG, M1GeV";
 
   //for (std::map<TString,TString>::iterator iter = fSampleTitleMap.begin(); iter != fSampleTitleMap.end(); ++iter) {
   //  std::cout << (*iter).first << "  " << (*iter).second << std::endl;
