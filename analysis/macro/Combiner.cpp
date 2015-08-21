@@ -78,6 +78,7 @@ Combiner::~Combiner(){
 
 void Combiner::DoComb(){
   Combiner::OverlayPlots();
+  Combiner::MakeEffPlots();
 }// end Combiner::DoComb
 
 
@@ -117,9 +118,34 @@ void Combiner::OverlayPlots(){
 }// end Combiner::OverlayPlots
 
 
+void Combiner::MakeEffPlots(){
+
+  fOutFile->cd();
+  TCanvas *c = new TCanvas();
+  c->cd();
+
+  TH1I *eff_mDM = new TH1I("eff_mDM","",fNSig,0,fNSig);
+
+/*  for (UInt_t mc = 0; mc < fNSig; mc++){
+    Double_t eff_val = 0.;
+    Double_t eff_num = fInSigTH1DHists[fIndexEff][mc]->GetBinContent(8);
+    Double_t eff_den = fInSigTH1DHists[fIndexEff][mc]->GetBinContent(1);
+//    if (eff_den != 0) eff_val = eff_num/eff_den; 
+//    std::cout << eff_val << std::endl;
+//    eff_mDM->Fill(mc,eff_val); 
+  }*/
+
+/*
+  eff_mDM->Write();
+  CMSLumi(c,0,lumi);
+  c->SaveAs(Form("%scomb/eff_mDM.png",fOutDir.Data()));
+  delete c; 
+*/
+}// end Combiner::MakeEffPlots
+
+
 void Combiner::MakeOutputCanvas(){
   for (UInt_t th1d = 0; th1d < fNTH1D; th1d++){
-
 
 /*
      for (UInt_t mc = 0; mc < fNBkg; mc++){
@@ -143,6 +169,7 @@ void Combiner::MakeOutputCanvas(){
     Combiner::DrawCanvasOverlay(th1d,isLogY);
   }
 }// end Combiner::MakeOutputCanvas
+
 
 void Combiner::DrawCanvasOverlay(const UInt_t th1d, const Bool_t isLogY){
   gStyle->SetOptStat(0);
@@ -462,17 +489,23 @@ void Combiner::InitCanvAndHists(){
 
 
 void Combiner::InitTH1DNames(){
+  
   // higgs & met variables
   fTH1DNames.push_back("mgg");
   fTH1DNames.push_back("ptgg");
   fTH1DNames.push_back("nvtx"); 
   fTH1DNames.push_back("t1pfmetphi");
   fTH1DNames.push_back("t1pfmet");
-  if (addText!="_n-1"){ fTH1DNames.push_back("mgg_selt1pfmet"); }
-  if (addText!="_n-1"){ fTH1DNames.push_back("t1pfmet_selmgg"); }
-  if (addText!="_n-1"){ fTH1DNames.push_back("phigg"); }
-  if (addText!="_n-1"){ fTH1DNames.push_back("dphi_ggmet"); }
 
+  if (addText!="_n-1"){ // plots that don't have n-1 versions 
+    fTH1DNames.push_back("mgg_selt1pfmet");
+    fTH1DNames.push_back("t1pfmet_selmgg");
+    fTH1DNames.push_back("phigg");
+    fTH1DNames.push_back("dphi_ggmet");
+    fTH1DNames.push_back("eff_sel");
+    fIndexEff = fTH1DNames.size();
+  }
+/*
   // photon variables
   fTH1DNames.push_back("pt1");
   fTH1DNames.push_back("pt2");
@@ -495,5 +528,5 @@ void Combiner::InitTH1DNames(){
   fTH1DNames.push_back("chiso2");
   fTH1DNames.push_back("neuiso1");
   fTH1DNames.push_back("neuiso2");
-
+*/
 }// end Combiner::InitTH1DNames

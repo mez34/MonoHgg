@@ -47,6 +47,7 @@ public:
   void InitCanvAndHists();
   void InitTH1DNames();
   void DoComb();
+  void MakeEffPlots();
   void OverlayPlots();
   void StackPlots();
   void MakeOutputCanvas();
@@ -65,6 +66,8 @@ private:
   UInt_t	fNData;
   UInt_t	fNBkg;
   UInt_t	fNSig;
+
+  UInt_t	fIndexEff;
 
   UInt_t	fNTH1D;
   TStrVec	fTH1DNames;
