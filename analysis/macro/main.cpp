@@ -122,7 +122,7 @@ int main(){
     Samples.push_back(SamplePair("DMHtoGG_M1000",0)); 
     Samples.push_back(SamplePair("DMHtoGG_M100",0)); 
     Samples.push_back(SamplePair("DMHtoGG_M10",0)); 
-    Samples.push_back(SamplePair("DMHtoGG_M1",0)); 
+//    Samples.push_back(SamplePair("DMHtoGG_M1",0)); 
     if (doFakeData) Samples.push_back(SamplePair("FakeData",5));
   
     UInt_t nbkg = 0;

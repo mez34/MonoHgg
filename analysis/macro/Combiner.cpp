@@ -22,6 +22,8 @@ Combiner::Combiner( SamplePairVec Samples, const Double_t inLumi, const ColorMap
   fNData = fDataNames.size();
   fNBkg  = fBkgNames.size();
   fNSig  = fSigNames.size();
+ 
+  std::cout << "DataSize = " << fNData << " BkgSize = " << fNBkg << " SigSize = " << fNSig << std::endl;
 
   Combiner::InitTH1DNames();
   fNTH1D = fTH1DNames.size(); 
@@ -149,13 +151,11 @@ void Combiner::DrawCanvasOverlay(const UInt_t th1d, const Bool_t isLogY){
   fOutTH1DStackPads[th1d]->cd();
    
   for (UInt_t mc = 0; mc < fNSig; mc++){
-    std::cout << "sig_int  " << mc << " = "<< fInSigTH1DHists[th1d][mc]->Integral() << std::endl;
     if (fInSigTH1DHists[th1d][mc]->Integral() > 0){
       fInSigTH1DHists[th1d][mc]->Scale(1.0/fInSigTH1DHists[th1d][mc]->Integral());
     }
   }
   for (UInt_t mc = 0; mc < fNBkg; mc++){
-    std::cout << "bkg_int  "<< mc <<" = "  << fInBkgTH1DHists[th1d][mc]->Integral() << std::endl;
     if (fInBkgTH1DHists[th1d][mc]->Integral() > 0 ){
       fInBkgTH1DHists[th1d][mc]->Scale(1.0/fInBkgTH1DHists[th1d][mc]->Integral());
     }
@@ -400,19 +400,19 @@ void Combiner::InitCanvAndHists(){
   for (UInt_t th1d = 0; th1d < fNTH1D; th1d++){ // loop over double hists
     fInDataTH1DHists[th1d].resize(fNData); 
     for (UInt_t data = 0; data < fNData; data++) { // init data double hists
-      fInDataTH1DHists[th1d][data] = (TH1D*)fDataFiles[data]->Get(Form("%s_%s",fTH1DNames[th1d].Data(),addText.Data()));
+      fInDataTH1DHists[th1d][data] = (TH1D*)fDataFiles[data]->Get(Form("%s%s",fTH1DNames[th1d].Data(),addText.Data()));
       CheckValidTH1D(fInDataTH1DHists[th1d][data],fTH1DNames[th1d],fDataFiles[data]->GetName());
     }
     fInBkgTH1DHists[th1d].resize(fNBkg); 
     for (UInt_t mc = 0; mc < fNBkg; mc++) { // init bkg double hists
-      fInBkgTH1DHists[th1d][mc] = (TH1D*)fBkgFiles[mc]->Get(Form("%s_%s",fTH1DNames[th1d].Data(),addText.Data()));
+      fInBkgTH1DHists[th1d][mc] = (TH1D*)fBkgFiles[mc]->Get(Form("%s%s",fTH1DNames[th1d].Data(),addText.Data()));
       CheckValidTH1D(fInBkgTH1DHists[th1d][mc],fTH1DNames[th1d],fBkgFiles[mc]->GetName());
       fInBkgTH1DHists[th1d][mc]->SetFillColor(fColorMap[fBkgNames[mc]]);
       fInBkgTH1DHists[th1d][mc]->SetLineColor(kBlack);
     }
     fInSigTH1DHists[th1d].resize(fNSig); 
     for (UInt_t mc = 0; mc < fNSig; mc++) { // init sig double hists
-      fInSigTH1DHists[th1d][mc] = (TH1D*)fSigFiles[mc]->Get(Form("%s_%s",fTH1DNames[th1d].Data(),addText.Data()));
+      fInSigTH1DHists[th1d][mc] = (TH1D*)fSigFiles[mc]->Get(Form("%s%s",fTH1DNames[th1d].Data(),addText.Data()));
       CheckValidTH1D(fInSigTH1DHists[th1d][mc],fTH1DNames[th1d],fSigFiles[mc]->GetName());
       fInSigTH1DHists[th1d][mc]->SetLineColor(fColorMap[fSigNames[mc]]);
     }
@@ -464,36 +464,36 @@ void Combiner::InitCanvAndHists(){
 void Combiner::InitTH1DNames(){
   // higgs & met variables
   fTH1DNames.push_back("mgg");
-//  fTH1DNames.push_back("ptgg");
-//  fTH1DNames.push_back("nvtx"); 
-//  fTH1DNames.push_back("t1pfmetphi");
+  fTH1DNames.push_back("ptgg");
+  fTH1DNames.push_back("nvtx"); 
+  fTH1DNames.push_back("t1pfmetphi");
   fTH1DNames.push_back("t1pfmet");
   if (addText!="_n-1"){ fTH1DNames.push_back("mgg_selt1pfmet"); }
   if (addText!="_n-1"){ fTH1DNames.push_back("t1pfmet_selmgg"); }
-//  if (addText!="_n-1"){ fTH1DNames.push_back("phi_H"); }
-//  if (addText!="_n-1"){ fTH1DNames.push_back("phi_HMET"); }
-//
-//  // photon variables
-//  fTH1DNames.push_back("pt1");
-//  fTH1DNames.push_back("pt2");
-//  fTH1DNames.push_back("eta1");
-//  fTH1DNames.push_back("eta2");
-//  fTH1DNames.push_back("phi1");
-//  fTH1DNames.push_back("phi2");
-//
-//  fTH1DNames.push_back("r91");
-//  fTH1DNames.push_back("r92");
-//
-//  // photon ID variables
-//  fTH1DNames.push_back("hoe1");
-//  fTH1DNames.push_back("hoe2");
-//  fTH1DNames.push_back("sieie1");
-//  fTH1DNames.push_back("sieie2");
-//  fTH1DNames.push_back("phoiso1");
-//  fTH1DNames.push_back("phoiso2");
-//  fTH1DNames.push_back("chiso1");
-//  fTH1DNames.push_back("chiso2");
-//  fTH1DNames.push_back("neuiso1");
-//  fTH1DNames.push_back("neuiso2");
+  if (addText!="_n-1"){ fTH1DNames.push_back("phigg"); }
+  if (addText!="_n-1"){ fTH1DNames.push_back("dphi_ggmet"); }
+
+  // photon variables
+  fTH1DNames.push_back("pt1");
+  fTH1DNames.push_back("pt2");
+  fTH1DNames.push_back("eta1");
+  fTH1DNames.push_back("eta2");
+  fTH1DNames.push_back("phi1");
+  fTH1DNames.push_back("phi2");
+
+  fTH1DNames.push_back("r91");
+  fTH1DNames.push_back("r92");
+
+  // photon ID variables
+  fTH1DNames.push_back("hoe1");
+  fTH1DNames.push_back("hoe2");
+  fTH1DNames.push_back("sieie1");
+  fTH1DNames.push_back("sieie2");
+  fTH1DNames.push_back("phoiso1");
+  fTH1DNames.push_back("phoiso2");
+  fTH1DNames.push_back("chiso1");
+  fTH1DNames.push_back("chiso2");
+  fTH1DNames.push_back("neuiso1");
+  fTH1DNames.push_back("neuiso2");
 
 }// end Combiner::InitTH1DNames
