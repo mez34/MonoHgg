@@ -78,7 +78,7 @@ Combiner::~Combiner(){
 
 void Combiner::DoComb(){
   Combiner::OverlayPlots();
-  Combiner::MakeEffPlots();
+
 }// end Combiner::DoComb
 
 
@@ -113,6 +113,8 @@ void Combiner::OverlayPlots(){
       fTH1DLegends[th1d]->AddEntry(fInSigTH1DHists[th1d][mc],fSampleTitleMap[fSigNames[mc]],"l");
     }
   }// end loop over th1d histos
+
+  if (addText!="_n-1") Combiner::MakeEffPlots();
   Combiner::MakeOutputCanvas();
 
 }// end Combiner::OverlayPlots
@@ -124,23 +126,25 @@ void Combiner::MakeEffPlots(){
   TCanvas *c = new TCanvas();
   c->cd();
 
-  TH1I *eff_mDM = new TH1I("eff_mDM","",fNSig,0,fNSig);
+  TH1D *eff_mDM = new TH1D("eff_mDM","",fNSig,0,fNSig);
 
-/*  for (UInt_t mc = 0; mc < fNSig; mc++){
-    Double_t eff_val = 0.;
-    Double_t eff_num = fInSigTH1DHists[fIndexEff][mc]->GetBinContent(8);
-    Double_t eff_den = fInSigTH1DHists[fIndexEff][mc]->GetBinContent(1);
-//    if (eff_den != 0) eff_val = eff_num/eff_den; 
-//    std::cout << eff_val << std::endl;
-//    eff_mDM->Fill(mc,eff_val); 
-  }*/
+  Double_t eff_val = 0.;
+  Double_t eff_num = 0.;
+  Double_t eff_den = 0.;
+  for (UInt_t mc = 0; mc < fNSig; mc++){
+    eff_num = fInSigTH1DHists[fIndexEff][mc]->GetBinContent(8);
+    eff_den = fInSigTH1DHists[fIndexEff][mc]->GetBinContent(1);
+    if (eff_den > 0) eff_val = eff_num/eff_den; 
+    eff_mDM->Fill((Double_t)mc,eff_val); 
+    eff_mDM->GetXaxis()->SetBinLabel(mc+1,fSigNames[mc]);// bins start at 1 not 0 so need mc+1
+  }
 
-/*
+  eff_mDM->Draw("PE");
   eff_mDM->Write();
   CMSLumi(c,0,lumi);
   c->SaveAs(Form("%scomb/eff_mDM.png",fOutDir.Data()));
   delete c; 
-*/
+
 }// end Combiner::MakeEffPlots
 
 
@@ -503,13 +507,13 @@ void Combiner::InitTH1DNames(){
     fTH1DNames.push_back("phigg");
     fTH1DNames.push_back("dphi_ggmet");
     fTH1DNames.push_back("eff_sel");
-    fIndexEff = fTH1DNames.size();
+    fIndexEff = fTH1DNames.size()-1;
   }
 
   // photon variables
   fTH1DNames.push_back("pt1");
   fTH1DNames.push_back("pt2");
-/*  fTH1DNames.push_back("eta1");
+  fTH1DNames.push_back("eta1");
   fTH1DNames.push_back("eta2");
   fTH1DNames.push_back("phi1");
   fTH1DNames.push_back("phi2");
@@ -528,5 +532,5 @@ void Combiner::InitTH1DNames(){
   fTH1DNames.push_back("chiso2");
   fTH1DNames.push_back("neuiso1");
   fTH1DNames.push_back("neuiso2");
-*/
+
 }// end Combiner::InitTH1DNames
