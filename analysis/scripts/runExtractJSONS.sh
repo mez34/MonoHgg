@@ -4,7 +4,7 @@
 python extractJSONS.py -i datasets_746_sig.json -o Higgs_scalar_nohdecay_gg_1000GeV	-d lists_50ns/MC
 python extractJSONS.py -i datasets_746_sig.json -o Higgs_scalar_nohdecay_gg_100GeV	-d lists_50ns/MC
 python extractJSONS.py -i datasets_746_sig.json -o Higgs_scalar_nohdecay_gg_10GeV	-d lists_50ns/MC
-
+python extractJSONS.py -i datasets_746_sig.json -o Higgs_scalar_nohdecay_gg_1GeV	-d lists_50ns/MC
 ##signal MC
 #python extractJSONS.py -i datasets_746sig.json	-o Higgs_scalar_nohdecay_gg_1000GeV 	-d lists_sig1
 #python extractJSONS.py -i datasets_746sig.json	-o Higgs_scalar_nohdecay_gg_100GeV 	-d lists_sig1
