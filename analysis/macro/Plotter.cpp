@@ -55,6 +55,11 @@ void Plotter::DoPlots(){
   nentries = tpho->GetEntries(); 
   fTH1DMap["eff_sel"]->Fill(0.,nentries);
 
+  Double_t effPUn[60]={0};
+  Double_t effPUd[60]={0};
+  Double_t effptn[60]={0};
+  Double_t effptd[60]={0};
+
   for (UInt_t entry = 0; entry < nentries; entry++){
     tpho->GetEntry(entry);
 
@@ -181,8 +186,18 @@ void Plotter::DoPlots(){
 	}
       }
     }
- 
 
+    for (UInt_t i = 0; i < 60; i++){
+      if (nvtx == i){
+	effPUd[i]++;
+	if (passBoth) effPUn[i]++;
+      }
+      if (ptgg >= 10*i && ptgg < 10*(i+1)){
+        effptd[i]++;
+        if (passBoth) effptn[i]++;
+      }
+    }
+ 
     // calculate phi of the Higgs
     Float_t phigg = TMath::ATan((pt1*TMath::Sin(phi1) - pt2*TMath::Sin(phi2)) / (pt1*TMath::Cos(phi1) - pt2*TMath::Cos(phi2)));
     fTH1DMap["phigg"]->Fill(phigg,Weight);
@@ -191,6 +206,17 @@ void Plotter::DoPlots(){
     fTH1DMap["dphi_ggmet"]->Fill(dphi_ggmet,Weight);
 
   }// end loop over entries in tree
+
+  Double_t effPU = 0;
+  Double_t effpt = 0;
+  Double_t bin = 0;
+  for (UInt_t i=0; i<60; i++){
+    bin = (Double_t)i;
+    if (effPUd[i] > 0) effPU = (Double_t)effPUn[i]/(Double_t)effPUd[i];
+    if (effptd[i] > 0) effpt = (Double_t)effptn[i]/(Double_t)effptd[i];
+    fTH1DMap["eff_PU"]->Fill(bin,effPU); 
+    fTH1DMap["eff_pt"]->Fill(bin*10,effpt); 
+  }
 
   fTH1DMap["eff_sel"]->GetXaxis()->SetBinLabel(1,"nentries");
   fTH1DMap["eff_sel"]->GetXaxis()->SetBinLabel(2,"passCHiso");
@@ -265,9 +291,8 @@ void Plotter::SetUpPlots(){
 
   // efficiency plots
   fTH1DMap["eff_sel"]		= Plotter::MakeTH1DPlot("eff_sel","",10,0.,10.,"","");
-  //fTH1DMap["eff_PU"]		= Plotter::MakeTH1DPlot("eff_PU","",60,0.,60.,"","");
-  //fTH1DMap["eff_pt"]		= Plotter::MakeTH1DPlot("eff_pt","",60,0.,600.,"","");
-  //fTH1DMap["eff_eta"]		= Plotter::MakeTH1DPlot("eff_eta","",60,-3.,3.,"","");
+  fTH1DMap["eff_PU"]		= Plotter::MakeTH1DPlot("eff_PU","",60,0.,60.,"","");
+  fTH1DMap["eff_pt"]		= Plotter::MakeTH1DPlot("eff_pt","",60,0.,600.,"","");
 
   // 2D plots
   fTH2DMap["mgg_PU"]		= Plotter::MakeTH2DPlot("mgg_PU","",60,0.,60.,60,50.,300.,"nvtx","m_{#gamma#gamma} (GeV)");
@@ -404,39 +429,6 @@ void Plotter::DeleteBranches(){
   delete b_pt1;
   delete b_pt2;
 }// end Plotter::DeleteBranches
-
-
-
-/* 
-   if (passAny) nphotonsPass++;
-    for (int x=0; x<60; x++){
-      if (intvariable[29]==x){ // evnts with nvtx = x
-        Eff[0][x]++;
-        if (passAny) Eff[1][x]++;
-      } 
-      if ((variable[9]>=10*x && variable[9]<10*(x+1)) || ((variable[1]>=10*x && variable[1]<10*(x+1)))){ //pt bins = 10GeV
-        Eff[2][x]++;
-        if (passAny) Eff[3][x]++;
-      }
-      if (((variable[24] >= (-3+(x/10)) && variable[24] < (-3+(x+1)/10)) )||(variable[23] >= (-3+(x/10)) && variable[23]< (-3+(x+1)/10))){ // eta bins = 1/10
-        Eff[4][x]++;
-        if (passAny) Eff[5][x]++;
-      } 
-    }// loop over bins for eff plots      
-  
-
-  Float_t eff[3][60]={0};
-  for (int x=0; x<60; x++){
-    if(Eff[0][x]!=0) eff[0][x]=(Float_t)Eff[1][x]/(Float_t)Eff[0][x];
-    if(Eff[2][x]!=0) eff[1][x]=(Float_t)Eff[3][x]/(Float_t)Eff[2][x];
-    if(Eff[4][x]!=0) eff[2][x]=(Float_t)Eff[5][x]/(Float_t)Eff[4][x];
-    
- 
-    hEff[0]->Fill(x,eff[0][x]);   
-    hEff[1]->Fill(10*x,eff[1][x]);   
-    hEff[2]->Fill(-3+(x/10),eff[2][x]);   
-*/
-
 
 
 void Plotter::FindMinAndMax(TH1F *& h, int plotLog){

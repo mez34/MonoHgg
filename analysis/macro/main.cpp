@@ -46,7 +46,7 @@ int main(){
 
   if (doTest){
     std::cout << "Working on test sample" << std::endl;
-    Plotter * test = new Plotter("./data/50ns/","./diPhoPlots/50ns/","test",30);
+    Plotter * test = new Plotter("./data/50ns/","./diPhoPlots/50ns/","GJets",30);
     test->DoPlots();
     delete test;
     std::cout << "Finished test sample" << std::endl;
@@ -96,13 +96,11 @@ int main(){
     delete DMH_M10;
     std::cout << "Finished DMHgg M10 sample" << std::endl;
   
-/*
     std::cout << "Working on DMHgg M1 sample" << std::endl;
     Plotter * DMH_M1 = new Plotter("./data/50ns/","./diPhoPlots/50ns/","DMHtoGG_M1",30);
     DMH_M1->DoPlots();
     delete DMH_M1;
     std::cout << "Finished DMHgg M1 sample" << std::endl;
-*/
   }
 
   if (doComb){
@@ -113,7 +111,7 @@ int main(){
     colorMap["DMHtoGG_M1000"]	= kMagenta;
     colorMap["DMHtoGG_M100"]	= kMagenta+1;
     colorMap["DMHtoGG_M10"]	= kRed+1;
-    //colorMap["DMHtoGG_M1"]	= kRed;
+    colorMap["DMHtoGG_M1"]	= kRed;
   
     SamplePairVec Samples; // vector to also be used for stack plots
     Samples.push_back(SamplePair("QCD",1)); 
@@ -122,7 +120,7 @@ int main(){
     Samples.push_back(SamplePair("DMHtoGG_M1000",0)); 
     Samples.push_back(SamplePair("DMHtoGG_M100",0)); 
     Samples.push_back(SamplePair("DMHtoGG_M10",0)); 
-//    Samples.push_back(SamplePair("DMHtoGG_M1",0)); 
+    Samples.push_back(SamplePair("DMHtoGG_M1",0)); 
     if (doFakeData) Samples.push_back(SamplePair("FakeData",5));
   
     UInt_t nbkg = 0;
