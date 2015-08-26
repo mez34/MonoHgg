@@ -36,8 +36,8 @@ int main(){
 
   bool doFakeData = false;
   bool doTest = false;
-  bool doPlots = false;
-  bool doComb = true;
+  bool doPlots = true;
+  bool doComb = false;
   
   
   //for CMSSW_7_0_pre9: run with root
