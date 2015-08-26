@@ -15,7 +15,10 @@
 
 #include "Plotter.hh"
 #include "Combiner.hh"
+#include "ReweightPU.hh"
 #include "Style.hh"
+
+
 #include "TROOT.h"
 #include "TStyle.h"
 
@@ -24,8 +27,8 @@
 typedef std::pair<TString,Double_t>  SampleYieldPair;
 typedef std::vector<SampleYieldPair> SampleYieldPairVec;
 
-static bool sortByYield(const SampleYieldPair& mcpair1, const SampleYieldPair& mcpair2){
-  return mcpair1.second <= mcpair2.second;
+static bool sortByYield(const SampleYieldPair& mcpair1, const SampleYieldPair& mcpair2) {
+  return mcpair1.second<=mcpair2.second;
 }
 
 int main(){
@@ -36,8 +39,9 @@ int main(){
 
   bool doFakeData = false;
   bool doTest = false;
+  bool doReweightPU = true;
   bool doPlots = true;
-  bool doComb = false;
+  bool doComb = true;
   
   
   //for CMSSW_7_0_pre9: run with root
@@ -58,6 +62,12 @@ int main(){
     delete FakeData;
     std::cout << "Finished FakeData sample" << std::endl;
   }
+
+ //--------------------------------------------------
+ //
+ // Make plots for each sample
+ //
+ //--------------------------------------------------
 
  if (doPlots){
     std::cout << "Working on GJets sample" << std::endl;
@@ -101,7 +111,24 @@ int main(){
     DMH_M1->DoPlots();
     delete DMH_M1;
     std::cout << "Finished DMHgg M1 sample" << std::endl;
-  }
+  }// end doPlots
+
+ //--------------------------------------------------
+ //
+ // Make comb (stack & overlay) plots w/ all samples 
+ //
+ //--------------------------------------------------
+
+  //DblVec puweights;
+  if (doReweightPU){ 
+   
+    std::cout << "Doing PU Reweighting" << std::endl;
+  /*  ReweightPU * reweight = new ReweightPU(PURWSamples, PURWselection, PURWnjetsselection, lumi, nBins_vtx, outdir)
+    puweights = reweight->GetPUWeights();
+    delete reweight;
+   */
+  }// end doReweightPU
+
 
   if (doComb){
     ColorMap colorMap;
@@ -112,7 +139,7 @@ int main(){
     colorMap["DMHtoGG_M100"]	= kMagenta+1;
     colorMap["DMHtoGG_M10"]	= kRed+1;
     colorMap["DMHtoGG_M1"]	= kRed;
-  
+
     SamplePairVec Samples; // vector to also be used for stack plots
     Samples.push_back(SamplePair("QCD",1)); 
     Samples.push_back(SamplePair("GJets",1)); 

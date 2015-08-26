@@ -31,7 +31,6 @@ public:
   Double_t	xmax; 
 };
 
-typedef std::vector<TString> 		TStrVec;
 typedef std::map<TString,TH1D*>		TH1DMap;
 typedef TH1DMap::iterator		TH1DMapIter;
 typedef std::map<TString,TH2D*>		TH2DMap;

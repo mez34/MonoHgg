@@ -24,14 +24,6 @@
 #include <iostream>
 #include <cmath>
 
-typedef std::pair<TString, Int_t> SamplePair;
-typedef std::vector<SamplePair> SamplePairVec;
-typedef SamplePairVec::iterator SamplePairVecIter;
-
-typedef std::map<TString, Color_t> ColorMap;
-typedef std::map<TString, TString> TStrMap;
-
-typedef std::vector<TString>  TStrVec;
 typedef std::vector<TFile*>   TFileVec;
 typedef std::vector<TH1D*>    TH1DVec;
 typedef std::vector<TH1DVec>  TH1DVecVec;

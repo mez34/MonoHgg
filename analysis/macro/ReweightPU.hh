@@ -49,7 +49,7 @@ private:
   TFile * fOutFile;
 
   Bool_t fRunLocal;
-}
+};
 
 #endif
 
