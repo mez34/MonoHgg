@@ -1,7 +1,6 @@
 #include "ReweightPU.hh"
 
-ReweightPU::ReweightPU(SamplePairVec Samples, const TString selection, const Int_t njetsselection, const Double_t lumi, const Int_t nBins, const TString outdir, const TString outtype, const Bool_t runLocal) {
-  fRunLocal = runLocal;
+ReweightPU::ReweightPU(SamplePairVec Samples, const TString selection, const Double_t lumi, const Int_t nBins, const TString outdir) {
 
   // save samples for PU weighting
   for (SamplePairVecIter iter = Samples.begin(); iter != Samples.end(); ++iter) {
@@ -19,13 +18,9 @@ ReweightPU::ReweightPU(SamplePairVec Samples, const TString selection, const Int
 
   // save selection
   fSelection = selection;
-  fNJetsSeln = njetsselection;
   
   // string for output of njets... -1 == no requirment on njets
-  fNJetsStr = "";
-  if (fNJetsSeln != -1){
-    fNJetsStr = Form("_nj%i",fNJetsSeln);
-  }
+  TString fNJetsStr = "";
 
   // save lumi
   fLumi = lumi;
@@ -35,7 +30,7 @@ ReweightPU::ReweightPU(SamplePairVec Samples, const TString selection, const Int
 
   // set outputs
   fOutDir  = outdir;
-  fOutType = outtype;
+  fOutType = "png";
 
   // Initialize output TH1D's for data
   fOutDataNvtx = new TH1D("nvtx_data","",fNBins,0.,Double_t(fNBins));

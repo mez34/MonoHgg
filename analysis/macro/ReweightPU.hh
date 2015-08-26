@@ -20,7 +20,7 @@ class ReweightPU
 {
 public:
 
-  ReweightPU(SamplePairVec Samples, const TString selection, const Int_t njetsselection, const Double_t lumi, const Int_t nBins, const TString outdir, const TString outtype, const Bool_t runLocal);
+  ReweightPU(SamplePairVec Samples, const TString selection, const Double_t lumi, const Int_t nBins, const TString outdir);
   DblVec GetPUWeights();
   ~ReweightPU();
 

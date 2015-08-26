@@ -39,10 +39,11 @@ int main(){
 
   bool doFakeData = false;
   bool doTest = false;
-  bool doReweightPU = true;
-  bool doPlots = true;
+  bool doReweightPU = false;
+  bool doPlots = false;
   bool doComb = true;
-  
+
+  Float_t lumi = 300.;  
   
   //for CMSSW_7_0_pre9: run with root
   //gROOT->LoadMacro("Plotter.cpp++g");
@@ -119,17 +120,6 @@ int main(){
  //
  //--------------------------------------------------
 
-  //DblVec puweights;
-  if (doReweightPU){ 
-   
-    std::cout << "Doing PU Reweighting" << std::endl;
-  /*  ReweightPU * reweight = new ReweightPU(PURWSamples, PURWselection, PURWnjetsselection, lumi, nBins_vtx, outdir)
-    puweights = reweight->GetPUWeights();
-    delete reweight;
-   */
-  }// end doReweightPU
-
-
   if (doComb){
     ColorMap colorMap;
     colorMap["QCD"] 		= kYellow;
@@ -149,7 +139,7 @@ int main(){
     Samples.push_back(SamplePair("DMHtoGG_M10",0)); 
     Samples.push_back(SamplePair("DMHtoGG_M1",0)); 
     if (doFakeData) Samples.push_back(SamplePair("FakeData",5));
-  
+
     UInt_t nbkg = 0;
     UInt_t nsig = 0;
     UInt_t ndata = 0;
@@ -161,7 +151,7 @@ int main(){
       else {ndata++;} 
     }
     UInt_t nsamples = nbkg + nsig + ndata;
-   
+ 
     SamplePairVec BkgSamples;
     SamplePairVec SigSamples;
     SamplePairVec DataSamples;
@@ -170,7 +160,7 @@ int main(){
       else if (Samples[isample].second == 1) BkgSamples.push_back(Samples[isample]);
       else  DataSamples.push_back(Samples[isample]);
     }
-  
+
     // to sort MC by smallest to largest for nice stacked plots
     SampleYieldPairVec tmp_mcyields;
     for (UInt_t mc = 0; mc < nbkg; mc++) {
@@ -204,13 +194,44 @@ int main(){
       Samples.push_back(SigSamples[mc]);
     }
   
+    ////////////////////////////////////////////////////
+    // Pile up reweighting 
+    ////////////////////////////////////////////////////
+
+    DblVec puweights_sig;
+    DblVec puweights_bkg;
+    TString PURWselection = ""; 
+    UInt_t nBins_vtx = 60; 
+
+    if (doReweightPU){ 
+      std::cout << "Doing PU Reweighting" << std::endl;
+      ReweightPU * reweight = new ReweightPU(SigSamples, PURWselection, lumi, nBins_vtx, outDir);
+      puweights_sig = reweight->GetPUWeights();
+      delete reweight;
+
+      //std::cout << "Doing PU Reweighting" << std::endl;
+      //ReweightPU * reweight = new ReweightPU(BkgSamples, PURWselection, lumi, nBins_vtx, outdir);
+      //puweights_bkg = reweight->GetPUWeights();
+      //delete reweight;
+    
+    }// end doReweightPU
+    else{ // if not doReweightPU, set puweights to 1
+      std::cout << "No PU Reweighting applied" << std::endl;
+      for (UInt_t i=1; i<=nBins_vtx; i++){
+	puweights_sig.push_back(1.0);
+        puweights_bkg.push_back(1.0);
+      }
+    }  
+
+    std::cout << "Finished PU Reweighting, now do Combiner plots" << std::endl;
+
     // make overlayed and stack plots
     // Combiner( Samples, lumi, colorMap , outDir, doNmin1plots )
-    Combiner *combAll = new Combiner(Samples,300,colorMap,outDir,false);
+    Combiner *combAll = new Combiner(Samples,lumi,colorMap,outDir,false);
     combAll->DoComb();
     delete combAll;   
   
-    Combiner *combAlln1 = new Combiner(Samples,300,colorMap,outDir,true);
+    Combiner *combAlln1 = new Combiner(Samples,lumi,colorMap,outDir,true);
     combAlln1->DoComb();
     delete combAlln1;   
   
