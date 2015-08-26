@@ -20,25 +20,19 @@ class ReweightPU
 {
 public:
 
-  ReweightPU(SamplePairVec Samples, const TString selection, const Double_t lumi, const Int_t nBins, const TString outdir);
+  ReweightPU( const TString MC, const TString Data, const Double_t lumi, const Int_t nBins, const TString indir, const TString outdir);
   DblVec GetPUWeights();
   ~ReweightPU();
 
 private:
   
-  TStrVec fDataNames;
-  TStrVec fMCNames;
+  TString fDataName;
+  TString fMCName;
   
-  UInt_t fNData;
-  UInt_t fNMC;
-
-  TString  fSelection;
-  Int_t    fNJetsSeln;
-  TString  fNJetsStr;
-
   Double_t fLumi;
   Int_t    fNBins;
 
+  TString fInDir;
   TString fOutDir;
   TString fOutType;
 
@@ -48,7 +42,6 @@ private:
 
   TFile * fOutFile;
 
-  Bool_t fRunLocal;
 };
 
 #endif
