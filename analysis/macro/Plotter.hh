@@ -39,7 +39,7 @@ typedef TH2DMap::iterator		TH2DMapIter;
 
 class Plotter{
 public:
-  Plotter(const TString inName, const TString outName, const TString inSpecies, const Double_t lumi);
+  Plotter(const TString inName, const TString outName, const TString inSpecies, const DblVec puweights, const Double_t lumi);
   ~Plotter();
 
   void DoPlots();  
@@ -61,6 +61,7 @@ private:
   TFile * 	inFile;
   TFile * 	outFile;
 
+  DblVec	fPUWeights;
   Double_t 	fLumi;
 
   TTree * 	tpho;
@@ -68,26 +69,6 @@ private:
 
   TH1DMap	fTH1DMap;
   TH2DMap	fTH2DMap;
-
-//
-  TCanvas * 	fTH1Canv;
-  TCanvas * 	fTH2Canv;
-  TStrVec 	varname;
-  TStrVec	xaxisLabel;
-  Int_t		NVARIABLES;
-  Float_t	variable[nvar];
-
-  TStrVec       effvar;	
-  Int_t		N2DVARIABLES;
-  Int_t		intvariable[nvar];
-
-  TStrVec	selvar;
-  Int_t		NSEL;
-  Int_t		selvarPair[10];
-
-  Int_t		nbins[nvar];
-  Int_t		range[nvar][2];
-//
 
   // variables for branches
   Int_t 	nvtx;

@@ -3,7 +3,7 @@
 #include "../../../DataFormats/Math/interface/deltaPhi.h"
 //#include "mkPlotsLivia/CMS_lumi.C"
 
-Plotter::Plotter( TString inName, TString outName, TString inSpecies, const Double_t lumi){
+Plotter::Plotter( TString inName, TString outName, TString inSpecies, const DblVec puweights, const Double_t lumi){
 
   // Get ROOT file
   name = inName;
@@ -15,6 +15,7 @@ Plotter::Plotter( TString inName, TString outName, TString inSpecies, const Doub
   CheckValidTree(tpho,"DiPhotonTree",Form("%s%s.root",name.Data(),species.Data()));
 
   fLumi = lumi;
+  fPUWeights = puweights;
 
   // Make output directory
   fName = outName;
@@ -64,7 +65,7 @@ void Plotter::DoPlots(){
     tpho->GetEntry(entry);
 
     // calculate the weight
-    Double_t Weight = weight;
+    Double_t Weight = (weight)*fPUWeights[nvtx];
 
     //Fill histograms
     fTH1DMap["mgg"]->Fill(mgg,Weight);

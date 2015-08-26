@@ -40,8 +40,8 @@ int main(){
   bool doFakeData = false;
   bool doTest = false;
   bool doReweightPU = false;
-  bool doPlots = false;
-  bool doComb = true;
+  bool doPlots = true;
+  bool doComb = false;
 
   Float_t lumi = 300.;  
   
@@ -49,76 +49,143 @@ int main(){
   //gROOT->LoadMacro("Plotter.cpp++g");
   //Plotter * test1 = new Plotter("./data/ALL_nosel/diPhotons","./diPhoPlots/ALL_nosel/","DMHtoGG",30);
 
+
+  SamplePairVec PURWSamples; // vector to also be used for stack plots
+  PURWSamples.push_back(SamplePair("QCD",1)); 
+  PURWSamples.push_back(SamplePair("GJets",1)); 
+  PURWSamples.push_back(SamplePair("GluGluHToGG",1)); 
+  PURWSamples.push_back(SamplePair("DMHtoGG_M1000",0)); 
+  PURWSamples.push_back(SamplePair("DMHtoGG_M100",0)); 
+  PURWSamples.push_back(SamplePair("DMHtoGG_M10",0)); 
+  PURWSamples.push_back(SamplePair("DMHtoGG_M1",0)); 
+  if (doFakeData) PURWSamples.push_back(SamplePair("FakeData",5));
+
+  UInt_t nbkg = 0;
+  UInt_t nsig = 0;
+  UInt_t ndata = 0;
+  
+  for (SamplePairVecIter iter=PURWSamples.begin(); iter != PURWSamples.end(); ++iter){
+    std::cout << "Analyzing Sample: "<< (*iter).first.Data() << std::endl;
+    if ((*iter).second == 1) {nbkg++;}
+    else if ((*iter).second == 0) {nsig++;}
+    else {ndata++;} 
+  }
+  UInt_t nsamples = nbkg + nsig + ndata;
+
+  SamplePairVec PURWBkgSamples;
+  SamplePairVec PURWSigSamples;
+  SamplePairVec PURWDataSamples;
+  for (UInt_t isample = 0; isample < nsamples; isample++){
+    if (PURWSamples[isample].second == 0) PURWSigSamples.push_back(PURWSamples[isample]);
+    else if (PURWSamples[isample].second == 1) PURWBkgSamples.push_back(PURWSamples[isample]);
+    else  PURWDataSamples.push_back(PURWSamples[isample]);
+  }
+
+  ////////////////////////////////////////////////////
+  // Pile up reweighting 
+  ////////////////////////////////////////////////////
+  DblVec		puweights_data;
+  DblVec 		puweights_sig;
+  DblVec 		puweights_bkg;
+  TString PURWselection = ""; 
+  UInt_t nBins_vtx = 60; 
+
+  // no puweight for data 
+  for (UInt_t i=1; i<=nBins_vtx; i++){
+    puweights_data.push_back(1.0);
+  }
+
+  if (doReweightPU){ 
+    std::cout << "Doing PU Reweighting" << std::endl;
+    ReweightPU * reweight = new ReweightPU(PURWSigSamples, PURWselection, lumi, nBins_vtx, outDir);
+    puweights_sig = reweight->GetPUWeights();
+    delete reweight;
+
+    //std::cout << "Doing PU Reweighting" << std::endl;
+    //ReweightPU * reweight = new ReweightPU(PURWBkgSamples, PURWselection, lumi, nBins_vtx, outdir);
+    //puweights_bkg = reweight->GetPUWeights();
+    //delete reweight;
+  
+  }// end doReweightPU
+  else{ // if not doReweightPU, set puweights to 1
+    std::cout << "No PU Reweighting applied" << std::endl;
+    for (UInt_t i=1; i<=nBins_vtx; i++){
+      puweights_sig.push_back(1.0);
+      puweights_bkg.push_back(1.0);
+    }
+  }  
+
+  std::cout << "Finished PU Reweighting, now do Combiner plots" << std::endl;
+
+  //--------------------------------------------------
+  //
+  // Make plots for each sample
+  //
+  //--------------------------------------------------
+
   if (doTest){
     std::cout << "Working on test sample" << std::endl;
-    Plotter * test = new Plotter("./data/50ns/","./diPhoPlots/50ns/","GJets",30);
+    Plotter * test = new Plotter("./data/50ns/","./diPhoPlots/50ns/","GJets",puweights_sig,lumi);
     test->DoPlots();
     delete test;
     std::cout << "Finished test sample" << std::endl;
   }
   if (doFakeData){
     std::cout << "Working on FakeData sample" << std::endl;
-    Plotter * FakeData = new Plotter("./data/50ns/","./diPhoPlots/50ns/","FakeData",30);
+    Plotter * FakeData = new Plotter("./data/50ns/","./diPhoPlots/50ns/","FakeData",puweights_bkg,lumi);
     FakeData->DoPlots();
     delete FakeData;
     std::cout << "Finished FakeData sample" << std::endl;
   }
-
- //--------------------------------------------------
- //
- // Make plots for each sample
- //
- //--------------------------------------------------
-
- if (doPlots){
+  if (doPlots){
     std::cout << "Working on GJets sample" << std::endl;
-    Plotter * GJets = new Plotter("./data/50ns/","./diPhoPlots/50ns/","GJets",30);
+    Plotter * GJets = new Plotter("./data/50ns/","./diPhoPlots/50ns/","GJets",puweights_bkg,lumi);
     GJets->DoPlots();
     delete GJets;
     std::cout << "Finished GJets sample" << std::endl;
 
     std::cout << "Working on QCD sample" << std::endl;
-    Plotter * QCD = new Plotter("./data/50ns/","./diPhoPlots/50ns/","QCD",30);
+    Plotter * QCD = new Plotter("./data/50ns/","./diPhoPlots/50ns/","QCD",puweights_bkg,lumi);
     QCD->DoPlots();
     delete QCD;
     std::cout << "Finished QCD sample" << std::endl;
 
     std::cout << "Working on GluGluH sample" << std::endl;
-    Plotter * GGHGG = new Plotter("./data/50ns/","./diPhoPlots/50ns/","GluGluHToGG",30);
+    Plotter * GGHGG = new Plotter("./data/50ns/","./diPhoPlots/50ns/","GluGluHToGG",puweights_bkg,lumi);
     GGHGG->DoPlots();
     delete GGHGG;
     std::cout << "Finished GluGluH sample" << std::endl;
   
     std::cout << "Working on DMHgg M1000 sample" << std::endl;
-    Plotter * DMH_M1000 = new Plotter("./data/50ns/","./diPhoPlots/50ns/","DMHtoGG_M1000",30);
+    Plotter * DMH_M1000 = new Plotter("./data/50ns/","./diPhoPlots/50ns/","DMHtoGG_M1000",puweights_sig,lumi);
     DMH_M1000->DoPlots();
     delete DMH_M1000;
     std::cout << "Finished DMHgg M1000 sample" << std::endl;
   
     std::cout << "Working on DMHgg M100 sample" << std::endl;
-    Plotter * DMH_M100 = new Plotter("./data/50ns/","./diPhoPlots/50ns/","DMHtoGG_M100",30);
+    Plotter * DMH_M100 = new Plotter("./data/50ns/","./diPhoPlots/50ns/","DMHtoGG_M100",puweights_sig,lumi);
     DMH_M100->DoPlots();
     delete DMH_M100;
     std::cout << "Finished DMHgg M100 sample" << std::endl;
   
     std::cout << "Working on DMHgg M10 sample" << std::endl;
-    Plotter * DMH_M10 = new Plotter("./data/50ns/","./diPhoPlots/50ns/","DMHtoGG_M10",30);
+    Plotter * DMH_M10 = new Plotter("./data/50ns/","./diPhoPlots/50ns/","DMHtoGG_M10",puweights_sig,lumi);
     DMH_M10->DoPlots();
     delete DMH_M10;
     std::cout << "Finished DMHgg M10 sample" << std::endl;
   
     std::cout << "Working on DMHgg M1 sample" << std::endl;
-    Plotter * DMH_M1 = new Plotter("./data/50ns/","./diPhoPlots/50ns/","DMHtoGG_M1",30);
+    Plotter * DMH_M1 = new Plotter("./data/50ns/","./diPhoPlots/50ns/","DMHtoGG_M1",puweights_sig,lumi);
     DMH_M1->DoPlots();
     delete DMH_M1;
     std::cout << "Finished DMHgg M1 sample" << std::endl;
   }// end doPlots
 
- //--------------------------------------------------
- //
- // Make comb (stack & overlay) plots w/ all samples 
- //
- //--------------------------------------------------
+  //--------------------------------------------------
+  //
+  // Make comb (stack & overlay) plots w/ all samples 
+  //
+  //--------------------------------------------------
 
   if (doComb){
     ColorMap colorMap;
@@ -193,37 +260,6 @@ int main(){
     for (UInt_t mc = 0; mc < nsig; mc++) {
       Samples.push_back(SigSamples[mc]);
     }
-  
-    ////////////////////////////////////////////////////
-    // Pile up reweighting 
-    ////////////////////////////////////////////////////
-
-    DblVec puweights_sig;
-    DblVec puweights_bkg;
-    TString PURWselection = ""; 
-    UInt_t nBins_vtx = 60; 
-
-    if (doReweightPU){ 
-      std::cout << "Doing PU Reweighting" << std::endl;
-      ReweightPU * reweight = new ReweightPU(SigSamples, PURWselection, lumi, nBins_vtx, outDir);
-      puweights_sig = reweight->GetPUWeights();
-      delete reweight;
-
-      //std::cout << "Doing PU Reweighting" << std::endl;
-      //ReweightPU * reweight = new ReweightPU(BkgSamples, PURWselection, lumi, nBins_vtx, outdir);
-      //puweights_bkg = reweight->GetPUWeights();
-      //delete reweight;
-    
-    }// end doReweightPU
-    else{ // if not doReweightPU, set puweights to 1
-      std::cout << "No PU Reweighting applied" << std::endl;
-      for (UInt_t i=1; i<=nBins_vtx; i++){
-	puweights_sig.push_back(1.0);
-        puweights_bkg.push_back(1.0);
-      }
-    }  
-
-    std::cout << "Finished PU Reweighting, now do Combiner plots" << std::endl;
 
     // make overlayed and stack plots
     // Combiner( Samples, lumi, colorMap , outDir, doNmin1plots )

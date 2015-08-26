@@ -250,8 +250,6 @@ void Combiner::DrawCanvasStack(const UInt_t th1d, const Bool_t isLogY){
   Double_t max = -100;
   max = Combiner::GetMaximum(th1d, true);
 
-  //std::cout << th1d << " " << max << std::endl;
-
   Double_t minval = 1E20;
   minval = Combiner::GetMinimum(th1d, true);
 
