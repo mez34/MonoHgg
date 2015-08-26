@@ -6,11 +6,7 @@
   // Call this script:
   // ./main
   //
-  // Arguments to Plotter:
-  // 1st : location of input data
-  // 2nd : output data location
-  // 3rd : name of sample 
-  // 4th : lumi of data
+
 
 
 #include "Plotter.hh"
@@ -50,19 +46,38 @@ int main(){
   //gROOT->LoadMacro("Plotter.cpp++g");
   //Plotter * test1 = new Plotter("./data/ALL_nosel/diPhotons","./diPhoPlots/ALL_nosel/","DMHtoGG",30);
 
-  ////////////////////////////////////////////////////
-  // Pile up reweighting 
-  ////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////
+  //
+  // Pile up reweighting
+  //
+  // Inputs to ReweightPU
+  // 1st : MC Sample to weight
+  // 2nd : Data Sample
+  // 3rd : lumi
+  // 4th : number of bins for nvtx
+  // 5th : input directory of samples
+  // 6th : output directory
+  //
+  /////////////////////////////////////////////////////
 
-  DblVec		puweights_data;
-  DblVec 		puweights_QCD;
-  DblVec 		puweights_GJets;
-  DblVec		puweights_sig;
-  DblVec		puweights_bkg;
+  DblVec	puweights_Data;
+  DblVec 	puweights_QCD;
+  DblVec 	puweights_GJets;
+  DblVec	puweights_GGHGG;
+  DblVec	puweights_sig1;
+  DblVec	puweights_sig10;
+  DblVec	puweights_sig100;
+  DblVec	puweights_sig1000;	
 
   // no puweight for data 
   for (UInt_t i=1; i<=nBins_vtx; i++){
-    puweights_data.push_back(1.0);
+    puweights_Data.push_back(1.0);
+    puweights_GJets.push_back(1.0);
+    puweights_GGHGG.push_back(1.0);
+    puweights_sig1000.push_back(1.0);
+    puweights_sig100.push_back(1.0);
+    puweights_sig10.push_back(1.0);
+    puweights_sig1.push_back(1.0);
   }
 
   if (doReweightPU){ 
@@ -75,82 +90,100 @@ int main(){
   else{ // if not doReweightPU, set puweights to 1
     std::cout << "No PU Reweighting applied" << std::endl;
     for (UInt_t i=1; i<=nBins_vtx; i++){
-      puweights_sig.push_back(1.0);
-      puweights_bkg.push_back(1.0);
+      puweights_QCD.push_back(1.0);
+      //puweights_GJets.push_back(1.0);
+      //puweights_GGHGG.push_back(1.0);
+      //puweights_sig1000.push_back(1.0);
+      //puweights_sig100.push_back(1.0);
+      //puweights_sig10.push_back(1.0);
+      //puweights_sig1.push_back(1.0);
     }
   }  
 
-  std::cout << "Finished PU Reweighting, now do Combiner plots" << std::endl;
+  std::cout << "Finished PU Reweighting" << std::endl;
 
-  //--------------------------------------------------
+  /////////////////////////////////////////////////////
   //
   // Make plots for each sample
   //
-  //--------------------------------------------------
+  // Arguments to Plotter:
+  // 1st : location of input data
+  // 2nd : output data location
+  // 3rd : name of sample 
+  // 4th : lumi of data
+  //
+  /////////////////////////////////////////////////////
 
   if (doTest){
     std::cout << "Working on test sample" << std::endl;
-    Plotter * test = new Plotter(inDir,outDir,"GJets",puweights_sig,lumi);
+    Plotter * test = new Plotter(inDir,outDir,"GJets",puweights_GJets,lumi);
     test->DoPlots();
     delete test;
     std::cout << "Finished test sample" << std::endl;
   }
   if (doFakeData){
     std::cout << "Working on FakeData sample" << std::endl;
-    Plotter * FakeData = new Plotter(inDir,outDir,"FakeData",puweights_bkg,lumi);
+    Plotter * FakeData = new Plotter(inDir,outDir,"FakeData",puweights_Data,lumi);
     FakeData->DoPlots();
     delete FakeData;
     std::cout << "Finished FakeData sample" << std::endl;
   }
   if (doPlots){
     std::cout << "Working on GJets sample" << std::endl;
-    Plotter * GJets = new Plotter(inDir,outDir,"GJets",puweights_bkg,lumi);
+    Plotter * GJets = new Plotter(inDir,outDir,"GJets",puweights_GJets,lumi);
     GJets->DoPlots();
     delete GJets;
     std::cout << "Finished GJets sample" << std::endl;
 
     std::cout << "Working on QCD sample" << std::endl;
-    Plotter * QCD = new Plotter(inDir,outDir,"QCD",puweights_bkg,lumi);
+    Plotter * QCD = new Plotter(inDir,outDir,"QCD",puweights_QCD,lumi);
     QCD->DoPlots();
     delete QCD;
     std::cout << "Finished QCD sample" << std::endl;
 
     std::cout << "Working on GluGluH sample" << std::endl;
-    Plotter * GGHGG = new Plotter(inDir,outDir,"GluGluHToGG",puweights_bkg,lumi);
+    Plotter * GGHGG = new Plotter(inDir,outDir,"GluGluHToGG",puweights_GGHGG,lumi);
     GGHGG->DoPlots();
     delete GGHGG;
     std::cout << "Finished GluGluH sample" << std::endl;
   
     std::cout << "Working on DMHgg M1000 sample" << std::endl;
-    Plotter * DMH_M1000 = new Plotter(inDir,outDir,"DMHtoGG_M1000",puweights_sig,lumi);
+    Plotter * DMH_M1000 = new Plotter(inDir,outDir,"DMHtoGG_M1000",puweights_sig1000,lumi);
     DMH_M1000->DoPlots();
     delete DMH_M1000;
     std::cout << "Finished DMHgg M1000 sample" << std::endl;
   
     std::cout << "Working on DMHgg M100 sample" << std::endl;
-    Plotter * DMH_M100 = new Plotter(inDir,outDir,"DMHtoGG_M100",puweights_sig,lumi);
+    Plotter * DMH_M100 = new Plotter(inDir,outDir,"DMHtoGG_M100",puweights_sig100,lumi);
     DMH_M100->DoPlots();
     delete DMH_M100;
     std::cout << "Finished DMHgg M100 sample" << std::endl;
   
     std::cout << "Working on DMHgg M10 sample" << std::endl;
-    Plotter * DMH_M10 = new Plotter(inDir,outDir,"DMHtoGG_M10",puweights_sig,lumi);
+    Plotter * DMH_M10 = new Plotter(inDir,outDir,"DMHtoGG_M10",puweights_sig10,lumi);
     DMH_M10->DoPlots();
     delete DMH_M10;
     std::cout << "Finished DMHgg M10 sample" << std::endl;
   
     std::cout << "Working on DMHgg M1 sample" << std::endl;
-    Plotter * DMH_M1 = new Plotter(inDir,outDir,"DMHtoGG_M1",puweights_sig,lumi);
+    Plotter * DMH_M1 = new Plotter(inDir,outDir,"DMHtoGG_M1",puweights_sig1,lumi);
     DMH_M1->DoPlots();
     delete DMH_M1;
     std::cout << "Finished DMHgg M1 sample" << std::endl;
   }// end doPlots
 
-  //--------------------------------------------------
+  ////////////////////////////////////////////////////
   //
   // Make comb (stack & overlay) plots w/ all samples 
   //
-  //--------------------------------------------------
+  // Arguments of Combiner
+  // 1st : SamplePairVec (Samples) that has Name,VALUE
+  // 2rd : lumi
+  // 3rd : ColorMap for samples
+  // 4th : output directory
+  // 5th : bool do N-1 plots 
+  //
+  ////////////////////////////////////////////////////
 
   if (doComb){
     ColorMap colorMap;
