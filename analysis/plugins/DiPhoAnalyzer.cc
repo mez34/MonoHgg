@@ -26,6 +26,10 @@
 
 #include "DataFormats/PatCandidates/interface/MET.h"
 
+#include "DataFormats/Common/interface/TriggerResults.h"
+#include "FWCore/Common/interface/TriggerNames.h"
+
+
 #include "TMath.h"
 #include "TTree.h"
 #include "TVector3.h"
@@ -42,6 +46,9 @@ using pat::PackedGenParticle;
 // diphoton tree
 struct diphoTree_struc_ {
 
+  int hltPhoton26Photon16Mass60;
+  int hltPhoton36Photon22Mass15;
+  int hltPhoton42Photon25Mass15;
   int run;
   int event;
   int lumi;
@@ -165,6 +172,7 @@ private:
 
   EDGetTokenT<View<pat::MET> > METToken_;
 
+  EDGetTokenT<edm::TriggerResults> triggerBitsToken_;
   // sample-dependent parameters needed for the analysis
   int dopureweight_;
   int sampleIndex_;
@@ -204,7 +212,8 @@ DiPhoAnalyzer::DiPhoAnalyzer(const edm::ParameterSet& iConfig):
   PileUpToken_(consumes<View<PileupSummaryInfo> >(iConfig.getUntrackedParameter<InputTag> ("PileUpTag", InputTag("addPileupInfo")))),
   genPhotonExtraToken_(mayConsume<vector<flashgg::GenPhotonExtra> >(iConfig.getParameter<InputTag>("genPhotonExtraTag"))),
   genPartToken_(consumes<View<reco::GenParticle> >(iConfig.getUntrackedParameter<InputTag> ("GenParticlesTag", InputTag("flashggPrunedGenParticles")))),
-  METToken_( consumes<View<pat::MET> >( iConfig.getUntrackedParameter<InputTag> ( "METTag", InputTag( "slimmedMETs" ) ) ) )
+  METToken_( consumes<View<pat::MET> >( iConfig.getUntrackedParameter<InputTag> ( "METTag", InputTag( "slimmedMETs" ) ) ) ),
+  triggerBitsToken_( consumes<edm::TriggerResults>( iConfig.getParameter<edm::InputTag>( "bits" ) ) )
 { 
   dopureweight_ = iConfig.getUntrackedParameter<int>("dopureweight", 0);
   sampleIndex_  = iConfig.getUntrackedParameter<int>("sampleIndex",0);
@@ -256,8 +265,27 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
   Handle<View<pat::MET> > METs;
   iEvent.getByToken( METToken_, METs );
 
+  Handle<edm::TriggerResults> triggerBits;
+  iEvent.getByToken( triggerBitsToken_, triggerBits );
 
   // --------------------------------------------------
+  std::cout<<"------------------------------"<<std::endl;
+
+  //Trigger info
+  int hltPhoton26Photon16Mass60=-500;
+  int hltPhoton36Photon22Mass15=-500;
+  int hltPhoton42Photon25Mass15=-500;
+
+  const edm::TriggerNames &triggerNames = iEvent.triggerNames( *triggerBits );
+  vector<std::string> const &names = triggerNames.triggerNames();  
+  for( unsigned index = 0; index < triggerNames.size(); ++index ) {
+    if( (TString::Format((triggerNames.triggerName( index )).c_str())).Contains("HLT_Photon") && (TString::Format((triggerNames.triggerName( index )).c_str())).Contains("Mass")  ) cout << index << " " << triggerNames.triggerName( index ) << " " << triggerBits->accept( index ) << endl;
+    if( (TString::Format((triggerNames.triggerName( index )).c_str())).Contains("HLT_Photon26") && (TString::Format((triggerNames.triggerName( index )).c_str())).Contains("Photon16")&& (TString::Format((triggerNames.triggerName( index )).c_str())).Contains("Mass60")  )hltPhoton26Photon16Mass60 = triggerBits->accept( index );
+    if( (TString::Format((triggerNames.triggerName( index )).c_str())).Contains("HLT_Photon36") && (TString::Format((triggerNames.triggerName( index )).c_str())).Contains("Photon22")&& (TString::Format((triggerNames.triggerName( index )).c_str())).Contains("Mass15")  )hltPhoton36Photon22Mass15 = triggerBits->accept( index );
+    if( (TString::Format((triggerNames.triggerName( index )).c_str())).Contains("HLT_Photon42") && (TString::Format((triggerNames.triggerName( index )).c_str())).Contains("Photon25")&& (TString::Format((triggerNames.triggerName( index )).c_str())).Contains("Mass15")  )hltPhoton42Photon25Mass15 = triggerBits->accept( index );
+ }
+  
+
   // Event info
   int run   = iEvent.eventAuxiliary().run();
   int event = iEvent.eventAuxiliary().event();
@@ -743,6 +771,10 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 		}
 
 		// Variables for the tree
+		treeDipho_.hltPhoton26Photon16Mass60=hltPhoton26Photon16Mass60;
+		treeDipho_.hltPhoton36Photon22Mass15=hltPhoton36Photon22Mass15;
+		treeDipho_.hltPhoton42Photon25Mass15=hltPhoton42Photon25Mass15;
+
 		treeDipho_.run = run;
 		treeDipho_.event = event;
 		treeDipho_.lumi = lumi;
@@ -857,6 +889,10 @@ void DiPhoAnalyzer::beginJob() {
   DiPhotonTree = fs_->make<TTree>("DiPhotonTree","di-photon tree");
 
   // with all infos
+  DiPhotonTree->Branch("hltPhoton26Photon16Mass60",&(treeDipho_.hltPhoton26Photon16Mass60),"hltPhoton26Photon16Mass60/I");
+  DiPhotonTree->Branch("hltPhoton36Photon22Mass15",&(treeDipho_.hltPhoton36Photon22Mass15),"hltPhoton36Photon22Mass15/I");
+  DiPhotonTree->Branch("hltPhoton42Photon25Mass15",&(treeDipho_.hltPhoton42Photon25Mass15),"hltPhoton42Photon25Mass15/I");
+
   DiPhotonTree->Branch("run",&(treeDipho_.run),"run/I");
   DiPhotonTree->Branch("event",&(treeDipho_.event),"event/I");
   DiPhotonTree->Branch("lumi",&(treeDipho_.lumi),"lumi/I");
@@ -937,7 +973,10 @@ void DiPhoAnalyzer::beginJob() {
 void DiPhoAnalyzer::endJob() { }
 
 void DiPhoAnalyzer::initTreeStructure() {
-
+  treeDipho_.hltPhoton26Photon16Mass60=-500;
+  treeDipho_.hltPhoton36Photon22Mass15=-500;
+  treeDipho_.hltPhoton42Photon25Mass15=-500;
+    
   treeDipho_.run   = -500;
   treeDipho_.event = -500;
   treeDipho_.lumi  = -500;
