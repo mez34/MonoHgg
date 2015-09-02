@@ -15,6 +15,8 @@ ReweightPU::ReweightPU(const TString MC, const TString Data, const Double_t lumi
   // set nBins for nvtx distribution
   fNBins = nBins;
 
+  std::cout << "lumi " << lumi << " nbins " << nBins << std::endl;
+
   // set outputs
   fOutDir  = outdir;
   fOutType = "png";
@@ -57,15 +59,18 @@ DblVec ReweightPU::GetPUWeights() {
 
   TTree * treeData = (TTree*)fileData->Get("DiPhotonTree");      
   CheckValidTree(treeData,"DiPhotonTree",filename);      
-  TH1D * tmpnvtxData = new TH1D("tmpnvtx","",fNBins,0.,Double_t(fNBins));
+  TH1D * tmpnvtxData = new TH1D("tmpnvtxData","",fNBins,0.,Double_t(fNBins));
   tmpnvtxData->Sumw2();
 
   // fill each input data nvtx
   std::cout << "Reading data nvtx: " << filename.Data() << std::endl;
   treeData->Draw("nvtx>>tmpnvtxData");
-  
+ 
   // add input data hist to total data hist
   fOutDataNvtx->Add(tmpnvtxData);
+  //tmpnvtxData->Draw();
+  //fOutDataNvtx->Draw();
+  fOutDataNvtx->Print();
 
   // delete objects
   delete tmpnvtxData;
@@ -80,7 +85,7 @@ DblVec ReweightPU::GetPUWeights() {
 
   TTree * treeMC = (TTree*)fileMC->Get("DiPhotonTree");      
   CheckValidTree(treeMC,"DiPhotonTree",filename);            
-  TH1D * tmpnvtxMC = new TH1D("tmpnvtx","",fNBins,0.,Double_t(fNBins));
+  TH1D * tmpnvtxMC = new TH1D("tmpnvtxMC","",fNBins,0.,Double_t(fNBins));
   tmpnvtxMC->Sumw2();
 
   // fill each input mc nvtx
@@ -89,6 +94,7 @@ DblVec ReweightPU::GetPUWeights() {
 
   // add input mc hist to total mc hist
   fOutMCNvtx->Add(tmpnvtxMC);
+  fOutMCNvtx->Print();
 
   // delete objects
   delete tmpnvtxMC;
@@ -103,6 +109,7 @@ DblVec ReweightPU::GetPUWeights() {
   // use these for scaling and rescaling
   const Double_t int_DataNvtx = fOutDataNvtx->Integral();
   const Double_t int_MCNvtx   = fOutMCNvtx->Integral();
+  std::cout << "DataNvtx = " << int_DataNvtx << " MCNvtx = " << int_MCNvtx << std::endl;
 
   TCanvas * c0 = new TCanvas(); // Draw before reweighting --> unscaled
   c0->cd();
