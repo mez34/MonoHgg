@@ -49,6 +49,11 @@ struct diphoTree_struc_ {
   int hltPhoton26Photon16Mass60;
   int hltPhoton36Photon22Mass15;
   int hltPhoton42Photon25Mass15;
+  int hltDiphoton30Mass95;
+  int hltDiphoton30Mass70;
+  int hltDiphoton30Mass55;
+  int hltDiphoton30Mass55PV;
+  int hltDiphoton30Mass55EB;
   int run;
   int event;
   int lumi;
@@ -272,18 +277,41 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
   //std::cout<<"------------------------------"<<std::endl;
 
   //Trigger info
+ 
+  //HLT_Photon26_R9Id85_OR_CaloId24b40e_Iso50T80L_Photon16_AND_HE10_R9Id65_Eta2_Mass60_v2 
+  //HLT_Photon36_R9Id85_OR_CaloId24b40e_Iso50T80L_Photon22_AND_HE10_R9Id65_Eta2_Mass15_v2
+  //HLT_Photon42_R9Id85_OR_CaloId24b40e_Iso50T80L_Photon25_AND_HE10_R9Id65_Eta2_Mass15_v1
+  //HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_Mass95_v1
+  //HLT_Diphoton30_18_R9Id_OR_IsoCaloId_AND_HE_R9Id_DoublePixelSeedMatch_Mass70_v1 
+  //HLT_Diphoton30PV_18PV_R9Id_AND_IsoCaloId_AND_HE_R9Id_DoublePixelVeto_Mass55_v1
+  //HLT_Diphoton30_18_Solid_R9Id_AND_IsoCaloId_AND_HE_R9Id_Mass55_v1
+  //HLT_Diphoton30EB_18EB_R9Id_OR_IsoCaloId_AND_HE_R9Id_DoublePixelVeto_Mass55_v1
+
   int hltPhoton26Photon16Mass60=-500;
   int hltPhoton36Photon22Mass15=-500;
   int hltPhoton42Photon25Mass15=-500;
+  int hltDiphoton30Mass95=-500;
+  int hltDiphoton30Mass70=-500;
+  int hltDiphoton30Mass55=-500;
+  int hltDiphoton30Mass55EB=-500;  
+  int hltDiphoton30Mass55PV=-500;
 
   const edm::TriggerNames &triggerNames = iEvent.triggerNames( *triggerBits );
   vector<std::string> const &names = triggerNames.triggerNames();  
   for( unsigned index = 0; index < triggerNames.size(); ++index ) {
+    // print out triggers that match "HLT_Photon or HLT_Diphoton" and have "Mass" as well
     //if( (TString::Format((triggerNames.triggerName( index )).c_str())).Contains("HLT_Photon") && (TString::Format((triggerNames.triggerName( index )).c_str())).Contains("Mass")  ) cout << index << " " << triggerNames.triggerName( index ) << " " << triggerBits->accept( index ) << endl;
+    //if( (TString::Format((triggerNames.triggerName( index )).c_str())).Contains("HLT_Diphoton") && (TString::Format((triggerNames.triggerName( index )).c_str())).Contains("Mass")  ) cout << index << " " << triggerNames.triggerName( index ) << " " << triggerBits->accept( index ) << endl;
     if( (TString::Format((triggerNames.triggerName( index )).c_str())).Contains("HLT_Photon26") && (TString::Format((triggerNames.triggerName( index )).c_str())).Contains("Photon16")&& (TString::Format((triggerNames.triggerName( index )).c_str())).Contains("Mass60")  )hltPhoton26Photon16Mass60 = triggerBits->accept( index );
     if( (TString::Format((triggerNames.triggerName( index )).c_str())).Contains("HLT_Photon36") && (TString::Format((triggerNames.triggerName( index )).c_str())).Contains("Photon22")&& (TString::Format((triggerNames.triggerName( index )).c_str())).Contains("Mass15")  )hltPhoton36Photon22Mass15 = triggerBits->accept( index );
     if( (TString::Format((triggerNames.triggerName( index )).c_str())).Contains("HLT_Photon42") && (TString::Format((triggerNames.triggerName( index )).c_str())).Contains("Photon25")&& (TString::Format((triggerNames.triggerName( index )).c_str())).Contains("Mass15")  )hltPhoton42Photon25Mass15 = triggerBits->accept( index );
- }
+    if( (TString::Format((triggerNames.triggerName( index )).c_str())).Contains("HLT_Diphoton30") && (TString::Format((triggerNames.triggerName( index )).c_str())).Contains("Mass95")  )hltDiphoton30Mass95 = triggerBits->accept( index );
+    if( (TString::Format((triggerNames.triggerName( index )).c_str())).Contains("HLT_Diphoton30") && (TString::Format((triggerNames.triggerName( index )).c_str())).Contains("Mass70")  )hltDiphoton30Mass70 = triggerBits->accept( index );
+    if( (TString::Format((triggerNames.triggerName( index )).c_str())).Contains("HLT_Diphoton30PV") && (TString::Format((triggerNames.triggerName( index )).c_str())).Contains("DoublePixelVeto_Mass55")  )hltDiphoton30Mass55PV = triggerBits->accept( index );
+    if( (TString::Format((triggerNames.triggerName( index )).c_str())).Contains("HLT_Diphoton30") && (TString::Format((triggerNames.triggerName( index )).c_str())).Contains("R9Id_Mass55")  )hltDiphoton30Mass55 = triggerBits->accept( index );
+    if( (TString::Format((triggerNames.triggerName( index )).c_str())).Contains("HLT_Diphoton30EB") && (TString::Format((triggerNames.triggerName( index )).c_str())).Contains("DoublePixelVeto_Mass55")  )hltDiphoton30Mass55EB = triggerBits->accept( index );
+
+}
   
 
   // Event info
@@ -774,7 +802,11 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 		treeDipho_.hltPhoton26Photon16Mass60=hltPhoton26Photon16Mass60;
 		treeDipho_.hltPhoton36Photon22Mass15=hltPhoton36Photon22Mass15;
 		treeDipho_.hltPhoton42Photon25Mass15=hltPhoton42Photon25Mass15;
-
+		treeDipho_.hltDiphoton30Mass95=hltDiphoton30Mass95;
+  		treeDipho_.hltDiphoton30Mass70=hltDiphoton30Mass70;
+  		treeDipho_.hltDiphoton30Mass55=hltDiphoton30Mass55;
+  		treeDipho_.hltDiphoton30Mass55PV=hltDiphoton30Mass55PV;
+  		treeDipho_.hltDiphoton30Mass55EB=hltDiphoton30Mass55EB;
 		treeDipho_.run = run;
 		treeDipho_.event = event;
 		treeDipho_.lumi = lumi;
@@ -892,6 +924,11 @@ void DiPhoAnalyzer::beginJob() {
   DiPhotonTree->Branch("hltPhoton26Photon16Mass60",&(treeDipho_.hltPhoton26Photon16Mass60),"hltPhoton26Photon16Mass60/I");
   DiPhotonTree->Branch("hltPhoton36Photon22Mass15",&(treeDipho_.hltPhoton36Photon22Mass15),"hltPhoton36Photon22Mass15/I");
   DiPhotonTree->Branch("hltPhoton42Photon25Mass15",&(treeDipho_.hltPhoton42Photon25Mass15),"hltPhoton42Photon25Mass15/I");
+  DiPhotonTree->Branch("hltDiphoton30Mass95",&(treeDipho_.hltDiphoton30Mass95),"hltDiphoton30Mass95/I");
+  DiPhotonTree->Branch("hltDiphoton30Mass70",&(treeDipho_.hltDiphoton30Mass70),"hltDiphoton30Mass70/I");
+  DiPhotonTree->Branch("hltDiphoton30Mass55",&(treeDipho_.hltDiphoton30Mass55),"hltDiphoton30Mass55/I");
+  DiPhotonTree->Branch("hltDiphoton30Mass55PV",&(treeDipho_.hltDiphoton30Mass55PV),"hltDiphoton30Mass55PV/I");
+  DiPhotonTree->Branch("hltDiphoton30Mass55EB",&(treeDipho_.hltDiphoton30Mass55EB),"hltDiphoton30Mass55EB/I");
 
   DiPhotonTree->Branch("run",&(treeDipho_.run),"run/I");
   DiPhotonTree->Branch("event",&(treeDipho_.event),"event/I");
@@ -976,7 +1013,12 @@ void DiPhoAnalyzer::initTreeStructure() {
   treeDipho_.hltPhoton26Photon16Mass60=-500;
   treeDipho_.hltPhoton36Photon22Mass15=-500;
   treeDipho_.hltPhoton42Photon25Mass15=-500;
-    
+  treeDipho_.hltDiphoton30Mass95=-500;   
+  treeDipho_.hltDiphoton30Mass70=-500;   
+  treeDipho_.hltDiphoton30Mass55=-500; 
+  treeDipho_.hltDiphoton30Mass55PV=-500; 
+  treeDipho_.hltDiphoton30Mass55EB=-500; 
+ 
   treeDipho_.run   = -500;
   treeDipho_.event = -500;
   treeDipho_.lumi  = -500;
