@@ -28,7 +28,7 @@ def main():
     parser.add_option('-t', '--testnjobs', action='store', dest='testnjobs', help='submit only the first n jobs' , default=1000000, type='int')
     parser.add_option('-N', '--neventsjob', action='store', dest='neventsjob', help='split the jobs with n events / batch job' , default=-1, type='int')
     parser.add_option('-T', '--eventsperfile', action='store', dest='eventsperfile', help='number of events per input file' , default=-1, type='int')
-    parser.add_option('--eos', action='store', dest='eos', help='copy the output in the specified EOS path' , default='/eos/cms/store/group/phys_higgs/soffi/MonoX/MonoH/outpuDiPhotonDumper')
+    parser.add_option('--eos', action='store', dest='eos', help='copy the output in the specified EOS path' , default='/eos/cms/store/user/mzientek/MonoH/outpuDiPhotonDumper')
     parser.add_option('--cfg', action='store', dest='cfg', help='the cfg to be run' , default='pippo_cfg.py')
     (opt, args) = parser.parse_args()
 

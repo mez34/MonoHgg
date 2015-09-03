@@ -269,7 +269,7 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
   iEvent.getByToken( triggerBitsToken_, triggerBits );
 
   // --------------------------------------------------
-  std::cout<<"------------------------------"<<std::endl;
+  //std::cout<<"------------------------------"<<std::endl;
 
   //Trigger info
   int hltPhoton26Photon16Mass60=-500;
@@ -279,7 +279,7 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
   const edm::TriggerNames &triggerNames = iEvent.triggerNames( *triggerBits );
   vector<std::string> const &names = triggerNames.triggerNames();  
   for( unsigned index = 0; index < triggerNames.size(); ++index ) {
-    if( (TString::Format((triggerNames.triggerName( index )).c_str())).Contains("HLT_Photon") && (TString::Format((triggerNames.triggerName( index )).c_str())).Contains("Mass")  ) cout << index << " " << triggerNames.triggerName( index ) << " " << triggerBits->accept( index ) << endl;
+    //if( (TString::Format((triggerNames.triggerName( index )).c_str())).Contains("HLT_Photon") && (TString::Format((triggerNames.triggerName( index )).c_str())).Contains("Mass")  ) cout << index << " " << triggerNames.triggerName( index ) << " " << triggerBits->accept( index ) << endl;
     if( (TString::Format((triggerNames.triggerName( index )).c_str())).Contains("HLT_Photon26") && (TString::Format((triggerNames.triggerName( index )).c_str())).Contains("Photon16")&& (TString::Format((triggerNames.triggerName( index )).c_str())).Contains("Mass60")  )hltPhoton26Photon16Mass60 = triggerBits->accept( index );
     if( (TString::Format((triggerNames.triggerName( index )).c_str())).Contains("HLT_Photon36") && (TString::Format((triggerNames.triggerName( index )).c_str())).Contains("Photon22")&& (TString::Format((triggerNames.triggerName( index )).c_str())).Contains("Mass15")  )hltPhoton36Photon22Mass15 = triggerBits->accept( index );
     if( (TString::Format((triggerNames.triggerName( index )).c_str())).Contains("HLT_Photon42") && (TString::Format((triggerNames.triggerName( index )).c_str())).Contains("Photon25")&& (TString::Format((triggerNames.triggerName( index )).c_str())).Contains("Mass15")  )hltPhoton42Photon25Mass15 = triggerBits->accept( index );
@@ -433,7 +433,7 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 	int passSubLeadHoe   = passHoeCuts( subleadScEta, subleadHoE );
         bool subleadSelel    = testPhotonIsolation( passSubLeadSieie, passSubLeadCHiso, passSubLeadNHiso, passSubLeadPHiso, passSubLeadHoe ); 
 
-	if (leadSelel || subleadSelel) std::cout<<"passes"<<std::endl;
+	if (leadSelel || subleadSelel) std::cout<<std::endl;
 	
 	//if (!leadSelel || !subleadSelel ) continue; //applies pho ID selection 
 	// chiara: end comment x efficiencies
