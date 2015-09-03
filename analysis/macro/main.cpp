@@ -80,11 +80,37 @@ int main(){
     puweights_sig1.push_back(1.0);
   }
 
-  if (doReweightPU){ 
-    std::cout << "Doing PU Reweighting" << std::endl;
-    ReweightPU * reweight = new ReweightPU("QCD","FakeData",lumi, nBins_vtx, inDir, outDir);
-    puweights_QCD = reweight->GetPUWeights();
-    delete reweight;
+  if (doReweightPU){
+ 
+    std::cout << "Doing PU Reweighting QCD" << std::endl;
+    ReweightPU * reweightQCD = new ReweightPU("QCD","FakeData",lumi, nBins_vtx, inDir, outDir+"purw/");
+    puweights_QCD = reweightQCD->GetPUWeights();
+    delete reweightQCD;
+    std::cout << "Doing PU Reweighting GJets" << std::endl;
+    ReweightPU * reweightGJets = new ReweightPU("GJets","FakeData",lumi, nBins_vtx, inDir, outDir+"purw/");
+    puweights_GJets = reweightGJets->GetPUWeights();
+    delete reweightGJets;
+    std::cout << "Doing PU Reweighting GGHGG" << std::endl;
+    ReweightPU * reweightGGHGG = new ReweightPU("GluGluHToGG","FakeData",lumi, nBins_vtx, inDir, outDir+"purw/");
+    puweights_GGHGG = reweightGGHGG->GetPUWeights();
+    delete reweightGGHGG;
+
+    std::cout << "Doing PU Reweighting DMHtoGG_M1000" << std::endl;
+    ReweightPU * reweightDMH1000 = new ReweightPU("DMHtoGG_M1000","FakeData",lumi, nBins_vtx, inDir, outDir+"purw/");
+    puweights_sig1000 = reweightDMH1000->GetPUWeights();
+    delete reweightDMH1000;
+    std::cout << "Doing PU Reweighting DMHtoGG_M100" << std::endl;
+    ReweightPU * reweightDMH100 = new ReweightPU("DMHtoGG_M100","FakeData",lumi, nBins_vtx, inDir, outDir+"purw/");
+    puweights_sig100 = reweightDMH100->GetPUWeights();
+    delete reweightDMH100;
+    std::cout << "Doing PU Reweighting DMHtoGG_M10" << std::endl;
+    ReweightPU * reweightDMH10 = new ReweightPU("DMHtoGG_M10","FakeData",lumi, nBins_vtx, inDir, outDir+"purw/");
+    puweights_sig10 = reweightDMH10->GetPUWeights();
+    delete reweightDMH10;
+    std::cout << "Doing PU Reweighting DMHtoGG_M1" << std::endl;
+    ReweightPU * reweightDMH1 = new ReweightPU("DMHtoGG_M1","FakeData",lumi, nBins_vtx, inDir, outDir+"purw/");
+    puweights_sig1 = reweightDMH1->GetPUWeights();
+    delete reweightDMH1;
   
   }// end doReweightPU
   else{ // if not doReweightPU, set puweights to 1

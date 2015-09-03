@@ -19,6 +19,7 @@ ReweightPU::ReweightPU(const TString MC, const TString Data, const Double_t lumi
 
   // set outputs
   fOutDir  = outdir;
+  MakeOutDirectory(outdir); 
   fOutType = "png";
 
   // Initialize output TH1D's for data
@@ -120,10 +121,10 @@ DblVec ReweightPU::GetPUWeights() {
   fOutMCNvtx->Draw("HIST SAME");
 
   c0->SetLogy(1); // save log
-  c0->SaveAs(Form("%snvtx_beforePURW_unnorm_log.%s",fOutDir.Data(),fOutType.Data()));
+  c0->SaveAs(Form("%snvtx_%s_beforePURW_unnorm_log.%s",fOutDir.Data(),fMCName.Data(),fOutType.Data()));
 
   c0->SetLogy(0); // save lin
-  c0->SaveAs(Form("%snvtx_beforePURW_unnorm.%s",fOutDir.Data(),fOutType.Data()));
+  c0->SaveAs(Form("%snvtx_%s_beforePURW_unnorm.%s",fOutDir.Data(),fMCName.Data(),fOutType.Data()));
   
   /////////////////////////////////////////////
   //       SCALE HERE TO GET REWEIGHTING     //
@@ -142,10 +143,10 @@ DblVec ReweightPU::GetPUWeights() {
   fOutMCNvtx->Draw("HIST SAME");
 
   c1->SetLogy(1); // save log
-  c1->SaveAs(Form("%snvtx_beforePURW_norm_log.%s",fOutDir.Data(),fOutType.Data()));
+  c1->SaveAs(Form("%snvtx_%s_beforePURW_norm_log.%s",fOutDir.Data(),fMCName.Data(),fOutType.Data()));
 
   c1->SetLogy(0); // save lin
-  c1->SaveAs(Form("%snvtx_beforePURW_norm.%s",fOutDir.Data(),fOutType.Data()));
+  c1->SaveAs(Form("%snvtx_%s_beforePURW_norm.%s",fOutDir.Data(),fMCName.Data(),fOutType.Data()));
 
   // Draw after reweighting 
   TCanvas * c2 = new TCanvas();
@@ -186,10 +187,10 @@ DblVec ReweightPU::GetPUWeights() {
   fOutMCNvtx->Draw("HIST SAME");
 
   c2->SetLogy(1); // save log
-  c2->SaveAs(Form("%snvtx_afterPURW_norm_log.%s",fOutDir.Data(),fOutType.Data()));
+  c2->SaveAs(Form("%snvtx_%s_afterPURW_norm_log.%s",fOutDir.Data(),fMCName.Data(),fOutType.Data()));
 
   c2->SetLogy(0); // save lin
-  c2->SaveAs(Form("%snvtx_afterPURW_norm.%s",fOutDir.Data(),fOutType.Data()));
+  c2->SaveAs(Form("%snvtx_%s_afterPURW_norm.%s",fOutDir.Data(),fMCName.Data(),fOutType.Data()));
 
   TCanvas * c3 = new TCanvas(); // Draw before reweighting --> unscaled
   c3->cd();
@@ -203,10 +204,10 @@ DblVec ReweightPU::GetPUWeights() {
   fOutMCNvtx->Draw("HIST SAME");
 
   c3->SetLogy(1); // save log
-  c3->SaveAs(Form("%snvtx_afterPURW_unnorm_log.%s",fOutDir.Data(),fOutType.Data()));
+  c3->SaveAs(Form("%snvtx_%s_afterPURW_unnorm_log.%s",fOutDir.Data(),fMCName.Data(),fOutType.Data()));
 
   c3->SetLogy(0); // save lin
-  c3->SaveAs(Form("%snvtx_afterPURW_unnorm.%s",fOutDir.Data(),fOutType.Data()));
+  c3->SaveAs(Form("%snvtx_%s_afterPURW_unnorm.%s",fOutDir.Data(),fMCName.Data(),fOutType.Data()));
   
   delete c0;
   delete c1;
