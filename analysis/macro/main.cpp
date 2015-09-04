@@ -12,6 +12,7 @@
 #include "Plotter.hh"
 #include "Combiner.hh"
 #include "ReweightPU.hh"
+#include "ABCDMethod.hh"
 #include "Style.hh"
 
 
@@ -35,10 +36,11 @@ int main(){
 
   bool doFakeData = false;
   bool doTest = false;
-  bool makePURWfiles = false; // recompute PURW and make files
-  bool doReweightPU = true;   // use PURW from old files if !makePURWfiles
-  bool doPlots = true;	      // make plots for each sample individually
-  bool doComb = false;	      // make stack/overlay plots
+  bool makePURWfiles = false;	// recompute PURW and make files
+  bool doReweightPU = false;	// use PURW from old files if !makePURWfiles
+  bool doPlots = false;		// make plots for each sample individually
+  bool doComb = false;		// make stack/overlay plots
+  bool doABCD = true;		// run ABCD method 
 
   Double_t lumi = 300.;  
   UInt_t nBins_vtx = 60; 
@@ -234,6 +236,81 @@ int main(){
     std::cout << "Finished DMHgg M1 sample" << std::endl;
   }// end doPlots
 
+
+  // setup all samples for Combiner and ABCD
+  ColorMap colorMap;
+  colorMap["QCD"] 		= kYellow;
+  colorMap["GJets"] 		= kGreen;
+  colorMap["GluGluHToGG"]	= kCyan;
+  colorMap["DMHtoGG_M1000"]	= kMagenta;
+  colorMap["DMHtoGG_M100"]	= kMagenta+1;
+  colorMap["DMHtoGG_M10"]	= kRed+1;
+  colorMap["DMHtoGG_M1"]	= kRed;
+
+  SamplePairVec Samples; // vector to also be used for stack plots
+  Samples.push_back(SamplePair("QCD",1)); 
+  Samples.push_back(SamplePair("GJets",1)); 
+  Samples.push_back(SamplePair("GluGluHToGG",1)); 
+  Samples.push_back(SamplePair("DMHtoGG_M1000",0)); 
+  Samples.push_back(SamplePair("DMHtoGG_M100",0)); 
+  Samples.push_back(SamplePair("DMHtoGG_M10",0)); 
+  Samples.push_back(SamplePair("DMHtoGG_M1",0)); 
+  if (doFakeData) Samples.push_back(SamplePair("FakeData",5));
+
+  UInt_t nbkg = 0;
+  UInt_t nsig = 0;
+  UInt_t ndata = 0;
+  
+  for (SamplePairVecIter iter=Samples.begin(); iter != Samples.end(); ++iter){
+    std::cout << "Analyzing Sample: "<< (*iter).first.Data() << std::endl;
+    if ((*iter).second == 1) {nbkg++;}
+    else if ((*iter).second == 0) {nsig++;}
+    else {ndata++;} 
+  }
+  UInt_t nsamples = nbkg + nsig + ndata;
+ 
+  SamplePairVec BkgSamples;
+  SamplePairVec SigSamples;
+  SamplePairVec DataSamples;
+  for (UInt_t isample = 0; isample < nsamples; isample++){
+    if (Samples[isample].second == 0) SigSamples.push_back(Samples[isample]);
+    else if (Samples[isample].second == 1) BkgSamples.push_back(Samples[isample]);
+    else  DataSamples.push_back(Samples[isample]);
+  }
+
+  // to sort MC by smallest to largest for nice stacked plots
+  SampleYieldPairVec tmp_mcyields;
+  for (UInt_t mc = 0; mc < nbkg; mc++) {
+      // open mc file first
+      TString mcfilename = Form("diPhoPlots/50ns/%s/plots_%s.root",BkgSamples[mc].first.Data(),BkgSamples[mc].first.Data());
+      TFile * tmp_mcfile = TFile::Open(mcfilename.Data());
+      // open nvtx plot
+      TH1D * tmpnvtx = (TH1D*)tmp_mcfile->Get("nvtx_n-1");
+      // get yield and push back with corresponding sample name
+      tmp_mcyields.push_back(SampleYieldPair(BkgSamples[mc].first,tmpnvtx->Integral()));
+  
+      delete tmpnvtx;
+      delete tmp_mcfile;
+   }
+  
+   std::sort(tmp_mcyields.begin(),tmp_mcyields.end(),sortByYield);
+   std::cout << "Finished sorting MC, now put samples in right order to be processed" << std::endl;
+   BkgSamples.clear();
+    for (UInt_t mc = 0; mc < nbkg; mc++) { // init mc double hists
+      BkgSamples.push_back(SamplePair(tmp_mcyields[mc].first,1));
+    }
+  
+  Samples.clear();
+  for (UInt_t data = 0; data < ndata; data++ ) {
+    Samples.push_back(DataSamples[data]);
+  }
+  for (UInt_t mc = 0; mc < nbkg; mc++ ) {
+    Samples.push_back(BkgSamples[mc]);
+  }
+  for (UInt_t mc = 0; mc < nsig; mc++) {
+    Samples.push_back(SigSamples[mc]);
+  }
+
   ////////////////////////////////////////////////////
   //
   // Make comb (stack & overlay) plots w/ all samples 
@@ -248,79 +325,6 @@ int main(){
   ////////////////////////////////////////////////////
 
   if (doComb){
-    ColorMap colorMap;
-    colorMap["QCD"] 		= kYellow;
-    colorMap["GJets"] 		= kGreen;
-    colorMap["GluGluHToGG"]	= kCyan;
-    colorMap["DMHtoGG_M1000"]	= kMagenta;
-    colorMap["DMHtoGG_M100"]	= kMagenta+1;
-    colorMap["DMHtoGG_M10"]	= kRed+1;
-    colorMap["DMHtoGG_M1"]	= kRed;
-
-    SamplePairVec Samples; // vector to also be used for stack plots
-    Samples.push_back(SamplePair("QCD",1)); 
-    Samples.push_back(SamplePair("GJets",1)); 
-    Samples.push_back(SamplePair("GluGluHToGG",1)); 
-    Samples.push_back(SamplePair("DMHtoGG_M1000",0)); 
-    Samples.push_back(SamplePair("DMHtoGG_M100",0)); 
-    Samples.push_back(SamplePair("DMHtoGG_M10",0)); 
-    Samples.push_back(SamplePair("DMHtoGG_M1",0)); 
-    if (doFakeData) Samples.push_back(SamplePair("FakeData",5));
-
-    UInt_t nbkg = 0;
-    UInt_t nsig = 0;
-    UInt_t ndata = 0;
-  
-    for (SamplePairVecIter iter=Samples.begin(); iter != Samples.end(); ++iter){
-      std::cout << "Analyzing Sample: "<< (*iter).first.Data() << std::endl;
-      if ((*iter).second == 1) {nbkg++;}
-      else if ((*iter).second == 0) {nsig++;}
-      else {ndata++;} 
-    }
-    UInt_t nsamples = nbkg + nsig + ndata;
- 
-    SamplePairVec BkgSamples;
-    SamplePairVec SigSamples;
-    SamplePairVec DataSamples;
-    for (UInt_t isample = 0; isample < nsamples; isample++){
-      if (Samples[isample].second == 0) SigSamples.push_back(Samples[isample]);
-      else if (Samples[isample].second == 1) BkgSamples.push_back(Samples[isample]);
-      else  DataSamples.push_back(Samples[isample]);
-    }
-
-    // to sort MC by smallest to largest for nice stacked plots
-    SampleYieldPairVec tmp_mcyields;
-    for (UInt_t mc = 0; mc < nbkg; mc++) {
-        // open mc file first
-        TString mcfilename = Form("diPhoPlots/50ns/%s/plots_%s.root",BkgSamples[mc].first.Data(),BkgSamples[mc].first.Data());
-        TFile * tmp_mcfile = TFile::Open(mcfilename.Data());
-        // open nvtx plot
-        TH1D * tmpnvtx = (TH1D*)tmp_mcfile->Get("nvtx_n-1");
-        // get yield and push back with corresponding sample name
-        tmp_mcyields.push_back(SampleYieldPair(BkgSamples[mc].first,tmpnvtx->Integral()));
-  
-        delete tmpnvtx;
-        delete tmp_mcfile;
-     }
-  
-     std::sort(tmp_mcyields.begin(),tmp_mcyields.end(),sortByYield);
-     std::cout << "Finished sorting MC, now put samples in right order to be processed" << std::endl;
-     BkgSamples.clear();
-      for (UInt_t mc = 0; mc < nbkg; mc++) { // init mc double hists
-        BkgSamples.push_back(SamplePair(tmp_mcyields[mc].first,1));
-      }
-  
-    Samples.clear();
-    for (UInt_t data = 0; data < ndata; data++ ) {
-      Samples.push_back(DataSamples[data]);
-    }
-    for (UInt_t mc = 0; mc < nbkg; mc++ ) {
-      Samples.push_back(BkgSamples[mc]);
-    }
-    for (UInt_t mc = 0; mc < nsig; mc++) {
-      Samples.push_back(SigSamples[mc]);
-    }
-
     // make overlayed and stack plots
     // Combiner( Samples, lumi, colorMap , outDir, doNmin1plots )
     Combiner *combAll = new Combiner(Samples,lumi,colorMap,outDir,false);
@@ -330,6 +334,12 @@ int main(){
     Combiner *combAlln1 = new Combiner(Samples,lumi,colorMap,outDir,true);
     combAlln1->DoComb();
     delete combAlln1;   
-  
   }// end doComb
+
+  if (doABCD){
+    ABCDMethod *abcd = new ABCDMethod(Samples,lumi,outDir);
+    abcd->DoAnalysis();
+    delete abcd; 
+  }// end doABCD
+
 }// end main
