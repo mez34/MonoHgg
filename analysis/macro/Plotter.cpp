@@ -67,146 +67,149 @@ void Plotter::DoPlots(){
     // calculate the weight
     Double_t Weight = (weight)*fPUWeights[nvtx];
 
-    //Fill histograms
-    fTH1DMap["mgg"]->Fill(mgg,Weight);
-    fTH1DMap["nvtx"]->Fill(nvtx,Weight);
-    fTH1DMap["ptgg"]->Fill(ptgg,Weight);
-    fTH1DMap["pt1"]->Fill(pt1,Weight);
-    fTH1DMap["pt2"]->Fill(pt2,Weight);
-    fTH1DMap["t1pfmet"]->Fill(t1pfmet,Weight);
-    fTH1DMap["t1pfmetphi"]->Fill(t1pfmetphi,Weight);
-    fTH1DMap["phi1"]->Fill(phi1,Weight);
-    fTH1DMap["phi2"]->Fill(phi2,Weight);
-    fTH1DMap["eta1"]->Fill(eta1,Weight);
-    fTH1DMap["eta2"]->Fill(eta2,Weight);
-    fTH1DMap["chiso1"]->Fill(chiso1,Weight);
-    fTH1DMap["chiso2"]->Fill(chiso2,Weight);
-    fTH1DMap["neuiso1"]->Fill(neuiso1,Weight);
-    fTH1DMap["neuiso2"]->Fill(neuiso2,Weight);
-    fTH1DMap["phoiso1"]->Fill(phoiso1,Weight);
-    fTH1DMap["phoiso2"]->Fill(phoiso2,Weight);
-    fTH1DMap["sieie1"]->Fill(sieie1,Weight);
-    fTH1DMap["sieie2"]->Fill(sieie2,Weight);
-    fTH1DMap["hoe1"]->Fill(hoe1,Weight);
-    fTH1DMap["hoe2"]->Fill(hoe2,Weight);
-    fTH1DMap["r91"]->Fill(r91,Weight);
-    fTH1DMap["r92"]->Fill(r92,Weight);
 
-    fTH2DMap["t1pfmet_mgg"]->Fill(mgg,t1pfmet,Weight);
-    fTH2DMap["mgg_PU"]->Fill(nvtx,mgg,Weight);
-    fTH2DMap["mgg_ptgg"]->Fill(ptgg,mgg,Weight);
-    fTH2DMap["t1pfmet_PU"]->Fill(nvtx,t1pfmet,Weight);
-    fTH2DMap["t1pfmet_ptgg"]->Fill(ptgg,t1pfmet,Weight);
+    if ( hltDiphoton30Mass95==1){ //passes trigger
+      //Fill histograms
+      fTH1DMap["mgg"]->Fill(mgg,Weight);
+      fTH1DMap["nvtx"]->Fill(nvtx,Weight);
+      fTH1DMap["ptgg"]->Fill(ptgg,Weight);
+      fTH1DMap["pt1"]->Fill(pt1,Weight);
+      fTH1DMap["pt2"]->Fill(pt2,Weight);
+      fTH1DMap["t1pfmet"]->Fill(t1pfmet,Weight);
+      fTH1DMap["t1pfmetphi"]->Fill(t1pfmetphi,Weight);
+      fTH1DMap["phi1"]->Fill(phi1,Weight);
+      fTH1DMap["phi2"]->Fill(phi2,Weight);
+      fTH1DMap["eta1"]->Fill(eta1,Weight);
+      fTH1DMap["eta2"]->Fill(eta2,Weight);
+      fTH1DMap["chiso1"]->Fill(chiso1,Weight);
+      fTH1DMap["chiso2"]->Fill(chiso2,Weight);
+      fTH1DMap["neuiso1"]->Fill(neuiso1,Weight);
+      fTH1DMap["neuiso2"]->Fill(neuiso2,Weight);
+      fTH1DMap["phoiso1"]->Fill(phoiso1,Weight);
+      fTH1DMap["phoiso2"]->Fill(phoiso2,Weight);
+      fTH1DMap["sieie1"]->Fill(sieie1,Weight);
+      fTH1DMap["sieie2"]->Fill(sieie2,Weight);
+      fTH1DMap["hoe1"]->Fill(hoe1,Weight);
+      fTH1DMap["hoe2"]->Fill(hoe2,Weight);
+      fTH1DMap["r91"]->Fill(r91,Weight);
+      fTH1DMap["r92"]->Fill(r92,Weight);
+
+      fTH2DMap["t1pfmet_mgg"]->Fill(mgg,t1pfmet,Weight);
+      fTH2DMap["mgg_PU"]->Fill(nvtx,mgg,Weight);
+      fTH2DMap["mgg_ptgg"]->Fill(ptgg,mgg,Weight);
+      fTH2DMap["t1pfmet_PU"]->Fill(nvtx,t1pfmet,Weight);
+      fTH2DMap["t1pfmet_ptgg"]->Fill(ptgg,t1pfmet,Weight);
 
 
-    Bool_t passCH1  = false;
-    Bool_t passCH2  = false;
-    Bool_t passNH1  = false;
-    Bool_t passNH2  = false;
-    Bool_t passPH1  = false;
-    Bool_t passPH2  = false;
-    Bool_t passS1   = false;
-    Bool_t passS2   = false;
-    Bool_t passHE1  = false;
-    Bool_t passHE2  = false;
-    Bool_t passAll1 = false;
-    Bool_t passAll2 = false;
-    Bool_t passBoth = false;
+      Bool_t passCH1  = false;
+      Bool_t passCH2  = false;
+      Bool_t passNH1  = false;
+      Bool_t passNH2  = false;
+      Bool_t passPH1  = false;
+      Bool_t passPH2  = false;
+      Bool_t passS1   = false;
+      Bool_t passS2   = false;
+      Bool_t passHE1  = false;
+      Bool_t passHE2  = false;
+      Bool_t passAll1 = false;
+      Bool_t passAll2 = false;
+      Bool_t passBoth = false;
 
-    if (passCHiso1==1) passCH1 = true; 
-    if (passCHiso2==1) passCH2 = true; 
-    if (passNHiso1==1) passNH1 = true;
-    if (passNHiso2==1) passNH2 = true;
-    if (passPHiso1==1) passPH1 = true;
-    if (passPHiso2==1) passPH2 = true;
-    if (passSieie1==1) passS1  = true;
-    if (passSieie2==1) passS2  = true;
-    if (passHoe1==1)   passHE1 = true; 
-    if (passHoe2==1)   passHE2 = true; 
+      if (passCHiso1==1) passCH1 = true; 
+      if (passCHiso2==1) passCH2 = true; 
+      if (passNHiso1==1) passNH1 = true;
+      if (passNHiso2==1) passNH2 = true;
+      if (passPHiso1==1) passPH1 = true;
+      if (passPHiso2==1) passPH2 = true;
+      if (passSieie1==1) passS1  = true;
+      if (passSieie2==1) passS2  = true;
+      if (passHoe1==1)   passHE1 = true; 
+      if (passHoe2==1)   passHE2 = true; 
 
-    if (passCH1 && passNH1 && passPH1 && passS1 && passHE1) passAll1 = true;
-    if (passCH2 && passNH2 && passPH2 && passS2 && passHE2) passAll2 = true;
-    if (passAll1 && passAll2) passBoth = true;
+      if (passCH1 && passNH1 && passPH1 && passS1 && passHE1) passAll1 = true;
+      if (passCH2 && passNH2 && passPH2 && passS2 && passHE2) passAll2 = true;
+      if (passAll1 && passAll2) passBoth = true;
 
-    //std::cout << passCH1 <<" "<< passNH1 <<" "<< passPH1 <<" "<< passHE1 <<" "<< passS1 << std::endl; 
-    //std::cout << passCH2 <<" "<< passNH2 <<" "<< passPH2 <<" "<< passHE2 <<" "<< passS2 << std::endl; 
-    //std::cout << passAll1 <<" "<< passAll2 <<" "<< passBoth << std::endl;
+      //std::cout << passCH1 <<" "<< passNH1 <<" "<< passPH1 <<" "<< passHE1 <<" "<< passS1 << std::endl; 
+      //std::cout << passCH2 <<" "<< passNH2 <<" "<< passPH2 <<" "<< passHE2 <<" "<< passS2 << std::endl; 
+      //std::cout << passAll1 <<" "<< passAll2 <<" "<< passBoth << std::endl;
 
-    //fill n-1 plots for the photon ID selection variables
-    if (passCH1 && passNH1 && passPH1 && passS1)  fTH1DMap["hoe1_n-1"]->Fill(hoe1,Weight); 
-    if (passCH1 && passNH1 && passPH1 && passHE1) fTH1DMap["sieie1_n-1"]->Fill(sieie1,Weight);
-    if (passCH1 && passNH1 && passHE1 && passS1)  fTH1DMap["phoiso1_n-1"]->Fill(phoiso1,Weight);
-    if (passCH1 && passPH1 && passHE1 && passS1)  fTH1DMap["neuiso1_n-1"]->Fill(neuiso1,Weight);
-    if (passPH1 && passNH1 && passHE1 && passS1)  fTH1DMap["chiso1_n-1"]->Fill(chiso1,Weight);
+      //fill n-1 plots for the photon ID selection variables
+      if (passCH1 && passNH1 && passPH1 && passS1)  fTH1DMap["hoe1_n-1"]->Fill(hoe1,Weight); 
+      if (passCH1 && passNH1 && passPH1 && passHE1) fTH1DMap["sieie1_n-1"]->Fill(sieie1,Weight);
+      if (passCH1 && passNH1 && passHE1 && passS1)  fTH1DMap["phoiso1_n-1"]->Fill(phoiso1,Weight);
+      if (passCH1 && passPH1 && passHE1 && passS1)  fTH1DMap["neuiso1_n-1"]->Fill(neuiso1,Weight);
+      if (passPH1 && passNH1 && passHE1 && passS1)  fTH1DMap["chiso1_n-1"]->Fill(chiso1,Weight);
 
-    if (passCH2 && passNH2 && passPH2 && passS2)  fTH1DMap["hoe2_n-1"]->Fill(hoe2,Weight); 
-    if (passCH2 && passNH2 && passPH2 && passHE2) fTH1DMap["sieie2_n-1"]->Fill(sieie2,Weight);
-    if (passCH2 && passNH2 && passHE2 && passS2)  fTH1DMap["phoiso2_n-1"]->Fill(phoiso2,Weight);
-    if (passCH2 && passPH2 && passHE2 && passS2)  fTH1DMap["neuiso2_n-1"]->Fill(neuiso2,Weight);
-    if (passPH2 && passNH2 && passHE2 && passS2)  fTH1DMap["chiso2_n-1"]->Fill(chiso2,Weight);
+      if (passCH2 && passNH2 && passPH2 && passS2)  fTH1DMap["hoe2_n-1"]->Fill(hoe2,Weight); 
+      if (passCH2 && passNH2 && passPH2 && passHE2) fTH1DMap["sieie2_n-1"]->Fill(sieie2,Weight);
+      if (passCH2 && passNH2 && passHE2 && passS2)  fTH1DMap["phoiso2_n-1"]->Fill(phoiso2,Weight);
+      if (passCH2 && passPH2 && passHE2 && passS2)  fTH1DMap["neuiso2_n-1"]->Fill(neuiso2,Weight);
+      if (passPH2 && passNH2 && passHE2 && passS2)  fTH1DMap["chiso2_n-1"]->Fill(chiso2,Weight);
 
-    if (passAll1){// fill pho1 plots if these photons pass phoID
-      fTH1DMap["pt1_n-1"]->Fill(pt1,Weight);
-      fTH1DMap["r91_n-1"]->Fill(r91,Weight);
-      fTH1DMap["phi1_n-1"]->Fill(phi1,Weight);
-      fTH1DMap["eta1_n-1"]->Fill(eta1,Weight);
-    }
-    if (passAll2){// fill pho2 plots if these photons pass phoID
-      fTH1DMap["pt2_n-1"]->Fill(pt2,Weight);
-      fTH1DMap["r92_n-1"]->Fill(r92,Weight);
-      fTH1DMap["phi2_n-1"]->Fill(phi2,Weight);
-      fTH1DMap["eta2_n-1"]->Fill(eta2,Weight);
-    } 
-    if (passBoth){
-      fTH1DMap["nvtx_n-1"]->Fill(nvtx,Weight);
-      fTH1DMap["mgg_n-1"]->Fill(mgg,Weight);  
-      fTH1DMap["ptgg_n-1"]->Fill(ptgg,Weight);  
-      fTH1DMap["t1pfmet_n-1"]->Fill(t1pfmet,Weight);  
-      fTH1DMap["t1pfmetphi_n-1"]->Fill(t1pfmetphi,Weight);  
-      if (mgg >= 120 && mgg <= 130) fTH1DMap["t1pfmet_selmgg"]->Fill(t1pfmet,Weight); 
-      if (t1pfmet >= 100) fTH1DMap["mgg_selt1pfmet"]->Fill(mgg,Weight); 
-    }
-
-    if (passCH1 && passCH2){
-      fTH1DMap["eff_sel"]->Fill(1.,1);
-      if (passNH1 && passNH2){
-        fTH1DMap["eff_sel"]->Fill(2.,1);
-        if (passPH1 && passPH2){
-          fTH1DMap["eff_sel"]->Fill(3.,1);
-          if (passS1 && passS2){ 
-	    fTH1DMap["eff_sel"]->Fill(4.,1);
-     	    if (passHE1 && passHE2){
-	      fTH1DMap["eff_sel"]->Fill(5.,1);
-	      if (mgg >= 120 && mgg <= 130){
-		fTH1DMap["eff_sel"]->Fill(6.,1);
-		if (t1pfmet >= 100){
-		  fTH1DMap["eff_sel"]->Fill(7.,1);
-		}
-	      }
-	    }
- 	  }
-	}
+      if (passAll1){// fill pho1 plots if these photons pass phoID
+        fTH1DMap["pt1_n-1"]->Fill(pt1,Weight);
+        fTH1DMap["r91_n-1"]->Fill(r91,Weight);
+        fTH1DMap["phi1_n-1"]->Fill(phi1,Weight);
+        fTH1DMap["eta1_n-1"]->Fill(eta1,Weight);
       }
-    }
+      if (passAll2){// fill pho2 plots if these photons pass phoID
+        fTH1DMap["pt2_n-1"]->Fill(pt2,Weight);
+        fTH1DMap["r92_n-1"]->Fill(r92,Weight);
+        fTH1DMap["phi2_n-1"]->Fill(phi2,Weight);
+        fTH1DMap["eta2_n-1"]->Fill(eta2,Weight);
+      } 
+      if (passBoth){
+        fTH1DMap["nvtx_n-1"]->Fill(nvtx,Weight);
+        fTH1DMap["mgg_n-1"]->Fill(mgg,Weight);  
+        fTH1DMap["ptgg_n-1"]->Fill(ptgg,Weight);  
+        fTH1DMap["t1pfmet_n-1"]->Fill(t1pfmet,Weight);  
+        fTH1DMap["t1pfmetphi_n-1"]->Fill(t1pfmetphi,Weight);  
+        if (mgg >= 120 && mgg <= 130) fTH1DMap["t1pfmet_selmgg"]->Fill(t1pfmet,Weight); 
+        if (t1pfmet >= 100) fTH1DMap["mgg_selt1pfmet"]->Fill(mgg,Weight); 
+      }
 
-    for (UInt_t i = 0; i < 60; i++){
-      if (nvtx == i){
-	effPUd[i]++;
-	if (passBoth) effPUn[i]++;
+      if (passCH1 && passCH2){
+        fTH1DMap["eff_sel"]->Fill(1.,1);
+        if (passNH1 && passNH2){
+          fTH1DMap["eff_sel"]->Fill(2.,1);
+          if (passPH1 && passPH2){
+            fTH1DMap["eff_sel"]->Fill(3.,1);
+            if (passS1 && passS2){ 
+              fTH1DMap["eff_sel"]->Fill(4.,1);
+       	    if (passHE1 && passHE2){
+                fTH1DMap["eff_sel"]->Fill(5.,1);
+                if (mgg >= 120 && mgg <= 130){
+          	fTH1DMap["eff_sel"]->Fill(6.,1);
+          	if (t1pfmet >= 100){
+          	  fTH1DMap["eff_sel"]->Fill(7.,1);
+          	}
+                }
+              }
+            }
+          }
+        }
       }
-      if (ptgg >= 10*i && ptgg < 10*(i+1)){
-        effptd[i]++;
-        if (passBoth) effptn[i]++;
+
+      for (UInt_t i = 0; i < 60; i++){
+        if (nvtx == i){
+          effPUd[i]++;
+          if (passBoth) effPUn[i]++;
+        }
+        if (ptgg >= 10*i && ptgg < 10*(i+1)){
+          effptd[i]++;
+          if (passBoth) effptn[i]++;
+        }
       }
-    }
  
-    // calculate phi of the Higgs
-    Float_t phigg = TMath::ATan((pt1*TMath::Sin(phi1) - pt2*TMath::Sin(phi2)) / (pt1*TMath::Cos(phi1) - pt2*TMath::Cos(phi2)));
-    fTH1DMap["phigg"]->Fill(phigg,Weight);
-    // calculate delta phi of Higgs & MET
-    Float_t dphi_ggmet = deltaPhi(phigg,t1pfmetphi);
-    fTH1DMap["dphi_ggmet"]->Fill(dphi_ggmet,Weight);
+      // calculate phi of the Higgs
+      Float_t phigg = TMath::ATan((pt1*TMath::Sin(phi1) - pt2*TMath::Sin(phi2)) / (pt1*TMath::Cos(phi1) - pt2*TMath::Cos(phi2)));
+      fTH1DMap["phigg"]->Fill(phigg,Weight);
+      // calculate delta phi of Higgs & MET
+      Float_t dphi_ggmet = deltaPhi(phigg,t1pfmetphi);
+      fTH1DMap["dphi_ggmet"]->Fill(dphi_ggmet,Weight);
 
+    }// end if passes trigger
   }// end loop over entries in tree
 
   Double_t effPU = 0;
@@ -418,6 +421,15 @@ void Plotter::SetBranchAddresses(){
   tpho->SetBranchAddress("passSieie2", &passSieie2, &b_passSieie2);
   tpho->SetBranchAddress("passHoe1", &passHoe1, &b_passHoe1);
   tpho->SetBranchAddress("passHoe2", &passHoe2, &b_passHoe2);
+  tpho->SetBranchAddress("hltPhoton26Photon16Mass60", &hltPhoton26Photon16Mass60, &b_hltPhoton26Photon16Mass60);
+  tpho->SetBranchAddress("hltPhoton36Photon22Mass15", &hltPhoton36Photon22Mass15, &b_hltPhoton36Photon22Mass15);
+  tpho->SetBranchAddress("hltPhoton42Photon25Mass15", &hltPhoton42Photon25Mass15, &b_hltPhoton42Photon25Mass15);
+  tpho->SetBranchAddress("hltDiphoton30Mass95", &hltDiphoton30Mass95, &b_hltDiphoton30Mass95);
+  tpho->SetBranchAddress("hltDiphoton30Mass70", &hltDiphoton30Mass70, &b_hltDiphoton30Mass70);
+  tpho->SetBranchAddress("hltDiphoton30Mass55", &hltDiphoton30Mass55, &b_hltDiphoton30Mass55);
+  tpho->SetBranchAddress("hltDiphoton30Mass55PV", &hltDiphoton30Mass55PV, &b_hltDiphoton30Mass55PV);
+  tpho->SetBranchAddress("hltDiphoton30Mass55EB", &hltDiphoton30Mass55EB, &b_hltDiphoton30Mass55EB);
+
 
   //tpho->SetBranchAddress("", &, &b_);
   
