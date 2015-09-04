@@ -92,6 +92,7 @@ void Plotter::DoPlots(){
     fTH1DMap["r91"]->Fill(r91,Weight);
     fTH1DMap["r92"]->Fill(r92,Weight);
 
+    fTH2DMap["t1pfmet_mgg"]->Fill(mgg,t1pfmet,Weight);
     fTH2DMap["mgg_PU"]->Fill(nvtx,mgg,Weight);
     fTH2DMap["mgg_ptgg"]->Fill(ptgg,mgg,Weight);
     fTH2DMap["t1pfmet_PU"]->Fill(nvtx,t1pfmet,Weight);
@@ -300,6 +301,7 @@ void Plotter::SetUpPlots(){
   fTH2DMap["mgg_ptgg"] 		= Plotter::MakeTH2DPlot("mgg_ptgg","",50,0.,500.,60,50.,300.,"p_{T,#gamma#gamma} (GeV)","m_{#gamma#gamma}");
   fTH2DMap["t1pfmet_PU"]	= Plotter::MakeTH2DPlot("t1pfmet_PU","",60,50.,300.,100,0.,1000.,"nvtx","MET (GeV)");
   fTH2DMap["t1pfmet_ptgg"]	= Plotter::MakeTH2DPlot("t1pfmet_ptgg","",60,0.,60.,100,0.,1000.,"p_{T,#gamma#gamma} (GeV)","MET (GeV)");
+  fTH2DMap["t1pfmet_mgg"]	= Plotter::MakeTH2DPlot("t1pfmet_mgg","",250,50.,300.,1000,0.,1000,"m_{#gamma#gamma} (GeV)","MET (GeV)");
 
 }// end Plotter::SetUpPlots
 
