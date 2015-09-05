@@ -99,17 +99,17 @@ void ABCDMethod::DoAnalysis(){
  
   min_x[0]=mgg_minAB1; // cat0 = A1
   min_x[1]=mgg_minAB1; // cat1 = B1
-  min_x[2]=mgg_maxAB2; // cat2 = A2
-  min_x[3]=mgg_maxAB2; // cat3 = B2
+  min_x[2]=mgg_maxCD;  // cat2 = A2
+  min_x[3]=mgg_maxCD;  // cat3 = B2
   min_x[4]=mgg_minCD;  // cat4 = D 
   min_x[5]=mgg_minCD;  // cat5 = C 
 
   max_x[0]=mgg_minCD;  // cat0 = A1
   max_x[1]=mgg_minCD;  // cat1 = B1
-  max_x[2]=mgg_maxCD;  // cat2 = A2
-  max_x[3]=mgg_maxCD;  // cat3 = B2
-  max_x[4]=mgg_maxAB2; // cat4 = D 
-  max_x[5]=mgg_maxAB2; // cat5 = C 
+  max_x[2]=mgg_maxAB2; // cat2 = A2
+  max_x[3]=mgg_maxAB2; // cat3 = B2
+  max_x[4]=mgg_maxCD;  // cat4 = D 
+  max_x[5]=mgg_maxCD;  // cat5 = C 
 
   min_y[0]=met_minD;   // cat0 = A1
   min_y[1]=met_minB;   // cat1 = B1
@@ -121,7 +121,7 @@ void ABCDMethod::DoAnalysis(){
   max_y[0]=met_maxD;   // cat0 = A1
   max_y[1]=met_minD;   // cat1 = B1
   max_y[2]=met_maxD;   // cat2 = A2
-  max_y[3]=met_minB;   // cat3 = B2
+  max_y[3]=met_minD;   // cat3 = B2
   max_y[4]=met_maxD;   // cat4 = D 
   max_y[5]=met_minD;   // cat5 = C 
 
@@ -138,10 +138,19 @@ void ABCDMethod::DoAnalysis(){
     if (cat == 4 || cat == 5 ) isSignalRegion = true;
 
     std::cout << cat << std::endl;
-    Data_Int[cat][0] = ABCDMethod::ComputeIntAndErr( fOutBkgTH2DHists[0], Data_IntErr[cat][0],  min_x[cat], max_x[cat], min_y[cat], max_y[cat], isSignalRegion);        
+    Data_Int[cat][0] = ABCDMethod::ComputeIntAndErr( fOutBkgTH2DHists[0], Data_IntErr[cat][0],  min_x[cat], max_x[cat], min_y[cat], max_y[cat], isSignalRegion);       
+    /*for (UInt_t mc = 0; mc < fNBkg; mc++){ 
+      Bkg_Int[cat][mc] = ABCDMethod::ComputeIntAndErr( fInBkgTH2DHists[0][mc], Bkg_IntErr[cat][mc],  min_x[cat], max_x[cat], min_y[cat], max_y[cat], isSignalRegion);        
+    }
+    // after finished with bkg samples separately, look at the combined sample
+    Bkg_Int[cat][fNBkg+1] = ABCDMethod::ComputeIntAndErr( fOutBkgTH2DHists[0], Bkg_IntErr[cat][fNBkg+1],  min_x[cat], max_x[cat], min_y[cat], max_y[cat], isSignalRegion);
+    for (UInt_t mc = 0; mc < fNSig; mc++){ 
+      Sig_Int[cat][mc] = ABCDMethod::ComputeIntAndErr( fInSigTH2DHists[0][mc], Sig_IntErr[cat][mc],  min_x[cat], max_x[cat], min_y[cat], max_y[cat], isSignalRegion);        
+    }*/
 
+    std::cout << Data_Int[cat][0] << " " << Data_IntErr[cat][0] << std::endl;
 
-  }    
+  }// end cat loop    
 
 
 }
@@ -149,6 +158,10 @@ void ABCDMethod::DoAnalysis(){
 Double_t ABCDMethod::ComputeIntAndErr(TH2D *& h, Double_t & error, const Double_t minX, const Double_t maxX, const Double_t minY, const Double_t maxY, bool isSigReg ){
 
   Double_t integral = 0.;
+
+  if(h == (TH2D*) NULL) std::cout << "NULL TH2D" << std::endl;
+
+  std::cout << "minx = " << minX << " maxX = " << maxX << " minY = " << minY << " maxY = " << maxY << std::endl; 
 
   Int_t binXmin;
   Int_t binXmax;
