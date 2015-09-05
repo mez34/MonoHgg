@@ -42,7 +42,7 @@ int main(){
   bool doComb = false;		// make stack/overlay plots
   bool doABCD = true;		// run ABCD method 
 
-  Double_t lumi = 300.;  
+  Double_t lumi = 40.;  
   UInt_t nBins_vtx = 60; 
   
   //for CMSSW_7_0_pre9: run with root
