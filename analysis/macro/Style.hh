@@ -7,6 +7,7 @@
 #include "TSystem.h"
 #include "TString.h"
 #include "TH1D.h"
+#include "TH2D.h"
 #include "TTree.h"
 #include "TFile.h"
 #include "TStyle.h"
@@ -31,6 +32,7 @@ void MakeOutDirectory(TString outdir);
 void CheckValidFile(TFile *& file, const TString fname);
 void CheckValidTree(TTree*& tree, const TString tname, const TString fname);
 void CheckValidTH1D(TH1D*& plot, const TString pname, const TString fname);
+void CheckValidTH2D(TH2D*& plot, const TString pname, const TString fname);
 void CMSLumi(TCanvas *& canvas, const Int_t iPosX, const Double_t inlumi);
 void setTDRStyle(); 
 

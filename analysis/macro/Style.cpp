@@ -48,6 +48,16 @@ void CheckValidTH1D(TH1D*& plot, const TString pname, const TString fname){
   }
 }
 
+void CheckValidTH2D(TH2D*& plot, const TString pname, const TString fname){
+  if (plot == (TH2D*) NULL) { // check if valid plot
+    std::cout << "Input TH2D is bad pointer: " << pname.Data() << " in input file: " << fname.Data() << " ...exiting..." << std::endl;
+    exit(1);
+  }
+  else {
+    //    std::cout << "Successfully initialized plot: " << pname.Data() << " in input file: " << fname.Data() << std::endl;
+  }
+}
+
 void CMSLumi(TCanvas *& canvas, const Int_t iPosX, const Double_t inlumi){
   canvas->cd();
   
