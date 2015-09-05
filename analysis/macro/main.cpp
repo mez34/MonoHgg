@@ -269,7 +269,6 @@ int main(){
     else {ndata++;} 
   }
   UInt_t nsamples = nbkg + nsig + ndata;
-  std::cout << "ndata = " << ndata << std::endl;
    
   SamplePairVec BkgSamples;
   SamplePairVec SigSamples;

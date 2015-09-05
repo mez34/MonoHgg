@@ -21,18 +21,23 @@
 #include <iostream>
 #include <cmath>
 
-//typedef std::vector<TString> TStrVec;
+typedef std::vector<TFile*>   TFileVec;
+typedef std::vector<TH1D*>    TH1DVec;
+typedef std::vector<TH1DVec>  TH1DVecVec;
+typedef std::vector<TH2D*>    TH2DVec;
+typedef std::vector<TH2DVec>  TH2DVecVec;
 
 class ABCDMethod{
 public: 
   ABCDMethod(const SamplePairVec Samples, const Double_t inLumi, const TString outname);
   void DoAnalysis();
-  void InitCanvAndHists();
+  void InitHists();
   void InitVariables();
   ~ABCDMethod();
 
 private:
   Double_t	lumi;
+  TString	fInDir;
   TString	fOutDir;
   TFile *	fOutFile;
 
@@ -48,6 +53,22 @@ private:
   TStrVec	fSigNames;
   TStrVec	fBkgNames;
   TStrVec	fDataNames;
+
+  TFileVec	fDataFiles;
+  TFileVec	fBkgFiles;
+  TFileVec	fSigFiles;
+
+  TH1DVecVec	fInDataTH1DHists;
+  TH1DVecVec	fInBkgTH1DHists;
+  TH1DVecVec	fInSigTH1DHists;
+
+  TH2DVecVec	fInDataTH2DHists;
+  TH2DVecVec	fInBkgTH2DHists;
+  TH2DVecVec	fInSigTH2DHists;
+
+  TH1DVec	fOutDataTH1DHists;
+  TH1DVec	fOutBkgTH1DHists;
+ 
 
 };
 #endif
