@@ -34,8 +34,8 @@ int main(){
   TString inDir = "./data/50ns/";
   TString outDir = "./diPhoPlots/50ns/";
 
-  bool doFakeData = false;
-  bool doTest = false;
+  bool doFakeData = true;	// use FakeData to test combiner
+  bool doTest = false;		// run plotter on test sample
   bool makePURWfiles = false;	// recompute PURW and make files
   bool doReweightPU = false;	// use PURW from old files if !makePURWfiles
   bool doPlots = false;		// make plots for each sample individually
@@ -178,14 +178,14 @@ int main(){
   //
   /////////////////////////////////////////////////////
 
-  if (doTest){
+  if (doTest && doPlots){
     std::cout << "Working on test sample" << std::endl;
     Plotter * test = new Plotter(inDir,outDir,"GJets",puweights_GJets,lumi);
     test->DoPlots();
     delete test;
     std::cout << "Finished test sample" << std::endl;
   }
-  if (doFakeData){
+  if (doFakeData && doPlots){
     std::cout << "Working on FakeData sample" << std::endl;
     Plotter * FakeData = new Plotter(inDir,outDir,"FakeData",puweights_Data,lumi);
     FakeData->DoPlots();
@@ -239,13 +239,14 @@ int main(){
 
   // setup all samples for Combiner and ABCD
   ColorMap colorMap;
-  colorMap["QCD"] 		= kYellow;
-  colorMap["GJets"] 		= kGreen;
-  colorMap["GluGluHToGG"]	= kCyan;
-  colorMap["DMHtoGG_M1000"]	= kMagenta;
-  colorMap["DMHtoGG_M100"]	= kMagenta+1;
-  colorMap["DMHtoGG_M10"]	= kRed+1;
-  colorMap["DMHtoGG_M1"]	= kRed;
+  colorMap["QCD"] 			= kYellow;
+  colorMap["GJets"] 			= kGreen;
+  colorMap["GluGluHToGG"]		= kCyan;
+  colorMap["DMHtoGG_M1000"]		= kMagenta;
+  colorMap["DMHtoGG_M100"]		= kMagenta+1;
+  colorMap["DMHtoGG_M10"]		= kRed+1;
+  colorMap["DMHtoGG_M1"]		= kRed;
+  if (doFakeData) colorMap["FakeData"]	= kBlack; 
 
   SamplePairVec Samples; // vector to also be used for stack plots
   Samples.push_back(SamplePair("QCD",1)); 
@@ -268,7 +269,8 @@ int main(){
     else {ndata++;} 
   }
   UInt_t nsamples = nbkg + nsig + ndata;
- 
+  std::cout << "ndata = " << ndata << std::endl;
+   
   SamplePairVec BkgSamples;
   SamplePairVec SigSamples;
   SamplePairVec DataSamples;

@@ -21,10 +21,14 @@
 #include <iostream>
 #include <cmath>
 
+//typedef std::vector<TString> TStrVec;
+
 class ABCDMethod{
 public: 
   ABCDMethod(const SamplePairVec Samples, const Double_t inLumi, const TString outname);
   void DoAnalysis();
+  void InitCanvAndHists();
+  void InitVariables();
   ~ABCDMethod();
 
 private:
@@ -32,6 +36,18 @@ private:
   TString	fOutDir;
   TFile *	fOutFile;
 
+  Int_t		fNBkg;
+  Int_t 	fNSig;
+  Int_t		fNData;
+  Int_t		fNTH1D;
+  Int_t		fNTH2D;
+
+  TStrVec	fTH1DNames;
+  TStrVec	fTH2DNames;
+
+  TStrVec	fSigNames;
+  TStrVec	fBkgNames;
+  TStrVec	fDataNames;
 
 };
 #endif
