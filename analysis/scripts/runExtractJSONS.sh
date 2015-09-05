@@ -1,6 +1,11 @@
 #! /bin/sh
 #run extractJSONS.py for all samples in file
 
+python extractJSONS.py -i datasets_746_WZH.json -o WplusH				-d lists_50ns/MC
+python extractJSONS.py -i datasets_746_WZH.json -o WminusH				-d lists_50ns/MC
+python extractJSONS.py -i datasets_746_WZH.json -o ZH 					-d lists_50ns/MC
+
+
 python extractJSONS.py -i datasets_746_sig.json -o Higgs_scalar_nohdecay_gg_1000GeV	-d lists_50ns/MC
 python extractJSONS.py -i datasets_746_sig.json -o Higgs_scalar_nohdecay_gg_100GeV	-d lists_50ns/MC
 python extractJSONS.py -i datasets_746_sig.json -o Higgs_scalar_nohdecay_gg_10GeV	-d lists_50ns/MC

@@ -8,6 +8,10 @@
 
 # 50ns samples
 
+./submitBatchDiPho.py --cfg diPhoAnaBATCH.py ZH					0 11  pippo 0.9753 1
+./submitBatchDiPho.py --cfg diPhoAnaBATCH.py WminusH				0 12  pippo 1.38 1
+./submitBatchDiPho.py --cfg diPhoAnaBATCH.py WplusH				0 13  pippo 1.38 1 
+
 ./submitBatchDiPho.py --cfg diPhoAnaBATCH.py Higgs_scalar_nohdecay_gg_1000GeV	0 100 pippo 0.01 1 #10fb xsec
 ./submitBatchDiPho.py --cfg diPhoAnaBATCH.py Higgs_scalar_nohdecay_gg_100GeV	0 101 pippo 0.01 1
 ./submitBatchDiPho.py --cfg diPhoAnaBATCH.py Higgs_scalar_nohdecay_gg_10GeV	0 102 pippo 0.01 1

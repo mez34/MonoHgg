@@ -1,6 +1,11 @@
 #! /bin/sh
 #run extractJSONS.py for all samples in file
 
+python extractFilesAndWeight.py -i lists_50ns/MC/ZH.json	-o ZH 		-d lists_50ns
+python extractFilesAndWeight.py -i lists_50ns/MC/WplusH.json	-o WplusH 	-d lists_50ns
+python extractFilesAndWeight.py -i lists_50ns/MC/WminusH.json	-o WminusH 	-d lists_50ns
+
+
 python extractFilesAndWeight.py -i lists_50ns/MC/Higgs_scalar_nohdecay_gg_1000GeV.json	-o Higgs_scalar_nohdecay_gg_1000GeV	-d lists_50ns
 python extractFilesAndWeight.py -i lists_50ns/MC/Higgs_scalar_nohdecay_gg_100GeV.json	-o Higgs_scalar_nohdecay_gg_100GeV	-d lists_50ns
 python extractFilesAndWeight.py -i lists_50ns/MC/Higgs_scalar_nohdecay_gg_10GeV.json	-o Higgs_scalar_nohdecay_gg_10GeV	-d lists_50ns
