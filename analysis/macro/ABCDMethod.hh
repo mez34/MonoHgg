@@ -63,6 +63,11 @@ private:
   DblVecVec 	fData_Int;
   DblVecVec 	fData_IntErr; 
 
+  DblVec	fCorrData;
+  DblVec	fCorrBkg;
+  DblVec	fCorrSig;
+
+
   Double_t	lumi;
   TString	fInDir;
   TString	fOutDir;

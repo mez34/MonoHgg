@@ -139,7 +139,7 @@ void ABCDMethod::DoAnalysis(){
     Sig_Int[cat].resize(fNSig);		// do all Sig separately
     Sig_IntErr[cat].resize(fNSig);
 
-    Data_Int[cat][0] = ABCDMethod::ComputeIntAndErr( fOutBkgTH2DHists[0], Data_IntErr[cat][0],  min_x[cat], max_x[cat], min_y[cat], max_y[cat], cat); 
+    Data_Int[cat][0] = ABCDMethod::ComputeIntAndErr( fOutDataTH2DHists[0], Data_IntErr[cat][0],  min_x[cat], max_x[cat], min_y[cat], max_y[cat], cat); 
     for (UInt_t mc = 0; mc < fNBkg; mc++){ 
       Bkg_Int[cat][mc] = ABCDMethod::ComputeIntAndErr( fInBkgTH2DHists[0][mc], Bkg_IntErr[cat][mc],  min_x[cat], max_x[cat], min_y[cat], max_y[cat], cat); 
     }
@@ -199,13 +199,23 @@ void ABCDMethod::DoAnalysis(){
   }// end cat loop over A,B,C,D
 
 
-  ABCDMethod::FillTable("Data", 0, Data_Int[0][0], Data_IntErr[0][0]);
+  // calculate correlation for each sample
+  fCorrData.push_back(fOutDataTH2DHists[0]->GetCorrelationFactor(1,2)); 
+  for (UInt_t mc = 0; mc < fNBkg; mc++){ 
+    fCorrBkg.push_back(fInBkgTH2DHists[0][mc]->GetCorrelationFactor(1,2));
+  }
+  fCorrBkg.push_back(fOutBkgTH2DHists[0]->GetCorrelationFactor(1,2)); //all bkg samples added together
+  for (UInt_t mc = 0; mc < fNSig; mc++){ 
+    fCorrSig.push_back(fInSigTH2DHists[0][mc]->GetCorrelationFactor(1,2));
+  } 
+
+
+  ABCDMethod::FillTable("Data", 0, fData_Int[0][0],fData_IntErr[0][0]);
 
   for (UInt_t mc = 0; mc < fNSig; mc++){
     ABCDMethod::WriteDataCard(fSigNames[mc].Data());
   }
 }
-
 
 void ABCDMethod::FillTable( const TString fSampleName, const UInt_t reg, const UInt_t Integral, const UInt_t Error){
   if (fOutTableTxtFile.is_open()){
