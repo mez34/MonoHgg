@@ -15,7 +15,6 @@ ABCDMethod::ABCDMethod( SamplePairVec Samples, const Double_t inLumi, const TStr
   met_maxD   = 400.;
 
   // make output txt file with output table
-  fOutTxtFile.open(Form("%s/DataCard.txt",fOutDir.Data())); 
   fOutTableTxtFile.open(Form("%s/ResultsTableForLatex.txt",fOutDir.Data()));
 
   // make output root file
@@ -60,7 +59,7 @@ ABCDMethod::~ABCDMethod(){
   }
  
   delete fOutFile;
-  fOutTxtFile.close();
+  // close output text files
   fOutTableTxtFile.close();
 }
 
@@ -154,12 +153,60 @@ void ABCDMethod::DoAnalysis(){
     //for (UInt_t mc = 0; mc < fNBkg+1; mc++){ std::cout << "Bkg " << Bkg_Int[cat][mc] << " " << Bkg_IntErr[cat][mc] << std::endl; }
     //for (UInt_t mc = 0; mc < fNSig; mc++){   std::cout << "Sig " << Sig_Int[cat][mc] << " " << Sig_IntErr[cat][mc] << std::endl; }
 
-  }// end cat loop    
+  }// end cat loop over A1,B1,A2,B2,C,D  
 
-    ABCDMethod::FillTable("Data", 0, Data_Int[0][0], Data_IntErr[0][0]);
-    ABCDMethod::WriteDataCard("Data", 0, Data_Int[0][0], Data_IntErr[0][0]);
 
+  Int_t fNReg = 4; // for 4 regions A,B,C,D
+  fData_Int.resize(fNReg);
+  fData_IntErr.resize(fNReg);
+  fBkg_Int.resize(fNReg);
+  fBkg_IntErr.resize(fNReg);
+  fSig_Int.resize(fNReg);
+  fSig_IntErr.resize(fNReg);
+  for (UInt_t cat = 0; cat < fNReg; cat++){ // loop over each category
+    fData_Int[cat].resize(1); 		// only one group for data since it is lumped together
+    fData_IntErr[cat].resize(1);		
+    fBkg_Int[cat].resize(fNBkg+1);	// do all Bkg separately and then one where all combined
+    fBkg_IntErr[cat].resize(fNBkg+1);
+    fSig_Int[cat].resize(fNSig);		// do all Sig separately
+    fSig_IntErr[cat].resize(fNSig);
+
+    if (cat == 0 || cat == 1){ // A or B region sum the integral and get error from sqrt(errReg1^2+errReg2^2)
+      fData_Int[cat][0] = (Data_Int[cat][0]+Data_Int[cat+2][0]); //cat+2 is the corresponding C and D regions 
+      fData_IntErr[cat][0] = (std::sqrt(Data_IntErr[cat][0]*Data_IntErr[cat][0]+ Data_IntErr[cat+2][0]*Data_IntErr[cat+2][0])); 
+      for (UInt_t mc = 0; mc < fNSig; mc++){ 
+        fSig_Int[cat][mc] = (Sig_Int[cat][mc]+Sig_Int[cat+2][mc]); 
+        fSig_IntErr[cat][mc] = (std::sqrt(Sig_IntErr[cat][mc]*Sig_IntErr[cat][mc]+ Sig_IntErr[cat+2][mc]*Sig_IntErr[cat+2][mc])); 
+      }
+      for (UInt_t mc = 0; mc < fNBkg+1; mc++){ 
+        fBkg_Int[cat][mc] = (Bkg_Int[cat][mc]+Bkg_Int[cat+2][mc]); 
+        fBkg_IntErr[cat][mc] = (std::sqrt(Bkg_IntErr[cat][mc]*Bkg_IntErr[cat][mc]+ Bkg_IntErr[cat+2][mc]*Bkg_IntErr[cat+2][mc])); 
+      }
+    }
+    else{ // C or D region, just take value from calculations above
+      fData_Int[cat][0] = (Data_Int[cat+2][0]); //cat+2 is the corresponding C and D regions 
+      fData_IntErr[cat][0] = (Data_IntErr[cat+2][0]); 
+      for (UInt_t mc = 0; mc < fNSig; mc++){ 
+        fSig_Int[cat][mc] = (Sig_Int[cat+2][mc]); 
+        fSig_IntErr[cat][mc] = (Sig_IntErr[cat+2][mc]);
+      }
+      for (UInt_t mc = 0; mc < fNBkg+1; mc++){ 
+        fBkg_Int[cat][mc] = (Bkg_Int[cat+2][mc]); 
+        fBkg_IntErr[cat][mc] = (Bkg_IntErr[cat+2][mc]);
+      }
+    }  
+
+  }// end cat loop over A,B,C,D
+
+
+  ABCDMethod::FillTable("Data", 0, Data_Int[0][0], Data_IntErr[0][0]);
+
+  for (UInt_t mc = 0; mc < fNSig; mc++){
+    ABCDMethod::WriteDataCard(fSigNames[mc].Data());
+  }
 }
+
+
 void ABCDMethod::FillTable( const TString fSampleName, const UInt_t reg, const UInt_t Integral, const UInt_t Error){
   if (fOutTableTxtFile.is_open()){
 
@@ -168,16 +215,46 @@ void ABCDMethod::FillTable( const TString fSampleName, const UInt_t reg, const U
 
 }
 
-void ABCDMethod::WriteDataCard( const TString fSampleName, const UInt_t reg, const UInt_t Integral, const UInt_t Error){
+void ABCDMethod::WriteDataCard( const TString fSigName){
 
-  std::cout << "Writing data card in: " << fOutDir.Data() << "/DataCard.txt" << std::endl;
+  std::cout << "Writing data card in: " << fOutDir.Data() << "/DataCard_" << fSigName.Data() <<".txt" << std::endl;
+  fOutTxtFile.open(Form("%s/DataCard_%s.txt",fOutDir.Data(),fSigName.Data())); 
   // print out the Data Card file
   if (fOutTxtFile.is_open()){
     fOutTxtFile << Form("#MonoHgg DataCard for C&C Limit Setting, %f pb-1 ",lumi) << std::endl;
     fOutTxtFile << "#Run with:combine -M Asymptotic cardname.txt --run blind " << std::endl;
+    fOutTxtFile << Form("# Lumi =  %f pb-1",lumi) << std::endl;
+    fOutTxtFile << "imax 1" << std::endl;
+    fOutTxtFile << "jmax *" << std::endl;
+    fOutTxtFile << "kmax *" << std::endl;
+    fOutTxtFile << "---------------" << std::endl;
+ 
+    fOutTxtFile << "bin 1"<< std::endl;
+    fOutTxtFile <<  "observation  0 "  << std::endl;
+    fOutTxtFile << "------------------------------" << std::endl;
+    fOutTxtFile << "bin     1             1            1           1            1               1 "<< std::endl;
+    fOutTxtFile << "process DM            Xgg          pp          pf           hgg             Vh " << std::endl;
+    fOutTxtFile << "process 0             1            2           3            4               5 " << std::endl;
+    fOutTxtFile << Form("rate %.3f          0.57         1.98        0.13         0.043           1.2 ",0.01)<< std::endl; //FIXME sigrate
+    fOutTxtFile << "--------------------------------" << std::endl;
+    fOutTxtFile << "#signal related" << std::endl;
+    fOutTxtFile << "lumi_8TeV     lnN     1.026000      -          -          -       1.02600   1.02600" << std::endl;
+    fOutTxtFile << "eff_trig      lnN     1.010000      -          -          -       1.01000   1.01000" << std::endl;
+    fOutTxtFile << "id_eff_eb     lnN     1.02000       -          -          -       1.02000   1.02000   " << std::endl;    
+    fOutTxtFile << "vtxEff        lnN   0.996/1.008     -          -          -     0.996/1.008  0.996/1.008" << std::endl; 
+    fOutTxtFile << "#background related" << std::endl;
+    fOutTxtFile << "abcd_estimate lnN       -         1.26000    1.26000    1.26000      -         -  " << std::endl;
+    fOutTxtFile << "Xgg_norm      gmN 19 -         0.03         -          -          -         -  " << std::endl;
+    fOutTxtFile << "pp_norm       gmN 36617 -           -        0.000054     -          -         -  " << std::endl;
+    fOutTxtFile << "pf_norm       gmN 24408 -           -          -       0.0000053     -         -  " << std::endl;
+
+
+   
+
   }
   else std::cout << "Unable to open DataCard Output File" << std::endl;
 
+  fOutTxtFile.close();
 }
 
 Double_t ABCDMethod::ComputeIntAndErr(TH2D *& h, Double_t & error, const Double_t minX, const Double_t maxX, const Double_t minY, const Double_t maxY, const UInt_t isReg ){
