@@ -125,7 +125,6 @@ void ABCDMethod::DoAnalysis(){
   max_y[4]=met_maxD;   // cat4 = D 
   max_y[5]=met_minD;   // cat5 = C 
 
-  Bool_t isSignalRegion = false;
  
   for (UInt_t cat = 0; cat < fNCat; cat++){ // loop over each category
     Data_Int[cat].resize(1); 		// only one group for data since it is lumped together
@@ -135,58 +134,75 @@ void ABCDMethod::DoAnalysis(){
     Sig_Int[cat].resize(fNSig);		// do all Sig separately
     Sig_IntErr[cat].resize(fNSig);
 
-    if (cat == 4 || cat == 5 ) isSignalRegion = true;
-
-    std::cout << cat << std::endl;
-    Data_Int[cat][0] = ABCDMethod::ComputeIntAndErr( fOutBkgTH2DHists[0], Data_IntErr[cat][0],  min_x[cat], max_x[cat], min_y[cat], max_y[cat], isSignalRegion);       
-    /*for (UInt_t mc = 0; mc < fNBkg; mc++){ 
-      Bkg_Int[cat][mc] = ABCDMethod::ComputeIntAndErr( fInBkgTH2DHists[0][mc], Bkg_IntErr[cat][mc],  min_x[cat], max_x[cat], min_y[cat], max_y[cat], isSignalRegion);        
+    Data_Int[cat][0] = ABCDMethod::ComputeIntAndErr( fOutBkgTH2DHists[0], Data_IntErr[cat][0],  min_x[cat], max_x[cat], min_y[cat], max_y[cat], cat); 
+    for (UInt_t mc = 0; mc < fNBkg; mc++){ 
+      Bkg_Int[cat][mc] = ABCDMethod::ComputeIntAndErr( fInBkgTH2DHists[0][mc], Bkg_IntErr[cat][mc],  min_x[cat], max_x[cat], min_y[cat], max_y[cat], cat); 
     }
     // after finished with bkg samples separately, look at the combined sample
-    Bkg_Int[cat][fNBkg+1] = ABCDMethod::ComputeIntAndErr( fOutBkgTH2DHists[0], Bkg_IntErr[cat][fNBkg+1],  min_x[cat], max_x[cat], min_y[cat], max_y[cat], isSignalRegion);
+    Bkg_Int[cat][fNBkg+1] = ABCDMethod::ComputeIntAndErr( fOutBkgTH2DHists[0], Bkg_IntErr[cat][fNBkg+1],  min_x[cat], max_x[cat], min_y[cat], max_y[cat], cat);
     for (UInt_t mc = 0; mc < fNSig; mc++){ 
-      Sig_Int[cat][mc] = ABCDMethod::ComputeIntAndErr( fInSigTH2DHists[0][mc], Sig_IntErr[cat][mc],  min_x[cat], max_x[cat], min_y[cat], max_y[cat], isSignalRegion);        
-    }*/
+      Sig_Int[cat][mc] = ABCDMethod::ComputeIntAndErr( fInSigTH2DHists[0][mc], Sig_IntErr[cat][mc],  min_x[cat], max_x[cat], min_y[cat], max_y[cat], cat); 
+    } 
 
-    std::cout << Data_Int[cat][0] << " " << Data_IntErr[cat][0] << std::endl;
+    //std::cout << "Data " << Data_Int[cat][0] << " " << Data_IntErr[cat][0] << std::endl;
+    //for (UInt_t mc = 0; mc < fNBkg+1; mc++){ std::cout << "Bkg " << Bkg_Int[cat][mc] << " " << Bkg_IntErr[cat][mc] << std::endl; }
+    //for (UInt_t mc = 0; mc < fNSig; mc++){   std::cout << "Sig " << Sig_Int[cat][mc] << " " << Sig_IntErr[cat][mc] << std::endl; }
 
   }// end cat loop    
+
+    
+    ABCDMethod::FillTable( "Data",0, Data_Int[0][0], Data_IntErr[0][0]);
+
+}
+
+void ABCDMethod::FillTable( const TString fSampleName, const UInt_t reg, const UInt_t Integral, const UInt_t Error){
 
 
 }
 
-Double_t ABCDMethod::ComputeIntAndErr(TH2D *& h, Double_t & error, const Double_t minX, const Double_t maxX, const Double_t minY, const Double_t maxY, bool isSigReg ){
+
+
+Double_t ABCDMethod::ComputeIntAndErr(TH2D *& h, Double_t & error, const Double_t minX, const Double_t maxX, const Double_t minY, const Double_t maxY, const UInt_t isReg ){
 
   Double_t integral = 0.;
 
   if(h == (TH2D*) NULL) std::cout << "NULL TH2D" << std::endl;
 
-  std::cout << "minx = " << minX << " maxX = " << maxX << " minY = " << minY << " maxY = " << maxY << std::endl; 
+  //std::cout << "minx = " << minX << " maxX = " << maxX << " minY = " << minY << " maxY = " << maxY << std::endl; 
 
   Int_t binXmin;
   Int_t binXmax;
   Int_t binYmin;
   Int_t binYmax;    
-  if (isSigReg){ // if signal find the exact bins
-    binXmin = h->FindBin(minX);
-    binXmax = h->FindBin(maxX);
-    binYmin = h->FindBin(minY);
-    binYmax = h->FindBin(maxY);
+  if (isReg == 4 || isReg == 5){ // if signal find the exact bins
+    binXmin = h->GetXaxis()->FindBin(minX);
+    binXmax = h->GetXaxis()->FindBin(maxX);
+    binYmin = h->GetYaxis()->FindBin(minY);
+    if (isReg == 4) binYmax = h->GetYaxis()->FindBin(maxY);
+    if (isReg == 5) binYmax = h->GetYaxis()->FindBin(maxY)-1;
   }
-  else{ // if not signal find the bin next to the signal region bin
-    binXmin = h->FindBin(minX)-1;
-    binXmax = h->FindBin(maxX)+1;
-    binYmin = h->FindBin(minY)-1;
-    binYmax = h->FindBin(maxY)+1;
+  else if (isReg == 0 || isReg == 1){ // if to left of signal region 
+    binXmin = h->GetXaxis()->FindBin(minX);
+    binXmax = h->GetXaxis()->FindBin(maxX)-1;
+    binYmin = h->GetYaxis()->FindBin(minY);
+    if (isReg == 0) binYmax = h->GetYaxis()->FindBin(maxY);
+    if (isReg == 1) binYmax = h->GetYaxis()->FindBin(maxY)-1;
+  }
+  else if (isReg == 2 || isReg == 3){ // if to right of signal region 
+    binXmin = h->GetXaxis()->FindBin(minX)+1;
+    binXmax = h->GetXaxis()->FindBin(maxX);
+    binYmin = h->GetYaxis()->FindBin(minY);
+    if (isReg == 2) binYmax = h->GetYaxis()->FindBin(maxY);
+    if (isReg == 3) binYmax = h->GetYaxis()->FindBin(maxY)-1;
   }
  
-  std::cout << "binXmin " << binXmin << std::endl;
-  std::cout << "binXmax " << binXmax << std::endl;
-  std::cout << "binYmin " << binYmin << std::endl;
-  std::cout << "binYmax " << binYmax << std::endl;
+  //std::cout << "binXmin " << binXmin << std::endl;
+  //std::cout << "binXmax " << binXmax << std::endl;
+  //std::cout << "binYmin " << binYmin << std::endl;
+  //std::cout << "binYmax " << binYmax << std::endl;
 
   integral = h->IntegralAndError(binXmin,binXmax,binYmin,binYmax,error);
-  std::cout << "integral = " << integral << " error = " << error << std::endl;
+  //std::cout << "integral = " << integral << " error = " << error << std::endl;
   return integral;
 }
 

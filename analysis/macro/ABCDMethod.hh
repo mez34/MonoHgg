@@ -32,7 +32,8 @@ class ABCDMethod{
 public: 
   ABCDMethod(const SamplePairVec Samples, const Double_t inLumi, const TString outname);
   void DoAnalysis();
-  Double_t ComputeIntAndErr(TH2D *& h, Double_t & error, const Double_t minX, const Double_t maxX, const Double_t minY, const Double_t maxY, Bool_t isSigReg );
+  Double_t ComputeIntAndErr(TH2D *& h, Double_t & error, const Double_t minX, const Double_t maxX, const Double_t minY, const Double_t maxY, const UInt_t isReg);
+  void FillTable( const TString fSampleName, const UInt_t reg, const UInt_t Integral, const UInt_t Error);
   void InitHists();
   void InitVariables();
   ~ABCDMethod();
