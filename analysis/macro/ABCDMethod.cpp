@@ -156,7 +156,34 @@ void ABCDMethod::DoAnalysis(){
   }// end cat loop over A1,B1,A2,B2,C,D  
 
 
-  Int_t fNReg = 4; // for 4 regions A,B,C,D
+  ABCDMethod::GetFinalValuesForABCDReg(); // merge A1&A2->A and B1&B2->B
+
+  ABCDMethod::DoABCDCalculations(); // calculate corr & diff values
+
+  fExpData.resize(1);
+  fExpBkg.resize(fNBkg+1);
+  fExpSig.resize(fNSig);
+  fExpErrData.resize(1);
+  fExpErrBkg.resize(fNBkg+1);
+  fExpErrSig.resize(fNSig);
+
+  fExpData[0]=ABCDMethod::FindExpectedValuesInD(fData_Int[0][0],fData_Int[1][0],fData_Int[3][0],fData_IntErr[0][0],fData_IntErr[1][0],fData_IntErr[3][0],fExpErrData[0]);
+  std::cout << "Exp D = " << fExpData[0] << " Exp D err " << fExpErrData[0] << std::endl;
+
+
+
+  ABCDMethod::FillTable("Data", 0, fData_Int[0][0],fData_IntErr[0][0]);
+
+  for (UInt_t mc = 0; mc < fNSig; mc++){
+    ABCDMethod::WriteDataCard(fSigNames[mc].Data());
+  }
+}
+
+void ABCDMethod::GetFinalValuesForABCDReg(){
+ 
+  //combine A1&A2 to A region and B1&B2 to B region
+
+  UInt_t fNReg = 4; // for 4 regions A,B,D,C
   fData_Int.resize(fNReg);
   fData_IntErr.resize(fNReg);
   fBkg_Int.resize(fNReg);
@@ -183,7 +210,7 @@ void ABCDMethod::DoAnalysis(){
         fBkg_IntErr[cat][mc] = (std::sqrt(Bkg_IntErr[cat][mc]*Bkg_IntErr[cat][mc]+ Bkg_IntErr[cat+2][mc]*Bkg_IntErr[cat+2][mc])); 
       }
     }
-    else{ // C or D region, just take value from calculations above
+    else{ // D or C region, just take value from calculations above
       fData_Int[cat][0] = (Data_Int[cat+2][0]); //cat+2 is the corresponding C and D regions 
       fData_IntErr[cat][0] = (Data_IntErr[cat+2][0]); 
       for (UInt_t mc = 0; mc < fNSig; mc++){ 
@@ -197,28 +224,78 @@ void ABCDMethod::DoAnalysis(){
     }  
 
   }// end cat loop over A,B,C,D
+}
 
+void ABCDMethod::DoABCDCalculations(){
 
   // calculate correlation for each sample
   fCorrData.push_back(fOutDataTH2DHists[0]->GetCorrelationFactor(1,2)); 
   for (UInt_t mc = 0; mc < fNBkg; mc++){ 
     fCorrBkg.push_back(fInBkgTH2DHists[0][mc]->GetCorrelationFactor(1,2));
   }
-  fCorrBkg.push_back(fOutBkgTH2DHists[0]->GetCorrelationFactor(1,2)); //all bkg samples added together
+  fCorrBkg.push_back(fOutBkgTH2DHists[0]->GetCorrelationFactor(1,2)); // all bkg samples added together
   for (UInt_t mc = 0; mc < fNSig; mc++){ 
     fCorrSig.push_back(fInSigTH2DHists[0][mc]->GetCorrelationFactor(1,2));
   } 
 
-
-  ABCDMethod::FillTable("Data", 0, fData_Int[0][0],fData_IntErr[0][0]);
-
-  for (UInt_t mc = 0; mc < fNSig; mc++){
-    ABCDMethod::WriteDataCard(fSigNames[mc].Data());
+  //calculate Diff = TMath::Abs((NC*NA/NB-ND)/(NC*NA/NB));
+  fDiffData.push_back(TMath::Abs((fData_Int[3][0]*fData_Int[0][0]/fData_Int[1][0]-fData_Int[2][0])/(fData_Int[3][0]*fData_Int[0][0]/fData_Int[1][0] )));
+  for (UInt_t mc = 0; mc < fNBkg+1; mc++){
+    fDiffBkg.push_back(TMath::Abs((fBkg_Int[3][mc]*fBkg_Int[0][mc]/fBkg_Int[1][mc]-fBkg_Int[2][mc])/(fBkg_Int[3][mc]*fBkg_Int[0][mc]/fBkg_Int[1][mc] ))); 
   }
+  for (UInt_t mc = 0; mc < fNSig; mc++){ 
+    fDiffSig.push_back(TMath::Abs((fSig_Int[3][mc]*fSig_Int[0][mc]/fSig_Int[1][mc]-fSig_Int[2][mc])/(fSig_Int[3][mc]*fSig_Int[0][mc]/fSig_Int[1][mc] ))); 
+  }
+
+}
+
+Double_t ABCDMethod::FindExpectedValuesInD(const Double_t NA, const Double_t NB, const Double_t NC, const Double_t NAerr, const Double_t NBerr, const Double_t NCerr, const Double_t & NDerr){ // find expected values in the D (signal) region
+  Double_t ExpND = 0;
+  
+  return ExpND;
 }
 
 void ABCDMethod::FillTable( const TString fSampleName, const UInt_t reg, const UInt_t Integral, const UInt_t Error){
   if (fOutTableTxtFile.is_open()){
+
+     fOutTableTxtFile << "\\begin{table}[bthp]" <<std::endl;
+     fOutTableTxtFile << "\\begin{tabular}{cc}" <<std::endl;
+     fOutTableTxtFile << "\\hline \\hline" <<std::endl;
+     fOutTableTxtFile << Form("$\\sqrt{s}$ = 13 TeV; L = %f $fb^{-1}$",lumi) <<" \\\\" <<std::endl;
+     fOutTableTxtFile << "$m_{\\gamma \\gamma}$ in $[110-130]$ and MET $>$ 250 GeV"<<" \\\\" <<std::endl;
+     fOutTableTxtFile << "\\hline" <<std::endl;
+
+/*   fOutTableTxtFile << "prompt+prompt &  "<<*(pp.format(2,"EXPF"))<<" \\\\"<<std::endl;
+     fOutTableTxtFile << "prompt+fake &  "<<*(pf.format(2,"EXPF"))<<" \\\\"<<std::endl;
+     fOutTableTxtFile << "W/Z/tt $\\gamma \\gamma$ &  "<<*(Zgg.format(2,"EXPF"))<<" \\\\"<<std::endl;
+     fOutTableTxtFile << "$h \\rightarrow  \\gamma \\gamma$  (ggH, VBF)&  "<<*(hgg.format(2,"EXPF"))<<" \\\\"<<std::endl;
+     fOutTableTxtFile << "Vh,$h \\rightarrow  \\gamma \\gamma$ &  "<<*(Vh.format(2,"EXPF"))<<" \\\\"<<std::endl;
+     fOutTableTxtFile << "\\hline" <<std::endl;
+     fOutTableTxtFile << "Total Background &  "<<*(tot.format(2,"EXPF"))<<" \\\\"<<std::endl;
+     fOutTableTxtFile << "$\\bar{\\chi}\\chi HH, m_{\\chi}$ = 1 GeV (10 fb) &  "<<*(s1.format(2,"EXPF"))<<" \\\\"<<std::endl;
+     fOutTableTxtFile << "$\\bar{\\chi}\\chi HH, m_{\\chi}$ = 10 GeV (10 fb) &  "<<*(s10.format(2,"EXPF"))<<" \\\\"<<std::endl;
+     fOutTableTxtFile << "$\\bar{\\chi}\\chi HH, m_{\\chi}$ = 100 GeV (10 fb) &  "<<*(s100.format(2,"EXPF"))<<" \\\\"<<std::endl;
+     fOutTableTxtFile << "$\\bar{\\chi}\\chi HH, m_{\\chi}$ = 1000 GeV (10 fb) &  "<<*(s1000.format(2,"EXPF"))<<" \\\\"<<std::endl;
+*/
+     fOutTableTxtFile << "\\hline \\hline" <<std::endl;
+     fOutTableTxtFile << "\\end{tabular}" <<std::endl;
+     fOutTableTxtFile << "\\end{table}" <<std::endl;
+
+/*  double ppExpND = ppNC*ppNA/ppNB;
+    double ppExpNDerr = sqrt((ppNCerr*ppNCerr*ppNA*ppNA/(ppNB*ppNB))+(ppNAerr*ppNAerr*ppNC*ppNC/(ppNB*ppNB))+(ppNBerr*ppNBerr*ppNC*ppNC*ppNA*ppNA/(pow(ppNB,4))));
+    double ppDiff = TMath::Abs((ppNC*ppNA/ppNB-ppND)/(ppNC*ppNA/ppNB));
+    RooRealVar ppA("ppA","ppA",ppNA,""); 	//ppNA is integral pp in A region
+    ppA.setError(ppNAerr);			//ppNAerr is error pp in A region
+    RooRealVar ppB("ppB","ppB",ppNB,"");
+    ppB.setError(ppNBerr);
+    RooRealVar ppC("ppC","ppC",ppNC,"");
+    ppC.setError(ppNCerr);
+    RooRealVar ppD("ppD","ppD",ppND,"");
+    ppD.setError(ppNDerr);
+    RooRealVar ppDexp("ppDexp","ppDexp",ppExpND,"");
+    ppDexp.setError(ppExpNDerr);
+    std::cout<<"prompt+prompt & "<<ppcorr<<" & "<<*ppA.format(2,"EXPP")<<"&"<<*ppB.format(2,"EXPP")<<"&"<<*ppC.format(2,"EXPP")<<"&"<<*ppD.format(2,"EXPP")<<"&"<<*ppDexp.format(2,"EXPP")<<"&"<<ppDiff<<"\\\\"<<std::endl;
+*/
 
   }
   else std::cout << "Unable to open ResultsTable Output File" <<std::endl;

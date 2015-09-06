@@ -34,6 +34,9 @@ public:
   ABCDMethod(const SamplePairVec Samples, const Double_t inLumi, const TString outname);
   void DoAnalysis();
   Double_t ComputeIntAndErr(TH2D *& h, Double_t & error, const Double_t minX, const Double_t maxX, const Double_t minY, const Double_t maxY, const UInt_t isReg);
+  void GetFinalValuesForABCDReg();
+  void DoABCDCalculations();
+  Double_t FindExpectedValuesInD(const Double_t NA, const Double_t NB, const Double_t NC, const Double_t NAerr, const Double_t NBerr, const Double_t NCerr, const Double_t & NDerr);
   void FillTable(const TString fSampleName, const UInt_t reg, const UInt_t Integral, const UInt_t Error);
   void WriteDataCard(const TString fSampleName);
   void InitHists();
@@ -67,6 +70,16 @@ private:
   DblVec	fCorrBkg;
   DblVec	fCorrSig;
 
+  DblVec	fExpData;
+  DblVec	fExpBkg;
+  DblVec	fExpSig;
+  DblVec	fExpErrData;
+  DblVec	fExpErrBkg;
+  DblVec	fExpErrSig;
+
+  DblVec	fDiffData;
+  DblVec	fDiffBkg;
+  DblVec	fDiffSig;
 
   Double_t	lumi;
   TString	fInDir;
