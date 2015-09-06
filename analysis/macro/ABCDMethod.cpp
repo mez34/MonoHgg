@@ -3,7 +3,6 @@
 ABCDMethod::ABCDMethod( SamplePairVec Samples, const Double_t inLumi, const TString outdir){
 
   lumi = inLumi;
-  std::cout << lumi << std::endl;
   fInDir = outdir;
   fOutDir = outdir+"ABCD";
 
@@ -16,8 +15,8 @@ ABCDMethod::ABCDMethod( SamplePairVec Samples, const Double_t inLumi, const TStr
   met_maxD   = 400.;
 
   // make output txt file with output table
-  fOutTxtFile.open(Form("%s/ResultsTableForLatex.txt",fOutDir.Data())); 
-
+  fOutTxtFile.open(Form("%s/DataCard.txt",fOutDir.Data())); 
+  fOutTableTxtFile.open(Form("%s/ResultsTableForLatex.txt",fOutDir.Data()));
 
   // make output root file
   MakeOutDirectory(Form("%s",fOutDir.Data()));
@@ -62,7 +61,7 @@ ABCDMethod::~ABCDMethod(){
  
   delete fOutFile;
   fOutTxtFile.close();
-
+  fOutTableTxtFile.close();
 }
 
 
@@ -157,20 +156,27 @@ void ABCDMethod::DoAnalysis(){
 
   }// end cat loop    
 
-    
     ABCDMethod::FillTable("Data", 0, Data_Int[0][0], Data_IntErr[0][0]);
+    ABCDMethod::WriteDataCard("Data", 0, Data_Int[0][0], Data_IntErr[0][0]);
+
+}
+void ABCDMethod::FillTable( const TString fSampleName, const UInt_t reg, const UInt_t Integral, const UInt_t Error){
+  if (fOutTableTxtFile.is_open()){
+
+  }
+  else std::cout << "Unable to open ResultsTable Output File" <<std::endl;
 
 }
 
-void ABCDMethod::FillTable( const TString fSampleName, const UInt_t reg, const UInt_t Integral, const UInt_t Error){
+void ABCDMethod::WriteDataCard( const TString fSampleName, const UInt_t reg, const UInt_t Integral, const UInt_t Error){
 
-  std::cout << "Writing data card in: " << fOutDir.Data() << "/ResultsTableForLatex.txt" << std::endl;
+  std::cout << "Writing data card in: " << fOutDir.Data() << "/DataCard.txt" << std::endl;
   // print out the Data Card file
   if (fOutTxtFile.is_open()){
     fOutTxtFile << Form("#MonoHgg DataCard for C&C Limit Setting, %f pb-1 ",lumi) << std::endl;
     fOutTxtFile << "#Run with:combine -M Asymptotic cardname.txt --run blind " << std::endl;
   }
-  else std::cout << "Unable to open OutputFile" << std::endl;
+  else std::cout << "Unable to open DataCard Output File" << std::endl;
 
 }
 

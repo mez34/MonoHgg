@@ -35,6 +35,7 @@ public:
   void DoAnalysis();
   Double_t ComputeIntAndErr(TH2D *& h, Double_t & error, const Double_t minX, const Double_t maxX, const Double_t minY, const Double_t maxY, const UInt_t isReg);
   void FillTable( const TString fSampleName, const UInt_t reg, const UInt_t Integral, const UInt_t Error);
+  void WriteDataCard( const TString fSampleName, const UInt_t reg, const UInt_t Integral, const UInt_t Error);
   void InitHists();
   void InitVariables();
   ~ABCDMethod();
@@ -60,6 +61,7 @@ private:
   TString	fOutDir;
   TFile *	fOutFile;
   std::ofstream	fOutTxtFile;
+  std::ofstream	fOutTableTxtFile;
 
   Int_t		fNBkg;
   Int_t 	fNSig;
