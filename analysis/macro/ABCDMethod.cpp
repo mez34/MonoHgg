@@ -144,7 +144,7 @@ void ABCDMethod::DoAnalysis(){
       Bkg_Int[cat][mc] = ABCDMethod::ComputeIntAndErr( fInBkgTH2DHists[0][mc], Bkg_IntErr[cat][mc],  min_x[cat], max_x[cat], min_y[cat], max_y[cat], cat); 
     }
     // after finished with bkg samples separately, look at the combined sample
-    Bkg_Int[cat][fNBkg+1] = ABCDMethod::ComputeIntAndErr( fOutBkgTH2DHists[0], Bkg_IntErr[cat][fNBkg+1],  min_x[cat], max_x[cat], min_y[cat], max_y[cat], cat);
+    Bkg_Int[cat][fNBkg] = ABCDMethod::ComputeIntAndErr( fOutBkgTH2DHists[0], Bkg_IntErr[cat][fNBkg],  min_x[cat], max_x[cat], min_y[cat], max_y[cat], cat);
     for (UInt_t mc = 0; mc < fNSig; mc++){ 
       Sig_Int[cat][mc] = ABCDMethod::ComputeIntAndErr( fInSigTH2DHists[0][mc], Sig_IntErr[cat][mc],  min_x[cat], max_x[cat], min_y[cat], max_y[cat], cat); 
     } 
@@ -249,6 +249,7 @@ void ABCDMethod::DoABCDCalculations(){
   fDiffData.push_back(TMath::Abs((fData_Int[3][0]*fData_Int[0][0]/fData_Int[1][0]-fData_Int[2][0])/(fData_Int[3][0]*fData_Int[0][0]/fData_Int[1][0] )));
   for (UInt_t mc = 0; mc < fNBkg+1; mc++){
     fDiffBkg.push_back(TMath::Abs((fBkg_Int[3][mc]*fBkg_Int[0][mc]/fBkg_Int[1][mc]-fBkg_Int[2][mc])/(fBkg_Int[3][mc]*fBkg_Int[0][mc]/fBkg_Int[1][mc] ))); 
+    std::cout << "Bkg Diff = " << fDiffBkg[mc] << std::endl;
   }
   for (UInt_t mc = 0; mc < fNSig; mc++){ 
     fDiffSig.push_back(TMath::Abs((fSig_Int[3][mc]*fSig_Int[0][mc]/fSig_Int[1][mc]-fSig_Int[2][mc])/(fSig_Int[3][mc]*fSig_Int[0][mc]/fSig_Int[1][mc] ))); 
