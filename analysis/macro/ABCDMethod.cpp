@@ -168,8 +168,15 @@ void ABCDMethod::DoAnalysis(){
   fExpErrSig.resize(fNSig);
 
   fExpData[0]=ABCDMethod::FindExpectedValuesInD(fData_Int[0][0],fData_Int[1][0],fData_Int[3][0],fData_IntErr[0][0],fData_IntErr[1][0],fData_IntErr[3][0],fExpErrData[0]);
-  std::cout << "Exp D = " << fExpData[0] << " Exp D err " << fExpErrData[0] << std::endl;
-
+  //std::cout << "Data: Exp D = " << fExpData[0] << " Exp D err " << fExpErrData[0] << std::endl;
+  for (UInt_t mc = 0; mc < fNBkg+1; mc++){
+    fExpBkg[mc]=ABCDMethod::FindExpectedValuesInD(fBkg_Int[0][mc],fBkg_Int[1][mc],fBkg_Int[3][mc],fBkg_IntErr[0][mc],fBkg_IntErr[1][mc],fBkg_IntErr[3][mc],fExpErrBkg[mc]);
+    std::cout << "Bkg: Exp D = " << fExpBkg[mc] << " Exp D err " << fExpErrBkg[mc] << std::endl;
+  }
+  for (UInt_t mc = 0; mc < fNSig; mc++){
+    fExpSig[mc]=ABCDMethod::FindExpectedValuesInD(fSig_Int[0][mc],fSig_Int[1][mc],fSig_Int[3][mc],fSig_IntErr[0][mc],fSig_IntErr[1][mc],fSig_IntErr[3][mc],fExpErrSig[mc]);
+    //std::cout << "Sig: Exp D = " << fExpSig[mc] << " Exp D err " << fExpErrSig[mc] << std::endl;
+  }
 
 
   ABCDMethod::FillTable("Data", 0, fData_Int[0][0],fData_IntErr[0][0]);
@@ -249,9 +256,9 @@ void ABCDMethod::DoABCDCalculations(){
 
 }
 
-Double_t ABCDMethod::FindExpectedValuesInD(const Double_t NA, const Double_t NB, const Double_t NC, const Double_t NAerr, const Double_t NBerr, const Double_t NCerr, const Double_t & NDerr){ // find expected values in the D (signal) region
-  Double_t ExpND = 0;
-  
+Double_t ABCDMethod::FindExpectedValuesInD(const Double_t NA, const Double_t NB, const Double_t NC, const Double_t NAerr, const Double_t NBerr, const Double_t NCerr, Double_t & NDerr){ // find expected values in the D (signal) region
+  Double_t ExpND = NC*NA/NB;                                                                                                                                
+  NDerr = std::sqrt((NCerr*NCerr*NA*NA/(NB*NB))+(NAerr*NAerr*NC*NC/(NB*NB))+(NBerr*NBerr*NC*NC*NA*NA/(std::pow(NB,4))));
   return ExpND;
 }
 

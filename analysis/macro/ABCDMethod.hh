@@ -36,7 +36,7 @@ public:
   Double_t ComputeIntAndErr(TH2D *& h, Double_t & error, const Double_t minX, const Double_t maxX, const Double_t minY, const Double_t maxY, const UInt_t isReg);
   void GetFinalValuesForABCDReg();
   void DoABCDCalculations();
-  Double_t FindExpectedValuesInD(const Double_t NA, const Double_t NB, const Double_t NC, const Double_t NAerr, const Double_t NBerr, const Double_t NCerr, const Double_t & NDerr);
+  Double_t FindExpectedValuesInD(const Double_t NA, const Double_t NB, const Double_t NC, const Double_t NAerr, const Double_t NBerr, const Double_t NCerr, Double_t & NDerr);
   void FillTable(const TString fSampleName, const UInt_t reg, const UInt_t Integral, const UInt_t Error);
   void WriteDataCard(const TString fSampleName);
   void InitHists();
