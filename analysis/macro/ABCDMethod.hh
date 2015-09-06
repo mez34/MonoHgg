@@ -19,6 +19,7 @@
 #include "TLatex.h"
 
 #include <iostream>
+#include <fstream>
 #include <cmath>
 
 typedef std::vector<DblVec>   DblVecVec;
@@ -58,6 +59,7 @@ private:
   TString	fInDir;
   TString	fOutDir;
   TFile *	fOutFile;
+  std::ofstream	fOutTxtFile;
 
   Int_t		fNBkg;
   Int_t 	fNSig;

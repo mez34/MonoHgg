@@ -3,6 +3,7 @@
 ABCDMethod::ABCDMethod( SamplePairVec Samples, const Double_t inLumi, const TString outdir){
 
   lumi = inLumi;
+  std::cout << lumi << std::endl;
   fInDir = outdir;
   fOutDir = outdir+"ABCD";
 
@@ -13,6 +14,10 @@ ABCDMethod::ABCDMethod( SamplePairVec Samples, const Double_t inLumi, const TStr
   met_minB   = 150.;
   met_minD   = 250.;
   met_maxD   = 400.;
+
+  // make output txt file with output table
+  fOutTxtFile.open(Form("%s/ResultsTableForLatex.txt",fOutDir.Data())); 
+
 
   // make output root file
   MakeOutDirectory(Form("%s",fOutDir.Data()));
@@ -56,6 +61,8 @@ ABCDMethod::~ABCDMethod(){
   }
  
   delete fOutFile;
+  fOutTxtFile.close();
+
 }
 
 
@@ -151,16 +158,21 @@ void ABCDMethod::DoAnalysis(){
   }// end cat loop    
 
     
-    ABCDMethod::FillTable( "Data",0, Data_Int[0][0], Data_IntErr[0][0]);
+    ABCDMethod::FillTable("Data", 0, Data_Int[0][0], Data_IntErr[0][0]);
 
 }
 
 void ABCDMethod::FillTable( const TString fSampleName, const UInt_t reg, const UInt_t Integral, const UInt_t Error){
 
+  std::cout << "Writing data card in: " << fOutDir.Data() << "/ResultsTableForLatex.txt" << std::endl;
+  // print out the Data Card file
+  if (fOutTxtFile.is_open()){
+    fOutTxtFile << Form("#MonoHgg DataCard for C&C Limit Setting, %f pb-1 ",lumi) << std::endl;
+    fOutTxtFile << "#Run with:combine -M Asymptotic cardname.txt --run blind " << std::endl;
+  }
+  else std::cout << "Unable to open OutputFile" << std::endl;
 
 }
-
-
 
 Double_t ABCDMethod::ComputeIntAndErr(TH2D *& h, Double_t & error, const Double_t minX, const Double_t maxX, const Double_t minY, const Double_t maxY, const UInt_t isReg ){
 
