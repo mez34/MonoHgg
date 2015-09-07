@@ -16,6 +16,10 @@ addWeights("data/50ns/DMHtoGG_M100.root", $lumi);
 addWeights("data/50ns/DMHtoGG_M10.root", $lumi);
 addWeights("data/50ns/DMHtoGG_M1.root", $lumi);
 addWeights("data/50ns/GluGluHToGG.root", $lumi);
+addWeights("data/50ns/ZH.root", $lumi);
+addWeights("data/50ns/WplusH.root", $lumi);
+addWeights("data/50ns/WminusH.root", $lumi);
+addWeights("data/50ns/DoubleEG.root", $lumi);
 
 .q
 

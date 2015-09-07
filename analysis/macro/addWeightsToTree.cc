@@ -122,7 +122,14 @@ void addWeights(const char* filename, float lumiForW, float massTrue=1) {
   Int_t		  passSieie2;
   Int_t		  passHoe1;
   Int_t		  passHoe2;
-
+  Int_t		  hltPhoton26Photon16Mass60;
+  Int_t		  hltPhoton36Photon22Mass15;
+  Int_t		  hltPhoton42Photon25Mass15;
+  Int_t		  hltDiphoton30Mass95; 
+  Int_t		  hltDiphoton30Mass70; 
+  Int_t		  hltDiphoton30Mass55; 
+  Int_t		  hltDiphoton30Mass55PV;
+  Int_t		  hltDiphoton30Mass55EB;
 
   
   // List of branches - original tree
@@ -199,6 +206,15 @@ void addWeights(const char* filename, float lumiForW, float massTrue=1) {
   TBranch	 *b_passSieie2;
   TBranch	 *b_passHoe1;
   TBranch	 *b_passHoe2;
+  TBranch	 *b_hltPhoton26Photon16Mass60;
+  TBranch	 *b_hltPhoton36Photon22Mass15;
+  TBranch	 *b_hltPhoton42Photon25Mass15;
+  TBranch	 *b_hltDiphoton30Mass95; 
+  TBranch	 *b_hltDiphoton30Mass70; 
+  TBranch	 *b_hltDiphoton30Mass55; 
+  TBranch	 *b_hltDiphoton30Mass55PV;
+  TBranch	 *b_hltDiphoton30Mass55EB;
+
 
   // Set branch addresses and branch pointers 
   treeOrig->SetBranchAddress("run", &run, &b_run);
@@ -274,6 +290,14 @@ void addWeights(const char* filename, float lumiForW, float massTrue=1) {
   treeOrig->SetBranchAddress("passSieie2", &passSieie2, &b_passSieie2);
   treeOrig->SetBranchAddress("passHoe1", &passHoe1, &b_passHoe1);
   treeOrig->SetBranchAddress("passHoe2", &passHoe2, &b_passHoe2);
+  treeOrig->SetBranchAddress("hltPhoton26Photon16Mass60", &hltPhoton26Photon16Mass60, &b_hltPhoton26Photon16Mass60);
+  treeOrig->SetBranchAddress("hltPhoton36Photon22Mass15", &hltPhoton36Photon22Mass15, &b_hltPhoton36Photon22Mass15);
+  treeOrig->SetBranchAddress("hltPhoton42Photon25Mass15", &hltPhoton42Photon25Mass15, &b_hltPhoton42Photon25Mass15);
+  treeOrig->SetBranchAddress("hltDiphoton30Mass95", &hltDiphoton30Mass95, &b_hltDiphoton30Mass95); 
+  treeOrig->SetBranchAddress("hltDiphoton30Mass70", &hltDiphoton30Mass70, &b_hltDiphoton30Mass70); 
+  treeOrig->SetBranchAddress("hltDiphoton30Mass55", &hltDiphoton30Mass55, &b_hltDiphoton30Mass55); 
+  treeOrig->SetBranchAddress("hltDiphoton30Mass55PV", &hltDiphoton30Mass55PV, &b_hltDiphoton30Mass55PV);
+  treeOrig->SetBranchAddress("hltDiphoton30Mass55EB", &hltDiphoton30Mass55EB, &b_hltDiphoton30Mass55EB);
 
 
   // new variables to be added
@@ -367,6 +391,14 @@ void addWeights(const char* filename, float lumiForW, float massTrue=1) {
     theTreeNew->Branch("passSieie2", &passSieie2, "passSieie2/I");
     theTreeNew->Branch("passHoe1", &passHoe1, "passHoe1/I");
     theTreeNew->Branch("passHoe2", &passHoe2, "passHoe2/I");
+    theTreeNew->Branch("hltPhoton26Photon16Mass60", &hltPhoton26Photon16Mass60, "hltPhoton26Photon16Mass60/I");
+    theTreeNew->Branch("hltPhoton36Photon22Mass15", &hltPhoton36Photon22Mass15, "hltPhoton36Photon22Mass15/I");
+    theTreeNew->Branch("hltPhoton42Photon25Mass15", &hltPhoton42Photon25Mass15, "hltPhoton42Photon25Mass15/I");
+    theTreeNew->Branch("hltDiphoton30Mass95", &hltDiphoton30Mass95, "hltDiphoton30Mass95/I");
+    theTreeNew->Branch("hltDiphoton30Mass70", &hltDiphoton30Mass70, "hltDiphoton30Mass70/I");
+    theTreeNew->Branch("hltDiphoton30Mass55", &hltDiphoton30Mass55, "hltDiphoton30Mass55/I");
+    theTreeNew->Branch("hltDiphoton30Mass55PV", &hltDiphoton30Mass55PV, "hltDiphoton30Mass55PV/I");
+    theTreeNew->Branch("hltDiphoton30Mass55EB", &hltDiphoton30Mass55EB, "hltDiphoton30Mass55EB/I");
  
   }
   
@@ -378,12 +410,12 @@ void addWeights(const char* filename, float lumiForW, float massTrue=1) {
     if (i==0) xsecToWeight = totXsec;
    
     // new variables
-    if (sampleID!=0) {
+    if (sampleID>0 && sampleID<10000) { //MC
       xsecWeight = perEveW * lumiForW * totXsec / sampleSumWeight;             
       weight     = xsecWeight * pu_weight;
       mggNominal = massTrue;
       mggGen     = genmgg;
-    } else {   
+    } else { //Data   
       xsecWeight = 1.;
       weight     = 1.;
       mggNominal = 1.;
