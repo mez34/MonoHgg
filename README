@@ -51,7 +51,12 @@ From MicroAOD to diPhotonAnaTrees
    in CMSSW_7_4_6_patch2
    7.1 make (to compile) 
    7.2 ./main (to run)
-     main.cpp calls Plotter.cpp (histos for each sample individually) and Combiner.cpp (overlay and stack samples)
+     In main.cpp if
+     (makePURWfiles)	calls ReweightPU.cpp	(makes PURW files for samples)
+     (doReweightPU)  	opens PURW files  	(doPURW instead of weighting=1)
+     (doPlots) 		calls Plotter.cpp 	(histos for each sample individually)
+     (doComb)  		calls Combiner.cpp 	(overlay and stack samples)
+     (doABCD)		calls ABCDMethod.cpp	(do ABCD/C&C analysis) 
      style set with Style.cpp
 
    in CMSSW_7_4_0_pre9
