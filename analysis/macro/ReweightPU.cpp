@@ -5,7 +5,7 @@ ReweightPU::ReweightPU(const TString MC, const TString Data, const Double_t lumi
   // save samples for PU weighting
   fMCName = MC;
   fDataName = Data;
-  
+ 
   fInDir = indir;
  
   std::cout << "Comparing " << fMCName.Data() << " vs. " << fDataName.Data() <<std::endl;
@@ -110,7 +110,7 @@ DblVec ReweightPU::GetPUWeights() {
   // use these for scaling and rescaling
   const Double_t int_DataNvtx = fOutDataNvtx->Integral();
   const Double_t int_MCNvtx   = fOutMCNvtx->Integral();
-  std::cout << "DataNvtx = " << int_DataNvtx << " MCNvtx = " << int_MCNvtx << std::endl;
+  //std::cout << "DataNvtx = " << int_DataNvtx << " MCNvtx = " << int_MCNvtx << std::endl;
 
   TCanvas * c0 = new TCanvas(); // Draw before reweighting --> unscaled
   c0->cd();
@@ -119,6 +119,8 @@ DblVec ReweightPU::GetPUWeights() {
   // draw and save in output directory --> appended by what selection we used for this pu reweight
   fOutDataNvtx->Draw("PE");
   fOutMCNvtx->Draw("HIST SAME");
+
+  CMSLumi(c0,0,fLumi);
 
   c0->SetLogy(1); // save log
   c0->SaveAs(Form("%snvtx_%s_beforePURW_unnorm_log.%s",fOutDir.Data(),fMCName.Data(),fOutType.Data()));
@@ -142,16 +144,15 @@ DblVec ReweightPU::GetPUWeights() {
   fOutDataNvtx->Draw("PE");
   fOutMCNvtx->Draw("HIST SAME");
 
+  CMSLumi(c1,0,fLumi);
+
   c1->SetLogy(1); // save log
   c1->SaveAs(Form("%snvtx_%s_beforePURW_norm_log.%s",fOutDir.Data(),fMCName.Data(),fOutType.Data()));
 
   c1->SetLogy(0); // save lin
   c1->SaveAs(Form("%snvtx_%s_beforePURW_norm.%s",fOutDir.Data(),fMCName.Data(),fOutType.Data()));
 
-  // Draw after reweighting 
-  TCanvas * c2 = new TCanvas();
-  c2->cd();
-  c2->SetTitle("After PU Reweighting Normalized");
+
 
   /////////////////////////////////////////////
   //      DIVIDE HERE TO GET REWEIGHTING     //
@@ -182,9 +183,25 @@ DblVec ReweightPU::GetPUWeights() {
   fOutFile->cd();
   fOutDataOverMCNvtx->Write();
 
+  TCanvas * c = new TCanvas();
+  fOutDataOverMCNvtx->Draw("PE");
+  CMSLumi(c,0,fLumi);
+  c->SetLogy(1);
+  c->SaveAs(Form("%spurw_%s_log.%s",fOutDir.Data(),fMCName.Data(),fOutType.Data()));
+  c->SetLogy(0);
+  c->SaveAs(Form("%spurw_%s.%s",fOutDir.Data(),fMCName.Data(),fOutType.Data()));
+
+
+  // Draw after reweighting 
+  TCanvas * c2 = new TCanvas();
+  c2->cd();
+  c2->SetTitle("After PU Reweighting Normalized");
+
   // draw output and save it, see comment above about selection
   fOutDataNvtx->Draw("PE");
   fOutMCNvtx->Draw("HIST SAME");
+
+  CMSLumi(c2,0,fLumi);
 
   c2->SetLogy(1); // save log
   c2->SaveAs(Form("%snvtx_%s_afterPURW_norm_log.%s",fOutDir.Data(),fMCName.Data(),fOutType.Data()));
@@ -202,6 +219,8 @@ DblVec ReweightPU::GetPUWeights() {
   
   fOutDataNvtx->Draw("PE");
   fOutMCNvtx->Draw("HIST SAME");
+
+  CMSLumi(c3,0,fLumi);
 
   c3->SetLogy(1); // save log
   c3->SaveAs(Form("%snvtx_%s_afterPURW_unnorm_log.%s",fOutDir.Data(),fMCName.Data(),fOutType.Data()));

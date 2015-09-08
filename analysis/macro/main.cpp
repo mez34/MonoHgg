@@ -34,13 +34,13 @@ int main(){
   TString inDir = "./data/50ns/";
   TString outDir = "./diPhoPlots/50ns/";
 
-  bool doFakeData = true;	// use FakeData to test combiner
+  bool doFakeData = false;	// use FakeData to test combiner
   bool doTest = false;		// run plotter on test sample
   bool makePURWfiles = false;	// recompute PURW and make files
-  bool doReweightPU = false;	// use PURW from old files if !makePURWfiles
-  bool doPlots = false;		// make plots for each sample individually
+  bool doReweightPU = true;	// use PURW from old files if !makePURWfiles
+  bool doPlots = true;		// make plots for each sample individually
   bool doComb = false;		// make stack/overlay plots
-  bool doABCD = true;		// run ABCD method 
+  bool doABCD = false;		// run ABCD method 
 
   Double_t lumi = 40.;  
   UInt_t nBins_vtx = 60; 
@@ -67,53 +67,26 @@ int main(){
   DblVec 	puweights_QCD;
   DblVec 	puweights_GJets;
   DblVec	puweights_GGHGG;
+  DblVec	puweights_WZH;
   DblVec	puweights_sig1;
   DblVec	puweights_sig10;
   DblVec	puweights_sig100;
   DblVec	puweights_sig1000;	
 
   // no puweight for data 
- /* for (UInt_t i=1; i<=nBins_vtx; i++){
-    puweights_Data.push_back(1.0);
-    puweights_GJets.push_back(1.0);
-    puweights_GGHGG.push_back(1.0);
-    puweights_sig1000.push_back(1.0);
-    puweights_sig100.push_back(1.0);
-    puweights_sig10.push_back(1.0);
-    puweights_sig1.push_back(1.0);
-  }*/
+  for (UInt_t i=1; i<=nBins_vtx; i++){ puweights_Data.push_back(1.0); }
 
   if (doReweightPU){
     if (makePURWfiles){ 
       std::cout << "Doing PU Reweighting QCD" << std::endl;
-      ReweightPU * reweightQCD = new ReweightPU("QCD","FakeData",lumi, nBins_vtx, inDir, outDir+"purw/");
+      ReweightPU * reweightQCD = new ReweightPU("QCD","DoubleEG",lumi, nBins_vtx, inDir, outDir+"purw/");
       puweights_QCD = reweightQCD->GetPUWeights();
       delete reweightQCD;
-      std::cout << "Doing PU Reweighting GJets" << std::endl;
-      ReweightPU * reweightGJets = new ReweightPU("GJets","FakeData",lumi, nBins_vtx, inDir, outDir+"purw/");
-      puweights_GJets = reweightGJets->GetPUWeights();
-      delete reweightGJets;
-      std::cout << "Doing PU Reweighting GGHGG" << std::endl;
-      ReweightPU * reweightGGHGG = new ReweightPU("GluGluHToGG","FakeData",lumi, nBins_vtx, inDir, outDir+"purw/");
-      puweights_GGHGG = reweightGGHGG->GetPUWeights();
-      delete reweightGGHGG;
 
       std::cout << "Doing PU Reweighting DMHtoGG_M1000" << std::endl;
-      ReweightPU * reweightDMH1000 = new ReweightPU("DMHtoGG_M1000","FakeData",lumi, nBins_vtx, inDir, outDir+"purw/");
+      ReweightPU * reweightDMH1000 = new ReweightPU("DMHtoGG_M1000","DoubleEG",lumi, nBins_vtx, inDir, outDir+"purw/");
       puweights_sig1000 = reweightDMH1000->GetPUWeights();
       delete reweightDMH1000;
-      std::cout << "Doing PU Reweighting DMHtoGG_M100" << std::endl;
-      ReweightPU * reweightDMH100 = new ReweightPU("DMHtoGG_M100","FakeData",lumi, nBins_vtx, inDir, outDir+"purw/");
-      puweights_sig100 = reweightDMH100->GetPUWeights();
-      delete reweightDMH100;
-      std::cout << "Doing PU Reweighting DMHtoGG_M10" << std::endl;
-      ReweightPU * reweightDMH10 = new ReweightPU("DMHtoGG_M10","FakeData",lumi, nBins_vtx, inDir, outDir+"purw/");
-      puweights_sig10 = reweightDMH10->GetPUWeights();
-      delete reweightDMH10;
-      std::cout << "Doing PU Reweighting DMHtoGG_M1" << std::endl;
-      ReweightPU * reweightDMH1 = new ReweightPU("DMHtoGG_M1","FakeData",lumi, nBins_vtx, inDir, outDir+"purw/");
-      puweights_sig1 = reweightDMH1->GetPUWeights();
-      delete reweightDMH1;
     }
 
     else{ //load PURW from already made files
@@ -132,6 +105,8 @@ int main(){
         puweights_QCD.push_back(fBkgRatio->GetBinContent(i));
         puweights_GJets.push_back(fBkgRatio->GetBinContent(i));
         puweights_GGHGG.push_back(fBkgRatio->GetBinContent(i));
+	puweights_WZH.push_back(fBkgRatio->GetBinContent(i));
+
         puweights_sig1000.push_back(fSigRatio->GetBinContent(i));
         puweights_sig100.push_back(fSigRatio->GetBinContent(i));
         puweights_sig10.push_back(fSigRatio->GetBinContent(i));
@@ -146,6 +121,7 @@ int main(){
       puweights_QCD.push_back(1.0);
       puweights_GJets.push_back(1.0);
       puweights_GGHGG.push_back(1.0);
+      puweights_WZH.push_back(1.0);
       puweights_sig1000.push_back(1.0);
       puweights_sig100.push_back(1.0);
       puweights_sig10.push_back(1.0);
@@ -193,6 +169,12 @@ int main(){
     std::cout << "Finished FakeData sample" << std::endl;
   }
   if (doPlots){
+    std::cout << "Working on DoubleEG sample" << std::endl;
+    Plotter * dEG = new Plotter(inDir,outDir,"DoubleEG",puweights_Data,lumi);
+    dEG->DoPlots();
+    delete dEG;
+    std::cout << "Finished DoubleEG sample" << std::endl;
+
     std::cout << "Working on GJets sample" << std::endl;
     Plotter * GJets = new Plotter(inDir,outDir,"GJets",puweights_GJets,lumi);
     GJets->DoPlots();
@@ -204,6 +186,12 @@ int main(){
     QCD->DoPlots();
     delete QCD;
     std::cout << "Finished QCD sample" << std::endl;
+
+    std::cout << "Working on WZH sample" << std::endl;
+    Plotter * WZH = new Plotter(inDir,outDir,"WZH",puweights_WZH,lumi);
+    WZH->DoPlots();
+    delete WZH;
+    std::cout << "Finished WZH sample" << std::endl;
 
     std::cout << "Working on GluGluH sample" << std::endl;
     Plotter * GGHGG = new Plotter(inDir,outDir,"GluGluHToGG",puweights_GGHGG,lumi);
