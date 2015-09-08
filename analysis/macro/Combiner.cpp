@@ -31,13 +31,16 @@ Combiner::Combiner( SamplePairVec Samples, const Double_t inLumi, const ColorMap
   // define colorMap and title
   fColorMap = colorMap;
   
+  fSampleTitleMap["DoubleEG"]		= "Data";
   fSampleTitleMap["QCD"] 		= "QCD";
   fSampleTitleMap["GJets"]		= "G + Jets";
+  fSampleTitleMap["WZH"]		= "WZH";
   fSampleTitleMap["GluGluHToGG"]	= "GluGlu #rightarrow H #rightarrow GG";
-  fSampleTitleMap["DMHtoGG_M1000"]	= "DM + H #rightarrow GG, M1000GeV";
-  fSampleTitleMap["DMHtoGG_M100"]	= "DM + H #rightarrow GG, M100GeV";
-  fSampleTitleMap["DMHtoGG_M10"]	= "DM + H #rightarrow GG, M10GeV";
   fSampleTitleMap["DMHtoGG_M1"]		= "DM + H #rightarrow GG, M1GeV";
+  fSampleTitleMap["DMHtoGG_M10"]	= "DM + H #rightarrow GG, M10GeV";
+  fSampleTitleMap["DMHtoGG_M100"]	= "DM + H #rightarrow GG, M100GeV";
+  fSampleTitleMap["DMHtoGG_M1000"]	= "DM + H #rightarrow GG, M1000GeV";
+  
 
   //for (std::map<TString,TString>::iterator iter = fSampleTitleMap.begin(); iter != fSampleTitleMap.end(); ++iter) {
   //  std::cout << (*iter).first << "  " << (*iter).second << std::endl;
@@ -96,7 +99,7 @@ void Combiner::OverlayPlots(){
 
     // bkg : copy histos and add to stacks
     for (UInt_t mc = 0; mc < fNBkg; mc++){
-      fInBkgTH1DHists[th1d][mc]->Scale(lumi);
+      //fInBkgTH1DHists[th1d][mc]->Scale(lumi);
       fOutBkgTH1DStacks[th1d]->Add(fInBkgTH1DHists[th1d][mc]);
       fTH1DLegends[th1d]->AddEntry(fInBkgTH1DHists[th1d][mc],fSampleTitleMap[fBkgNames[mc]],"lf");
       if (mc == 0){
@@ -109,7 +112,7 @@ void Combiner::OverlayPlots(){
   
     // sig: just add to legend
     for (UInt_t mc = 0; mc < fNSig; mc++){
-      fInSigTH1DHists[th1d][mc]->Scale(lumi);
+      //fInSigTH1DHists[th1d][mc]->Scale(lumi);
       fTH1DLegends[th1d]->AddEntry(fInSigTH1DHists[th1d][mc],fSampleTitleMap[fSigNames[mc]],"l");
     }
   }// end loop over th1d histos

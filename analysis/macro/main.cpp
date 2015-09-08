@@ -37,12 +37,12 @@ int main(){
   bool doFakeData = false;	// use FakeData to test combiner
   bool doTest = false;		// run plotter on test sample
   bool makePURWfiles = false;	// recompute PURW and make files
-  bool doReweightPU = true;	// use PURW from old files if !makePURWfiles
-  bool doPlots = true;		// make plots for each sample individually
-  bool doComb = false;		// make stack/overlay plots
+  bool doReweightPU = false;	// use PURW from old files if !makePURWfiles
+  bool doPlots = false;		// make plots for each sample individually
+  bool doComb = true;		// make stack/overlay plots
   bool doABCD = false;		// run ABCD method 
 
-  Double_t lumi = 40.;  
+  Double_t lumi = 40.; // in pb^-1 
   UInt_t nBins_vtx = 60; 
   
   //for CMSSW_7_0_pre9: run with root
@@ -229,21 +229,25 @@ int main(){
   ColorMap colorMap;
   colorMap["QCD"] 			= kYellow;
   colorMap["GJets"] 			= kGreen;
+  colorMap["WZH"]			= kOrange-3;
   colorMap["GluGluHToGG"]		= kCyan;
-  colorMap["DMHtoGG_M1000"]		= kMagenta;
-  colorMap["DMHtoGG_M100"]		= kMagenta+1;
-  colorMap["DMHtoGG_M10"]		= kRed+1;
   colorMap["DMHtoGG_M1"]		= kRed;
+  colorMap["DMHtoGG_M10"]		= kRed+1;
+  colorMap["DMHtoGG_M100"]		= kMagenta+1;
+  colorMap["DMHtoGG_M1000"]		= kMagenta;
+  colorMap["DoubleEG"]			= kBlack;
   if (doFakeData) colorMap["FakeData"]	= kBlack; 
 
   SamplePairVec Samples; // vector to also be used for stack plots
   Samples.push_back(SamplePair("QCD",1)); 
+  Samples.push_back(SamplePair("WZH",1));
   Samples.push_back(SamplePair("GJets",1)); 
   Samples.push_back(SamplePair("GluGluHToGG",1)); 
-  Samples.push_back(SamplePair("DMHtoGG_M1000",0)); 
-  Samples.push_back(SamplePair("DMHtoGG_M100",0)); 
-  Samples.push_back(SamplePair("DMHtoGG_M10",0)); 
   Samples.push_back(SamplePair("DMHtoGG_M1",0)); 
+  Samples.push_back(SamplePair("DMHtoGG_M10",0)); 
+  Samples.push_back(SamplePair("DMHtoGG_M100",0)); 
+  Samples.push_back(SamplePair("DMHtoGG_M1000",0)); 
+  Samples.push_back(SamplePair("DoubleEG",5));
   if (doFakeData) Samples.push_back(SamplePair("FakeData",5));
 
   UInt_t nbkg = 0;
