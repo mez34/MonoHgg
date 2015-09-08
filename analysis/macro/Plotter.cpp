@@ -3,11 +3,12 @@
 #include "../../../DataFormats/Math/interface/deltaPhi.h"
 //#include "mkPlotsLivia/CMS_lumi.C"
 
-Plotter::Plotter( TString inName, TString outName, TString inSpecies, const DblVec puweights, const Double_t lumi){
+Plotter::Plotter( TString inName, TString outName, TString inSpecies, const DblVec puweights, const Double_t lumi, Bool_t sigMC){
 
   // Get ROOT file
   name = inName;
   species = inSpecies;
+  isSigMC = sigMC;
   inFile = TFile::Open(Form("%s%s.root",name.Data(),species.Data()));
   CheckValidFile(inFile,Form("%s%s.root",name.Data(),species.Data()));  
   // Open Tree from inFile
@@ -61,14 +62,24 @@ void Plotter::DoPlots(){
   Double_t effptn[60]={0};
   Double_t effptd[60]={0};
 
+  fTH1DMap["hlt"]->Fill(0.5,nentries);
+
   for (UInt_t entry = 0; entry < nentries; entry++){
     tpho->GetEntry(entry);
 
     // calculate the weight
     Double_t Weight = (weight)*fPUWeights[nvtx];
 
+    if (hltPhoton26Photon16Mass60 == 1) fTH1DMap["hlt"]->Fill(1.5,1);
+    if (hltPhoton36Photon22Mass15 == 1) fTH1DMap["hlt"]->Fill(2.5,1);
+    if (hltPhoton42Photon25Mass15 == 1) fTH1DMap["hlt"]->Fill(3.5,1);
+    if (hltDiphoton30Mass95 == 1)   fTH1DMap["hlt"]->Fill(4.5,1);
+    if (hltDiphoton30Mass70 == 1)   fTH1DMap["hlt"]->Fill(5.5,1);
+    if (hltDiphoton30Mass55 == 1)   fTH1DMap["hlt"]->Fill(6.5,1);
+    if (hltDiphoton30Mass55PV == 1) fTH1DMap["hlt"]->Fill(7.5,1);
+    if (hltDiphoton30Mass55EB == 1) fTH1DMap["hlt"]->Fill(8.5,1);
 
-    if ( hltDiphoton30Mass95==1){ //passes trigger
+    if ( isSigMC ||  hltDiphoton30Mass95==1){ //passes trigger
       //Fill histograms
       fTH1DMap["mgg"]->Fill(mgg,Weight);
       fTH1DMap["nvtx"]->Fill(nvtx,Weight);
@@ -232,6 +243,16 @@ void Plotter::DoPlots(){
   fTH1DMap["eff_sel"]->GetXaxis()->SetBinLabel(7,"passMgg");
   fTH1DMap["eff_sel"]->GetXaxis()->SetBinLabel(8,"passMet");  
 
+  fTH1DMap["hlt"]->GetXaxis()->SetBinLabel(1,"nentries");
+  fTH1DMap["hlt"]->GetXaxis()->SetBinLabel(2,"Pho26Pho16M60");
+  fTH1DMap["hlt"]->GetXaxis()->SetBinLabel(3,"Pho36Pho22M15");
+  fTH1DMap["hlt"]->GetXaxis()->SetBinLabel(4,"Pho42Pho25M15");
+  fTH1DMap["hlt"]->GetXaxis()->SetBinLabel(5,"Dipho30M95");
+  fTH1DMap["hlt"]->GetXaxis()->SetBinLabel(6,"Dipho30M70");
+  fTH1DMap["hlt"]->GetXaxis()->SetBinLabel(7,"Dipho30M55");
+  fTH1DMap["hlt"]->GetXaxis()->SetBinLabel(8,"Dipho30M55PV");
+  fTH1DMap["hlt"]->GetXaxis()->SetBinLabel(9,"Dipho30M55EB");
+
   Plotter::SavePlots();
 
 }// end Plotter::DoPlots
@@ -262,6 +283,8 @@ void Plotter::SetUpPlots(){
   fTH1DMap["hoe2"]		= Plotter::MakeTH1DPlot("hoe2","",250,0.,0.025,"H/E(#gamma2)","");
   fTH1DMap["r91"]		= Plotter::MakeTH1DPlot("r91","",100,0.,1.1,"R9(#gamma1)","");
   fTH1DMap["r92"]		= Plotter::MakeTH1DPlot("r92","",100,0.,1.1,"R9(#gamma2)","");
+  fTH1DMap["hlt"]		= Plotter::MakeTH1DPlot("hlt","",10,0.,10,"","");
+
 
   // n minus 1 plots
   fTH1DMap["nvtx_n-1"]		= Plotter::MakeTH1DPlot("nvtx_n-1","",60,0.,60.,"nvtx","");

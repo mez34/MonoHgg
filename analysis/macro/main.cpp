@@ -37,7 +37,7 @@ int main(){
   bool doFakeData = false;	// use FakeData to test combiner
   bool doTest = false;		// run plotter on test sample
   bool makePURWfiles = false;	// recompute PURW and make files
-  bool doReweightPU = false;	// use PURW from old files if !makePURWfiles
+  bool doReweightPU = true;	// use PURW from old files if !makePURWfiles
   bool doPlots = false;		// make plots for each sample individually
   bool doComb = true;		// make stack/overlay plots
   bool doABCD = false;		// run ABCD method 
@@ -87,6 +87,14 @@ int main(){
       ReweightPU * reweightDMH1000 = new ReweightPU("DMHtoGG_M1000","DoubleEG",lumi, nBins_vtx, inDir, outDir+"purw/");
       puweights_sig1000 = reweightDMH1000->GetPUWeights();
       delete reweightDMH1000;
+
+      puweights_WZH = puweights_QCD;
+      puweights_GGHGG = puweights_QCD;
+      puweights_GJets = puweights_QCD;
+      puweights_sig100 = puweights_sig1000;
+      puweights_sig10 = puweights_sig1000;
+      puweights_sig1 = puweights_sig1000;
+
     }
 
     else{ //load PURW from already made files
@@ -151,74 +159,75 @@ int main(){
   // 2nd : output data location
   // 3rd : name of sample 
   // 4th : lumi of data
+  // 5th : bool isSigMC (overrides trigger)
   //
   /////////////////////////////////////////////////////
 
   if (doTest && doPlots){
     std::cout << "Working on test sample" << std::endl;
-    Plotter * test = new Plotter(inDir,outDir,"GJets",puweights_GJets,lumi);
+    Plotter * test = new Plotter(inDir,outDir,"GJets",puweights_GJets,lumi,false);
     test->DoPlots();
     delete test;
     std::cout << "Finished test sample" << std::endl;
   }
   if (doFakeData && doPlots){
     std::cout << "Working on FakeData sample" << std::endl;
-    Plotter * FakeData = new Plotter(inDir,outDir,"FakeData",puweights_Data,lumi);
+    Plotter * FakeData = new Plotter(inDir,outDir,"FakeData",puweights_Data,lumi,false);
     FakeData->DoPlots();
     delete FakeData;
     std::cout << "Finished FakeData sample" << std::endl;
   }
   if (doPlots){
     std::cout << "Working on DoubleEG sample" << std::endl;
-    Plotter * dEG = new Plotter(inDir,outDir,"DoubleEG",puweights_Data,lumi);
+    Plotter * dEG = new Plotter(inDir,outDir,"DoubleEG",puweights_Data,lumi,false);
     dEG->DoPlots();
     delete dEG;
     std::cout << "Finished DoubleEG sample" << std::endl;
 
     std::cout << "Working on GJets sample" << std::endl;
-    Plotter * GJets = new Plotter(inDir,outDir,"GJets",puweights_GJets,lumi);
+    Plotter * GJets = new Plotter(inDir,outDir,"GJets",puweights_GJets,lumi,false);
     GJets->DoPlots();
     delete GJets;
     std::cout << "Finished GJets sample" << std::endl;
 
     std::cout << "Working on QCD sample" << std::endl;
-    Plotter * QCD = new Plotter(inDir,outDir,"QCD",puweights_QCD,lumi);
+    Plotter * QCD = new Plotter(inDir,outDir,"QCD",puweights_QCD,lumi,false);
     QCD->DoPlots();
     delete QCD;
     std::cout << "Finished QCD sample" << std::endl;
 
     std::cout << "Working on WZH sample" << std::endl;
-    Plotter * WZH = new Plotter(inDir,outDir,"WZH",puweights_WZH,lumi);
+    Plotter * WZH = new Plotter(inDir,outDir,"WZH",puweights_WZH,lumi,false);
     WZH->DoPlots();
     delete WZH;
     std::cout << "Finished WZH sample" << std::endl;
 
     std::cout << "Working on GluGluH sample" << std::endl;
-    Plotter * GGHGG = new Plotter(inDir,outDir,"GluGluHToGG",puweights_GGHGG,lumi);
+    Plotter * GGHGG = new Plotter(inDir,outDir,"GluGluHToGG",puweights_GGHGG,lumi,false);
     GGHGG->DoPlots();
     delete GGHGG;
     std::cout << "Finished GluGluH sample" << std::endl;
   
     std::cout << "Working on DMHgg M1000 sample" << std::endl;
-    Plotter * DMH_M1000 = new Plotter(inDir,outDir,"DMHtoGG_M1000",puweights_sig1000,lumi);
+    Plotter * DMH_M1000 = new Plotter(inDir,outDir,"DMHtoGG_M1000",puweights_sig1000,lumi,true);
     DMH_M1000->DoPlots();
     delete DMH_M1000;
     std::cout << "Finished DMHgg M1000 sample" << std::endl;
   
     std::cout << "Working on DMHgg M100 sample" << std::endl;
-    Plotter * DMH_M100 = new Plotter(inDir,outDir,"DMHtoGG_M100",puweights_sig100,lumi);
+    Plotter * DMH_M100 = new Plotter(inDir,outDir,"DMHtoGG_M100",puweights_sig100,lumi,true);
     DMH_M100->DoPlots();
     delete DMH_M100;
     std::cout << "Finished DMHgg M100 sample" << std::endl;
   
     std::cout << "Working on DMHgg M10 sample" << std::endl;
-    Plotter * DMH_M10 = new Plotter(inDir,outDir,"DMHtoGG_M10",puweights_sig10,lumi);
+    Plotter * DMH_M10 = new Plotter(inDir,outDir,"DMHtoGG_M10",puweights_sig10,lumi,true);
     DMH_M10->DoPlots();
     delete DMH_M10;
     std::cout << "Finished DMHgg M10 sample" << std::endl;
   
     std::cout << "Working on DMHgg M1 sample" << std::endl;
-    Plotter * DMH_M1 = new Plotter(inDir,outDir,"DMHtoGG_M1",puweights_sig1,lumi);
+    Plotter * DMH_M1 = new Plotter(inDir,outDir,"DMHtoGG_M1",puweights_sig1,lumi,true);
     DMH_M1->DoPlots();
     delete DMH_M1;
     std::cout << "Finished DMHgg M1 sample" << std::endl;
