@@ -184,6 +184,8 @@ void Combiner::DrawCanvasOverlay(const UInt_t th1d, const Bool_t isLogY){
   fOutTH1DStackPads[th1d]->Draw();
   fOutTH1DStackPads[th1d]->cd();
    
+  if (fOutDataTH1DHists[th1d]->Integral() > 0) fOutDataTH1DHists[th1d]->Scale(1.0/fOutDataTH1DHists[th1d]->Integral());
+
   for (UInt_t mc = 0; mc < fNSig; mc++){
     if (fInSigTH1DHists[th1d][mc]->Integral() > 0){
       fInSigTH1DHists[th1d][mc]->Scale(1.0/fInSigTH1DHists[th1d][mc]->Integral());
@@ -213,6 +215,7 @@ void Combiner::DrawCanvasOverlay(const UInt_t th1d, const Bool_t isLogY){
   for (UInt_t mc = 0; mc < fNSig; mc++){
     fInSigTH1DHists[th1d][mc]->Draw("HIST SAME");
   }
+  if (fNData > 0) fOutDataTH1DHists[th1d]->Draw("PE SAME");
   fTH1DLegends[th1d]->Draw("SAME"); 
 
   TString suffix = "";
