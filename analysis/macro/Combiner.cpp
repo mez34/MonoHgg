@@ -199,12 +199,15 @@ void Combiner::DrawCanvasOverlay(const UInt_t th1d, const Bool_t isLogY){
     fInBkgTH1DHists[th1d][mc]->SetLineColor(fColorMap[fBkgNames[mc]]);
   }
 
-  Double_t max = -100;
-  max = Combiner::GetMaximum(th1d, false);
+  Double_t maxOverlay = -100;
+  maxOverlay = Combiner::GetMaximum(th1d, false);
+  //Double_t minOverlay = 1e9;
+  //minOverlay = Combiner::GetMinimum(th1d, false);  
 
   // start by drawing the sig first
-  if (isLogY) fInSigTH1DHists[th1d][0]->SetMaximum(max*10);
-  else fInSigTH1DHists[th1d][0]->SetMaximum(max*1.1);
+  if (isLogY) fInSigTH1DHists[th1d][0]->SetMaximum(maxOverlay*10);
+  else fInSigTH1DHists[th1d][0]->SetMaximum(maxOverlay*1.1);
+  //if (fNData > 0) fInSigTH1DHists[th1d][0]->SetMinimum(minOverlay*0.9);
 
   fInSigTH1DHists[th1d][0]->SetTitle("");
   fInSigTH1DHists[th1d][0]->Draw("hist");
@@ -253,16 +256,15 @@ void Combiner::DrawCanvasStack(const UInt_t th1d, const Bool_t isLogY){
   }*/
 
 
-  Double_t max = -100;
-  max = Combiner::GetMaximum(th1d, true);
-
-  Double_t minval = 1E20;
-  minval = Combiner::GetMinimum(th1d, true);
+  Double_t maxval = -100;
+  maxval = Combiner::GetMaximum(th1d, true);
+  //Double_t minval = 1E20;
+  //minval = Combiner::GetMinimum(th1d, true);
 
 
   // start by drawing the sig first
-  if (isLogY) fInSigTH1DHists[th1d][0]->SetMaximum(max*10);
-  else fInSigTH1DHists[th1d][0]->SetMaximum(max*1.1);
+  if (isLogY) fInSigTH1DHists[th1d][0]->SetMaximum(maxval*10);
+  else fInSigTH1DHists[th1d][0]->SetMaximum(maxval*1.1);
   //if (fNData > 0) fInSigTH1DHists[th1d][0]->SetMinimum(minval);
   fInSigTH1DHists[th1d][0]->SetTitle("");
   fInSigTH1DHists[th1d][0]->Draw("HIST");

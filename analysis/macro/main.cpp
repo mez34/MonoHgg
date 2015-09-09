@@ -37,7 +37,7 @@ int main(){
   bool doFakeData = false;	// use FakeData to test combiner
   bool doTest = false;		// run plotter on test sample
   bool makePURWfiles = false;	// recompute PURW and make files
-  bool doReweightPU = true;	// use PURW from old files if !makePURWfiles
+  bool doReweightPU = false;	// use PURW from old files if !makePURWfiles
   bool doPlots = false;		// make plots for each sample individually
   bool doComb = true;		// make stack/overlay plots
   bool doABCD = false;		// run ABCD method 
@@ -233,6 +233,16 @@ int main(){
     std::cout << "Finished DMHgg M1 sample" << std::endl;
   }// end doPlots
 
+  //clear the vectors after they have been used
+  puweights_Data.clear();
+  puweights_QCD.clear();
+  puweights_GJets.clear();
+  puweights_GGHGG.clear();
+  puweights_WZH.clear();
+  puweights_sig1000.clear();
+  puweights_sig100.clear();
+  puweights_sig10.clear();
+  puweights_sig1.clear();
 
   // setup all samples for Combiner and ABCD
   ColorMap colorMap;

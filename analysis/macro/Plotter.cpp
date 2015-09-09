@@ -55,8 +55,8 @@ void Plotter::DoPlots(){
   Plotter::SetUpPlots();
  
   nentries = tpho->GetEntries(); 
-  fTH1DMap["eff_sel"]->Fill(0.,nentries);
-
+  fTH1DMap["eff_sel"]->Fill(0.5,1);
+  
   Double_t effPUn[60]={0};
   Double_t effPUd[60]={0};
   Double_t effptn[60]={0};
@@ -78,6 +78,8 @@ void Plotter::DoPlots(){
     if (hltDiphoton30Mass55 == 1)   fTH1DMap["hlt"]->Fill(6.5,1);
     if (hltDiphoton30Mass55PV == 1) fTH1DMap["hlt"]->Fill(7.5,1);
     if (hltDiphoton30Mass55EB == 1) fTH1DMap["hlt"]->Fill(8.5,1);
+
+    if (hltDiphoton30Mass95 == 1) fTH1DMap["eff_sel"]->Fill(1.5,1.0/nentries);
 
     if ( isSigMC ||  hltDiphoton30Mass95==1){ //passes trigger
       //Fill histograms
@@ -181,19 +183,19 @@ void Plotter::DoPlots(){
       }
 
       if (passCH1 && passCH2){
-        fTH1DMap["eff_sel"]->Fill(1.,1);
+        fTH1DMap["eff_sel"]->Fill(2.5,1.0/nentries);
         if (passNH1 && passNH2){
-          fTH1DMap["eff_sel"]->Fill(2.,1);
+          fTH1DMap["eff_sel"]->Fill(3.5,1.0/nentries);
           if (passPH1 && passPH2){
-            fTH1DMap["eff_sel"]->Fill(3.,1);
+            fTH1DMap["eff_sel"]->Fill(4.5,1.0/nentries);
             if (passS1 && passS2){ 
-              fTH1DMap["eff_sel"]->Fill(4.,1);
+              fTH1DMap["eff_sel"]->Fill(5.5,1.0/nentries);
        	    if (passHE1 && passHE2){
-                fTH1DMap["eff_sel"]->Fill(5.,1);
+                fTH1DMap["eff_sel"]->Fill(6.5,1.0/nentries);
                 if (mgg >= 120 && mgg <= 130){
-          	fTH1DMap["eff_sel"]->Fill(6.,1);
+          	fTH1DMap["eff_sel"]->Fill(7.5,1.0/nentries);
           	if (t1pfmet >= 100){
-          	  fTH1DMap["eff_sel"]->Fill(7.,1);
+          	  fTH1DMap["eff_sel"]->Fill(8.5,1.0/nentries);
           	}
                 }
               }
@@ -235,13 +237,14 @@ void Plotter::DoPlots(){
   }
 
   fTH1DMap["eff_sel"]->GetXaxis()->SetBinLabel(1,"nentries");
-  fTH1DMap["eff_sel"]->GetXaxis()->SetBinLabel(2,"passCHiso");
-  fTH1DMap["eff_sel"]->GetXaxis()->SetBinLabel(3,"passNHiso");
-  fTH1DMap["eff_sel"]->GetXaxis()->SetBinLabel(4,"passPHiso");
-  fTH1DMap["eff_sel"]->GetXaxis()->SetBinLabel(5,"passSieie");
-  fTH1DMap["eff_sel"]->GetXaxis()->SetBinLabel(6,"passHoe");
-  fTH1DMap["eff_sel"]->GetXaxis()->SetBinLabel(7,"passMgg");
-  fTH1DMap["eff_sel"]->GetXaxis()->SetBinLabel(8,"passMet");  
+  fTH1DMap["eff_sel"]->GetXaxis()->SetBinLabel(2,"passTrigger");
+  fTH1DMap["eff_sel"]->GetXaxis()->SetBinLabel(3,"passCHiso");
+  fTH1DMap["eff_sel"]->GetXaxis()->SetBinLabel(4,"passNHiso");
+  fTH1DMap["eff_sel"]->GetXaxis()->SetBinLabel(5,"passPHiso");
+  fTH1DMap["eff_sel"]->GetXaxis()->SetBinLabel(6,"passSieie");
+  fTH1DMap["eff_sel"]->GetXaxis()->SetBinLabel(7,"passHoe");
+  fTH1DMap["eff_sel"]->GetXaxis()->SetBinLabel(8,"passMgg");
+  fTH1DMap["eff_sel"]->GetXaxis()->SetBinLabel(9,"passMet");  
 
   fTH1DMap["hlt"]->GetXaxis()->SetBinLabel(1,"nentries");
   fTH1DMap["hlt"]->GetXaxis()->SetBinLabel(2,"Pho26Pho16M60");
@@ -283,8 +286,6 @@ void Plotter::SetUpPlots(){
   fTH1DMap["hoe2"]		= Plotter::MakeTH1DPlot("hoe2","",250,0.,0.025,"H/E(#gamma2)","");
   fTH1DMap["r91"]		= Plotter::MakeTH1DPlot("r91","",100,0.,1.1,"R9(#gamma1)","");
   fTH1DMap["r92"]		= Plotter::MakeTH1DPlot("r92","",100,0.,1.1,"R9(#gamma2)","");
-  fTH1DMap["hlt"]		= Plotter::MakeTH1DPlot("hlt","",10,0.,10,"","");
-
 
   // n minus 1 plots
   fTH1DMap["nvtx_n-1"]		= Plotter::MakeTH1DPlot("nvtx_n-1","",60,0.,60.,"nvtx","");
@@ -321,6 +322,7 @@ void Plotter::SetUpPlots(){
   fTH1DMap["eff_sel"]		= Plotter::MakeTH1DPlot("eff_sel","",10,0.,10.,"","");
   fTH1DMap["eff_PU"]		= Plotter::MakeTH1DPlot("eff_PU","",60,0.,60.,"","");
   fTH1DMap["eff_pt"]		= Plotter::MakeTH1DPlot("eff_pt","",60,0.,600.,"","");
+  fTH1DMap["hlt"]		= Plotter::MakeTH1DPlot("hlt","",10,0.,10,"","");
 
   // 2D plots
   fTH2DMap["mgg_PU"]		= Plotter::MakeTH2DPlot("mgg_PU","",60,0.,60.,60,50.,300.,"nvtx","m_{#gamma#gamma} (GeV)");
