@@ -37,8 +37,8 @@ int main(){
   bool doFakeData = false;	// use FakeData to test combiner
   bool doTest = false;		// run plotter on test sample
   bool makePURWfiles = false;	// recompute PURW and make files
-  bool doReweightPU = false;	// use PURW from old files if !makePURWfiles
-  bool doPlots = false;		// make plots for each sample individually
+  bool doReweightPU = true;	// use PURW from old files if !makePURWfiles
+  bool doPlots = true;		// make plots for each sample individually
   bool doComb = true;		// make stack/overlay plots
   bool doABCD = false;		// run ABCD method 
 
@@ -113,7 +113,7 @@ int main(){
         puweights_QCD.push_back(fBkgRatio->GetBinContent(i));
         puweights_GJets.push_back(fBkgRatio->GetBinContent(i));
         puweights_GGHGG.push_back(fBkgRatio->GetBinContent(i));
-	puweights_WZH.push_back(fBkgRatio->GetBinContent(i));
+        puweights_WZH.push_back(fBkgRatio->GetBinContent(i));
 
         puweights_sig1000.push_back(fSigRatio->GetBinContent(i));
         puweights_sig100.push_back(fSigRatio->GetBinContent(i));
@@ -137,16 +137,17 @@ int main(){
     }
   }  
 
-  /*std::cout << "PU reweight values "<<std::endl;
-  for (UInt_t i=1; i<=nBins_vtx; i++){
-    std::cout << "puweights_QCD     " << puweights_QCD[i]     << std::endl;   
-    std::cout << "puweights_GJets   " << puweights_GJets[i]   << std::endl;
-    std::cout << "puweights_GGHGG   " << puweights_GGHGG[i]   << std::endl;
-    std::cout << "puweights_sig1000 " << puweights_sig1000[i] << std::endl; 
-    std::cout << "puweights_sig100  " << puweights_sig100[i]  << std::endl;
-    std::cout << "puweights_sig10   " << puweights_sig10[i]   << std::endl;
-    std::cout << "puweights_sig1    " << puweights_sig1[i]    << std::endl;
-  }*/
+//  std::cout << "PU reweight values "<<std::endl;
+//  for (UInt_t i=1; i<=nBins_vtx; i++){
+//    std::cout << "puweights_Data    " << puweights_Data[i]    << std::endl;
+//    std::cout << "puweights_QCD     " << puweights_QCD[i]     << std::endl;   
+//    std::cout << "puweights_GJets   " << puweights_GJets[i]   << std::endl;
+//    std::cout << "puweights_GGHGG   " << puweights_GGHGG[i]   << std::endl;
+//    std::cout << "puweights_sig1000 " << puweights_sig1000[i] << std::endl; 
+//    std::cout << "puweights_sig100  " << puweights_sig100[i]  << std::endl;
+//    std::cout << "puweights_sig10   " << puweights_sig10[i]   << std::endl;
+//    std::cout << "puweights_sig1    " << puweights_sig1[i]    << std::endl;
+//  }
 
   std::cout << "Finished PU Reweighting" << std::endl;
 
@@ -231,6 +232,7 @@ int main(){
     DMH_M1->DoPlots();
     delete DMH_M1;
     std::cout << "Finished DMHgg M1 sample" << std::endl;
+
   }// end doPlots
 
   //clear the vectors after they have been used

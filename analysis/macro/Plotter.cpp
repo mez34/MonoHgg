@@ -81,6 +81,8 @@ void Plotter::DoPlots(){
 
     if (hltDiphoton30Mass95 == 1) fTH1DMap["eff_sel"]->Fill(1.5,1.0/nentries);
 
+    fTH1DMap["nvtx_preHlt"]->Fill(nvtx,Weight);
+
     if ( isSigMC ||  hltDiphoton30Mass95==1){ //passes trigger
       //Fill histograms
       fTH1DMap["mgg"]->Fill(mgg,Weight);
@@ -274,18 +276,19 @@ void Plotter::SetUpPlots(){
   fTH1DMap["eta2"]		= Plotter::MakeTH1DPlot("eta2","",100,-5.,5.,"#eta(#gamma2)","");
   fTH1DMap["pt1"]		= Plotter::MakeTH1DPlot("pt1","",50,0.,500.,"p_{T,#gamma1} (GeV)","");
   fTH1DMap["pt2"]		= Plotter::MakeTH1DPlot("pt2","",50,0.,500.,"p_{T,#gamma2} (GeV)","");
-  fTH1DMap["chiso1"]		= Plotter::MakeTH1DPlot("chiso1","",150,-5.,15.,"CHiso(#gamma1)","");
-  fTH1DMap["chiso2"]		= Plotter::MakeTH1DPlot("chiso2","",150,-5.,15.,"CHiso(#gamma2)","");
-  fTH1DMap["neuiso1"]		= Plotter::MakeTH1DPlot("neuiso1","",150,-5.,15.,"NHiso(#gamma1)","");
-  fTH1DMap["neuiso2"]		= Plotter::MakeTH1DPlot("neuiso2","",150,-5.,15.,"NHiso(#gamma2)","");
-  fTH1DMap["phoiso1"]		= Plotter::MakeTH1DPlot("phoiso1","",150,-5.,15.,"PHiso(#gamma1)",""); 
-  fTH1DMap["phoiso2"]		= Plotter::MakeTH1DPlot("phoiso2","",150,-5.,15.,"PHiso(#gamma2)",""); 
-  fTH1DMap["sieie1"]		= Plotter::MakeTH1DPlot("sieie1","",300,0.,0.03,"#sigma_{i#eta i#eta}(#gamma1)",""); 
-  fTH1DMap["sieie2"]		= Plotter::MakeTH1DPlot("sieie2","",300,0.,0.03,"#sigma_{i#eta i#eta}(#gamma2)",""); 
-  fTH1DMap["hoe1"]		= Plotter::MakeTH1DPlot("hoe1","",250,0.,0.025,"H/E(#gamma1)","");
-  fTH1DMap["hoe2"]		= Plotter::MakeTH1DPlot("hoe2","",250,0.,0.025,"H/E(#gamma2)","");
+  fTH1DMap["chiso1"]		= Plotter::MakeTH1DPlot("chiso1","",75,-5.,15.,"CHiso(#gamma1)","");
+  fTH1DMap["chiso2"]		= Plotter::MakeTH1DPlot("chiso2","",75,-5.,15.,"CHiso(#gamma2)","");
+  fTH1DMap["neuiso1"]		= Plotter::MakeTH1DPlot("neuiso1","",75,-5.,15.,"NHiso(#gamma1)","");
+  fTH1DMap["neuiso2"]		= Plotter::MakeTH1DPlot("neuiso2","",75,-5.,15.,"NHiso(#gamma2)","");
+  fTH1DMap["phoiso1"]		= Plotter::MakeTH1DPlot("phoiso1","",75,-5.,15.,"PHiso(#gamma1)",""); 
+  fTH1DMap["phoiso2"]		= Plotter::MakeTH1DPlot("phoiso2","",75,-5.,15.,"PHiso(#gamma2)",""); 
+  fTH1DMap["sieie1"]		= Plotter::MakeTH1DPlot("sieie1","",150,0.,0.03,"#sigma_{i#eta i#eta}(#gamma1)",""); 
+  fTH1DMap["sieie2"]		= Plotter::MakeTH1DPlot("sieie2","",150,0.,0.03,"#sigma_{i#eta i#eta}(#gamma2)",""); 
+  fTH1DMap["hoe1"]		= Plotter::MakeTH1DPlot("hoe1","",125,0.,0.025,"H/E(#gamma1)","");
+  fTH1DMap["hoe2"]		= Plotter::MakeTH1DPlot("hoe2","",125,0.,0.025,"H/E(#gamma2)","");
   fTH1DMap["r91"]		= Plotter::MakeTH1DPlot("r91","",100,0.,1.1,"R9(#gamma1)","");
   fTH1DMap["r92"]		= Plotter::MakeTH1DPlot("r92","",100,0.,1.1,"R9(#gamma2)","");
+  fTH1DMap["nvtx_preHlt"]	= Plotter::MakeTH1DPlot("nvtx_preHlt","",60,0.,60.,"nvtx","");
 
   // n minus 1 plots
   fTH1DMap["nvtx_n-1"]		= Plotter::MakeTH1DPlot("nvtx_n-1","",60,0.,60.,"nvtx","");
@@ -299,16 +302,16 @@ void Plotter::SetUpPlots(){
   fTH1DMap["eta2_n-1"]		= Plotter::MakeTH1DPlot("eta2_n-1","",100,-5.,5.,"#eta(#gamma2)","");
   fTH1DMap["pt1_n-1"]		= Plotter::MakeTH1DPlot("pt1_n-1","",50,0.,500.,"p_{T,#gamma1} (GeV)","");
   fTH1DMap["pt2_n-1"]		= Plotter::MakeTH1DPlot("pt2_n-1","",50,0.,500.,"p_{T,#gamma2} (GeV)","");
-  fTH1DMap["chiso1_n-1"]	= Plotter::MakeTH1DPlot("chiso1_n-1","",150,-5.,15.,"CHiso(#gamma1)","");
-  fTH1DMap["chiso2_n-1"]	= Plotter::MakeTH1DPlot("chiso2_n-1","",150,-5.,15.,"CHiso(#gamma2)","");
-  fTH1DMap["neuiso1_n-1"]	= Plotter::MakeTH1DPlot("neuiso1_n-1","",150,-5.,15.,"NHiso(#gamma1)","");
-  fTH1DMap["neuiso2_n-1"]	= Plotter::MakeTH1DPlot("neuiso2_n-1","",150,-5.,15.,"NHiso(#gamma2)","");
-  fTH1DMap["phoiso1_n-1"]	= Plotter::MakeTH1DPlot("phoiso1_n-1","",150,-5.,15.,"PHiso(#gamma1)",""); 
-  fTH1DMap["phoiso2_n-1"]	= Plotter::MakeTH1DPlot("phoiso2_n-1","",150,-5.,15.,"PHiso(#gamma2)",""); 
-  fTH1DMap["sieie1_n-1"]	= Plotter::MakeTH1DPlot("sieie1_n-1","",300,0.,0.03,"#sigma_{i#eta i#eta}(#gamma1)",""); 
-  fTH1DMap["sieie2_n-1"]	= Plotter::MakeTH1DPlot("sieie2_n-1","",300,0.,0.03,"#sigma_{i#eta i#eta}(#gamma2)",""); 
-  fTH1DMap["hoe1_n-1"]		= Plotter::MakeTH1DPlot("hoe1_n-1","",250,0.,0.025,"H/E(#gamma1)","");
-  fTH1DMap["hoe2_n-1"]		= Plotter::MakeTH1DPlot("hoe2_n-1","",250,0.,0.025,"H/E(#gamma2)","");
+  fTH1DMap["chiso1_n-1"]	= Plotter::MakeTH1DPlot("chiso1_n-1","",75,-5.,15.,"CHiso(#gamma1)","");
+  fTH1DMap["chiso2_n-1"]	= Plotter::MakeTH1DPlot("chiso2_n-1","",75,-5.,15.,"CHiso(#gamma2)","");
+  fTH1DMap["neuiso1_n-1"]	= Plotter::MakeTH1DPlot("neuiso1_n-1","",75,-5.,15.,"NHiso(#gamma1)","");
+  fTH1DMap["neuiso2_n-1"]	= Plotter::MakeTH1DPlot("neuiso2_n-1","",75,-5.,15.,"NHiso(#gamma2)","");
+  fTH1DMap["phoiso1_n-1"]	= Plotter::MakeTH1DPlot("phoiso1_n-1","",75,-5.,15.,"PHiso(#gamma1)",""); 
+  fTH1DMap["phoiso2_n-1"]	= Plotter::MakeTH1DPlot("phoiso2_n-1","",75,-5.,15.,"PHiso(#gamma2)",""); 
+  fTH1DMap["sieie1_n-1"]	= Plotter::MakeTH1DPlot("sieie1_n-1","",150,0.,0.03,"#sigma_{i#eta i#eta}(#gamma1)",""); 
+  fTH1DMap["sieie2_n-1"]	= Plotter::MakeTH1DPlot("sieie2_n-1","",150,0.,0.03,"#sigma_{i#eta i#eta}(#gamma2)",""); 
+  fTH1DMap["hoe1_n-1"]		= Plotter::MakeTH1DPlot("hoe1_n-1","",125,0.,0.025,"H/E(#gamma1)","");
+  fTH1DMap["hoe2_n-1"]		= Plotter::MakeTH1DPlot("hoe2_n-1","",125,0.,0.025,"H/E(#gamma2)","");
   fTH1DMap["r91_n-1"]		= Plotter::MakeTH1DPlot("r91_n-1","",100,0.,1.1,"R9(#gamma1)","");
   fTH1DMap["r92_n-1"]		= Plotter::MakeTH1DPlot("r92_n-1","",100,0.,1.1,"R9(#gamma2)","");
 
