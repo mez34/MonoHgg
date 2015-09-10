@@ -348,6 +348,17 @@ int main(){
     delete combAlln1;   
   }// end doComb
 
+  ////////////////////////////////////////////////////
+  //
+  // Make comb (stack & overlay) plots w/ all samples 
+  //
+  // Arguments of Combiner
+  // 1st : SamplePairVec (Samples) that has Name,VALUE
+  // 2rd : lumi
+  // 3th : output directory
+  //
+  ////////////////////////////////////////////////////
+
   if (doABCD){
     ABCDMethod *abcd = new ABCDMethod(Samples,lumi,outDir);
     abcd->DoAnalysis();

@@ -21,7 +21,8 @@ hadd data/50ns/ZH.root		    ../../output/job_201595_12522/ZH/ZH*.root
 hadd data/50ns/WplusH.root	    ../../output/job_201595_125252/WplusH/WplusH*.root
 hadd data/50ns/WminusH.root	    ../../output/job_201595_12528/WminusH/WminusH*.root
 
-hadd data/50ns/DoubleEG.root	    ../../output/job_201594_171326/DoubleEG/DoubleEG*.root
+hadd data/50ns/DoubleEG.root	    ../../output/job_2015910_12489/DoubleEG/DoubleEG*.root
+#hadd data/50ns/DoubleEG.root	    ../../output/job_201594_171326/DoubleEG/DoubleEG*.root
 
 
 # 50ns sample without triggers

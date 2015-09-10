@@ -30,5 +30,5 @@ python extractJSONS.py -i datasets_746.json	-o GluGluHToGG				-d lists_50ns/MC
 #python extractJSONS.py -i datasets.json 	-o ttHJetToGG_M130 			-d lists_50ns/MC
 ##Data
 #python extractJSONS.py -i datasets.json 	-o SinglePhoton 			-d lists_50ns/Data
-#python extractJSONS.py -i datasets.json 	-o DoubleEG	 			-d lists_50ns/Data
+#python extractJSONS.py -i datasets_746dEG.json	-o DoubleEG	 			-d lists_50ns/Data
 #python extractJSONS.py -i datasets.json 	-o EGamma	 			-d lists_50ns/Data
