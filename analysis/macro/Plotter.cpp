@@ -55,7 +55,7 @@ void Plotter::DoPlots(){
   Plotter::SetUpPlots();
  
   nentries = tpho->GetEntries(); 
-  fTH1DMap["eff_sel"]->Fill(0.5,1);
+
   
   Double_t effPUn[60]={0};
   Double_t effPUd[60]={0};
@@ -79,9 +79,8 @@ void Plotter::DoPlots(){
     if (hltDiphoton30Mass55PV == 1) fTH1DMap["hlt"]->Fill(7.5,1);
     if (hltDiphoton30Mass55EB == 1) fTH1DMap["hlt"]->Fill(8.5,1);
 
-    if (hltDiphoton30Mass95 == 1) fTH1DMap["eff_sel"]->Fill(1.5,1.0/nentries);
-
-    fTH1DMap["nvtx_preHlt"]->Fill(nvtx,Weight);
+    fTH1DMap["eff_sel"]->Fill(0.5,Weight);
+    if (hltDiphoton30Mass95 == 1) fTH1DMap["eff_sel"]->Fill(1.5,Weight);
 
     if ( isSigMC ||  hltDiphoton30Mass95==1){ //passes trigger
       //Fill histograms
@@ -92,6 +91,10 @@ void Plotter::DoPlots(){
       fTH1DMap["pt2"]->Fill(pt2,Weight);
       fTH1DMap["t1pfmet"]->Fill(t1pfmet,Weight);
       fTH1DMap["t1pfmetphi"]->Fill(t1pfmetphi,Weight);
+      fTH1DMap["pfmet"]->Fill(pfmet,Weight);
+      fTH1DMap["pfmetphi"]->Fill(pfmetphi,Weight);
+      fTH1DMap["calomet"]->Fill(calomet,Weight);
+      fTH1DMap["calometphi"]->Fill(calometphi,Weight);
       fTH1DMap["phi1"]->Fill(phi1,Weight);
       fTH1DMap["phi2"]->Fill(phi2,Weight);
       fTH1DMap["eta1"]->Fill(eta1,Weight);
@@ -180,24 +183,28 @@ void Plotter::DoPlots(){
         fTH1DMap["ptgg_n-1"]->Fill(ptgg,Weight);  
         fTH1DMap["t1pfmet_n-1"]->Fill(t1pfmet,Weight);  
         fTH1DMap["t1pfmetphi_n-1"]->Fill(t1pfmetphi,Weight);  
+        fTH1DMap["pfmet_n-1"]->Fill(pfmet,Weight);
+        fTH1DMap["pfmetphi_n-1"]->Fill(pfmetphi,Weight);
+        fTH1DMap["calomet_n-1"]->Fill(calomet,Weight);
+        fTH1DMap["calometphi_n-1"]->Fill(calometphi,Weight);
         if (mgg >= 120 && mgg <= 130) fTH1DMap["t1pfmet_selmgg"]->Fill(t1pfmet,Weight); 
         if (t1pfmet >= 100) fTH1DMap["mgg_selt1pfmet"]->Fill(mgg,Weight); 
       }
 
       if (passCH1 && passCH2){
-        fTH1DMap["eff_sel"]->Fill(2.5,1.0/nentries);
+        fTH1DMap["eff_sel"]->Fill(2.5,Weight);
         if (passNH1 && passNH2){
-          fTH1DMap["eff_sel"]->Fill(3.5,1.0/nentries);
+          fTH1DMap["eff_sel"]->Fill(3.5,Weight);
           if (passPH1 && passPH2){
-            fTH1DMap["eff_sel"]->Fill(4.5,1.0/nentries);
+            fTH1DMap["eff_sel"]->Fill(4.5,Weight);
             if (passS1 && passS2){ 
-              fTH1DMap["eff_sel"]->Fill(5.5,1.0/nentries);
+              fTH1DMap["eff_sel"]->Fill(5.5,Weight);
        	    if (passHE1 && passHE2){
-                fTH1DMap["eff_sel"]->Fill(6.5,1.0/nentries);
+                fTH1DMap["eff_sel"]->Fill(6.5,Weight);
                 if (mgg >= 120 && mgg <= 130){
-          	fTH1DMap["eff_sel"]->Fill(7.5,1.0/nentries);
+          	fTH1DMap["eff_sel"]->Fill(7.5,Weight);
           	if (t1pfmet >= 100){
-          	  fTH1DMap["eff_sel"]->Fill(8.5,1.0/nentries);
+          	  fTH1DMap["eff_sel"]->Fill(8.5,Weight);
           	}
                 }
               }
@@ -269,7 +276,11 @@ void Plotter::SetUpPlots(){
   fTH1DMap["mgg"]		= Plotter::MakeTH1DPlot("mgg","",60,50.,300.,"m_{#gamma#gamma} (GeV)","");  
   fTH1DMap["ptgg"]		= Plotter::MakeTH1DPlot("ptgg","",100,0.,1000.,"p_{T,#gamma#gamma} (GeV)","");
   fTH1DMap["t1pfmet"]		= Plotter::MakeTH1DPlot("t1pfmet","",100,0.,1000,"t1PF MET (GeV)","");
-  fTH1DMap["t1pfmetphi"]	= Plotter::MakeTH1DPlot("t1pfmetphi","",80,-4.,4.,"MET #phi","");
+  fTH1DMap["t1pfmetphi"]	= Plotter::MakeTH1DPlot("t1pfmetphi","",80,-4.,4.,"t1PF MET #phi","");
+  fTH1DMap["pfmet"]		= Plotter::MakeTH1DPlot("pfmet","",100,0.,1000,"PF MET (GeV)","");
+  fTH1DMap["pfmetphi"]		= Plotter::MakeTH1DPlot("pfmetphi","",80,-4.,4.,"PF MET #phi","");
+  fTH1DMap["calomet"]		= Plotter::MakeTH1DPlot("calomet","",100,0.,1000,"calo MET (GeV)","");
+  fTH1DMap["calometphi"]	= Plotter::MakeTH1DPlot("calometphi","",80,-4.,4.,"calo MET #phi","");
   fTH1DMap["phi1"]		= Plotter::MakeTH1DPlot("phi1","",80,-4.,4.,"#phi(#gamma1)","");
   fTH1DMap["phi2"]		= Plotter::MakeTH1DPlot("phi2","",80,-4.,4.,"#phi(#gamma2)","");
   fTH1DMap["eta1"]		= Plotter::MakeTH1DPlot("eta1","",100,-5.,5.,"#eta(#gamma1)","");
@@ -288,14 +299,17 @@ void Plotter::SetUpPlots(){
   fTH1DMap["hoe2"]		= Plotter::MakeTH1DPlot("hoe2","",125,0.,0.025,"H/E(#gamma2)","");
   fTH1DMap["r91"]		= Plotter::MakeTH1DPlot("r91","",100,0.,1.1,"R9(#gamma1)","");
   fTH1DMap["r92"]		= Plotter::MakeTH1DPlot("r92","",100,0.,1.1,"R9(#gamma2)","");
-  fTH1DMap["nvtx_preHlt"]	= Plotter::MakeTH1DPlot("nvtx_preHlt","",60,0.,60.,"nvtx","");
 
   // n minus 1 plots
   fTH1DMap["nvtx_n-1"]		= Plotter::MakeTH1DPlot("nvtx_n-1","",60,0.,60.,"nvtx","");
   fTH1DMap["mgg_n-1"]		= Plotter::MakeTH1DPlot("mgg_n-1","",60,50.,300.,"m_{#gamma#gamma} (GeV)","");  
   fTH1DMap["ptgg_n-1"]		= Plotter::MakeTH1DPlot("ptgg_n-1","",100,0.,1000.,"p_{T,#gamma#gamma} (GeV)","");
   fTH1DMap["t1pfmet_n-1"]	= Plotter::MakeTH1DPlot("t1pfmet_n-1","",100,0.,1000.,"t1PF MET (GeV)","");
-  fTH1DMap["t1pfmetphi_n-1"]	= Plotter::MakeTH1DPlot("t1pfmetphi_n-1","",80,-4.,4.,"MET #phi","");
+  fTH1DMap["t1pfmetphi_n-1"]	= Plotter::MakeTH1DPlot("t1pfmetphi_n-1","",80,-4.,4.,"t1PF MET #phi","");
+  fTH1DMap["pfmet_n-1"]		= Plotter::MakeTH1DPlot("pfmet_n-1","",100,0.,1000,"PF MET (GeV)","");
+  fTH1DMap["pfmetphi_n-1"]	= Plotter::MakeTH1DPlot("pfmetphi_n-1","",80,-4.,4.,"PF MET #phi","");
+  fTH1DMap["calomet_n-1"]	= Plotter::MakeTH1DPlot("calomet_n-1","",100,0.,1000,"calo MET (GeV)","");
+  fTH1DMap["calometphi_n-1"]	= Plotter::MakeTH1DPlot("calometphi_n-1","",80,-4.,4.,"calo MET #phi","");
   fTH1DMap["phi1_n-1"]		= Plotter::MakeTH1DPlot("phi1_n-1","",80,-4.,4.,"#phi(#gamma1)","");
   fTH1DMap["phi2_n-1"]		= Plotter::MakeTH1DPlot("phi2_n-1","",80,-4.,4.,"#phi(#gamma2)","");
   fTH1DMap["eta1_n-1"]		= Plotter::MakeTH1DPlot("eta1_n-1","",100,-5.,5.,"#eta(#gamma1)","");
@@ -421,6 +435,13 @@ void Plotter::SetBranchAddresses(){
   tpho->SetBranchAddress("ptgg",   &ptgg,    &b_ptgg);
   tpho->SetBranchAddress("t1pfmet", &t1pfmet, &b_t1pfmet);   
   tpho->SetBranchAddress("t1pfmetPhi", &t1pfmetphi, &b_t1pfmetPhi);   
+  tpho->SetBranchAddress("t1pfmetSumEt", &t1pfmetSumEt, &b_t1pfmetSumEt);   
+  tpho->SetBranchAddress("pfmet", &pfmet, &b_pfmet);   
+  tpho->SetBranchAddress("pfmetPhi", &pfmetphi, &b_pfmetPhi);   
+  tpho->SetBranchAddress("pfmetSumEt", &pfmetSumEt, &b_pfmetSumEt);   
+  tpho->SetBranchAddress("calomet", &calomet, &b_calomet);   
+  tpho->SetBranchAddress("calometPhi", &calometphi, &b_calometPhi);   
+  tpho->SetBranchAddress("calometSumEt", &calometSumEt, &b_calometSumEt);   
   tpho->SetBranchAddress("pt1", &pt1, &b_pt1);   
   tpho->SetBranchAddress("pt2", &pt2, &b_pt2);   
   tpho->SetBranchAddress("chiso1", &chiso1, &b_chiso1);   

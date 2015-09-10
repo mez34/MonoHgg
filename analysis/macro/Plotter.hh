@@ -78,6 +78,13 @@ private:
   Float_t	ptgg;
   Float_t	t1pfmet; 
   Float_t	t1pfmetphi; 
+  Float_t	t1pfmetSumEt; 
+  Float_t	pfmet; 
+  Float_t	pfmetphi; 
+  Float_t	pfmetSumEt; 
+  Float_t	calomet; 
+  Float_t	calometphi; 
+  Float_t	calometSumEt; 
   Float_t	pt1;
   Float_t	pt2;
   Float_t	phi1;
@@ -122,6 +129,13 @@ private:
   TBranch	*b_ptgg;
   TBranch	*b_t1pfmet;
   TBranch	*b_t1pfmetPhi;
+  TBranch	*b_t1pfmetSumEt;
+  TBranch	*b_pfmet;
+  TBranch	*b_pfmetPhi;
+  TBranch	*b_pfmetSumEt;
+  TBranch	*b_calomet;
+  TBranch	*b_calometPhi;
+  TBranch	*b_calometSumEt;
   TBranch	*b_pt1;
   TBranch	*b_pt2;
   TBranch	*b_phi1;

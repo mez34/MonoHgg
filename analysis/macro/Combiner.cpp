@@ -506,6 +506,10 @@ void Combiner::InitTH1DNames(){
   fTH1DNames.push_back("nvtx"); 
   fTH1DNames.push_back("t1pfmetphi");
   fTH1DNames.push_back("t1pfmet");
+  fTH1DNames.push_back("pfmetphi");
+  fTH1DNames.push_back("pfmet");
+  fTH1DNames.push_back("calometphi");
+  fTH1DNames.push_back("calomet");
 
   if (addText!="_n-1"){ // plots that don't have n-1 versions 
     fTH1DNames.push_back("mgg_selt1pfmet");
