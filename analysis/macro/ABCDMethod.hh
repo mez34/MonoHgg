@@ -18,16 +18,23 @@
 #include "TPaveText.h"
 #include "TLatex.h"
 
+//#include "RooGlobalFunc.h"
+#include "RooRealVar.h"
+
 #include <iostream>
 #include <fstream>
 #include <cmath>
 
-typedef std::vector<DblVec>   DblVecVec;
-typedef std::vector<TFile*>   TFileVec;
-typedef std::vector<TH1D*>    TH1DVec;
-typedef std::vector<TH1DVec>  TH1DVecVec;
-typedef std::vector<TH2D*>    TH2DVec;
-typedef std::vector<TH2DVec>  TH2DVecVec;
+using namespace RooFit;
+
+typedef std::vector<DblVec>   	 DblVecVec;
+typedef std::vector<TFile*>   	 TFileVec;
+typedef std::vector<TH1D*>    	 TH1DVec;
+typedef std::vector<TH1DVec>  	 TH1DVecVec;
+typedef std::vector<TH2D*>    	 TH2DVec;
+typedef std::vector<TH2DVec>  	 TH2DVecVec;
+typedef std::vector<RooRealVar*> RooVec;
+typedef std::vector<RooVec>	 RooVecVec;
 
 class ABCDMethod{
 public: 
@@ -36,8 +43,10 @@ public:
   Double_t ComputeIntAndErr(TH2D *& h, Double_t & error, const Double_t minX, const Double_t maxX, const Double_t minY, const Double_t maxY, const UInt_t isReg);
   void GetFinalValuesForABCDReg();
   void DoABCDCalculations();
+  Double_t FindDiff(const Double_t NA, const Double_t NB, const Double_t NC, const Double_t ND);
   Double_t FindExpectedValuesInD(const Double_t NA, const Double_t NB, const Double_t NC, const Double_t NAerr, const Double_t NBerr, const Double_t NCerr, Double_t & NDerr);
-  void FillTable(const TString fSampleName, const UInt_t reg, const UInt_t Integral, const UInt_t Error);
+  void SetRooVariables();
+  void FillTable();
   void WriteDataCard(const TString fSampleName);
   void InitHists();
   void InitVariables();
@@ -51,6 +60,21 @@ private:
   Double_t	met_minB;
   Double_t	met_minD;
   Double_t	met_maxD;
+
+  RooVec	fRData;
+  RooVec	fRBkg;
+  RooVec	fRSig;
+
+  DblVec	fFullData_Int;
+  DblVec	fFullData_IntErr;
+  DblVec	fFullBkg_Int;
+  DblVec	fFullBkg_IntErr;
+  DblVec	fFullSig_Int;
+  DblVec	fFullSig_IntErr;
+
+  RooVecVec	fRooData;
+  RooVecVec	fRooBkg;
+  RooVecVec	fRooSig;
 
   DblVecVec 	Sig_Int;
   DblVecVec 	Sig_IntErr;

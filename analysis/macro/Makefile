@@ -1,7 +1,7 @@
 
 CPPFLAGS := $(shell root-config --cflags)
 CXXFLAGS := -std=c++0x -g
-LDFLAGS  := $(shell root-config --libs)
+LDFLAGS  := $(shell root-config --libs) -L $(ROOTSYS/lib) -lRooFit -lRooFitCore
 
 TGTS := main
 

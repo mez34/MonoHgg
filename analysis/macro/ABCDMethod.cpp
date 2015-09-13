@@ -2,10 +2,15 @@
 
 ABCDMethod::ABCDMethod( SamplePairVec Samples, const Double_t inLumi, const TString outdir){
 
+  // load RooFit
+  gSystem->Load("libRooFit");
+  //using namespace RooFit;
+
   lumi = inLumi;
   fInDir = outdir;
   fOutDir = outdir+"ABCD";
 
+  // values for the different bin edges
   mgg_minAB1 = 100.;
   mgg_minCD  = 110.;
   mgg_maxCD  = 130.;
@@ -39,7 +44,6 @@ ABCDMethod::ABCDMethod( SamplePairVec Samples, const Double_t inLumi, const TStr
 
   ABCDMethod::InitHists();
 
-
 }
 
 ABCDMethod::~ABCDMethod(){
@@ -57,10 +61,21 @@ ABCDMethod::~ABCDMethod(){
     for (UInt_t mc = 0; mc < fNBkg; mc++) delete fInBkgTH2DHists[th2d][mc];
     for (UInt_t mc = 0; mc < fNSig; mc++) delete fInSigTH2DHists[th2d][mc];
   }
- 
+
+  // delete RooRealVar
+  delete fRData[0];
+  for (UInt_t mc = 0; mc < fNBkg+1; mc++){
+    delete fRBkg[mc];
+  }
+  for (UInt_t mc = 0; mc < fNSig; mc++){
+    delete fRSig[mc];
+  }
+   
   delete fOutFile;
   // close output text files
   fOutTableTxtFile.close();
+  
+  std::cout << "Finished Deleting" << std::endl;
 }
 
 
@@ -69,20 +84,25 @@ void ABCDMethod::DoAnalysis(){
   // add all data files together
   // data : copy first histogram & add all others too it 
   for (UInt_t data = 0; data < fNData; data++){
+    //std::cout << "number entries in data in " << fInDataTH2DHists[0][data]->GetEntries() << std::endl;
     if (data == 0) fOutDataTH2DHists[0] = (TH2D*)fInDataTH2DHists[0][data]->Clone(); 
     else fOutDataTH2DHists[0]->Add(fInDataTH2DHists[0][data]);
   }
+  //std::cout << "number entries in data" << fOutDataTH2DHists[0]->GetEntries() << std::endl;
 
   // scale bkg and then make one copy of histos where bkg added together
   for (UInt_t mc = 0; mc < fNBkg; mc++){
     fInBkgTH2DHists[0][mc]->Scale(lumi);
+    //std::cout << "number entries in bkg in " << fInBkgTH2DHists[0][mc]->GetEntries() << std::endl;
     if (mc == 0) fOutBkgTH2DHists[0] = (TH2D*)fInBkgTH2DHists[0][mc]->Clone();
     else fOutBkgTH2DHists[0]->Add(fInBkgTH2DHists[0][mc]);
   } 
+  //std::cout << "number entries in bkg " << fOutBkgTH2DHists[0]->GetEntries() << std::endl;
 
   // just scale the signal by lumi, don't add together 
   for (UInt_t mc = 0; mc < fNSig; mc++){
     fInSigTH2DHists[0][mc]->Scale(lumi);
+    //std::cout << "number entries in sig in " << fInSigTH2DHists[0][mc]->GetEntries() << std::endl;
   }
  
   Int_t fNCat = 6; // for 6 categories A1,B1,A2,B2,D,C
@@ -150,13 +170,40 @@ void ABCDMethod::DoAnalysis(){
     } 
 
     //std::cout << "Data " << Data_Int[cat][0] << " " << Data_IntErr[cat][0] << std::endl;
-    //for (UInt_t mc = 0; mc < fNBkg+1; mc++){ std::cout << "Bkg " << Bkg_Int[cat][mc] << " " << Bkg_IntErr[cat][mc] << std::endl; }
-    //for (UInt_t mc = 0; mc < fNSig; mc++){   std::cout << "Sig " << Sig_Int[cat][mc] << " " << Sig_IntErr[cat][mc] << std::endl; }
+    //for (UInt_t mc = 0; mc < fNBkg+1; mc++){ std::cout << fBkgNames[mc] << " in " << cat << " reg "<< Bkg_Int[cat][mc] << " " << Bkg_IntErr[cat][mc] << std::endl; }
+    //for (UInt_t mc = 0; mc < fNSig; mc++){   std::cout << fSigNames[mc] << " in " << cat << " reg "<< Sig_Int[cat][mc] << " " << Sig_IntErr[cat][mc] << std::endl; }
 
   }// end cat loop over A1,B1,A2,B2,C,D  
 
+  // calculate integral and error for full range
+  fFullData_Int.resize(1);
+  fFullBkg_Int.resize(fNBkg+1);
+  fFullSig_Int.resize(fNSig);
+  fFullData_IntErr.resize(1);
+  fFullBkg_IntErr.resize(fNBkg+1);
+  fFullSig_IntErr.resize(fNSig);
+ 
+  fFullData_Int[0] = ABCDMethod::ComputeIntAndErr( fOutDataTH2DHists[0], fFullData_IntErr[0], mgg_minAB1, mgg_maxAB2, met_minB, met_maxD, fNCat); 
+  for (UInt_t mc = 0; mc < fNBkg; mc++){ 
+    fFullBkg_Int[mc] = ABCDMethod::ComputeIntAndErr( fInBkgTH2DHists[0][mc], fFullBkg_IntErr[mc], mgg_minAB1, mgg_maxAB2, met_minB, met_maxD, fNCat); 
+  }
+  fFullBkg_Int[fNBkg] = ABCDMethod::ComputeIntAndErr( fOutBkgTH2DHists[0], fFullBkg_IntErr[fNBkg], mgg_minAB1, mgg_maxAB2, met_minB, met_maxD, fNCat); 
+  for (UInt_t mc = 0; mc < fNSig; mc++){ 
+    fFullSig_Int[mc] = ABCDMethod::ComputeIntAndErr( fInSigTH2DHists[0][mc], fFullSig_IntErr[mc], mgg_minAB1, mgg_maxAB2, met_minB, met_maxD, fNCat); 
+  } 
+
+  //std::cout << "All Data int " << fFullData_Int[0] << " error " << fFullData_IntErr[0] << std::endl;
+  //for (UInt_t mc = 0; mc < fNBkg+1; mc++){ std::cout << "All " << fBkgNames[mc] << " int " << fFullBkg_Int[mc] << " " << fFullBkg_IntErr[mc] << std::endl; }
+  //for (UInt_t mc = 0; mc < fNSig; mc++){   std::cout << "All " << fSigNames[mc] << " int " << fFullSig_Int[mc] << " " << fFullSig_IntErr[mc] << std::endl; }
+
 
   ABCDMethod::GetFinalValuesForABCDReg(); // merge A1&A2->A and B1&B2->B
+  //for (UInt_t reg=0; reg <4; reg++){// print out A,B,D,C values
+  //  std::cout << "Data in reg " << reg << " has int = " << fData_Int[reg][0] << " and err = " << fData_IntErr[reg][0] << std::endl;
+  //  for (UInt_t mc = 0; mc < fNBkg+1; mc++){ std::cout << fBkgNames[mc] << " in reg " << reg << " has int " << fBkg_Int[reg][mc] << " and err " << fBkg_IntErr[reg][mc] << std::endl; }
+  //  for (UInt_t mc = 0; mc < fNSig; mc++){   std::cout << fSigNames[mc] << " in reg " << reg << " has int " << fSig_Int[reg][mc] << " and err " << fSig_IntErr[reg][mc] << std::endl; }
+  //}
+
 
   ABCDMethod::DoABCDCalculations(); // calculate corr & diff values
 
@@ -168,18 +215,17 @@ void ABCDMethod::DoAnalysis(){
   fExpErrSig.resize(fNSig);
 
   fExpData[0]=ABCDMethod::FindExpectedValuesInD(fData_Int[0][0],fData_Int[1][0],fData_Int[3][0],fData_IntErr[0][0],fData_IntErr[1][0],fData_IntErr[3][0],fExpErrData[0]);
-  //std::cout << "Data: Exp D = " << fExpData[0] << " Exp D err " << fExpErrData[0] << std::endl;
+  std::cout << "Data: Exp D = " << fExpData[0] << " Exp D err " << fExpErrData[0] << std::endl;
   for (UInt_t mc = 0; mc < fNBkg+1; mc++){
     fExpBkg[mc]=ABCDMethod::FindExpectedValuesInD(fBkg_Int[0][mc],fBkg_Int[1][mc],fBkg_Int[3][mc],fBkg_IntErr[0][mc],fBkg_IntErr[1][mc],fBkg_IntErr[3][mc],fExpErrBkg[mc]);
-    std::cout << "Bkg: Exp D = " << fExpBkg[mc] << " Exp D err " << fExpErrBkg[mc] << std::endl;
+    std::cout << fBkgNames[mc] << ": Exp D = " << fExpBkg[mc] << " Exp D err " << fExpErrBkg[mc] << std::endl;
   }
   for (UInt_t mc = 0; mc < fNSig; mc++){
     fExpSig[mc]=ABCDMethod::FindExpectedValuesInD(fSig_Int[0][mc],fSig_Int[1][mc],fSig_Int[3][mc],fSig_IntErr[0][mc],fSig_IntErr[1][mc],fSig_IntErr[3][mc],fExpErrSig[mc]);
-    //std::cout << "Sig: Exp D = " << fExpSig[mc] << " Exp D err " << fExpErrSig[mc] << std::endl;
+    std::cout << fSigNames[mc] <<": Exp D = " << fExpSig[mc] << " Exp D err " << fExpErrSig[mc] << std::endl;
   }
 
-
-  ABCDMethod::FillTable("Data", 0, fData_Int[0][0],fData_IntErr[0][0]);
+  ABCDMethod::FillTable();
 
   for (UInt_t mc = 0; mc < fNSig; mc++){
     ABCDMethod::WriteDataCard(fSigNames[mc].Data());
@@ -230,7 +276,7 @@ void ABCDMethod::GetFinalValuesForABCDReg(){
       }
     }  
 
-  }// end cat loop over A,B,C,D
+  }// end cat loop over A,B,D,C
 }
 
 void ABCDMethod::DoABCDCalculations(){
@@ -246,24 +292,42 @@ void ABCDMethod::DoABCDCalculations(){
   } 
 
   //calculate Diff = TMath::Abs((NC*NA/NB-ND)/(NC*NA/NB));
-  fDiffData.push_back(TMath::Abs((fData_Int[3][0]*fData_Int[0][0]/fData_Int[1][0]-fData_Int[2][0])/(fData_Int[3][0]*fData_Int[0][0]/fData_Int[1][0] )));
+  fDiffData.resize(1);
+  fDiffBkg.resize(fNBkg+1);
+  fDiffSig.resize(fNSig);
+
+  fDiffData[0] = ABCDMethod::FindDiff(fData_Int[0][0],fData_Int[1][0],fData_Int[3][0],fData_Int[2][0]);
+  //std::cout << "Data Diff = " << fDiffData[0] << std::endl;
   for (UInt_t mc = 0; mc < fNBkg+1; mc++){
-    fDiffBkg.push_back(TMath::Abs((fBkg_Int[3][mc]*fBkg_Int[0][mc]/fBkg_Int[1][mc]-fBkg_Int[2][mc])/(fBkg_Int[3][mc]*fBkg_Int[0][mc]/fBkg_Int[1][mc] ))); 
-    std::cout << "Bkg Diff = " << fDiffBkg[mc] << std::endl;
+    fDiffBkg[mc]= ABCDMethod::FindDiff(fBkg_Int[0][mc],fBkg_Int[1][mc],fBkg_Int[3][mc],fBkg_Int[2][mc]); 
+    //std::cout << fBkgNames[mc] << " Diff = " << fDiffBkg[mc] << std::endl;
   }
   for (UInt_t mc = 0; mc < fNSig; mc++){ 
-    fDiffSig.push_back(TMath::Abs((fSig_Int[3][mc]*fSig_Int[0][mc]/fSig_Int[1][mc]-fSig_Int[2][mc])/(fSig_Int[3][mc]*fSig_Int[0][mc]/fSig_Int[1][mc] ))); 
+    fDiffSig[mc]= ABCDMethod::FindDiff(fSig_Int[0][mc],fSig_Int[1][mc],fSig_Int[3][mc],fSig_Int[2][mc]); 
+    //std::cout << fSigNames[mc] << " Diff = " << fDiffSig[mc] << std::endl;
   }
 
+}
+
+Double_t ABCDMethod::FindDiff(const Double_t NA, const Double_t NB, const Double_t NC, const Double_t ND){
+  Double_t Diff = 0.;
+  if ( NB-ND != 0 && NA > 0 && NB > 0 && NC > 0 ){
+    Diff = TMath::Abs((NC*NA/NB-ND)/(NC*NA/NB)); 
+  }  
+  return Diff;
 }
 
 Double_t ABCDMethod::FindExpectedValuesInD(const Double_t NA, const Double_t NB, const Double_t NC, const Double_t NAerr, const Double_t NBerr, const Double_t NCerr, Double_t & NDerr){ // find expected values in the D (signal) region
-  Double_t ExpND = NC*NA/NB;                                                                                                                                
-  NDerr = std::sqrt((NCerr*NCerr*NA*NA/(NB*NB))+(NAerr*NAerr*NC*NC/(NB*NB))+(NBerr*NBerr*NC*NC*NA*NA/(std::pow(NB,4))));
+  Double_t ExpND = 0.;
+  NDerr = 0.;
+  if (NB > 0){ 
+    ExpND = NC*NA/NB;                                                                                                                                
+    NDerr = std::sqrt((NCerr*NCerr*NA*NA/(NB*NB))+(NAerr*NAerr*NC*NC/(NB*NB))+(NBerr*NBerr*NC*NC*NA*NA/(std::pow(NB,4))));
+  }
   return ExpND;
 }
 
-void ABCDMethod::FillTable( const TString fSampleName, const UInt_t reg, const UInt_t Integral, const UInt_t Error){
+void ABCDMethod::FillTable(){
   if (fOutTableTxtFile.is_open()){
 
      fOutTableTxtFile << "\\begin{table}[bthp]" <<std::endl;
@@ -273,18 +337,23 @@ void ABCDMethod::FillTable( const TString fSampleName, const UInt_t reg, const U
      fOutTableTxtFile << "$m_{\\gamma \\gamma}$ in $[110-130]$ and MET $>$ 250 GeV"<<" \\\\" <<std::endl;
      fOutTableTxtFile << "\\hline" <<std::endl;
 
-/*   fOutTableTxtFile << "prompt+prompt &  "<<*(pp.format(2,"EXPF"))<<" \\\\"<<std::endl;
-     fOutTableTxtFile << "prompt+fake &  "<<*(pf.format(2,"EXPF"))<<" \\\\"<<std::endl;
-     fOutTableTxtFile << "W/Z/tt $\\gamma \\gamma$ &  "<<*(Zgg.format(2,"EXPF"))<<" \\\\"<<std::endl;
-     fOutTableTxtFile << "$h \\rightarrow  \\gamma \\gamma$  (ggH, VBF)&  "<<*(hgg.format(2,"EXPF"))<<" \\\\"<<std::endl;
-     fOutTableTxtFile << "Vh,$h \\rightarrow  \\gamma \\gamma$ &  "<<*(Vh.format(2,"EXPF"))<<" \\\\"<<std::endl;
-     fOutTableTxtFile << "\\hline" <<std::endl;
-     fOutTableTxtFile << "Total Background &  "<<*(tot.format(2,"EXPF"))<<" \\\\"<<std::endl;
-     fOutTableTxtFile << "$\\bar{\\chi}\\chi HH, m_{\\chi}$ = 1 GeV (10 fb) &  "<<*(s1.format(2,"EXPF"))<<" \\\\"<<std::endl;
-     fOutTableTxtFile << "$\\bar{\\chi}\\chi HH, m_{\\chi}$ = 10 GeV (10 fb) &  "<<*(s10.format(2,"EXPF"))<<" \\\\"<<std::endl;
-     fOutTableTxtFile << "$\\bar{\\chi}\\chi HH, m_{\\chi}$ = 100 GeV (10 fb) &  "<<*(s100.format(2,"EXPF"))<<" \\\\"<<std::endl;
-     fOutTableTxtFile << "$\\bar{\\chi}\\chi HH, m_{\\chi}$ = 1000 GeV (10 fb) &  "<<*(s1000.format(2,"EXPF"))<<" \\\\"<<std::endl;
-*/
+     ABCDMethod::SetRooVariables();
+     fOutTableTxtFile << "Data &  " << *(fRData[0]->format(2,"EXPF")) << std::endl;
+     std::cout << "Data &  " << *(fRData[0]->format(2,"EXPF")) << std::endl;
+
+     TString name = "";
+     for (UInt_t mc = 0; mc < fNBkg; mc++){
+       fOutTableTxtFile << fBkgNames[mc].Data() << " &  " << *(fRBkg[mc]->format(2,"EXPP")) <<  " \\\\" << std::endl;
+       std::cout << fBkgNames[mc].Data() <<  " &  " << *(fRBkg[mc]->format(2,"EXPF")) << std::endl;
+     }
+     fOutTableTxtFile << "\\hline" << std::endl;
+       fOutTableTxtFile << "Total Bkg &  " << *(fRBkg[fNBkg]->format(2,"EXPF")) <<  " \\\\" << std::endl;
+
+     for (UInt_t mc = 0; mc < fNSig; mc++){
+       fOutTableTxtFile << fSigNames[mc].Data() << " &  " << *(fRSig[mc]->format(2,"EXPF")) <<  " \\\\" << std::endl; 
+       std::cout << fSigNames[mc] <<  " &  " << *(fRSig[mc]->format(2,"EXPF")) << std::endl;
+     }
+ 
      fOutTableTxtFile << "\\hline \\hline" <<std::endl;
      fOutTableTxtFile << "\\end{tabular}" <<std::endl;
      fOutTableTxtFile << "\\end{table}" <<std::endl;
@@ -307,6 +376,72 @@ void ABCDMethod::FillTable( const TString fSampleName, const UInt_t reg, const U
 
   }
   else std::cout << "Unable to open ResultsTable Output File" <<std::endl;
+
+}
+
+void ABCDMethod::SetRooVariables(){
+
+  UInt_t fNReg = 4;
+  fRooData.resize(fNReg);
+  fRooBkg.resize(fNReg);
+  fRooSig.resize(fNReg);
+  TString cat_name = "";
+  TString name = "";
+
+  for (UInt_t cat = 0; cat < fNReg; cat++){// loop over A,B,C,D
+    fRooData[cat].resize(1);
+    fRooBkg[cat].resize(fNBkg+1);
+    fRooSig[cat].resize(fNSig);
+//
+//    if (cat==0) cat_name = "_A";
+//    if (cat==1) cat_name = "_B";
+//    if (cat==2) cat_name = "_D";
+//    if (cat==3) cat_name = "_C";
+// 
+//    name = Form("Data%s",cat_name.Data());
+//
+//    RooRealVar Data(name,name,fData_Int[cat][0]);
+//    Data.setError(fData_IntErr[cat][0]);
+//    fRooData[cat][0]=Data; 
+//    Data.Delete();
+// 
+//    for (UInt_t mc = 0; mc < fNBkg+1; mc++){
+//      name = Form("%s%s",fBkgNames[mc].Data(),cat_name.Data());
+//      RooRealVar Bkg(name,name,fBkg_Int[cat][mc]);
+//      Bkg.setError(fBkg_IntErr[cat][mc]);
+//      fRooBkg[cat][mc]=Bkg;
+//      Bkg.Delete();
+//    }
+//   
+//    for (UInt_t mc = 0; mc < fNSig; mc++){
+//      name = Form("%s%s",fSigNames[mc].Data(),cat_name.Data());
+//      RooRealVar Sig(name,name,fSig_Int[cat][mc]);
+//      Sig.setError(fSig_IntErr[cat][mc]);
+//      fRooSig[cat][mc]=Sig;
+//      Sig.Delete();
+//    }
+//    
+  }// end loop over categories
+
+  fRData.resize(1);
+  fRBkg.resize(fNBkg+1);
+  fRSig.resize(fNSig);
+
+  fRData[0] = new RooRealVar("Data","Data",fFullData_Int[0]);
+  fRData[0]->setError(fFullData_IntErr[0]);
+
+  for (UInt_t mc = 0; mc < fNBkg+1; mc++){
+    if (mc==fNBkg+1) name = "TotBkg";
+    else name = fBkgNames[mc];    
+    fRBkg[mc] = new RooRealVar(name,name,fFullBkg_Int[mc]);
+    fRBkg[mc]->setError(fFullBkg_IntErr[mc]);
+  }
+
+  for (UInt_t mc = 0; mc < fNSig; mc++){
+    fRSig[mc] = new RooRealVar(fSigNames[mc],fSigNames[mc],fFullSig_Int[mc]);
+    fRSig[mc]->setError(fFullSig_IntErr[mc]);
+  }
+
 
 }
 
@@ -364,7 +499,7 @@ Double_t ABCDMethod::ComputeIntAndErr(TH2D *& h, Double_t & error, const Double_
   Int_t binXmax;
   Int_t binYmin;
   Int_t binYmax;    
-  if (isReg == 4 || isReg == 5){ // if signal find the exact bins
+  if (isReg == 4 || isReg == 5 || isReg == 6){ // if signal find the exact bins
     binXmin = h->GetXaxis()->FindBin(minX);
     binXmax = h->GetXaxis()->FindBin(maxX);
     binYmin = h->GetYaxis()->FindBin(minY);
