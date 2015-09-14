@@ -111,13 +111,14 @@ void Plotter::DoPlots(){
       fTH1DMap["hoe2"]->Fill(hoe2,Weight);
       fTH1DMap["r91"]->Fill(r91,Weight);
       fTH1DMap["r92"]->Fill(r92,Weight);
+      fTH1DMap["t1pfmet_zoom"]->Fill(t1pfmet,Weight);
 
       fTH2DMap["t1pfmet_mgg"]->Fill(mgg,t1pfmet,Weight);
       fTH2DMap["mgg_PU"]->Fill(nvtx,mgg,Weight);
       fTH2DMap["mgg_ptgg"]->Fill(ptgg,mgg,Weight);
       fTH2DMap["t1pfmet_PU"]->Fill(nvtx,t1pfmet,Weight);
       fTH2DMap["t1pfmet_ptgg"]->Fill(ptgg,t1pfmet,Weight);
-
+   
 
       Bool_t passCH1  = false;
       Bool_t passCH2  = false;
@@ -273,7 +274,7 @@ void Plotter::DoPlots(){
 void Plotter::SetUpPlots(){
   // fill all plots from tree
   fTH1DMap["nvtx"]		= Plotter::MakeTH1DPlot("nvtx","",60,0.,60.,"nvtx","");
-  fTH1DMap["mgg"]		= Plotter::MakeTH1DPlot("mgg","",60,50.,300.,"m_{#gamma#gamma} (GeV)","");  
+  fTH1DMap["mgg"]		= Plotter::MakeTH1DPlot("mgg","",40,100.,300.,"m_{#gamma#gamma} (GeV)","");  
   fTH1DMap["ptgg"]		= Plotter::MakeTH1DPlot("ptgg","",100,0.,1000.,"p_{T,#gamma#gamma} (GeV)","");
   fTH1DMap["t1pfmet"]		= Plotter::MakeTH1DPlot("t1pfmet","",100,0.,1000,"t1PF MET (GeV)","");
   fTH1DMap["t1pfmetphi"]	= Plotter::MakeTH1DPlot("t1pfmetphi","",80,-4.,4.,"t1PF MET #phi","");
@@ -299,10 +300,11 @@ void Plotter::SetUpPlots(){
   fTH1DMap["hoe2"]		= Plotter::MakeTH1DPlot("hoe2","",125,0.,0.025,"H/E(#gamma2)","");
   fTH1DMap["r91"]		= Plotter::MakeTH1DPlot("r91","",100,0.,1.1,"R9(#gamma1)","");
   fTH1DMap["r92"]		= Plotter::MakeTH1DPlot("r92","",100,0.,1.1,"R9(#gamma2)","");
+  fTH1DMap["t1pfmet_zoom"]	= Plotter::MakeTH1DPlot("t1pfmet_zoom","",60,0.,300.,"t1PF MET (GEV)","");
 
   // n minus 1 plots
   fTH1DMap["nvtx_n-1"]		= Plotter::MakeTH1DPlot("nvtx_n-1","",60,0.,60.,"nvtx","");
-  fTH1DMap["mgg_n-1"]		= Plotter::MakeTH1DPlot("mgg_n-1","",60,50.,300.,"m_{#gamma#gamma} (GeV)","");  
+  fTH1DMap["mgg_n-1"]		= Plotter::MakeTH1DPlot("mgg_n-1","",40,100.,300.,"m_{#gamma#gamma} (GeV)","");  
   fTH1DMap["ptgg_n-1"]		= Plotter::MakeTH1DPlot("ptgg_n-1","",100,0.,1000.,"p_{T,#gamma#gamma} (GeV)","");
   fTH1DMap["t1pfmet_n-1"]	= Plotter::MakeTH1DPlot("t1pfmet_n-1","",100,0.,1000.,"t1PF MET (GeV)","");
   fTH1DMap["t1pfmetphi_n-1"]	= Plotter::MakeTH1DPlot("t1pfmetphi_n-1","",80,-4.,4.,"t1PF MET #phi","");
@@ -333,7 +335,7 @@ void Plotter::SetUpPlots(){
   fTH1DMap["phigg"]		= Plotter::MakeTH1DPlot("phigg","",80,-4.,4.,"#phi(#gamma#gamma)","");
   fTH1DMap["dphi_ggmet"]	= Plotter::MakeTH1DPlot("dphi_ggmet","",80,-4.,4.,"#Delta#phi(#gamma#gamma,MET)","");
   fTH1DMap["t1pfmet_selmgg"]	= Plotter::MakeTH1DPlot("t1pfmet_selmgg","",100,0.,1000.,"t1PF MET (GeV)","");
-  fTH1DMap["mgg_selt1pfmet"]	= Plotter::MakeTH1DPlot("mgg_selt1pfmet","",100,0.,1000.,"m_{#gamma#gamma} (GeV)","");
+  fTH1DMap["mgg_selt1pfmet"]	= Plotter::MakeTH1DPlot("mgg_selt1pfmet","",40,100.,300.,"m_{#gamma#gamma} (GeV)","");
 
   // efficiency plots
   fTH1DMap["eff_sel"]		= Plotter::MakeTH1DPlot("eff_sel","",10,0.,10.,"","");
@@ -342,11 +344,11 @@ void Plotter::SetUpPlots(){
   fTH1DMap["hlt"]		= Plotter::MakeTH1DPlot("hlt","",10,0.,10,"","");
 
   // 2D plots
-  fTH2DMap["mgg_PU"]		= Plotter::MakeTH2DPlot("mgg_PU","",60,0.,60.,60,50.,300.,"nvtx","m_{#gamma#gamma} (GeV)");
-  fTH2DMap["mgg_ptgg"] 		= Plotter::MakeTH2DPlot("mgg_ptgg","",50,0.,500.,60,50.,300.,"p_{T,#gamma#gamma} (GeV)","m_{#gamma#gamma}");
+  fTH2DMap["mgg_PU"]		= Plotter::MakeTH2DPlot("mgg_PU","",60,0.,60.,40,100.,300.,"nvtx","m_{#gamma#gamma} (GeV)");
+  fTH2DMap["mgg_ptgg"] 		= Plotter::MakeTH2DPlot("mgg_ptgg","",50,0.,500.,40,100.,300.,"p_{T,#gamma#gamma} (GeV)","m_{#gamma#gamma}");
   fTH2DMap["t1pfmet_PU"]	= Plotter::MakeTH2DPlot("t1pfmet_PU","",60,50.,300.,100,0.,1000.,"nvtx","MET (GeV)");
   fTH2DMap["t1pfmet_ptgg"]	= Plotter::MakeTH2DPlot("t1pfmet_ptgg","",60,0.,60.,100,0.,1000.,"p_{T,#gamma#gamma} (GeV)","MET (GeV)");
-  fTH2DMap["t1pfmet_mgg"]	= Plotter::MakeTH2DPlot("t1pfmet_mgg","",250,50.,300.,1000,0.,1000,"m_{#gamma#gamma} (GeV)","MET (GeV)");
+  fTH2DMap["t1pfmet_mgg"]	= Plotter::MakeTH2DPlot("t1pfmet_mgg","",200,100.,300.,1000,0.,1000,"m_{#gamma#gamma} (GeV)","MET (GeV)");
 
 }// end Plotter::SetUpPlots
 
