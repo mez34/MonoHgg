@@ -15,9 +15,11 @@ ABCDMethod::ABCDMethod( SamplePairVec Samples, const Double_t inLumi, const TStr
   mgg_minCD  = 110.;
   mgg_maxCD  = 130.;
   mgg_maxAB2 = 180.; 
-  met_minB   = 150.;
+  met_minB   = 0.;
   met_minD   = 250.;
-  met_maxD   = 400.;
+  met_maxD   = 1000.;
+
+  // titles for output Latex table
 
   // make output txt file with output table
   fOutTableTxtFile.open(Form("%s/ResultsTableForLatex.txt",fOutDir.Data()));
@@ -64,12 +66,15 @@ ABCDMethod::~ABCDMethod(){
 
   // delete RooRealVar
   delete fRData[0];
-  for (UInt_t mc = 0; mc < fNBkg+1; mc++){
-    delete fRBkg[mc];
+  for (UInt_t mc = 0; mc < fNBkg+1; mc++){ delete fRBkg[mc]; }
+  for (UInt_t mc = 0; mc < fNSig; mc++){ delete fRSig[mc]; }
+
+  for (UInt_t cat = 0; cat < 4; cat++){
+    delete fRooData[cat][0];
+    for (UInt_t mc = 0; mc < fNBkg+1; mc++){ delete fRooBkg[cat][mc]; }
+    for (UInt_t mc = 0; mc < fNSig; mc++){ delete fRooSig[cat][mc]; }
   }
-  for (UInt_t mc = 0; mc < fNSig; mc++){
-    delete fRSig[mc];
-  }
+
    
   delete fOutFile;
   // close output text files
@@ -92,7 +97,7 @@ void ABCDMethod::DoAnalysis(){
 
   // scale bkg and then make one copy of histos where bkg added together
   for (UInt_t mc = 0; mc < fNBkg; mc++){
-    fInBkgTH2DHists[0][mc]->Scale(lumi);
+    //fInBkgTH2DHists[0][mc]->Scale(lumi);
     //std::cout << "number entries in bkg in " << fInBkgTH2DHists[0][mc]->GetEntries() << std::endl;
     if (mc == 0) fOutBkgTH2DHists[0] = (TH2D*)fInBkgTH2DHists[0][mc]->Clone();
     else fOutBkgTH2DHists[0]->Add(fInBkgTH2DHists[0][mc]);
@@ -101,7 +106,7 @@ void ABCDMethod::DoAnalysis(){
 
   // just scale the signal by lumi, don't add together 
   for (UInt_t mc = 0; mc < fNSig; mc++){
-    fInSigTH2DHists[0][mc]->Scale(lumi);
+    //fInSigTH2DHists[0][mc]->Scale(lumi);
     //std::cout << "number entries in sig in " << fInSigTH2DHists[0][mc]->GetEntries() << std::endl;
   }
  
@@ -338,8 +343,9 @@ void ABCDMethod::FillTable(){
      fOutTableTxtFile << "\\hline" <<std::endl;
 
      ABCDMethod::SetRooVariables();
-     fOutTableTxtFile << "Data &  " << *(fRData[0]->format(2,"EXPF")) << std::endl;
+     fOutTableTxtFile << "Data &  " << *(fRData[0]->format(2,"EXPF")) <<  " \\\\" << std::endl;
      std::cout << "Data &  " << *(fRData[0]->format(2,"EXPF")) << std::endl;
+     fOutTableTxtFile << "\\hline" << std::endl;
 
      TString name = "";
      for (UInt_t mc = 0; mc < fNBkg; mc++){
@@ -348,7 +354,8 @@ void ABCDMethod::FillTable(){
      }
      fOutTableTxtFile << "\\hline" << std::endl;
        fOutTableTxtFile << "Total Bkg &  " << *(fRBkg[fNBkg]->format(2,"EXPF")) <<  " \\\\" << std::endl;
-
+     fOutTableTxtFile << "\\hline" << std::endl;
+     
      for (UInt_t mc = 0; mc < fNSig; mc++){
        fOutTableTxtFile << fSigNames[mc].Data() << " &  " << *(fRSig[mc]->format(2,"EXPF")) <<  " \\\\" << std::endl; 
        std::cout << fSigNames[mc] <<  " &  " << *(fRSig[mc]->format(2,"EXPF")) << std::endl;
@@ -357,6 +364,32 @@ void ABCDMethod::FillTable(){
      fOutTableTxtFile << "\\hline \\hline" <<std::endl;
      fOutTableTxtFile << "\\end{tabular}" <<std::endl;
      fOutTableTxtFile << "\\end{table}" <<std::endl;
+
+     std::cout << "Writing ResultsTable in " << Form("%s/ResultsTableForLatex.txt",fOutDir.Data()) << std::endl;
+
+     std::cout << "Data: A    =  " << *(fRooData[0][0]->format(2,"EXPP")) << std::endl;
+     std::cout << "Data: B    =  " << *(fRooData[1][0]->format(2,"EXPP")) << std::endl;
+     std::cout << "Data: C    =  " << *(fRooData[3][0]->format(2,"EXPP")) << std::endl;
+     std::cout << "Data: D    =  " << *(fRooData[2][0]->format(2,"EXPP")) << std::endl;
+     std::cout << "Data: corr =  " << fCorrData[0]  << std::endl;
+     std::cout << "Data: ExpD =  " << fExpData[0] << " \\pm " << fExpErrData[0] << std::endl;
+     for (UInt_t mc = 0; mc < fNBkg+1; mc++){
+       std::cout << fBkgNames[mc] << ": A    =  " << *(fRooBkg[0][mc]->format(2,"EXPP")) << std::endl;
+       std::cout << fBkgNames[mc] << ": B    =  " << *(fRooBkg[1][mc]->format(2,"EXPP")) << std::endl;
+       std::cout << fBkgNames[mc] << ": C    =  " << *(fRooBkg[3][mc]->format(2,"EXPP")) << std::endl;
+       std::cout << fBkgNames[mc] << ": D    =  " << *(fRooBkg[2][mc]->format(2,"EXPP")) << std::endl;
+       std::cout << fBkgNames[mc] << ": corr =  " << fCorrBkg[mc]  << std::endl;
+       std::cout << fBkgNames[mc] << ": ExpD =  " << fExpBkg[mc] << " \\pm " << fExpErrBkg[mc] << std::endl;
+     }
+     for (UInt_t mc = 0; mc < fNSig; mc++){
+       std::cout << fSigNames[mc] << ": A    =  " << *(fRooSig[0][mc]->format(2,"EXPP")) << std::endl;
+       std::cout << fSigNames[mc] << ": B    =  " << *(fRooSig[1][mc]->format(2,"EXPP")) << std::endl;
+       std::cout << fSigNames[mc] << ": C    =  " << *(fRooSig[3][mc]->format(2,"EXPP")) << std::endl;
+       std::cout << fSigNames[mc] << ": D    =  " << *(fRooSig[2][mc]->format(2,"EXPP")) << std::endl;
+       std::cout << fSigNames[mc] << ": corr =  " << fCorrSig[mc]  << std::endl;
+       std::cout << fSigNames[mc] << ": ExpD =  " << fExpSig[mc] << " \\pm " << fExpErrSig[mc] << std::endl;
+     }
+
 
 /*  double ppExpND = ppNC*ppNA/ppNB;
     double ppExpNDerr = sqrt((ppNCerr*ppNCerr*ppNA*ppNA/(ppNB*ppNB))+(ppNAerr*ppNAerr*ppNC*ppNC/(ppNB*ppNB))+(ppNBerr*ppNBerr*ppNC*ppNC*ppNA*ppNA/(pow(ppNB,4))));
@@ -392,35 +425,29 @@ void ABCDMethod::SetRooVariables(){
     fRooData[cat].resize(1);
     fRooBkg[cat].resize(fNBkg+1);
     fRooSig[cat].resize(fNSig);
-//
-//    if (cat==0) cat_name = "_A";
-//    if (cat==1) cat_name = "_B";
-//    if (cat==2) cat_name = "_D";
-//    if (cat==3) cat_name = "_C";
-// 
-//    name = Form("Data%s",cat_name.Data());
-//
-//    RooRealVar Data(name,name,fData_Int[cat][0]);
-//    Data.setError(fData_IntErr[cat][0]);
-//    fRooData[cat][0]=Data; 
-//    Data.Delete();
-// 
-//    for (UInt_t mc = 0; mc < fNBkg+1; mc++){
-//      name = Form("%s%s",fBkgNames[mc].Data(),cat_name.Data());
-//      RooRealVar Bkg(name,name,fBkg_Int[cat][mc]);
-//      Bkg.setError(fBkg_IntErr[cat][mc]);
-//      fRooBkg[cat][mc]=Bkg;
-//      Bkg.Delete();
-//    }
-//   
-//    for (UInt_t mc = 0; mc < fNSig; mc++){
-//      name = Form("%s%s",fSigNames[mc].Data(),cat_name.Data());
-//      RooRealVar Sig(name,name,fSig_Int[cat][mc]);
-//      Sig.setError(fSig_IntErr[cat][mc]);
-//      fRooSig[cat][mc]=Sig;
-//      Sig.Delete();
-//    }
-//    
+
+    if (cat==0) cat_name = "_A";
+    if (cat==1) cat_name = "_B";
+    if (cat==2) cat_name = "_D";
+    if (cat==3) cat_name = "_C";
+ 
+    name = Form("Data%s",cat_name.Data());
+
+    fRooData[cat][0]= new RooRealVar(name,name,fData_Int[cat][0]); 
+    fRooData[cat][0]->setError(fData_IntErr[cat][0]);
+  
+    for (UInt_t mc = 0; mc < fNBkg+1; mc++){
+      name = Form("%s%s",fBkgNames[mc].Data(),cat_name.Data());
+      fRooBkg[cat][mc] = new RooRealVar(name,name,fBkg_Int[cat][mc]);
+      fRooBkg[cat][mc]->setError(fBkg_IntErr[cat][mc]);
+    }
+   
+    for (UInt_t mc = 0; mc < fNSig; mc++){
+      name = Form("%s%s",fSigNames[mc].Data(),cat_name.Data());
+      fRooSig[cat][mc] = new RooRealVar(name,name,fSig_Int[cat][mc]);
+      fRooSig[cat][mc]->setError(fSig_IntErr[cat][mc]);
+    }
+    
   }// end loop over categories
 
   fRData.resize(1);
@@ -493,7 +520,7 @@ Double_t ABCDMethod::ComputeIntAndErr(TH2D *& h, Double_t & error, const Double_
 
   if(h == (TH2D*) NULL) std::cout << "NULL TH2D" << std::endl;
 
-  //std::cout << "minx = " << minX << " maxX = " << maxX << " minY = " << minY << " maxY = " << maxY << std::endl; 
+  //std::cout << isReg <<  " minx = " << minX << " maxX = " << maxX << " minY = " << minY << " maxY = " << maxY << std::endl; 
 
   Int_t binXmin;
   Int_t binXmax;
@@ -503,7 +530,7 @@ Double_t ABCDMethod::ComputeIntAndErr(TH2D *& h, Double_t & error, const Double_
     binXmin = h->GetXaxis()->FindBin(minX);
     binXmax = h->GetXaxis()->FindBin(maxX);
     binYmin = h->GetYaxis()->FindBin(minY);
-    if (isReg == 4) binYmax = h->GetYaxis()->FindBin(maxY);
+    if (isReg == 4 || isReg == 6) binYmax = h->GetYaxis()->FindBin(maxY);
     if (isReg == 5) binYmax = h->GetYaxis()->FindBin(maxY)-1;
   }
   else if (isReg == 0 || isReg == 1){ // if to left of signal region 
@@ -520,7 +547,8 @@ Double_t ABCDMethod::ComputeIntAndErr(TH2D *& h, Double_t & error, const Double_
     if (isReg == 2) binYmax = h->GetYaxis()->FindBin(maxY);
     if (isReg == 3) binYmax = h->GetYaxis()->FindBin(maxY)-1;
   }
- 
+
+  //std::cout << isReg << std::endl; 
   //std::cout << "binXmin " << binXmin << std::endl;
   //std::cout << "binXmax " << binXmax << std::endl;
   //std::cout << "binYmin " << binYmin << std::endl;
