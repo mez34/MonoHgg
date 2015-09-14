@@ -65,6 +65,8 @@ private:
   RooVec	fRBkg;
   RooVec	fRSig;
 
+  TStrMap	fSampleTitleMap;
+
   DblVec	fFullData_Int;
   DblVec	fFullData_IntErr;
   DblVec	fFullBkg_Int;
