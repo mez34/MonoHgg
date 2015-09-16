@@ -44,6 +44,7 @@ public:
 
   void DoPlots();  
   void FindMinAndMax(TH1F *& h, int plotLog);
+  TH1D * DrawOverflowBin(const TH1D * h);
 
   void SetBranchAddresses();
   void SetUpPlots();
@@ -69,6 +70,7 @@ private:
   Int_t		nentries;
 
   TH1DMap	fTH1DMap;
+  TH1DMap	fTH1DNewMap; //these histos have overflow bin
   TH2DMap	fTH2DMap;
 
   // variables for branches

@@ -113,7 +113,7 @@ void Plotter::DoPlots(){
       fTH1DMap["r92"]->Fill(r92,Weight);
       fTH1DMap["t1pfmet_zoom"]->Fill(t1pfmet,Weight);
 
-      fTH2DMap["t1pfmet_mgg"]->Fill(mgg,t1pfmet,Weight);
+
       fTH2DMap["mgg_PU"]->Fill(nvtx,mgg,Weight);
       fTH2DMap["mgg_ptgg"]->Fill(ptgg,mgg,Weight);
       fTH2DMap["t1pfmet_PU"]->Fill(nvtx,t1pfmet,Weight);
@@ -179,6 +179,7 @@ void Plotter::DoPlots(){
         fTH1DMap["eta2_n-1"]->Fill(eta2,Weight);
       } 
       if (passBoth){
+        fTH2DMap["t1pfmet_mgg"]->Fill(mgg,t1pfmet,Weight);
         fTH1DMap["nvtx_n-1"]->Fill(nvtx,Weight);
         fTH1DMap["mgg_n-1"]->Fill(mgg,Weight);  
         fTH1DMap["ptgg_n-1"]->Fill(ptgg,Weight);  
@@ -188,7 +189,7 @@ void Plotter::DoPlots(){
         fTH1DMap["pfmetphi_n-1"]->Fill(pfmetphi,Weight);
         fTH1DMap["calomet_n-1"]->Fill(calomet,Weight);
         fTH1DMap["calometphi_n-1"]->Fill(calometphi,Weight);
-        if (mgg >= 120 && mgg <= 130) fTH1DMap["t1pfmet_selmgg"]->Fill(t1pfmet,Weight); 
+        if (mgg >= 110 && mgg <= 130) fTH1DMap["t1pfmet_selmgg"]->Fill(t1pfmet,Weight); 
         if (t1pfmet >= 100) fTH1DMap["mgg_selt1pfmet"]->Fill(mgg,Weight); 
       }
 
@@ -348,7 +349,7 @@ void Plotter::SetUpPlots(){
   fTH2DMap["mgg_ptgg"] 		= Plotter::MakeTH2DPlot("mgg_ptgg","",50,0.,500.,40,100.,300.,"p_{T,#gamma#gamma} (GeV)","m_{#gamma#gamma}");
   fTH2DMap["t1pfmet_PU"]	= Plotter::MakeTH2DPlot("t1pfmet_PU","",60,50.,300.,100,0.,1000.,"nvtx","MET (GeV)");
   fTH2DMap["t1pfmet_ptgg"]	= Plotter::MakeTH2DPlot("t1pfmet_ptgg","",60,0.,60.,100,0.,1000.,"p_{T,#gamma#gamma} (GeV)","MET (GeV)");
-  fTH2DMap["t1pfmet_mgg"]	= Plotter::MakeTH2DPlot("t1pfmet_mgg","",200,100.,300.,1000,0.,1000,"m_{#gamma#gamma} (GeV)","MET (GeV)");
+  fTH2DMap["t1pfmet_mgg"]	= Plotter::MakeTH2DPlot("t1pfmet_mgg","",80,100.,180.,400,0.,400,"m_{#gamma#gamma} (GeV)","MET (GeV)");
 
 }// end Plotter::SetUpPlots
 
@@ -367,12 +368,17 @@ TH2D * Plotter::MakeTH2DPlot(const TString hname, const TString htitle, const In
   return hist;
 }// end Plotter::MakeTH2DPlot
 
+TH1D * DrawOverflowBin(const TH1D * h){
+    Int_t nbin = h->GetNbinsX()+1;
+    Double_t overflow = h->GetBinContent(nbin); 
+
+}
+
 
 void Plotter::SavePlots(){
   outFile->cd();
 
   TCanvas * canv = new TCanvas();
-
 
   for (TH1DMapIter mapiter = fTH1DMap.begin(); mapiter != fTH1DMap.end(); mapiter++){
     canv->Clear();
@@ -380,6 +386,8 @@ void Plotter::SavePlots(){
     if ((*mapiter).second == (TH1D*) NULL)	{std::cout << "TH1D Null" << std::endl;}
     if (outFile == (TFile*) NULL)		{std::cout << "OutFile Null" << std::endl;}
     if (canv == (TCanvas*) NULL)		{std::cout << "Canvas Null" << std::endl;}
+
+    //fTH1DNewMap[(*mapiter).first].second = DrawOverflowBin( (*mapiter).second );   
 
     (*mapiter).second->Write(); // save histos to root file 
     canv->cd();

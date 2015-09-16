@@ -15,8 +15,8 @@ ABCDMethod::ABCDMethod( SamplePairVec Samples, const Double_t inLumi, const TStr
   mgg_minCD  = 110.;
   mgg_maxCD  = 130.;
   mgg_maxAB2 = 180.; 
-  met_minB   = 0.;
-  met_minD   = 250.;
+  met_minB   = 70.;
+  met_minD   = 100.;
   met_maxD   = 1000.;
 
   // titles for output Latex table
@@ -106,16 +106,22 @@ void ABCDMethod::DoAnalysis(){
 
   // scale bkg and then make one copy of histos where bkg added together
   for (UInt_t mc = 0; mc < fNBkg; mc++){
-    //fInBkgTH2DHists[0][mc]->Scale(lumi);
+    //fInBkgTH2DHists[0][mc]->Scale(300000./40.);// in order to scale to 300fb-1
     //std::cout << "number entries in bkg in " << fInBkgTH2DHists[0][mc]->GetEntries() << std::endl;
-    if (mc == 0) fOutBkgTH2DHists[0] = (TH2D*)fInBkgTH2DHists[0][mc]->Clone();
-    else fOutBkgTH2DHists[0]->Add(fInBkgTH2DHists[0][mc]);
+ 
+    // sum over nonresonant bkgs only
+    if (fBkgNames[mc] == "GJets") fOutBkgTH2DHists[0] = (TH2D*)fInBkgTH2DHists[0][mc]->Clone();
+    if (fBkgNames[mc] == "QCD") fOutBkgTH2DHists[0]->Add(fInBkgTH2DHists[0][mc]);
+
+    // use below if summing over all backgrounds
+    //if (mc == 0) fOutBkgTH2DHists[0] = (TH2D*)fInBkgTH2DHists[0][mc]->Clone();
+    //else fOutBkgTH2DHists[0]->Add(fInBkgTH2DHists[0][mc]);
   } 
   //std::cout << "number entries in bkg " << fOutBkgTH2DHists[0]->GetEntries() << std::endl;
 
   // just scale the signal by lumi, don't add together 
   for (UInt_t mc = 0; mc < fNSig; mc++){
-    //fInSigTH2DHists[0][mc]->Scale(lumi);
+    //fInSigTH2DHists[0][mc]->Scale(300000./40.);// in order to scale to 300fb-1
     //std::cout << "number entries in sig in " << fInSigTH2DHists[0][mc]->GetEntries() << std::endl;
   }
  
@@ -355,7 +361,6 @@ void ABCDMethod::FillTable(){
      fOutTableTxtFile << "\\begin{tabular}{cc}" <<std::endl;
      fOutTableTxtFile << "\\hline \\hline" <<std::endl;
      fOutTableTxtFile << Form("$\\sqrt{s}$ = 13 TeV; L = %3.1f $pb^{-1}$",lumi) <<" \\\\" <<std::endl;
-     //fOutTableTxtFile << "$m_{\\gamma \\gamma}$ in $[110-130]$ and MET $>$ 250 GeV"<<" \\\\" <<std::endl;
      fOutTableTxtFile << "\\hline" <<std::endl;
 
      ABCDMethod::SetRooVariables();
@@ -381,37 +386,94 @@ void ABCDMethod::FillTable(){
      fOutTableTxtFile << "\\end{tabular}" <<std::endl;
      fOutTableTxtFile << "\\end{table}" <<std::endl;
      // end first table
-    
-     
-     // second table has values for A,B,C,ExpD,D,Diff,Corr 
 
-     fOutTableTxtFile << "\% Table with values of A,B,C,ExpD,D,Diff,Corr for each sample" << std::endl;
+     // second table has the summary of total number of events in signal region for each sample
+     fOutTableTxtFile << "\% Summary of Events in Signal Region for each sample" << std::endl;
      fOutTableTxtFile << "\\begin{table}[bthp]" <<std::endl;
-     fOutTableTxtFile << "\\begin{tabular}{ccccccccc}" <<std::endl;
+     fOutTableTxtFile << "\\begin{tabular}{cc}" <<std::endl;
      fOutTableTxtFile << "\\hline \\hline" <<std::endl;
      fOutTableTxtFile << Form("$\\sqrt{s}$ = 13 TeV; L = %3.1f $pb^{-1}$",lumi) <<" \\\\" <<std::endl;
-     //fOutTableTxtFile << "$m_{\\gamma \\gamma}$ in $[110-130]$ and MET $>$ 250 GeV"<<" \\\\" <<std::endl;
-     fOutTableTxtFile << "\\hline" <<std::endl;
-     fOutTableTxtFile << "Sample & $N_A$ & $N_B$ & $N_C$ & ExpD & $N_D$ & Diff & Corr \\\\" << std::endl;
+     fOutTableTxtFile << Form("$m_{\\gamma \\gamma}$ in $[%3.f-%3.f]$ and MET $>$ %3.f GeV",mgg_minCD,mgg_maxCD,met_minD)<<" \\\\" <<std::endl;
      fOutTableTxtFile << "\\hline" <<std::endl;
 
-     fOutTableTxtFile << "Data &  " << *(fRooData[0][0]->format(2,"EXPP")) << " &  " << *(fRooData[1][0]->format(2,"EXPP")) <<  " &  " << *(fRooData[3][0]->format(2,"EXPP")) << " &  $" << fExpData[0] << "\\pm" << fExpErrData[0] << "$ &  " << *(fRooData[2][0]->format(2,"EXPP")) << " &  $" << fDiffData[0] << "$ &  $" << fCorrData[0]  <<"$ \\\\" << std::endl;
+     ABCDMethod::SetRooVariables();
+     fOutTableTxtFile << "Data &  " << *(fRooData[2][0]->format(2,"EXPF")) <<  " \\\\" << std::endl;
+     std::cout << "Data &  " << *(fRooData[2][0]->format(2,"EXPF")) << std::endl;
      fOutTableTxtFile << "\\hline" << std::endl;
 
      for (UInt_t mc = 0; mc < fNBkg; mc++){
-       fOutTableTxtFile << fSampleTitleMap[fBkgNames[mc]] << " &  " << *(fRooBkg[0][mc]->format(2,"EXPP")) << " &  " << *(fRooBkg[1][mc]->format(2,"EXPP")) <<  " &  " << *(fRooBkg[3][mc]->format(2,"EXPP")) << " &  $" << fExpBkg[mc] << "\\pm" << fExpErrBkg[mc] << "$ &  " << *(fRooBkg[2][mc]->format(2,"EXPP")) << " &  $" << fDiffBkg[mc] << "$ &  $" << fCorrBkg[mc]  <<"$ \\\\" << std::endl;
+       fOutTableTxtFile << fSampleTitleMap[fBkgNames[mc]] << " &  " << *(fRooBkg[2][mc]->format(2,"EXPP")) <<  " \\\\" << std::endl;
+       std::cout << fBkgNames[mc].Data() <<  " &  " << *(fRooBkg[2][mc]->format(2,"EXPF")) << std::endl;
      }
      fOutTableTxtFile << "\\hline" << std::endl;
-     fOutTableTxtFile << "Total Bkg &  " << *(fRooBkg[0][fNBkg]->format(2,"EXPP")) << " &  " << *(fRooBkg[1][fNBkg]->format(2,"EXPP")) <<  " &  " << *(fRooBkg[3][fNBkg]->format(2,"EXPP")) << " &  $" << fExpBkg[fNBkg] << "\\pm" << fExpErrBkg[fNBkg] << "$ &  " << *(fRooBkg[2][fNBkg]->format(2,"EXPP")) << " &  $" << fDiffBkg[fNBkg] << "$ &  $" << fCorrBkg[fNBkg]  <<"$ \\\\" << std::endl;
+       fOutTableTxtFile << "Total Bkg &  " << *(fRooBkg[2][fNBkg]->format(2,"EXPF")) <<  " \\\\" << std::endl;
      fOutTableTxtFile << "\\hline" << std::endl;
+     
      for (UInt_t mc = 0; mc < fNSig; mc++){
-       fOutTableTxtFile << fSampleTitleMap[fSigNames[mc]] << " &  " << *(fRooSig[0][mc]->format(2,"EXPP")) << " &  " << *(fRooSig[1][mc]->format(2,"EXPP")) <<  " &  " << *(fRooSig[3][mc]->format(2,"EXPP")) << " &  $" << fExpSig[mc] << "\\pm" << fExpErrSig[mc] << "$ &  " << *(fRooSig[2][mc]->format(2,"EXPP")) << " &  $" << fDiffSig[mc] << "$ &  $" << fCorrSig[mc]  <<"$ \\\\" << std::endl;
+       fOutTableTxtFile << fSampleTitleMap[fSigNames[mc]] << " &  " << *(fRooSig[2][mc]->format(2,"EXPF")) <<  " \\\\" << std::endl; 
+       std::cout << fSigNames[mc] <<  " &  " << *(fRooSig[2][mc]->format(2,"EXPF")) << std::endl;
      }
  
      fOutTableTxtFile << "\\hline \\hline" <<std::endl;
      fOutTableTxtFile << "\\end{tabular}" <<std::endl;
      fOutTableTxtFile << "\\end{table}" <<std::endl;
      // end second table
+    
+     
+     // third table has values for A,B,C,ExpD,D,Diff,Corr 
+
+     fOutTableTxtFile << "\% Table with values of A,B,C,ExpD,D,Diff,Corr for each sample" << std::endl;
+     fOutTableTxtFile << "\\begin{table}[bthp]" <<std::endl;
+     fOutTableTxtFile << "\\begin{tabular}{ccccccccc}" <<std::endl;
+     fOutTableTxtFile << "\\hline \\hline" <<std::endl;
+     fOutTableTxtFile << Form("$\\sqrt{s}$ = 13 TeV; L = %3.1f $pb^{-1}$",lumi) <<" \\\\" <<std::endl;
+     fOutTableTxtFile << "\\hline" <<std::endl;
+     fOutTableTxtFile << "Sample & Corr($m_{\\gamma\\gamma}$,MET) & $N_A$ & $N_B$ & $N_C$ & $N_D$ & Expected D & Diff  \\\\" << std::endl;
+     fOutTableTxtFile << "\\hline" <<std::endl;
+
+     fOutTableTxtFile << "Data &  $" << fCorrData[0] << "$ &  " <<
+        *(fRooData[0][0]->format(2,"EXPP")) << " &  " << 
+        *(fRooData[1][0]->format(2,"EXPP")) << " &  " << 
+        *(fRooData[3][0]->format(2,"EXPP")) << " &  " <<  
+        *(fRooData[2][0]->format(2,"EXPP")) << " &  $" << 
+        fExpData[0] << "\\pm" << fExpErrData[0] << "$ &  $" << 
+        fDiffData[0] <<"$ \\\\" << std::endl;
+     fOutTableTxtFile << "\\hline" << std::endl;
+
+     for (UInt_t mc = 0; mc < fNBkg; mc++){
+       fOutTableTxtFile << fSampleTitleMap[fBkgNames[mc]] << " &  $" << fCorrBkg[mc] << "$ &  " << 
+         *(fRooBkg[0][mc]->format(2,"EXPP")) << " &  " << 
+         *(fRooBkg[1][mc]->format(2,"EXPP")) << " &  " << 
+         *(fRooBkg[3][mc]->format(2,"EXPP")) << " &  " <<  
+         *(fRooBkg[2][mc]->format(2,"EXPP")) << " &  $" << 
+         fExpBkg[mc] << "\\pm" << fExpErrBkg[mc] << "$ &  $" << 
+         fDiffBkg[mc] <<"$ \\\\" << std::endl;
+     }
+     fOutTableTxtFile << "\\hline" << std::endl;
+       fOutTableTxtFile << "Total Bkg &  $" << fCorrBkg[fNBkg] << "$ &  " << 
+         *(fRooBkg[0][fNBkg]->format(2,"EXPP")) << " &  " << 
+         *(fRooBkg[1][fNBkg]->format(2,"EXPP")) << " &  " << 
+         *(fRooBkg[3][fNBkg]->format(2,"EXPP")) << " &  " <<  
+         *(fRooBkg[2][fNBkg]->format(2,"EXPP")) << " &  $" << 
+         fExpBkg[fNBkg] << "\\pm" << fExpErrBkg[fNBkg] << "$ &  $" << 
+         fDiffBkg[fNBkg] <<"$ \\\\" << std::endl;
+//     fOutTableTxtFile << "Total Bkg &  " << *(fRooBkg[0][fNBkg]->format(2,"EXPP")) << " &  " << *(fRooBkg[1][fNBkg]->format(2,"EXPP")) <<  " &  " << *(fRooBkg[3][fNBkg]->format(2,"EXPP")) << " &  $" << fExpBkg[fNBkg] << "\\pm" << fExpErrBkg[fNBkg] << "$ &  " << *(fRooBkg[2][fNBkg]->format(2,"EXPP")) << " &  $" << fDiffBkg[fNBkg] << "$ &  $" << fCorrBkg[fNBkg]  <<"$ \\\\" << std::endl;
+     fOutTableTxtFile << "\\hline" << std::endl;
+     for (UInt_t mc = 0; mc < fNSig; mc++){
+       fOutTableTxtFile << fSampleTitleMap[fSigNames[mc]] << " &  $" << fCorrSig[mc] << "$ &  " << 
+         *(fRooSig[0][mc]->format(2,"EXPP")) << " &  " << 
+         *(fRooSig[1][mc]->format(2,"EXPP")) << " &  " << 
+         *(fRooSig[3][mc]->format(2,"EXPP")) << " &  " <<  
+         *(fRooSig[2][mc]->format(2,"EXPP")) << " &  $" << 
+         fExpSig[mc] << "\\pm" << fExpErrSig[mc] << "$ &  $" << 
+         fDiffSig[mc] <<"$ \\\\" << std::endl;
+//       fOutTableTxtFile << fSampleTitleMap[fSigNames[mc]] << " &  " << *(fRooSig[0][mc]->format(2,"EXPP")) << " &  " << *(fRooSig[1][mc]->format(2,"EXPP")) <<  " &  " << *(fRooSig[3][mc]->format(2,"EXPP")) << " &  $" << fExpSig[mc] << "\\pm" << fExpErrSig[mc] << "$ &  " << *(fRooSig[2][mc]->format(2,"EXPP")) << " &  $" << fDiffSig[mc] << "$ &  $" << fCorrSig[mc]  <<"$ \\\\" << std::endl;
+     }
+ 
+     fOutTableTxtFile << "\\hline \\hline" <<std::endl;
+     fOutTableTxtFile << "\\end{tabular}" <<std::endl;
+     fOutTableTxtFile << "\\end{table}" <<std::endl;
+     // end third table
 
      // finish Latex doc
      fOutTableTxtFile << "\\end{document}" <<std::endl;
@@ -439,24 +501,6 @@ void ABCDMethod::FillTable(){
        std::cout << fSigNames[mc] << ": corr =  " << fCorrSig[mc]  << std::endl;
        std::cout << fSigNames[mc] << ": ExpD =  " << fExpSig[mc] << " \\pm " << fExpErrSig[mc] << std::endl;
      }
-
-
-/*  double ppExpND = ppNC*ppNA/ppNB;
-    double ppExpNDerr = sqrt((ppNCerr*ppNCerr*ppNA*ppNA/(ppNB*ppNB))+(ppNAerr*ppNAerr*ppNC*ppNC/(ppNB*ppNB))+(ppNBerr*ppNBerr*ppNC*ppNC*ppNA*ppNA/(pow(ppNB,4))));
-    double ppDiff = TMath::Abs((ppNC*ppNA/ppNB-ppND)/(ppNC*ppNA/ppNB));
-    RooRealVar ppA("ppA","ppA",ppNA,""); 	//ppNA is integral pp in A region
-    ppA.setError(ppNAerr);			//ppNAerr is error pp in A region
-    RooRealVar ppB("ppB","ppB",ppNB,"");
-    ppB.setError(ppNBerr);
-    RooRealVar ppC("ppC","ppC",ppNC,"");
-    ppC.setError(ppNCerr);
-    RooRealVar ppD("ppD","ppD",ppND,"");
-    ppD.setError(ppNDerr);
-    RooRealVar ppDexp("ppDexp","ppDexp",ppExpND,"");
-    ppDexp.setError(ppExpNDerr);
-    std::cout<<"prompt+prompt & "<<ppcorr<<" & "<<*ppA.format(2,"EXPP")<<"&"<<*ppB.format(2,"EXPP")<<"&"<<*ppC.format(2,"EXPP")<<"&"<<*ppD.format(2,"EXPP")<<"&"<<*ppDexp.format(2,"EXPP")<<"&"<<ppDiff<<"\\\\"<<std::endl;
-*/
-
   }
   else std::cout << "Unable to open ResultsTable Output File" <<std::endl;
 
