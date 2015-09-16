@@ -141,7 +141,7 @@ private:
 
   TH2DVec	fOutDataTH2DHists; 
   TH2DVec	fOutBkgTH2DHists;
- 
+  TH2DVec	fOutSelBkgTH2DHists;
 
 };
 #endif
