@@ -1,6 +1,8 @@
 #! /bin/sh
 #run extractJSONS.py for all samples in file
 
+python extractFilesAndWeight.py -i lists_50ns/MC/DiPhoton.json  -o DiPhoton     -d lists_50ns
+
 python extractFilesAndWeight.py -i lists_50ns/MC/ZH.json	-o ZH 		-d lists_50ns
 python extractFilesAndWeight.py -i lists_50ns/MC/WplusH.json	-o WplusH 	-d lists_50ns
 python extractFilesAndWeight.py -i lists_50ns/MC/WminusH.json	-o WminusH 	-d lists_50ns

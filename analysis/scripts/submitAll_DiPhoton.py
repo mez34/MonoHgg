@@ -7,8 +7,9 @@
 
 
 # 50ns samples
+./submitBatchDiPho.py --cfg diPhoAnaBATCH.py DiPhoton				0 15  pippo 84 1
 
-./submitBatchDiPho.py --cfg diPhoAnaBATCH.py ZH					0 11  pippo 0.9753 1
+./submitBatchDiPho.py --cfg diPhoAnaBATCH.py ZH					0 11  pippo 0.8696 1  #previously had used incorr 0.8696(pp)+0.1057(gg)
 ./submitBatchDiPho.py --cfg diPhoAnaBATCH.py WminusH				0 12  pippo 1.38 1
 ./submitBatchDiPho.py --cfg diPhoAnaBATCH.py WplusH				0 13  pippo 1.38 1 
 
@@ -26,9 +27,7 @@
 
 ./submitBatchDiPho.py --cfg diPhoAnaBATCH.py GluGluHToGG	     		0  10 pippo  43.92   1
 
-./submitBatchDiPho.py --cfg diPhoAnaBATCH.py ttHJetToGG_M120    		0  6  pippo  1 1
-./submitBatchDiPho.py --cfg diPhoAnaBATCH.py ttHJetToGG_M125    		0  7  pippo  1 1
-./submitBatchDiPho.py --cfg diPhoAnaBATCH.py ttHJetToGG_M130    		0  8  pippo  1 1
+./submitBatchDiPho.py --cfg diPhoAnaBATCH.py ttHJetToGG_M120    		0  6  pippo  0.5085 1
 
 # 50ns Data
 ./submitBatchDiPho.py --cfg diPhoAnaBATCH.py DoubleEG           		0 10000 pippo  1 1

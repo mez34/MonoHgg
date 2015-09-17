@@ -1,6 +1,8 @@
 #! /bin/sh
 #run extractJSONS.py for all samples in file
 
+python extractJSONS.py -i datssets_746_dipho.json -o DiPhoton				-d lists_50ns/MC
+
 python extractJSONS.py -i datasets_746_WZH.json -o WplusH				-d lists_50ns/MC
 python extractJSONS.py -i datasets_746_WZH.json -o WminusH				-d lists_50ns/MC
 python extractJSONS.py -i datasets_746_WZH.json -o ZH 					-d lists_50ns/MC
