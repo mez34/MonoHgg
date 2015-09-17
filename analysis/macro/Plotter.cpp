@@ -81,6 +81,36 @@ void Plotter::DoPlots(){
 
     fTH1DMap["eff_sel"]->Fill(0.5,Weight);
 
+    Bool_t passCH1  = false;
+    Bool_t passCH2  = false;
+    Bool_t passNH1  = false;
+    Bool_t passNH2  = false;
+    Bool_t passPH1  = false;
+    Bool_t passPH2  = false;
+    Bool_t passS1   = false;
+    Bool_t passS2   = false;
+    Bool_t passHE1  = false;
+    Bool_t passHE2  = false;
+    Bool_t passAll1 = false;
+    Bool_t passAll2 = false;
+    Bool_t passBoth = false;
+
+    if (passCHiso1==1) passCH1 = true; 
+    if (passCHiso2==1) passCH2 = true; 
+    if (passNHiso1==1) passNH1 = true;
+    if (passNHiso2==1) passNH2 = true;
+    if (passPHiso1==1) passPH1 = true;
+    if (passPHiso2==1) passPH2 = true;
+    if (passSieie1==1) passS1  = true;
+    if (passSieie2==1) passS2  = true;
+    if (passHoe1==1)   passHE1 = true; 
+    if (passHoe2==1)   passHE2 = true; 
+
+    if (passCH1 && passNH1 && passPH1 && passS1 && passHE1) passAll1 = true;
+    if (passCH2 && passNH2 && passPH2 && passS2 && passHE2) passAll2 = true;
+    if (passAll1 && passAll2) passBoth = true;
+
+    //start full selection for plots
     if ( pt1 > mgg/3 && pt2 > mgg/4){
       fTH1DMap["eff_sel"]->Fill(1.5,Weight);
       if ( isSigMC ||  hltDiphoton30Mass95==1){ //passes trigger
@@ -123,34 +153,7 @@ void Plotter::DoPlots(){
         fTH2DMap["t1pfmet_ptgg"]->Fill(ptgg,t1pfmet,Weight);
    
 
-        Bool_t passCH1  = false;
-        Bool_t passCH2  = false;
-        Bool_t passNH1  = false;
-        Bool_t passNH2  = false;
-        Bool_t passPH1  = false;
-        Bool_t passPH2  = false;
-        Bool_t passS1   = false;
-        Bool_t passS2   = false;
-        Bool_t passHE1  = false;
-        Bool_t passHE2  = false;
-        Bool_t passAll1 = false;
-        Bool_t passAll2 = false;
-        Bool_t passBoth = false;
 
-        if (passCHiso1==1) passCH1 = true; 
-        if (passCHiso2==1) passCH2 = true; 
-        if (passNHiso1==1) passNH1 = true;
-        if (passNHiso2==1) passNH2 = true;
-        if (passPHiso1==1) passPH1 = true;
-        if (passPHiso2==1) passPH2 = true;
-        if (passSieie1==1) passS1  = true;
-        if (passSieie2==1) passS2  = true;
-        if (passHoe1==1)   passHE1 = true; 
-        if (passHoe2==1)   passHE2 = true; 
-
-        if (passCH1 && passNH1 && passPH1 && passS1 && passHE1) passAll1 = true;
-        if (passCH2 && passNH2 && passPH2 && passS2 && passHE2) passAll2 = true;
-        if (passAll1 && passAll2) passBoth = true;
 
         //std::cout << passCH1 <<" "<< passNH1 <<" "<< passPH1 <<" "<< passHE1 <<" "<< passS1 << std::endl; 
         //std::cout << passCH2 <<" "<< passNH2 <<" "<< passPH2 <<" "<< passHE2 <<" "<< passS2 << std::endl; 
@@ -238,6 +241,11 @@ void Plotter::DoPlots(){
 
       }// end if passes trigger
     }// end if passes pt cuts 
+    
+    if ( isSigMC ||  hltDiphoton30Mass95==1){ //passes trigger
+      if(passAll2 && pt2 > mgg/4) fTH1DMap["phi1_pho2pass"]->Fill(phi1,Weight);
+      if(passAll1 && pt1 > mgg/3) fTH1DMap["phi2_pho1pass"]->Fill(phi2,Weight);
+    }
   }// end loop over entries in tree
 
   Double_t effPU = 0;
@@ -310,6 +318,9 @@ void Plotter::SetUpPlots(){
   fTH1DMap["r91"]		= Plotter::MakeTH1DPlot("r91","",100,0.,1.1,"R9(#gamma1)","");
   fTH1DMap["r92"]		= Plotter::MakeTH1DPlot("r92","",100,0.,1.1,"R9(#gamma2)","");
   fTH1DMap["t1pfmet_zoom"]	= Plotter::MakeTH1DPlot("t1pfmet_zoom","",60,0.,300.,"t1PF MET (GEV)","");
+
+  fTH1DMap["phi1_pho2pass"]     = Plotter::MakeTH1DPlot("phi1_pho2pass","",80,-4.,4.,"","");
+  fTH1DMap["phi2_pho1pass"]     = Plotter::MakeTH1DPlot("phi2_pho1pass","",80,-4.,4.,"","");
 
   // n minus 1 plots
   fTH1DMap["nvtx_n-1"]		= Plotter::MakeTH1DPlot("nvtx_n-1","",60,0.,60.,"nvtx","");

@@ -17,6 +17,8 @@ hadd data/50ns/QCD_Pt-40toInf.root  ../../output/job_201594_171744/QCD_Pt-40toIn
 
 hadd data/50ns/GluGluHToGG.root     ../../output/job_201595_125557/GluGluHToGG/GluGluHToGG*.root
 
+hadd data/50ns/DiPhoton.root	    ../../output/job_2015917_12130/DiPhoton/DiPhoton*.root
+
 hadd data/50ns/ZH.root		    ../../output/job_2015917_112043/ZH/ZH*.root
 #hadd data/50ns/ZH.root		    ../../output/job_201595_12522/ZH/ZH*.root
 hadd data/50ns/WplusH.root	    ../../output/job_201595_125252/WplusH/WplusH*.root

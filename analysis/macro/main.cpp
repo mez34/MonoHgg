@@ -38,8 +38,8 @@ int main(){
   bool doTest = false;		// run plotter on test sample
   bool makePURWfiles = false;	// recompute PURW and make files
   bool doReweightPU = true;	// use PURW from old files if !makePURWfiles
-  bool doPlots = true;		// make plots for each sample individually
-  bool doComb = true;		// make stack/overlay plots
+  bool doPlots = false;		// make plots for each sample individually
+  bool doComb = false;		// make stack/overlay plots
   bool doABCD = true;		// run ABCD method 
 
   Double_t lumi = 40.; // in pb^-1 
@@ -64,10 +64,13 @@ int main(){
   /////////////////////////////////////////////////////
 
   DblVec	puweights_Data;
+
   DblVec 	puweights_QCD;
   DblVec 	puweights_GJets;
   DblVec	puweights_GGHGG;
   DblVec	puweights_WZH;
+  DblVec	puweights_GG;
+
   DblVec	puweights_sig1;
   DblVec	puweights_sig10;
   DblVec	puweights_sig100;
@@ -91,6 +94,7 @@ int main(){
       puweights_WZH = puweights_QCD;
       puweights_GGHGG = puweights_QCD;
       puweights_GJets = puweights_QCD;
+      puweights_GG = puweights_QCD;
       puweights_sig100 = puweights_sig1000;
       puweights_sig10 = puweights_sig1000;
       puweights_sig1 = puweights_sig1000;
@@ -114,6 +118,7 @@ int main(){
         puweights_GJets.push_back(fBkgRatio->GetBinContent(i));
         puweights_GGHGG.push_back(fBkgRatio->GetBinContent(i));
         puweights_WZH.push_back(fBkgRatio->GetBinContent(i));
+        puweights_GG.push_back(fBkgRatio->GetBinContent(i));
 
         puweights_sig1000.push_back(fSigRatio->GetBinContent(i));
         puweights_sig100.push_back(fSigRatio->GetBinContent(i));
@@ -130,6 +135,7 @@ int main(){
       puweights_GJets.push_back(1.0);
       puweights_GGHGG.push_back(1.0);
       puweights_WZH.push_back(1.0);
+      puweights_GG.push_back(1.0);
       puweights_sig1000.push_back(1.0);
       puweights_sig100.push_back(1.0);
       puweights_sig10.push_back(1.0);
@@ -143,6 +149,7 @@ int main(){
 //    std::cout << "puweights_QCD     " << puweights_QCD[i]     << std::endl;   
 //    std::cout << "puweights_GJets   " << puweights_GJets[i]   << std::endl;
 //    std::cout << "puweights_GGHGG   " << puweights_GGHGG[i]   << std::endl;
+//    std::cout << "puweights_GG      " << puweights_GG[i]	<< std::endl;
 //    std::cout << "puweights_sig1000 " << puweights_sig1000[i] << std::endl; 
 //    std::cout << "puweights_sig100  " << puweights_sig100[i]  << std::endl;
 //    std::cout << "puweights_sig10   " << puweights_sig10[i]   << std::endl;
@@ -209,6 +216,12 @@ int main(){
     delete GGHGG;
     std::cout << "Finished GluGluH sample" << std::endl;
   
+    std::cout << "Working on DiPhoton sample" << std::endl;
+    Plotter * GG = new Plotter(inDir,outDir,"DiPhoton",puweights_GG,lumi,false);
+    GG->DoPlots();
+    delete GG;
+    std::cout << "Finished GluGluH sample" << std::endl;
+
     std::cout << "Working on DMHgg M1000 sample" << std::endl;
     Plotter * DMH_M1000 = new Plotter(inDir,outDir,"DMHtoGG_M1000",puweights_sig1000,lumi,true);
     DMH_M1000->DoPlots();
@@ -241,6 +254,7 @@ int main(){
   puweights_GJets.clear();
   puweights_GGHGG.clear();
   puweights_WZH.clear();
+  puweights_GG.clear();
   puweights_sig1000.clear();
   puweights_sig100.clear();
   puweights_sig10.clear();
@@ -252,6 +266,7 @@ int main(){
   colorMap["GJets"] 			= kGreen;
   colorMap["WZH"]			= kOrange-3;
   colorMap["GluGluHToGG"]		= kCyan;
+  colorMap["DiPhoton"]			= kBlue;
   colorMap["DMHtoGG_M1"]		= kRed;
   colorMap["DMHtoGG_M10"]		= kRed+1;
   colorMap["DMHtoGG_M100"]		= kMagenta+1;
@@ -264,6 +279,7 @@ int main(){
   Samples.push_back(SamplePair("WZH",1));
   Samples.push_back(SamplePair("GJets",1)); 
   Samples.push_back(SamplePair("GluGluHToGG",1)); 
+  Samples.push_back(SamplePair("DiPhoton",1));
   Samples.push_back(SamplePair("DMHtoGG_M1",0)); 
   Samples.push_back(SamplePair("DMHtoGG_M10",0)); 
   Samples.push_back(SamplePair("DMHtoGG_M100",0)); 

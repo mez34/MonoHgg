@@ -25,6 +25,7 @@ ABCDMethod::ABCDMethod( SamplePairVec Samples, const Double_t inLumi, const TStr
   fSampleTitleMap["GJets"]		= "$\\gamma$ + Jets";
   fSampleTitleMap["WZH"]		= "W/Z + H";
   fSampleTitleMap["GluGluHToGG"]	= "$H \\rightarrow \\gamma \\gamma$ (ggH)";
+  fSampleTitleMap["DiPhoton"]		= "$\\gamma\\gamma$";
   fSampleTitleMap["DMHtoGG_M1"]		= "$\\bar{\\chi}\\chi HH, m_{\\chi}$ = 1 GeV (10 fb)";
   fSampleTitleMap["DMHtoGG_M10"]	= "$\\bar{\\chi}\\chi HH, m_{\\chi}$ = 10 GeV (10 fb)";
   fSampleTitleMap["DMHtoGG_M100"]	= "$\\bar{\\chi}\\chi HH, m_{\\chi}$ = 100 GeV (10 fb)";
@@ -108,13 +109,17 @@ void ABCDMethod::DoAnalysis(){
   //std::cout << "number entries in data" << fOutDataTH2DHists[0]->GetEntries() << std::endl;
 
   // scale bkg and then make one copy of histos where bkg added together
+  
+  
   for (UInt_t mc = 0; mc < fNBkg; mc++){
     //fInBkgTH2DHists[0][mc]->Scale(300000./40.);// in order to scale to 300fb-1
     //std::cout << "number entries in bkg in " << fInBkgTH2DHists[0][mc]->GetEntries() << std::endl;
  
     // sum over nonresonant bkgs only
-    if (fBkgNames[mc] == "GJets") fOutSelBkgTH2DHists[0] = (TH2D*)fInBkgTH2DHists[0][mc]->Clone();
-    if (fBkgNames[mc] == "QCD") fOutSelBkgTH2DHists[0]->Add(fInBkgTH2DHists[0][mc]);
+    // FIXME NEED TO CLONE FIRST SAMPLE THAT APPEARS, OTHERWISE SEGFAULTS
+    if (fBkgNames[mc] == "DiPhoton") fOutSelBkgTH2DHists[0] = (TH2D*)fInBkgTH2DHists[0][mc]->Clone();
+    if (fBkgNames[mc] == "GJets")    fOutSelBkgTH2DHists[0]->Add(fInBkgTH2DHists[0][mc]); 
+    if (fBkgNames[mc] == "QCD")      fOutSelBkgTH2DHists[0]->Add(fInBkgTH2DHists[0][mc]);    
 
     // use below if summing over all backgrounds
     if (mc == 0) fOutBkgTH2DHists[0] = (TH2D*)fInBkgTH2DHists[0][mc]->Clone();

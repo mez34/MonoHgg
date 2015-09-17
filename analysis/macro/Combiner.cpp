@@ -33,13 +33,14 @@ Combiner::Combiner( SamplePairVec Samples, const Double_t inLumi, const ColorMap
   
   fSampleTitleMap["DoubleEG"]		= "Data";
   fSampleTitleMap["QCD"] 		= "QCD";
-  fSampleTitleMap["GJets"]		= "G + Jets";
+  fSampleTitleMap["GJets"]		= "#gamma + Jets";
   fSampleTitleMap["WZH"]		= "WZH";
-  fSampleTitleMap["GluGluHToGG"]	= "GluGlu #rightarrow H #rightarrow GG";
-  fSampleTitleMap["DMHtoGG_M1"]		= "DM + H #rightarrow GG, M1GeV";
-  fSampleTitleMap["DMHtoGG_M10"]	= "DM + H #rightarrow GG, M10GeV";
-  fSampleTitleMap["DMHtoGG_M100"]	= "DM + H #rightarrow GG, M100GeV";
-  fSampleTitleMap["DMHtoGG_M1000"]	= "DM + H #rightarrow GG, M1000GeV";
+  fSampleTitleMap["GluGluHToGG"]	= "H #rightarrow #gamma#gamma (ggH)";
+  fSampleTitleMap["DiPhoton"]		= "#gamma#gamma";
+  fSampleTitleMap["DMHtoGG_M1"]		= "#bar{#chi}#chi HH ,m_{#chi} = 1 GeV";
+  fSampleTitleMap["DMHtoGG_M10"]	= "#bar{#chi}#chi HH ,m_{#chi} = 10 GeV";
+  fSampleTitleMap["DMHtoGG_M100"]	= "#bar{#chi}#chi HH ,m_{#chi} = 100 GeV";
+  fSampleTitleMap["DMHtoGG_M1000"]	= "#bar{#chi}#chi HH ,m_{#chi} = 1000 GeV";
   
 
   //for (std::map<TString,TString>::iterator iter = fSampleTitleMap.begin(); iter != fSampleTitleMap.end(); ++iter) {
@@ -512,6 +513,8 @@ void Combiner::InitTH1DNames(){
   fTH1DNames.push_back("calomet");
 
   if (addText!="_n-1"){ // plots that don't have n-1 versions 
+    fTH1DNames.push_back("phi1_pho2pass");
+    fTH1DNames.push_back("phi2_pho1pass");
     fTH1DNames.push_back("t1pfmet_zoom");
     fTH1DNames.push_back("mgg_selt1pfmet");
     fTH1DNames.push_back("t1pfmet_selmgg");
