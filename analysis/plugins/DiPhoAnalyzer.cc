@@ -461,7 +461,8 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 	int passSubLeadHoe   = passHoeCuts( subleadScEta, subleadHoE );
         bool subleadSelel    = testPhotonIsolation( passSubLeadSieie, passSubLeadCHiso, passSubLeadNHiso, passSubLeadPHiso, passSubLeadHoe ); 
 
-	if (leadSelel || subleadSelel) std::cout<<std::endl;
+        int numpassing = 0;
+	if (leadSelel || subleadSelel) numpassing++;
 	
 	//if (!leadSelel || !subleadSelel ) continue; //applies pho ID selection 
 	// chiara: end comment x efficiencies

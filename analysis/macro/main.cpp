@@ -39,8 +39,8 @@ int main(){
   bool makePURWfiles = false;	// recompute PURW and make files
   bool doReweightPU = true;	// use PURW from old files if !makePURWfiles
   bool doPlots = false;		// make plots for each sample individually
-  bool doComb = false;		// make stack/overlay plots
-  bool doABCD = true;		// run ABCD method 
+  bool doComb = true;		// make stack/overlay plots
+  bool doABCD = false;		// run ABCD method 
 
   Double_t lumi = 40.; // in pb^-1 
   UInt_t nBins_vtx = 60; 
@@ -264,9 +264,9 @@ int main(){
   ColorMap colorMap;
   colorMap["QCD"] 			= kYellow;
   colorMap["GJets"] 			= kGreen;
-  colorMap["WZH"]			= kOrange-3;
+  colorMap["WZH"]			= kCyan+3;
   colorMap["GluGluHToGG"]		= kCyan;
-  colorMap["DiPhoton"]			= kBlue;
+  colorMap["DiPhoton"]			= kOrange-2;
   colorMap["DMHtoGG_M1"]		= kRed;
   colorMap["DMHtoGG_M10"]		= kRed+1;
   colorMap["DMHtoGG_M100"]		= kMagenta+1;

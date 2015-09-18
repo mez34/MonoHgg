@@ -36,11 +36,11 @@ Combiner::Combiner( SamplePairVec Samples, const Double_t inLumi, const ColorMap
   fSampleTitleMap["GJets"]		= "#gamma + Jets";
   fSampleTitleMap["WZH"]		= "WZH";
   fSampleTitleMap["GluGluHToGG"]	= "H #rightarrow #gamma#gamma (ggH)";
-  fSampleTitleMap["DiPhoton"]		= "#gamma#gamma";
-  fSampleTitleMap["DMHtoGG_M1"]		= "#bar{#chi}#chi HH ,m_{#chi} = 1 GeV";
-  fSampleTitleMap["DMHtoGG_M10"]	= "#bar{#chi}#chi HH ,m_{#chi} = 10 GeV";
-  fSampleTitleMap["DMHtoGG_M100"]	= "#bar{#chi}#chi HH ,m_{#chi} = 100 GeV";
-  fSampleTitleMap["DMHtoGG_M1000"]	= "#bar{#chi}#chi HH ,m_{#chi} = 1000 GeV";
+  fSampleTitleMap["DiPhoton"]		= "Non resonant #gamma#gamma";
+  fSampleTitleMap["DMHtoGG_M1"]		= "m_{#chi} = 1 GeV";//#bar{#chi}#chi HH ,m_{#chi} = 1 GeV";
+  fSampleTitleMap["DMHtoGG_M10"]	= "m_{#chi} = 10 GeV";//#bar{#chi}#chi HH ,m_{#chi} = 10 GeV";
+  fSampleTitleMap["DMHtoGG_M100"]	= "m_{#chi} = 100 GeV";//#bar{#chi}#chi HH ,m_{#chi} = 100 GeV";
+  fSampleTitleMap["DMHtoGG_M1000"]	= "m_{#chi} = 1000 GeV";//#bar{#chi}#chi HH ,m_{#chi} = 1000 GeV";
   
 
   //for (std::map<TString,TString>::iterator iter = fSampleTitleMap.begin(); iter != fSampleTitleMap.end(); ++iter) {
@@ -102,7 +102,7 @@ void Combiner::OverlayPlots(){
     for (UInt_t mc = 0; mc < fNBkg; mc++){
       //fInBkgTH1DHists[th1d][mc]->Scale(lumi);
       fOutBkgTH1DStacks[th1d]->Add(fInBkgTH1DHists[th1d][mc]);
-      fTH1DLegends[th1d]->AddEntry(fInBkgTH1DHists[th1d][mc],fSampleTitleMap[fBkgNames[mc]],"lf");
+      fTH1DLegends[th1d]->AddEntry(fInBkgTH1DHists[th1d][mc],fSampleTitleMap[fBkgNames[mc]],"f");
       if (mc == 0){
         fOutBkgTH1DHists[th1d] = (TH1D*)fInBkgTH1DHists[th1d][mc]->Clone();
       }
@@ -465,10 +465,10 @@ void Combiner::InitCanvAndHists(){
 
   fTH1DLegends.resize(fNTH1D);
   for (UInt_t th1d = 0; th1d < fNTH1D; th1d++){
-    fTH1DLegends[th1d] = new TLegend(0.70,0.7,0.9,0.89); // (x1,y1,x2,y2)
+    fTH1DLegends[th1d] = new TLegend(0.65,0.6,0.9,0.89); // (x1,y1,x2,y2)
     fTH1DLegends[th1d]->SetBorderSize(4);
     fTH1DLegends[th1d]->SetLineColor(kBlack);
-    fTH1DLegends[th1d]->SetTextSize(0.03);
+    fTH1DLegends[th1d]->SetTextSize(0.045);//0.03
     fTH1DLegends[th1d]->SetLineWidth(2);
   }
 
