@@ -1,31 +1,47 @@
 #! /bin/sh 
 # this scripts creates a merged root file in the self-created merged
 
-mkdir -p data/50ns/
+#for new samples all in FLASHgg version Spring15BetaV4
+mkdir -p data/50ns_betaV4/
 
-hadd data/50ns/DMHtoGG_M1000.root   ../../output/job_201594_17733/Higgs_scalar_nohdecay_gg_1000GeV/Higgs_scalar_nohdecay_gg_1000GeV_*.root  
-hadd data/50ns/DMHtoGG_M100.root    ../../output/job_201595_125340/Higgs_scalar_nohdecay_gg_100GeV/Higgs_scalar_nohdecay_gg_100GeV_*.root
-hadd data/50ns/DMHtoGG_M10.root     ../../output/job_201595_125345/Higgs_scalar_nohdecay_gg_10GeV/Higgs_scalar_nohdecay_gg_10GeV_*.root
-hadd data/50ns/DMHtoGG_M1.root      ../../output/job_201595_125349/Higgs_scalar_nohdecay_gg_1GeV/Higgs_scalar_nohdecay_gg_1GeV_*.root
+hadd data/50ns_betaV4/GluGluHToGG.root		../../output/job_2015918_152233/GluGluHToGG/GluGluHToGG*.root
+hadd data/50ns_betaV4/VH.root			../../output/job_2015918_152255/VH/VH*.root
+hadd data/50ns_betaV4/GJet_Pt-20to40.root	../../output/job_2015918_15211/GJet_Pt-20to40/GJet_Pt-20to40*.root
+hadd data/50ns_betaV4/GJet_Pt-40toInf.root	../../output/job_2015918_152121/GJet_Pt-40toInf/GJet_Pt-40toInf*.root
+hadd data/50ns_betaV4/QCD_Pt-30to40.root	../../output/job_2015918_152158/QCD_Pt-30to40/QCD_Pt-30to40*.root
+hadd data/50ns_betaV4/QCD_Pt-30toInf.root	../../output/job_2015918_15228/QCD_Pt-30toInf/QCD_Pt-30toInf*.root
+hadd data/50ns_betaV4/QCD_Pt-40toInf.root	../../output/job_2015918_152222/QCD_Pt-40toInf/QCD_Pt-40toInf*.root
+hadd data/50ns_betaV4/DiPhoton.root		../../output/job_2015918_151959/DiPhoton/DiPhoton*.root
+hadd data/50ns_betaV4/DoubleEG.root		../../output/job_2015918_152434/DoubleEG/DoubleEG*.root
 
-hadd data/50ns/GJet_Pt-20to40.root  ../../output/job_201595_125355/GJet_Pt-20to40/GJet_Pt-20to40*.root
-hadd data/50ns/GJet_Pt-40toInf.root ../../output/job_201595_125454/GJet_Pt-40toInf/GJet_Pt-40toInf*.root
 
-hadd data/50ns/QCD_Pt-30to40.root   ../../output/job_201594_171656/QCD_Pt-30to40/QCD_Pt-30to40*.root 
-hadd data/50ns/QCD_Pt-30toInf.root  ../../output/job_201594_17176/QCD_Pt-30toInf/QCD_Pt-30toInf*.root
-hadd data/50ns/QCD_Pt-40toInf.root  ../../output/job_201594_171744/QCD_Pt-40toInf/QCD_Pt-40toInf*.root
 
-hadd data/50ns/GluGluHToGG.root     ../../output/job_201595_125557/GluGluHToGG/GluGluHToGG*.root
 
-hadd data/50ns/DiPhoton.root	    ../../output/job_2015917_12130/DiPhoton/DiPhoton*.root
 
-hadd data/50ns/ZH.root		    ../../output/job_2015917_112043/ZH/ZH*.root
-#hadd data/50ns/ZH.root		    ../../output/job_201595_12522/ZH/ZH*.root
-hadd data/50ns/WplusH.root	    ../../output/job_201595_125252/WplusH/WplusH*.root
-hadd data/50ns/WminusH.root	    ../../output/job_201595_12528/WminusH/WminusH*.root
-
-hadd data/50ns/DoubleEG.root	    ../../output/job_2015910_12489/DoubleEG/DoubleEG*.root
-#hadd data/50ns/DoubleEG.root	    ../../output/job_201594_171326/DoubleEG/DoubleEG*.root
+#mdkir -p data/50ns/
+#hadd data/50ns/DMHtoGG_M1000.root   ../../output/job_201594_17733/Higgs_scalar_nohdecay_gg_1000GeV/Higgs_scalar_nohdecay_gg_1000GeV_*.root  
+#hadd data/50ns/DMHtoGG_M100.root    ../../output/job_201595_125340/Higgs_scalar_nohdecay_gg_100GeV/Higgs_scalar_nohdecay_gg_100GeV_*.root
+#hadd data/50ns/DMHtoGG_M10.root     ../../output/job_201595_125345/Higgs_scalar_nohdecay_gg_10GeV/Higgs_scalar_nohdecay_gg_10GeV_*.root
+#hadd data/50ns/DMHtoGG_M1.root      ../../output/job_201595_125349/Higgs_scalar_nohdecay_gg_1GeV/Higgs_scalar_nohdecay_gg_1GeV_*.root
+#
+#hadd data/50ns/GJet_Pt-20to40.root  ../../output/job_201595_125355/GJet_Pt-20to40/GJet_Pt-20to40*.root
+#hadd data/50ns/GJet_Pt-40toInf.root ../../output/job_201595_125454/GJet_Pt-40toInf/GJet_Pt-40toInf*.root
+#
+#hadd data/50ns/QCD_Pt-30to40.root   ../../output/job_201594_171656/QCD_Pt-30to40/QCD_Pt-30to40*.root 
+#hadd data/50ns/QCD_Pt-30toInf.root  ../../output/job_201594_17176/QCD_Pt-30toInf/QCD_Pt-30toInf*.root
+#hadd data/50ns/QCD_Pt-40toInf.root  ../../output/job_201594_171744/QCD_Pt-40toInf/QCD_Pt-40toInf*.root
+#
+#hadd data/50ns/GluGluHToGG.root     ../../output/job_201595_125557/GluGluHToGG/GluGluHToGG*.root
+#
+#hadd data/50ns/DiPhoton.root	    ../../output/job_2015917_12130/DiPhoton/DiPhoton*.root
+#
+#hadd data/50ns/ZH.root		    ../../output/job_2015917_112043/ZH/ZH*.root
+##hadd data/50ns/ZH.root		    ../../output/job_201595_12522/ZH/ZH*.root
+#hadd data/50ns/WplusH.root	    ../../output/job_201595_125252/WplusH/WplusH*.root
+#hadd data/50ns/WminusH.root	    ../../output/job_201595_12528/WminusH/WminusH*.root
+#
+#hadd data/50ns/DoubleEG.root	    ../../output/job_2015910_12489/DoubleEG/DoubleEG*.root
+##hadd data/50ns/DoubleEG.root	    ../../output/job_201594_171326/DoubleEG/DoubleEG*.root
 
 
 # 50ns sample without triggers

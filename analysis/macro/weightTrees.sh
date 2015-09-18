@@ -11,15 +11,9 @@ addWeights("data/50ns/GJet_Pt-40toInf.root", $lumi);
 addWeights("data/50ns/QCD_Pt-30to40.root", $lumi);
 addWeights("data/50ns/QCD_Pt-30toInf.root", $lumi);
 addWeights("data/50ns/QCD_Pt-40toInf.root", $lumi);
-addWeights("data/50ns/DMHtoGG_M1000.root", $lumi);
-addWeights("data/50ns/DMHtoGG_M100.root", $lumi);
-addWeights("data/50ns/DMHtoGG_M10.root", $lumi);
-addWeights("data/50ns/DMHtoGG_M1.root", $lumi);
+
 addWeights("data/50ns/GluGluHToGG.root", $lumi);
-addWeights("data/50ns/ZH.root", $lumi);
 addWeights("data/50ns/DiPhoton.root", $lumi);
-addWeights("data/50ns/WplusH.root", $lumi);
-addWeights("data/50ns/WminusH.root", $lumi);
 addWeights("data/50ns/DoubleEG.root", $lumi);
 
 .q
@@ -27,6 +21,18 @@ addWeights("data/50ns/DoubleEG.root", $lumi);
 EOF
 
 echo "done weighting."
+
+
+#previous betaV2 version Z,W+,W- are separate:
+#addWeights("data/50ns/ZH.root", $lumi);
+#addWeights("data/50ns/WplusH.root", $lumi);
+#addWeights("data/50ns/WminusH.root", $lumi);
+
+#signal samples weren't remade 
+#addWeights("data/50ns/DMHtoGG_M1000.root", $lumi);
+#addWeights("data/50ns/DMHtoGG_M100.root", $lumi);
+#addWeights("data/50ns/DMHtoGG_M10.root", $lumi);
+#addWeights("data/50ns/DMHtoGG_M1.root", $lumi);
 
 
 

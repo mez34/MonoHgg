@@ -31,16 +31,16 @@ static bool sortByYield(const SampleYieldPair& mcpair1, const SampleYieldPair& m
 int main(){
   setTDRStyle();
 
-  TString inDir = "./data/50ns/";
-  TString outDir = "./diPhoPlots/50ns/";
+  TString inDir = "./data/50ns_betaV4/";
+  TString outDir = "./diPhoPlots/50ns_betaV4/";
 
   bool doFakeData = false;	// use FakeData to test combiner
   bool doTest = false;		// run plotter on test sample
-  bool makePURWfiles = false;	// recompute PURW and make files
+  bool makePURWfiles = true;	// recompute PURW and make files
   bool doReweightPU = true;	// use PURW from old files if !makePURWfiles
-  bool doPlots = false;		// make plots for each sample individually
+  bool doPlots = true;		// make plots for each sample individually
   bool doComb = true;		// make stack/overlay plots
-  bool doABCD = false;		// run ABCD method 
+  bool doABCD = true;		// run ABCD method 
 
   Double_t lumi = 40.; // in pb^-1 
   UInt_t nBins_vtx = 60; 

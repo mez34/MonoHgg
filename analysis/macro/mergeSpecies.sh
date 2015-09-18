@@ -3,11 +3,13 @@
 
 mkdir -p data/mergedFinal
 
-hadd data/50ns/GJets.root data/50ns/GJet_Pt-20to40.root data/50ns/GJet_Pt-40toInf.root 
+hadd data/50ns_betaV4/GJets.root data/50ns_betaV4/GJet_Pt-20to40.root data/50ns_betaV4/GJet_Pt-40toInf.root 
+hadd data/50ns_betaV4/QCD.root   data/50ns_betaV4/QCD_Pt-30to40.root  data/50ns_betaV4/QCD_Pt-30toInf.root   data/50ns_betaV4/QCD_Pt-40toInf.root 
 
-hadd data/50ns/QCD.root data/50ns/QCD_Pt-30to40.root data/50ns/QCD_Pt-30toInf.root data/50ns/QCD_Pt-40toInf.root 
 
-hadd data/50ns/WZH.root data/50ns/ZH.root data/50ns/WplusH.root data/50ns/WminusH.root
+#hadd data/50ns/GJets.root data/50ns/GJet_Pt-20to40.root data/50ns/GJet_Pt-40toInf.root 
+#hadd data/50ns/QCD.root data/50ns/QCD_Pt-30to40.root data/50ns/QCD_Pt-30toInf.root data/50ns/QCD_Pt-40toInf.root 
+#hadd data/50ns/WZH.root data/50ns/ZH.root data/50ns/WplusH.root data/50ns/WminusH.root
 
 #hadd data/mergedFinal/GGJets.root data/merged/GGJets_M-200To500.root data/merged/GGJets_M-500To1000.root data/merged/GGJets_M-1000To2000.root data/merged/GGJets_M-2000To4000.root data/merged/GGJets_M-4000To8000.root data/merged/GGJets_M-8000To13000.root
 ##
