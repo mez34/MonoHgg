@@ -34,7 +34,7 @@ Combiner::Combiner( SamplePairVec Samples, const Double_t inLumi, const ColorMap
   fSampleTitleMap["DoubleEG"]		= "Data";
   fSampleTitleMap["QCD"] 		= "QCD";
   fSampleTitleMap["GJets"]		= "#gamma + Jets";
-  fSampleTitleMap["WZH"]		= "WZH";
+  fSampleTitleMap["VH"]			= "VH";
   fSampleTitleMap["GluGluHToGG"]	= "H #rightarrow #gamma#gamma (ggH)";
   fSampleTitleMap["DiPhoton"]		= "Non resonant #gamma#gamma";
   fSampleTitleMap["DMHtoGG_M1"]		= "m_{#chi} = 1 GeV";//#bar{#chi}#chi HH ,m_{#chi} = 1 GeV";

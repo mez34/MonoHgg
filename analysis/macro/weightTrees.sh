@@ -6,15 +6,22 @@ echo "Adding weights for " $lumi " pb-1..."
 root -l -b <<EOF
 .L addWeightsToTree.cc+  
  
-addWeights("data/50ns/GJet_Pt-20to40.root", $lumi);
-addWeights("data/50ns/GJet_Pt-40toInf.root", $lumi);
-addWeights("data/50ns/QCD_Pt-30to40.root", $lumi);
-addWeights("data/50ns/QCD_Pt-30toInf.root", $lumi);
-addWeights("data/50ns/QCD_Pt-40toInf.root", $lumi);
+addWeights("data/50ns_betaV4/GJet_Pt-20to40.root", $lumi);
+addWeights("data/50ns_betaV4/GJet_Pt-40toInf.root", $lumi);
+addWeights("data/50ns_betaV4/QCD_Pt-30to40.root", $lumi);
+addWeights("data/50ns_betaV4/QCD_Pt-30toInf.root", $lumi);
+addWeights("data/50ns_betaV4/QCD_Pt-40toInf.root", $lumi);
 
-addWeights("data/50ns/GluGluHToGG.root", $lumi);
-addWeights("data/50ns/DiPhoton.root", $lumi);
-addWeights("data/50ns/DoubleEG.root", $lumi);
+addWeights("data/50ns_betaV4/GluGluHToGG.root", $lumi);
+addWeights("data/50ns_betaV4/DiPhoton.root", $lumi);
+addWeights("data/50ns_betaV4/VH.root", $lumi);
+
+addWeights("data/50ns_betaV4/DoubleEG.root", $lumi);
+
+addWeights("data/50ns_betaV4/DMHtoGG_M1000.root", $lumi);
+addWeights("data/50ns_betaV4/DMHtoGG_M100.root", $lumi);
+addWeights("data/50ns_betaV4/DMHtoGG_M10.root", $lumi);
+addWeights("data/50ns_betaV4/DMHtoGG_M1.root", $lumi);
 
 .q
 

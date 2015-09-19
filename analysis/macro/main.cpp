@@ -36,14 +36,14 @@ int main(){
 
   bool doFakeData = false;	// use FakeData to test combiner
   bool doTest = false;		// run plotter on test sample
-  bool makePURWfiles = true;	// recompute PURW and make files
+  bool makePURWfiles = false;	// recompute PURW and make files
   bool doReweightPU = true;	// use PURW from old files if !makePURWfiles
   bool doPlots = true;		// make plots for each sample individually
   bool doComb = true;		// make stack/overlay plots
   bool doABCD = true;		// run ABCD method 
 
-  Double_t lumi = 40.; // in pb^-1 
-  UInt_t nBins_vtx = 60; 
+  Double_t lumi = 41.64; // in pb^-1 
+  UInt_t nBins_vtx = 60; // number of bins for PURW 
   
   //for CMSSW_7_0_pre9: run with root
   //gROOT->LoadMacro("Plotter.cpp++g");
@@ -205,7 +205,7 @@ int main(){
     std::cout << "Finished QCD sample" << std::endl;
 
     std::cout << "Working on WZH sample" << std::endl;
-    Plotter * WZH = new Plotter(inDir,outDir,"WZH",puweights_WZH,lumi,false);
+    Plotter * WZH = new Plotter(inDir,outDir,"VH",puweights_WZH,lumi,false);
     WZH->DoPlots();
     delete WZH;
     std::cout << "Finished WZH sample" << std::endl;
@@ -264,7 +264,7 @@ int main(){
   ColorMap colorMap;
   colorMap["QCD"] 			= kYellow;
   colorMap["GJets"] 			= kGreen;
-  colorMap["WZH"]			= kCyan+3;
+  colorMap["VH"]			= kCyan+3;
   colorMap["GluGluHToGG"]		= kCyan;
   colorMap["DiPhoton"]			= kOrange-2;
   colorMap["DMHtoGG_M1"]		= kRed;
@@ -276,7 +276,7 @@ int main(){
 
   SamplePairVec Samples; // vector to also be used for stack plots
   Samples.push_back(SamplePair("QCD",1)); 
-  Samples.push_back(SamplePair("WZH",1));
+  Samples.push_back(SamplePair("VH",1));
   Samples.push_back(SamplePair("GJets",1)); 
   Samples.push_back(SamplePair("GluGluHToGG",1)); 
   Samples.push_back(SamplePair("DiPhoton",1));
@@ -312,7 +312,7 @@ int main(){
   SampleYieldPairVec tmp_mcyields;
   for (UInt_t mc = 0; mc < nbkg; mc++) {
       // open mc file first
-      TString mcfilename = Form("diPhoPlots/50ns/%s/plots_%s.root",BkgSamples[mc].first.Data(),BkgSamples[mc].first.Data());
+      TString mcfilename = Form("%s%s/plots_%s.root",outDir.Data(),BkgSamples[mc].first.Data(),BkgSamples[mc].first.Data());
       TFile * tmp_mcfile = TFile::Open(mcfilename.Data());
       // open nvtx plot
       TH1D * tmpnvtx = (TH1D*)tmp_mcfile->Get("nvtx_n-1");

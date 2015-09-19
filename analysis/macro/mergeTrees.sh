@@ -15,6 +15,10 @@ hadd data/50ns_betaV4/DiPhoton.root		../../output/job_2015918_151959/DiPhoton/Di
 hadd data/50ns_betaV4/DoubleEG.root		../../output/job_2015918_152434/DoubleEG/DoubleEG*.root
 
 
+hadd data/50ns_betaV4/DMHtoGG_M1000.root   ../../output/job_201594_17733/Higgs_scalar_nohdecay_gg_1000GeV/Higgs_scalar_nohdecay_gg_1000GeV_*.root  
+hadd data/50ns_betaV4/DMHtoGG_M100.root    ../../output/job_201595_125340/Higgs_scalar_nohdecay_gg_100GeV/Higgs_scalar_nohdecay_gg_100GeV_*.root
+hadd data/50ns_betaV4/DMHtoGG_M10.root     ../../output/job_201595_125345/Higgs_scalar_nohdecay_gg_10GeV/Higgs_scalar_nohdecay_gg_10GeV_*.root
+hadd data/50ns_betaV4/DMHtoGG_M1.root      ../../output/job_201595_125349/Higgs_scalar_nohdecay_gg_1GeV/Higgs_scalar_nohdecay_gg_1GeV_*.root
 
 
 
