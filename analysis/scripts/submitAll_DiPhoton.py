@@ -24,9 +24,11 @@
 ./submitBatchDiPho.py --cfg diPhoAnaBATCH.py QCD_Pt-30toInf     		0  4  pippo  259296  1
 ./submitBatchDiPho.py --cfg diPhoAnaBATCH.py QCD_Pt-40toInf     		0  5  pippo  108240  1
 
-./submitBatchDiPho.py --cfg diPhoAnaBATCH.py GluGluHToGG	     		0  10 pippo  43.92   1
+./submitBatchDiPho.py --cfg diPhoAnaBATCH.py GluGluHToGG	     		0  10 pippo  0.08784 1 #value=xsec*br (xsec=43.92,br=0.002)
 
-./submitBatchDiPho.py --cfg diPhoAnaBATCH.py VH					0  11 pippo  2.2496 1 #xsec=ZH+WH 
+./submitBatchDiPho.py --cfg diPhoAnaBATCH.py VH					0  11 pippo  0.0044992 1 #value=xsec(ZH+WH)*br (xsec=2.2496,br=0.002)
+
+./submitBatchDiPho.py --cfg diPhoAnaBATCH.py DYJetsToLL				0  12 pippo  6025.2 1 
 
 #./submitBatchDiPho.py --cfg diPhoAnaBATCH.py ttHJetToGG_M120    		0  6  pippo  0.5085 1
 

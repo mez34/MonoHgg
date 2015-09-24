@@ -4,6 +4,7 @@
 # All FLASHgg version Spring15BetaV4:
 
 python extractJSONS.py -i datasets_746_betaV4/datasets_746_betaV4_all.json	-o DiPhoton		-d lists_50ns_betaV4/MC
+python extractJSONS.py -i datasets_746_betaV4/datasets_746_betaV4_all.json	-o DYJetsToLL		-d lists_50ns_betaV4/MC
 python extractJSONS.py -i datasets_746_betaV4/datasets_746_betaV4_all.json      -o QCD_Pt-30to40	-d lists_50ns_betaV4/MC
 python extractJSONS.py -i datasets_746_betaV4/datasets_746_betaV4_all.json      -o QCD_Pt-40toInf	-d lists_50ns_betaV4/MC
 python extractJSONS.py -i datasets_746_betaV4/datasets_746_betaV4_all.json      -o QCD_Pt-30toInf	-d lists_50ns_betaV4/MC
