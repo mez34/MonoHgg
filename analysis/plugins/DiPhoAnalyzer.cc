@@ -329,15 +329,16 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
   float pu_weight = 1.;
   float pu_n      = -1.;
   if (sampleID>0 && sampleID<10000) {     // MC
-    pu_n = 0.;
-    for( unsigned int PVI = 0; PVI < PileupInfos->size(); ++PVI ) {
-      Int_t pu_bunchcrossing = PileupInfos->ptrAt( PVI )->getBunchCrossing();
-      if( pu_bunchcrossing == 0 ) {
-	pu_n = PileupInfos->ptrAt( PVI )->getPU_NumInteractions();
-      }
-    }
+    //pu_n = 0.;
+    //for( unsigned int PVI = 0; PVI < PileupInfos->size(); ++PVI ) {
+    //  Int_t pu_bunchcrossing = PileupInfos->ptrAt( PVI )->getBunchCrossing();
+    //  if( pu_bunchcrossing == 0 ) {
+    //    pu_n = PileupInfos->ptrAt( PVI )->getPU_NumInteractions();
+    //  }
+    //}
     if (dopureweight_) 
-      pu_weight = GetPUWeight(pu_n);         
+      //pu_weight = GetPUWeight(pu_n);         
+      pu_weight = GetPUWeight(nvtx);         
   }
   
  
@@ -361,7 +362,7 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
   }
 
   // Events breakdown
-  h_selection->Fill(0.,perEveW);
+  if(hltDiphoton30Mass95) h_selection->Fill(0.,perEveW);
 
 
   // Get MET
@@ -381,13 +382,13 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
       
       float leadScEta  = (diphoPtr->leadingPhoton()->superCluster())->eta();         
       float leadPt     = diphoPtr->leadingPhoton()->et();
-      float leadChIso  = diphoPtr->leadingPhoton()->egChargedHadronIso();
+      float leadChIso  = diphoPtr->leadingPhoton()->egChargedHadronIso()- rho * getChargedHadronEAForPhotonIso((diphoPtr->leadingPhoton()->superCluster())->eta());//Livia correction: add pu correction here
       float leadR9noZS = diphoPtr->leadingPhoton()->full5x5_r9();
       bool leadPresel  = isGammaPresel( leadScEta, leadPt, leadR9noZS, leadChIso); 
 
       float subleadScEta  = (diphoPtr->subLeadingPhoton()->superCluster())->eta();               
       float subleadPt     = diphoPtr->subLeadingPhoton()->et();
-      float subleadChIso  = diphoPtr->subLeadingPhoton()->egChargedHadronIso();
+      float subleadChIso  = diphoPtr->subLeadingPhoton()->egChargedHadronIso()- rho * getChargedHadronEAForPhotonIso((diphoPtr->subLeadingPhoton()->superCluster())->eta());
       float subleadR9noZS = diphoPtr->subLeadingPhoton()->full5x5_r9();
       bool subleadPresel  = isGammaPresel( subleadScEta, subleadPt, subleadR9noZS, subleadChIso); 
       if (!leadPresel || !subleadPresel) continue;   
@@ -503,6 +504,11 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 	    float thisSystemMgg = diphoPtr->mass();
 
 	    if (thisSystemMgg<50 ) continue;    // chiara: x ana: 300; x phys14: 500; x sinc 200 
+
+	    float leadPt    = diphoPtr->leadingPhoton()->et();
+	    float subleadPt = diphoPtr->subLeadingPhoton()->et();
+
+	    if (leadPt< thisSystemMgg/3 || subleadPt<thisSystemMgg/4) continue;             //Livia correction: add scaling pt cuts
 
 	    massDipho.push_back(theDiphoton);
 	  }
@@ -1109,25 +1115,26 @@ void DiPhoAnalyzer::SetPuWeights(std::string puWeightFile) {
   f_pu->cd();
 
   TH1D *puweights = 0;
-  TH1D *gen_pu = 0;
-  gen_pu    = (TH1D*) f_pu->Get("generated_pu");
-  puweights = (TH1D*) f_pu->Get("weights");
+  //TH1D *gen_pu = 0;
+  //gen_pu    = (TH1D*) f_pu->Get("generated_pu");
+  //puweights = (TH1D*) f_pu->Get("weights");
+  puweights = (TH1D*) f_pu->Get("puhist");
 
-  if (!puweights || !gen_pu) {
+  if (!puweights /*|| !gen_pu*/) {
     std::cout << "weights histograms  not found in file " << puWeightFile << std::endl;
     return;
   }
-  TH1D* weightedPU= (TH1D*)gen_pu->Clone("weightedPU");
-  weightedPU->Multiply(puweights);
+  //TH1D* weightedPU= (TH1D*)gen_pu->Clone("weightedPU");
+  //weightedPU->Multiply(puweights);
 
-  // Rescaling weights in order to preserve same integral of events                               
-  TH1D* weights = (TH1D*)puweights->Clone("rescaledWeights");
-  weights->Scale( gen_pu->Integral(1,MAX_PU_REWEIGHT) / weightedPU->Integral(1,MAX_PU_REWEIGHT) );
+  //// Rescaling weights in order to preserve same integral of events                               
+  //TH1D* weights = (TH1D*)puweights->Clone("rescaledWeights");
+  //weights->Scale( gen_pu->Integral(1,MAX_PU_REWEIGHT) / weightedPU->Integral(1,MAX_PU_REWEIGHT) );
 
   float sumPuWeights=0.;
   for (int i = 0; i<MAX_PU_REWEIGHT; i++) {
     float weight=1.;
-    weight=weights->GetBinContent(i+1);
+    weight=puweights->GetBinContent(i+1);
     sumPuWeights+=weight;
     puweights_.push_back(weight);
   }
@@ -1191,38 +1198,33 @@ else return 0.;
 }
 
 int DiPhoAnalyzer::passSieieCuts(float sceta, float sieie){
-  int passes = -500;
-  if (fabs(sceta)<1.479 && sieie>0.0100) passes = 0;
-  else if (sieie>0.0267) passes = 0;
-  else passes = 1;
+  int passes = 1;
+  if (fabs(sceta)<1.4442 && sieie>0.0100) passes = 0;
+  if ((fabs(sceta)>1.566 && fabs(sceta)<2.5) && sieie>0.0267) passes = 0;
   return passes;
 }
 int DiPhoAnalyzer::passCHisoCuts(float sceta, float chiso, float pt){
-  int passes = -500;
-  if (fabs(sceta)<1.479 && chiso>1.31) passes = 0;
-  else if (chiso>1.25) passes = 0;
-  else passes = 1;
+  int passes = 1;
+  if (fabs(sceta)<1.4442 && chiso>1.31) passes = 0;
+  if ((fabs(sceta)>1.566 && fabs(sceta)<2.5) && chiso>1.25) passes = 0;
   return passes;
 }
 int DiPhoAnalyzer::passNHisoCuts(float sceta, float nhiso, float pt){
-  int passes = -500;
-  if (fabs(sceta)<1.479 && nhiso > 0.60+exp(0.0044*pt+0.5809)) passes = 0;
-  else if (nhiso > 1.65 + exp(0.0040*pt+0.9402)) passes = 0;
-  else passes = 1;
+  int passes = 1;
+  if (fabs(sceta)<1.4442 && nhiso > 0.60+exp(0.0044*pt+0.5809)) passes = 0;
+  if ((fabs(sceta)>1.566 && fabs(sceta)<2.5) && nhiso > 1.65 + exp(0.0040*pt+0.9402)) passes = 0;
   return passes;
 }
 int DiPhoAnalyzer::passPHisoCuts(float sceta, float phiso, float pt){
-  int passes = -500;
-  if (fabs(sceta)<1.479 && phiso > 1.33+0.0043*pt) passes = 0;
-  else if (phiso > 1.02+0.0041*pt) passes = 0;
-  else passes = 1;
+  int passes = 1;
+  if (fabs(sceta)<1.4442 && phiso > 1.33+0.0043*pt) passes = 0;
+  if ((fabs(sceta)>1.566 && fabs(sceta)<2.5) && phiso > 1.02+0.0041*pt) passes = 0;
   return passes;
 }
 int DiPhoAnalyzer::passHoeCuts(float sceta, float hoe){
-  int passes = -500;
-  if (fabs(sceta)<1.479 && hoe>0.05) passes = 0;
-  else if (hoe>0.05) passes = 0;
-  else passes = 1;
+  int passes = 1;
+  if (fabs(sceta)<1.4442 && hoe>0.05) passes = 0;
+  if ((fabs(sceta)>1.566 && fabs(sceta)<2.5) && hoe>0.05) passes = 0;
   return passes;
 }
 
