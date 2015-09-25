@@ -15,6 +15,7 @@ addWeights("data/50ns_betaV4/QCD_Pt-40toInf.root", $lumi);
 addWeights("data/50ns_betaV4/GluGluHToGG.root", $lumi);
 addWeights("data/50ns_betaV4/DiPhoton.root", $lumi);
 addWeights("data/50ns_betaV4/VH.root", $lumi);
+addWeights("data/50ns_betaV4/DYJetsToLL.root", $lumi);
 
 addWeights("data/50ns_betaV4/DoubleEG.root", $lumi);
 

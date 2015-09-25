@@ -24,6 +24,7 @@ ABCDMethod::ABCDMethod( SamplePairVec Samples, const Double_t inLumi, const TStr
   fSampleTitleMap["QCD"] 		= "QCD";
   fSampleTitleMap["GJets"]		= "$\\gamma$ + Jets";
   fSampleTitleMap["WZH"]		= "W/Z + H";
+  fSampleTitleMap["DYJetsToLL"]		= "Drell-Yan";
   fSampleTitleMap["GluGluHToGG"]	= "$H \\rightarrow \\gamma \\gamma$ (ggH)";
   fSampleTitleMap["DiPhoton"]		= "$\\gamma\\gamma$";
   fSampleTitleMap["DMHtoGG_M1"]		= "$\\bar{\\chi}\\chi HH, m_{\\chi}$ = 1 GeV (10 fb)";
@@ -117,9 +118,10 @@ void ABCDMethod::DoAnalysis(){
  
     // sum over nonresonant bkgs only
     // FIXME NEED TO CLONE FIRST SAMPLE THAT APPEARS, OTHERWISE SEGFAULTS
-    if (fBkgNames[mc] == "DiPhoton") fOutSelBkgTH2DHists[0] = (TH2D*)fInBkgTH2DHists[0][mc]->Clone();
-    if (fBkgNames[mc] == "GJets")    fOutSelBkgTH2DHists[0]->Add(fInBkgTH2DHists[0][mc]); 
-    if (fBkgNames[mc] == "QCD")      fOutSelBkgTH2DHists[0]->Add(fInBkgTH2DHists[0][mc]);    
+    if (fBkgNames[mc] == "DiPhoton")   fOutSelBkgTH2DHists[0] = (TH2D*)fInBkgTH2DHists[0][mc]->Clone();
+    if (fBkgNames[mc] == "GJets")      fOutSelBkgTH2DHists[0]->Add(fInBkgTH2DHists[0][mc]); 
+    if (fBkgNames[mc] == "QCD")        fOutSelBkgTH2DHists[0]->Add(fInBkgTH2DHists[0][mc]);    
+    if (fBkgNames[mc] == "DYJetsToLL") fOutSelBkgTH2DHists[0]->Add(fInBkgTH2DHists[0][mc]);
 
     // use below if summing over all backgrounds
     if (mc == 0) fOutBkgTH2DHists[0] = (TH2D*)fInBkgTH2DHists[0][mc]->Clone();

@@ -34,9 +34,10 @@ Combiner::Combiner( SamplePairVec Samples, const Double_t inLumi, const ColorMap
   fSampleTitleMap["DoubleEG"]		= "Data";
   fSampleTitleMap["QCD"] 		= "QCD";
   fSampleTitleMap["GJets"]		= "#gamma + Jets";
-  fSampleTitleMap["VH"]			= "VH";
+  fSampleTitleMap["VH"]			= "V + H";
+  fSampleTitleMap["DYJetsToLL"]		= "Drell-Yan";
   fSampleTitleMap["GluGluHToGG"]	= "H #rightarrow #gamma#gamma (ggH)";
-  fSampleTitleMap["DiPhoton"]		= "Non resonant #gamma#gamma";
+  fSampleTitleMap["DiPhoton"]		= "#gamma + #gamma";
   fSampleTitleMap["DMHtoGG_M1"]		= "m_{#chi} = 1 GeV";//#bar{#chi}#chi HH ,m_{#chi} = 1 GeV";
   fSampleTitleMap["DMHtoGG_M10"]	= "m_{#chi} = 10 GeV";//#bar{#chi}#chi HH ,m_{#chi} = 10 GeV";
   fSampleTitleMap["DMHtoGG_M100"]	= "m_{#chi} = 100 GeV";//#bar{#chi}#chi HH ,m_{#chi} = 100 GeV";
@@ -110,7 +111,12 @@ void Combiner::OverlayPlots(){
         fOutBkgTH1DHists[th1d]->Add(fInBkgTH1DHists[th1d][mc]);
       }
     } 
-  
+    //fOutBkgTH1DHists[th1d]->Sumw2();
+    fOutBkgTH1DHists[th1d]->SetFillColor(kBlack);
+    fOutBkgTH1DHists[th1d]->SetFillStyle(3003);
+    fOutBkgTH1DHists[th1d]->SetMarkerSize(0);
+    fTH1DLegends[th1d]->AddEntry(fOutBkgTH1DHists[th1d],"Bkg Uncertainty","F");
+
     // sig: just add to legend
     for (UInt_t mc = 0; mc < fNSig; mc++){
       //fInSigTH1DHists[th1d][mc]->Scale(lumi);
@@ -220,6 +226,7 @@ void Combiner::DrawCanvasOverlay(const UInt_t th1d, const Bool_t isLogY){
     fInSigTH1DHists[th1d][mc]->Draw("HIST SAME");
   }
   if (fNData > 0) fOutDataTH1DHists[th1d]->Draw("PE SAME");
+  fOutBkgTH1DHists[th1d]->Draw("E2 SAME");
   fTH1DLegends[th1d]->Draw("SAME"); 
 
   TString suffix = "";
@@ -315,6 +322,7 @@ void Combiner::DrawCanvasStack(const UInt_t th1d, const Bool_t isLogY){
     fOutRatioTH1DHists[th1d]->GetYaxis()->SetTitleOffset(0.5);
 
     fOutRatioTH1DHists[th1d]->Draw("EP SAME");
+    //fOutRatioTH1DHistsCopy[th1d]->Draw("E2 SAME");
   } 
 
 
@@ -355,17 +363,51 @@ void Combiner::MakeRatioLine(const UInt_t th1d){
 
 void Combiner::MakeRatioPlots(){
 
+Double_t bkg = 0.;
+Double_t dat = 0.;
+Double_t bkgErr = 0.;
+Double_t datErr = 0.;
+Double_t ratErr = 0.;
+
   for (UInt_t th1d = 0; th1d < fNTH1D; th1d++){ // double hists
     if (fNData > 0) fOutRatioTH1DHists[th1d] = (TH1D*)fOutDataTH1DHists[th1d]->Clone();
     else fOutRatioTH1DHists[th1d] = (TH1D*)fOutBkgTH1DHists[th1d]->Clone();
+
     fOutRatioTH1DHists[th1d]->SetTitle("");
     fOutRatioTH1DHists[th1d]->Divide(fOutBkgTH1DHists[th1d]);  
+
+    fOutRatioTH1DHistsCopy[th1d] = (TH1D*)fOutRatioTH1DHists[th1d]->Clone();
+
     fOutRatioTH1DHists[th1d]->SetLineColor(kBlack);
     fOutRatioTH1DHists[th1d]->SetMinimum(-0.1);  // Define Y ..
     fOutRatioTH1DHists[th1d]->SetMaximum(2.1);   // .. range
     fOutRatioTH1DHists[th1d]->SetStats(0);       // No statistics on lower plot
     fOutRatioTH1DHists[th1d]->GetYaxis()->SetTitle("Data/MC");
-  }
+    for (UInt_t bin=0; bin<=fOutRatioTH1DHists[th1d]->GetNbinsX();bin++){
+      if (fOutBkgTH1DHists[th1d]->GetBinContent(bin)){
+        bkg = fOutBkgTH1DHists[th1d]->GetBinContent(bin);
+        dat = fOutDataTH1DHists[th1d]->GetBinContent(bin);
+        bkgErr = fOutBkgTH1DHists[th1d]->GetBinError(bin);
+        datErr = fOutDataTH1DHists[th1d]->GetBinError(bin);
+        ratErr = TMath::Sqrt(TMath::Power(datErr/bkg,2)+TMath::Power(dat*bkgErr/(bkg*bkg),2)); 
+      }
+      else ratErr = 0.;
+      //std::cout << "RatioErr1 = " << ratErr << std::endl;
+      fOutRatioTH1DHists[th1d]->SetBinError(bin,ratErr);
+    }
+    for (UInt_t bin=0; bin<=fOutRatioTH1DHistsCopy[th1d]->GetNbinsX();bin++){
+      if (fOutBkgTH1DHists[th1d]->GetBinContent(bin)){
+        bkg = fOutBkgTH1DHists[th1d]->GetBinContent(bin);
+        dat = fOutDataTH1DHists[th1d]->GetBinContent(bin);
+        bkgErr = fOutBkgTH1DHists[th1d]->GetBinError(bin);
+        datErr = fOutDataTH1DHists[th1d]->GetBinError(bin);
+        ratErr = bkgErr/bkg; 
+      }
+      else ratErr = 0.;
+      //std::cout << "RatioErr2 = " << ratErr << std::endl;
+      fOutRatioTH1DHistsCopy[th1d]->SetBinError(bin,ratErr);
+    }
+  }// end loop over hists
 
 }// end Combiner::MakeRatioPlots
 
@@ -477,6 +519,7 @@ void Combiner::InitCanvAndHists(){
   fOutBkgTH1DHists.resize(fNTH1D);
   //if (fNData > 0){
     fOutRatioTH1DHists.resize(fNTH1D); 
+    fOutRatioTH1DHistsCopy.resize(fNTH1D); 
     fOutTH1DRatioLines.resize(fNTH1D);
     fOutTH1DRatioPads.resize(fNTH1D);
   //} 

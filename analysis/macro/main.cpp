@@ -35,12 +35,12 @@ int main(){
   TString outDir = "./diPhoPlots/50ns_betaV4/";
 
   bool doFakeData = false;	// use FakeData to test combiner
-  bool doTest = false;		// run plotter on test sample
+  bool sortMC = false;		// use if want to sort bkg smallest to biggest
   bool makePURWfiles = false;	// recompute PURW and make files
   bool doReweightPU = true;	// use PURW from old files if !makePURWfiles
-  bool doPlots = true;		// make plots for each sample individually
+  bool doPlots = false;		// make plots for each sample individually
   bool doComb = true;		// make stack/overlay plots
-  bool doABCD = true;		// run ABCD method 
+  bool doABCD = false;		// run ABCD method 
 
   Double_t lumi = 41.64; // in pb^-1 
   UInt_t nBins_vtx = 60; // number of bins for PURW 
@@ -70,6 +70,7 @@ int main(){
   DblVec	puweights_GGHGG;
   DblVec	puweights_WZH;
   DblVec	puweights_GG;
+  DblVec	puweights_DY;
 
   DblVec	puweights_sig1;
   DblVec	puweights_sig10;
@@ -95,6 +96,7 @@ int main(){
       puweights_GGHGG = puweights_QCD;
       puweights_GJets = puweights_QCD;
       puweights_GG = puweights_QCD;
+      puweights_DY = puweights_QCD;
       puweights_sig100 = puweights_sig1000;
       puweights_sig10 = puweights_sig1000;
       puweights_sig1 = puweights_sig1000;
@@ -119,6 +121,7 @@ int main(){
         puweights_GGHGG.push_back(fBkgRatio->GetBinContent(i));
         puweights_WZH.push_back(fBkgRatio->GetBinContent(i));
         puweights_GG.push_back(fBkgRatio->GetBinContent(i));
+	puweights_DY.push_back(fBkgRatio->GetBinContent(i));
 
         puweights_sig1000.push_back(fSigRatio->GetBinContent(i));
         puweights_sig100.push_back(fSigRatio->GetBinContent(i));
@@ -136,6 +139,7 @@ int main(){
       puweights_GGHGG.push_back(1.0);
       puweights_WZH.push_back(1.0);
       puweights_GG.push_back(1.0);
+      puweights_DY.push_back(1.0);
       puweights_sig1000.push_back(1.0);
       puweights_sig100.push_back(1.0);
       puweights_sig10.push_back(1.0);
@@ -150,6 +154,7 @@ int main(){
 //    std::cout << "puweights_GJets   " << puweights_GJets[i]   << std::endl;
 //    std::cout << "puweights_GGHGG   " << puweights_GGHGG[i]   << std::endl;
 //    std::cout << "puweights_GG      " << puweights_GG[i]	<< std::endl;
+//    std::cout << "puweights_DY      " << puweights_DY[i]	<< std::endl;
 //    std::cout << "puweights_sig1000 " << puweights_sig1000[i] << std::endl; 
 //    std::cout << "puweights_sig100  " << puweights_sig100[i]  << std::endl;
 //    std::cout << "puweights_sig10   " << puweights_sig10[i]   << std::endl;
@@ -171,13 +176,6 @@ int main(){
   //
   /////////////////////////////////////////////////////
 
-  if (doTest && doPlots){
-    std::cout << "Working on test sample" << std::endl;
-    Plotter * test = new Plotter(inDir,outDir,"GJets",puweights_GJets,lumi,false);
-    test->DoPlots();
-    delete test;
-    std::cout << "Finished test sample" << std::endl;
-  }
   if (doFakeData && doPlots){
     std::cout << "Working on FakeData sample" << std::endl;
     Plotter * FakeData = new Plotter(inDir,outDir,"FakeData",puweights_Data,lumi,false);
@@ -222,6 +220,12 @@ int main(){
     delete GG;
     std::cout << "Finished GluGluH sample" << std::endl;
 
+    std::cout << "Working on DYJets sample" << std::endl;
+    Plotter * DY = new Plotter(inDir,outDir,"DYJetsToLL",puweights_DY,lumi,false);
+    DY->DoPlots();
+    delete DY;
+    std::cout << "Finished DYJets sample" << std::endl;
+
     std::cout << "Working on DMHgg M1000 sample" << std::endl;
     Plotter * DMH_M1000 = new Plotter(inDir,outDir,"DMHtoGG_M1000",puweights_sig1000,lumi,true);
     DMH_M1000->DoPlots();
@@ -255,6 +259,7 @@ int main(){
   puweights_GGHGG.clear();
   puweights_WZH.clear();
   puweights_GG.clear();
+  puweights_DY.clear();
   puweights_sig1000.clear();
   puweights_sig100.clear();
   puweights_sig10.clear();
@@ -262,11 +267,12 @@ int main(){
 
   // setup all samples for Combiner and ABCD
   ColorMap colorMap;
-  colorMap["QCD"] 			= kYellow;
-  colorMap["GJets"] 			= kGreen;
-  colorMap["VH"]			= kCyan+3;
-  colorMap["GluGluHToGG"]		= kCyan;
-  colorMap["DiPhoton"]			= kOrange-2;
+  colorMap["QCD"] 			= kYellow+8;
+  colorMap["GJets"] 			= kAzure+8;
+  colorMap["VH"]			= kPink+7;//kCyan+3;
+  colorMap["GluGluHToGG"]		= kMagenta+7;//kCyan;
+  colorMap["DiPhoton"]			= kSpring+7;
+  colorMap["DYJetsToLL"]		= kOrange+7;
   colorMap["DMHtoGG_M1"]		= kRed;
   colorMap["DMHtoGG_M10"]		= kRed+1;
   colorMap["DMHtoGG_M100"]		= kMagenta+1;
@@ -275,11 +281,13 @@ int main(){
   if (doFakeData) colorMap["FakeData"]	= kBlack; 
 
   SamplePairVec Samples; // vector to also be used for stack plots
-  Samples.push_back(SamplePair("QCD",1)); 
+  //ordered to match Livia
   Samples.push_back(SamplePair("VH",1));
-  Samples.push_back(SamplePair("GJets",1)); 
   Samples.push_back(SamplePair("GluGluHToGG",1)); 
   Samples.push_back(SamplePair("DiPhoton",1));
+  Samples.push_back(SamplePair("DYJetsToLL",1));
+  Samples.push_back(SamplePair("QCD",1)); 
+  Samples.push_back(SamplePair("GJets",1)); 
   Samples.push_back(SamplePair("DMHtoGG_M1",0)); 
   Samples.push_back(SamplePair("DMHtoGG_M10",0)); 
   Samples.push_back(SamplePair("DMHtoGG_M100",0)); 
@@ -308,6 +316,7 @@ int main(){
     else  DataSamples.push_back(Samples[isample]);
   }
 
+  if (sortMC){
   // to sort MC by smallest to largest for nice stacked plots
   SampleYieldPairVec tmp_mcyields;
   for (UInt_t mc = 0; mc < nbkg; mc++) {
@@ -329,7 +338,7 @@ int main(){
     for (UInt_t mc = 0; mc < nbkg; mc++) { // init mc double hists
       BkgSamples.push_back(SamplePair(tmp_mcyields[mc].first,1));
     }
-  
+
   Samples.clear();
   for (UInt_t data = 0; data < ndata; data++ ) {
     Samples.push_back(DataSamples[data]);
@@ -340,6 +349,7 @@ int main(){
   for (UInt_t mc = 0; mc < nsig; mc++) {
     Samples.push_back(SigSamples[mc]);
   }
+  }// end if sortMC
 
   ////////////////////////////////////////////////////
   //

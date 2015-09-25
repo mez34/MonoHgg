@@ -86,6 +86,7 @@ private:
   TH1DVec	fOutSigTH1DHists;
   TH1DVec	fOutDataTH1DHists;
   TH1DVec	fOutRatioTH1DHists;
+  TH1DVec	fOutRatioTH1DHistsCopy;
   TLineVec	fOutTH1DRatioLines;
 
   TH1DVec	fOutTH1DComb;
