@@ -12,6 +12,7 @@ analysis/macro/main
 #ignore output of json parsing
 analysis/scripts/list*/
 *.list
+*.json
 
 #ignore files created by batch jobs
 analysis/scripts/job*

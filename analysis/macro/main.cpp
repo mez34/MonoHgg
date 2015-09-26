@@ -34,12 +34,12 @@ int main(){
   TString inDir = "./data/50ns_betaV4/";
   TString outDir = "./diPhoPlots/50ns_betaV4/";
 
-  bool doFakeData = false;	// use FakeData to test combiner
+  bool doFakeData = true;	// use FakeData to test combiner
   bool sortMC = false;		// use if want to sort bkg smallest to biggest
   bool makePURWfiles = false;	// recompute PURW and make files
   bool doReweightPU = true;	// use PURW from old files if !makePURWfiles
   bool doPlots = false;		// make plots for each sample individually
-  bool doComb = true;		// make stack/overlay plots
+  bool doComb = false;		// make stack/overlay plots
   bool doABCD = false;		// run ABCD method 
 
   Double_t lumi = 41.64; // in pb^-1 
@@ -101,9 +101,23 @@ int main(){
       puweights_sig10 = puweights_sig1000;
       puweights_sig1 = puweights_sig1000;
 
-    }
 
-    else{ //load PURW from already made files
+      // create text files with purw values
+      std::ofstream fOutPURWFileBkg;
+      fOutPURWFileBkg.open(Form("%spurw/purw_bkg.txt",outDir.Data()));  
+      std::ofstream fOutPURWFileSig;
+      fOutPURWFileSig.open(Form("%spurw/purw_sig.txt",outDir.Data()));  
+
+      for (UInt_t i=1; i<=nBins_vtx; i++){
+        fOutPURWFileBkg << puweights_QCD[i]     << std::endl;
+        fOutPURWFileSig << puweights_sig1000[i] << std::endl;
+      }
+      fOutPURWFileBkg.close();
+      fOutPURWFileSig.close();
+
+    }// end if makePURWfiles
+
+    else{ // load PURW from already made files
       TString fSigName = Form("%spurw/PURW_DMHtoGG_M1000.root",outDir.Data());
       TString fBkgName = Form("%spurw/PURW_QCD.root",outDir.Data());
       TFile *fSig = TFile::Open(fSigName.Data());
@@ -176,9 +190,9 @@ int main(){
   //
   /////////////////////////////////////////////////////
 
-  if (doFakeData && doPlots){
+  if (doFakeData){
     std::cout << "Working on FakeData sample" << std::endl;
-    Plotter * FakeData = new Plotter(inDir,outDir,"FakeData",puweights_Data,lumi,false);
+    Plotter * FakeData = new Plotter(inDir,outDir,"DiPhoton_test",puweights_Data,lumi,false);
     FakeData->DoPlots();
     delete FakeData;
     std::cout << "Finished FakeData sample" << std::endl;

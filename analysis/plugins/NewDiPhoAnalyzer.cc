@@ -1117,7 +1117,7 @@ void NewDiPhoAnalyzer::SetPuWeights(std::string puWeightFile) {
   // TH1D *gen_pu = 0;
   //gen_pu    = (TH1D*) f_pu->Get("generated_pu");
   //puweights = (TH1D*) f_pu->Get("weights");
-  puweights = (TH1D*) f_pu->Get("puhist");
+  puweights = (TH1D*) f_pu->Get("nvtx_dataOverMC");
 
   if (!puweights /*|| !gen_pu*/) {
     std::cout << "weights histograms  not found in file " << puWeightFile << std::endl;

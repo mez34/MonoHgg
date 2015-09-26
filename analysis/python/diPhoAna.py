@@ -39,7 +39,7 @@ process.load("flashgg/MicroAOD/flashggDiPhotons_cfi")
 
 process.TFileService = cms.Service("TFileService",fileName = cms.string("diPhotons.root"))
 
-process.diPhoAna = cms.EDAnalyzer('DiPhoAnalyzer',
+process.diPhoAna = cms.EDAnalyzer('NewDiPhoAnalyzer',
                                   VertexTag = cms.untracked.InputTag('offlineSlimmedPrimaryVertices'),
 				  METTag=cms.untracked.InputTag('slimmedMETs'),
                                   genPhotonExtraTag = cms.InputTag("flashggGenPhotonsExtra"),    
@@ -48,11 +48,11 @@ process.diPhoAna = cms.EDAnalyzer('DiPhoAnalyzer',
                                   #reducedEndcapRecHitCollection = cms.InputTag('reducedEgamma','reducedEERecHits'),
                                   PileupTag = cms.untracked.InputTag('addPileupInfo'),
                                   generatorInfo = cms.InputTag("generator"),
-                                  dopureweight = cms.untracked.int32(0),
+                                  dopureweight = cms.untracked.int32(1),
                                   bits         = cms.InputTag('TriggerResults::HLT'),
                                   #sampleIndex  = cms.untracked.int32(101),   
 				  sampleIndex  = cms.untracked.int32(0),
-                                  puWFileName  = cms.string('xxx'),   # chiara  
+                                  puWFileName  = cms.string('PURW_DMHtoGG_M1000.root'),   # chiara  
                                   xsec         = cms.untracked.double(1), #pb
                                   kfac         = cms.untracked.double(1.),
                                   sumDataset   = cms.untracked.double(100.0)   # chiara

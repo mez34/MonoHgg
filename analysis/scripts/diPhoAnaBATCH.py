@@ -1,7 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 import FWCore.Utilities.FileUtils as FileUtils
 
-process = cms.Process("diPhoAna")
+process = cms.Process("diPhoAnaBATCH")
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
 
@@ -26,7 +26,7 @@ process.load("flashgg/MicroAOD/flashggDiPhotons_cfi")
 
 process.TFileService = cms.Service("TFileService",fileName = cms.string("OUTPUT"))
 
-process.diPhoAna = cms.EDAnalyzer('DiPhoAnalyzer',
+process.diPhoAnaBATCH = cms.EDAnalyzer('NewDiPhoAnalyzer',
                                   VertexTag = cms.untracked.InputTag('offlineSlimmedPrimaryVertices'),
 				  METTag=cms.untracked.InputTag('slimmedMETs'),
                                   genPhotonExtraTag = cms.InputTag("flashggGenPhotonsExtra"),   
@@ -44,5 +44,5 @@ process.diPhoAna = cms.EDAnalyzer('DiPhoAnalyzer',
                                   sumDataset   = SDS
                                   )
 
-process.p = cms.Path(process.diPhoAna)
+process.p = cms.Path(process.diPhoAnaBATCH)
 

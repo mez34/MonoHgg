@@ -377,6 +377,7 @@ TH1D * Plotter::MakeTH1DPlot(const TString hname, const TString htitle, const In
   hist->GetXaxis()->SetTitle(xtitle.Data());
   hist->GetYaxis()->SetTitle(ytitle.Data());
   hist->Sumw2();
+  gStyle->SetOptStat(1111111);
   return hist;
 }// end Plotter::MakeTH1DPlot
 
