@@ -4,21 +4,21 @@
 #for new samples all in FLASHgg version Spring15BetaV4
 mkdir -p data/50ns_betaV4/
 
-hadd data/50ns_betaV4/GluGluHToGG.root		../../output/job_2015924_16120/GluGluHToGG/GluGluHToGG*.root
-hadd data/50ns_betaV4/VH.root			../../output/job_2015924_16126/VH/VH*.root
-hadd data/50ns_betaV4/DYJetsToLL.root		../../output/job_2015924_161213/DYJetsToLL/DYJetsToLL*.root
-hadd data/50ns_betaV4/GJet_Pt-20to40.root	../../output/job_2015924_16116/GJet_Pt-20to40/GJet_Pt-20to40*.root
-hadd data/50ns_betaV4/GJet_Pt-40toInf.root	../../output/job_2015924_162114/GJet_Pt-40toInf/GJet_Pt-40toInf*.root
-hadd data/50ns_betaV4/QCD_Pt-30to40.root	../../output/job_2015924_161110/QCD_Pt-30to40/QCD_Pt-30to40*.root
-hadd data/50ns_betaV4/QCD_Pt-30toInf.root	../../output/job_2015924_161121/QCD_Pt-30toInf/QCD_Pt-30toInf*.root
-hadd data/50ns_betaV4/QCD_Pt-40toInf.root	../../output/job_2015924_161142/QCD_Pt-40toInf/QCD_Pt-40toInf*.root
-hadd data/50ns_betaV4/DiPhoton.root		../../output/job_2015924_161019/DiPhoton/DiPhoton*.root
-hadd data/50ns_betaV4/DoubleEG.root		../../output/job_2015924_16154/DoubleEG/DoubleEG*.root
+hadd data/50ns_betaV4/GluGluHToGG.root		../../output/job_2015927_0205/GluGluHToGG/GluGluHToGG*.root
+hadd data/50ns_betaV4/VH.root			../../output/job_2015927_0913/VH/VH*.root
+hadd data/50ns_betaV4/DYJetsToLL.root		../../output/job_2015927_0209/DYJetsToLL/DYJetsToLL*.root
+hadd data/50ns_betaV4/GJet_Pt-20to40.root	../../output/job_2015927_01822/GJet_Pt-20to40/GJet_Pt-20to40*.root
+hadd data/50ns_betaV4/GJet_Pt-40toInf.root	../../output/job_2015927_01839/GJet_Pt-40toInf/GJet_Pt-40toInf*.root
+hadd data/50ns_betaV4/QCD_Pt-30to40.root	../../output/job_2015927_01921/QCD_Pt-30to40/QCD_Pt-30to40*.root
+hadd data/50ns_betaV4/QCD_Pt-30toInf.root	../../output/job_2015927_01934/QCD_Pt-30toInf/QCD_Pt-30toInf*.root
+hadd data/50ns_betaV4/QCD_Pt-40toInf.root	../../output/job_2015927_01952/QCD_Pt-40toInf/QCD_Pt-40toInf*.root
+hadd data/50ns_betaV4/DiPhoton.root		../../output/job_2015927_01754/DiPhoton/DiPhoton*.root
+hadd data/50ns_betaV4/DoubleEG.root		../../output/job_2015927_02227/DoubleEG/DoubleEG*.root
 
-hadd data/50ns_betaV4/DMHtoGG_M1000.root     	../../output/job_2015924_162322/Higgs_scalar_nohdecay_gg_1000GeV/Higgs_scalar_nohdecay_gg_1000GeV_*.root  
-hadd data/50ns_betaV4/DMHtoGG_M100.root      	../../output/job_2015924_162325/Higgs_scalar_nohdecay_gg_100GeV/Higgs_scalar_nohdecay_gg_100GeV_*.root
-hadd data/50ns_betaV4/DMHtoGG_M10.root       	../../output/job_2015924_162328/Higgs_scalar_nohdecay_gg_10GeV/Higgs_scalar_nohdecay_gg_10GeV_*.root
-hadd data/50ns_betaV4/DMHtoGG_M1.root        	../../output/job_2015924_162410/Higgs_scalar_nohdecay_gg_1GeV/Higgs_scalar_nohdecay_gg_1GeV_*.root
+hadd data/50ns_betaV4/DMHtoGG_M1000.root     	../../output/job_2015926_20935/Higgs_scalar_nohdecay_gg_1000GeV/Higgs_scalar_nohdecay_gg_1000GeV_*.root  
+hadd data/50ns_betaV4/DMHtoGG_M100.root      	../../output/job_2015926_20937/Higgs_scalar_nohdecay_gg_100GeV/Higgs_scalar_nohdecay_gg_100GeV_*.root
+hadd data/50ns_betaV4/DMHtoGG_M10.root       	../../output/job_2015926_20941/Higgs_scalar_nohdecay_gg_10GeV/Higgs_scalar_nohdecay_gg_10GeV_*.root
+hadd data/50ns_betaV4/DMHtoGG_M1.root        	../../output/job_2015926_20944/Higgs_scalar_nohdecay_gg_1GeV/Higgs_scalar_nohdecay_gg_1GeV_*.root
 
 
 

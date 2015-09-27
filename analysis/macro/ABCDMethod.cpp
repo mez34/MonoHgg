@@ -23,7 +23,7 @@ ABCDMethod::ABCDMethod( SamplePairVec Samples, const Double_t inLumi, const TStr
   //fSampleTitleMap["Data"]		= "Data";
   fSampleTitleMap["QCD"] 		= "QCD";
   fSampleTitleMap["GJets"]		= "$\\gamma$ + Jets";
-  fSampleTitleMap["WZH"]		= "W/Z + H";
+  fSampleTitleMap["VH"]			= "V + H";
   fSampleTitleMap["DYJetsToLL"]		= "Drell-Yan";
   fSampleTitleMap["GluGluHToGG"]	= "$H \\rightarrow \\gamma \\gamma$ (ggH)";
   fSampleTitleMap["DiPhoton"]		= "$\\gamma\\gamma$";
@@ -195,7 +195,9 @@ void ABCDMethod::DoAnalysis(){
       Bkg_Int[cat][mc] = ABCDMethod::ComputeIntAndErr( fInBkgTH2DHists[0][mc], Bkg_IntErr[cat][mc],  min_x[cat], max_x[cat], min_y[cat], max_y[cat], cat); 
     }
     // after finished with bkg samples separately, look at the combined sample
+    // total bkg
     Bkg_Int[cat][fNBkg] = ABCDMethod::ComputeIntAndErr( fOutBkgTH2DHists[0], Bkg_IntErr[cat][fNBkg],  min_x[cat], max_x[cat], min_y[cat], max_y[cat], cat);
+    // non-resonant bkg
     Bkg_Int[cat][fNBkg+1] = ABCDMethod::ComputeIntAndErr( fOutSelBkgTH2DHists[0], Bkg_IntErr[cat][fNBkg+1],  min_x[cat], max_x[cat], min_y[cat], max_y[cat], cat);
 
     for (UInt_t mc = 0; mc < fNSig; mc++){ 
@@ -498,13 +500,18 @@ void ABCDMethod::FillTable(){
      std::cout << "Data: D    =  " << *(fRooData[2][0]->format(2,"EXPP")) << std::endl;
      std::cout << "Data: corr =  " << fCorrData[0]  << std::endl;
      std::cout << "Data: ExpD =  " << fExpData[0] << " \\pm " << fExpErrData[0] << std::endl;
+  
+     TString bkgname="";
      for (UInt_t mc = 0; mc < fNBkg+2; mc++){
-       std::cout << fBkgNames[mc] << ": A    =  " << *(fRooBkg[0][mc]->format(2,"EXPP")) << std::endl;
-       std::cout << fBkgNames[mc] << ": B    =  " << *(fRooBkg[1][mc]->format(2,"EXPP")) << std::endl;
-       std::cout << fBkgNames[mc] << ": C    =  " << *(fRooBkg[3][mc]->format(2,"EXPP")) << std::endl;
-       std::cout << fBkgNames[mc] << ": D    =  " << *(fRooBkg[2][mc]->format(2,"EXPP")) << std::endl;
-       std::cout << fBkgNames[mc] << ": corr =  " << fCorrBkg[mc]  << std::endl;
-       std::cout << fBkgNames[mc] << ": ExpD =  " << fExpBkg[mc] << " \\pm " << fExpErrBkg[mc] << std::endl;
+       if (mc == fNBkg) bkgname="Total Bkg";
+       else if (mc==fNBkg+1) bkgname="Non-res Bkg";
+       else bkgname = fBkgNames[mc]; 
+       std::cout << bkgname << ": A    =  " << *(fRooBkg[0][mc]->format(2,"EXPP")) << std::endl;
+       std::cout << bkgname << ": B    =  " << *(fRooBkg[1][mc]->format(2,"EXPP")) << std::endl;
+       std::cout << bkgname << ": C    =  " << *(fRooBkg[3][mc]->format(2,"EXPP")) << std::endl;
+       std::cout << bkgname << ": D    =  " << *(fRooBkg[2][mc]->format(2,"EXPP")) << std::endl;
+       std::cout << bkgname << ": corr =  " << fCorrBkg[mc]  << std::endl;
+       std::cout << bkgname << ": ExpD =  " << fExpBkg[mc] << " \\pm " << fExpErrBkg[mc] << std::endl;
      }
      for (UInt_t mc = 0; mc < fNSig; mc++){
        std::cout << fSigNames[mc] << ": A    =  " << *(fRooSig[0][mc]->format(2,"EXPP")) << std::endl;

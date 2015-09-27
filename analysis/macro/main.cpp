@@ -34,13 +34,13 @@ int main(){
   TString inDir = "./data/50ns_betaV4/";
   TString outDir = "./diPhoPlots/50ns_betaV4/";
 
-  bool doFakeData = true;	// use FakeData to test combiner
+  bool doFakeData = false;	// use FakeData to test combiner
   bool sortMC = false;		// use if want to sort bkg smallest to biggest
   bool makePURWfiles = false;	// recompute PURW and make files
-  bool doReweightPU = true;	// use PURW from old files if !makePURWfiles
+  bool doReweightPU = false;	// use PURW from old files if !makePURWfiles
   bool doPlots = false;		// make plots for each sample individually
   bool doComb = false;		// make stack/overlay plots
-  bool doABCD = false;		// run ABCD method 
+  bool doABCD = true;		// run ABCD method 
 
   Double_t lumi = 41.64; // in pb^-1 
   UInt_t nBins_vtx = 60; // number of bins for PURW 

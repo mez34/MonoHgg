@@ -115,7 +115,7 @@ void Combiner::OverlayPlots(){
     fOutBkgTH1DHists[th1d]->SetFillColor(kBlack);
     fOutBkgTH1DHists[th1d]->SetFillStyle(3003);
     fOutBkgTH1DHists[th1d]->SetMarkerSize(0);
-    fTH1DLegends[th1d]->AddEntry(fOutBkgTH1DHists[th1d],"Bkg Uncertainty","F");
+    //fTH1DLegends[th1d]->AddEntry(fOutBkgTH1DHists[th1d],"Bkg Uncertainty","F");
 
     // sig: just add to legend
     for (UInt_t mc = 0; mc < fNSig; mc++){
