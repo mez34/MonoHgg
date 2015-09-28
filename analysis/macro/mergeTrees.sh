@@ -15,10 +15,18 @@ hadd data/50ns_betaV4/QCD_Pt-40toInf.root	../../output/job_2015927_01952/QCD_Pt-
 hadd data/50ns_betaV4/DiPhoton.root		../../output/job_2015927_01754/DiPhoton/DiPhoton*.root
 hadd data/50ns_betaV4/DoubleEG.root		../../output/job_2015927_02227/DoubleEG/DoubleEG*.root
 
-hadd data/50ns_betaV4/DMHtoGG_M1000.root     	../../output/job_2015926_20935/Higgs_scalar_nohdecay_gg_1000GeV/Higgs_scalar_nohdecay_gg_1000GeV_*.root  
-hadd data/50ns_betaV4/DMHtoGG_M100.root      	../../output/job_2015926_20937/Higgs_scalar_nohdecay_gg_100GeV/Higgs_scalar_nohdecay_gg_100GeV_*.root
-hadd data/50ns_betaV4/DMHtoGG_M10.root       	../../output/job_2015926_20941/Higgs_scalar_nohdecay_gg_10GeV/Higgs_scalar_nohdecay_gg_10GeV_*.root
-hadd data/50ns_betaV4/DMHtoGG_M1.root        	../../output/job_2015926_20944/Higgs_scalar_nohdecay_gg_1GeV/Higgs_scalar_nohdecay_gg_1GeV_*.root
+#using Livia's PURW file:
+hadd data/50ns_betaV4/DMHtoGG_M1000.root     	../../output/job_2015928_222853/Higgs_scalar_nohdecay_gg_1000GeV/Higgs_scalar_nohdecay_gg_1000GeV_*.root  
+hadd data/50ns_betaV4/DMHtoGG_M100.root      	../../output/job_2015928_222859/Higgs_scalar_nohdecay_gg_100GeV/Higgs_scalar_nohdecay_gg_100GeV_*.root
+hadd data/50ns_betaV4/DMHtoGG_M10.root       	../../output/job_2015928_22293/Higgs_scalar_nohdecay_gg_10GeV/Higgs_scalar_nohdecay_gg_10GeV_*.root
+hadd data/50ns_betaV4/DMHtoGG_M1.root        	../../output/job_2015928_222958/Higgs_scalar_nohdecay_gg_1GeV/Higgs_scalar_nohdecay_gg_1GeV_*.root
+
+
+#my PUrw file:
+#hadd data/50ns_betaV4/DMHtoGG_M1000.root     	../../output/job_2015926_20935/Higgs_scalar_nohdecay_gg_1000GeV/Higgs_scalar_nohdecay_gg_1000GeV_*.root  
+#hadd data/50ns_betaV4/DMHtoGG_M100.root      	../../output/job_2015926_20937/Higgs_scalar_nohdecay_gg_100GeV/Higgs_scalar_nohdecay_gg_100GeV_*.root
+#hadd data/50ns_betaV4/DMHtoGG_M10.root       	../../output/job_2015926_20941/Higgs_scalar_nohdecay_gg_10GeV/Higgs_scalar_nohdecay_gg_10GeV_*.root
+#hadd data/50ns_betaV4/DMHtoGG_M1.root        	../../output/job_2015926_20944/Higgs_scalar_nohdecay_gg_1GeV/Higgs_scalar_nohdecay_gg_1GeV_*.root
 
 
 

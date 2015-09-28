@@ -96,7 +96,7 @@ void Combiner::OverlayPlots(){
         if (data == 0) fOutDataTH1DHists[th1d] = (TH1D*)fInDataTH1DHists[th1d][data]->Clone(); 
         else fOutDataTH1DHists[th1d]->Add(fInDataTH1DHists[th1d][data]);
       }
-     if (fNData > 0)  fTH1DLegends[th1d]->AddEntry(fOutDataTH1DHists[th1d],"Data","pl"); //add data entry to legend
+     //if (fNData > 0)  fTH1DLegends[th1d]->AddEntry(fOutDataTH1DHists[th1d],"Data","pl"); //add data entry to legend
    // }// end if ndata>0
 
     // bkg : copy histos and add to stacks
@@ -141,17 +141,35 @@ void Combiner::MakeEffPlots(){
   Double_t eff_val = 0.;
   Double_t eff_num = 0.;
   Double_t eff_den = 0.;
-  for (UInt_t mc = 0; mc < fNSig; mc++){
-    eff_num = fInSigTH1DHists[fIndexEff][mc]->GetBinContent(8);
-    eff_den = fInSigTH1DHists[fIndexEff][mc]->GetBinContent(1);
-    if (eff_den > 0) eff_val = eff_num/eff_den; 
-    eff_mDM->Fill((Double_t)mc,eff_val); 
-    eff_mDM->GetXaxis()->SetBinLabel(mc+1,fSigNames[mc]);// bins start at 1 not 0 so need mc+1
-  }
+  Double_t num_err = 0.;
+  Double_t den_err = 0.;
+  Double_t eff_err = 0.;
+  //Double_t err,er1,er2 = 0.;
 
+  for (UInt_t mc = 0; mc < fNSig; mc++){
+    eff_num = 25*fInSigTH1DHists[fIndexEff][mc]->GetBinContent(10); // events passing sel,mgg,met
+    eff_den = 25*fInSigTH1DHists[fIndexEff][mc]->GetBinContent(11); // events only require pass presel
+    num_err = TMath::Sqrt(eff_num);
+    den_err = TMath::Sqrt(eff_den); 
+    if (eff_den > 0) eff_val = eff_num/eff_den; 
+    eff_mDM->SetBinContent(mc+1,eff_val); 
+    eff_mDM->GetXaxis()->SetBinLabel(mc+1,fSigNames[mc]);// bins start at 1 not 0 so need mc+1
+    eff_err = TMath::Sqrt(eff_val*(1.0-eff_val)/eff_den);
+    std::cout << eff_num << " / " << eff_den << " err " << eff_err << std::endl; 
+    // eff_err = TMath::Sqrt(TMath::Power(num_err/eff_den,2)+TMath::Power(eff_num*den_err/(eff_den*eff_den),2)); 
+    //er1 = TMath::Min(eff_err,eff_val);
+    //er2 = TMath::Min(eff_err,1-eff_val);
+    //err = TMath::Min(eff_err,1.);
+    //std::cout << eff_err << " low " << er1 << " hi " << er2 << " blah " << err << std::endl;
+
+    eff_mDM->SetBinError(mc+1,eff_err);
+    std::cout << "binCon " << eff_mDM->GetBinContent(mc+1) << " err " << eff_mDM->GetBinError(mc+1) << std::endl; 
+  }
+  eff_mDM->SetMaximum(1.0);
+  eff_mDM->SetMinimum(0.0);
   eff_mDM->Draw("PE");
   eff_mDM->Write();
-  CMSLumi(c,0,lumi);
+  CMSLumi(c,0,25*lumi);
   c->SaveAs(Form("%scomb/eff_mDM.png",fOutDir.Data()));
   delete c; 
 
@@ -191,7 +209,7 @@ void Combiner::DrawCanvasOverlay(const UInt_t th1d, const Bool_t isLogY){
   fOutTH1DStackPads[th1d]->Draw();
   fOutTH1DStackPads[th1d]->cd();
    
-  if (fOutDataTH1DHists[th1d]->Integral() > 0) fOutDataTH1DHists[th1d]->Scale(1.0/fOutDataTH1DHists[th1d]->Integral());
+  //if (fOutDataTH1DHists[th1d]->Integral() > 0) fOutDataTH1DHists[th1d]->Scale(1.0/fOutDataTH1DHists[th1d]->Integral());
 
   for (UInt_t mc = 0; mc < fNSig; mc++){
     if (fInSigTH1DHists[th1d][mc]->Integral() > 0){
@@ -215,6 +233,10 @@ void Combiner::DrawCanvasOverlay(const UInt_t th1d, const Bool_t isLogY){
   if (isLogY) fInSigTH1DHists[th1d][0]->SetMaximum(maxOverlay*10);
   else fInSigTH1DHists[th1d][0]->SetMaximum(maxOverlay*1.1);
   //if (fNData > 0) fInSigTH1DHists[th1d][0]->SetMinimum(minOverlay*0.9);
+  if (th1d==fIndexMgg){ 
+    fInSigTH1DHists[th1d][0]->SetMinimum(0.0001); 
+    fInSigTH1DHists[th1d][0]->SetMaximum(10);
+  }
 
   fInSigTH1DHists[th1d][0]->SetTitle("");
   fInSigTH1DHists[th1d][0]->Draw("hist");
@@ -225,7 +247,7 @@ void Combiner::DrawCanvasOverlay(const UInt_t th1d, const Bool_t isLogY){
   for (UInt_t mc = 0; mc < fNSig; mc++){
     fInSigTH1DHists[th1d][mc]->Draw("HIST SAME");
   }
-  if (fNData > 0) fOutDataTH1DHists[th1d]->Draw("PE SAME");
+  //if (fNData > 0) fOutDataTH1DHists[th1d]->Draw("PE SAME");
   fOutBkgTH1DHists[th1d]->Draw("E2 SAME");
   fTH1DLegends[th1d]->Draw("SAME"); 
 
@@ -507,10 +529,11 @@ void Combiner::InitCanvAndHists(){
 
   fTH1DLegends.resize(fNTH1D);
   for (UInt_t th1d = 0; th1d < fNTH1D; th1d++){
-    fTH1DLegends[th1d] = new TLegend(0.65,0.6,0.9,0.89); // (x1,y1,x2,y2)
+    fTH1DLegends[th1d] = new TLegend(0.6075,0.6536441,0.8575,0.9340678);
+    //fTH1DLegends[th1d] = new TLegend(0.65,0.5,0.9,0.89); // (x1,y1,x2,y2)
     fTH1DLegends[th1d]->SetBorderSize(4);
     fTH1DLegends[th1d]->SetLineColor(kBlack);
-    fTH1DLegends[th1d]->SetTextSize(0.045);//0.03
+    fTH1DLegends[th1d]->SetTextSize(0.04);//0.03
     fTH1DLegends[th1d]->SetLineWidth(2);
   }
 
@@ -528,11 +551,13 @@ void Combiner::InitCanvAndHists(){
     fOutTH1DCanvases[th1d] = new TCanvas(fTH1DNames[th1d].Data(),"");
     fOutTH1DCanvases[th1d]->cd();
 
-    fOutTH1DStackPads[th1d] = new TPad("","",0,0.3,1.0,0.99);
+    //fOutTH1DStackPads[th1d] = new TPad("","",0,0.3,1.0,0.99);
+    fOutTH1DStackPads[th1d] = new TPad("","",0.01,0.13,0.75,1.);
     fOutTH1DStackPads[th1d]->SetBottomMargin(0); // upper and lower pad are joined
 
     //if (fNData > 0){// for lower pad with ratio plot
-      fOutTH1DRatioPads[th1d] = new TPad("","",0,0.05,1.0,0.3);
+      //fOutTH1DRatioPads[th1d] = new TPad("","",0,0.05,1.0,0.3);
+      fOutTH1DRatioPads[th1d] = new TPad("","",0.01,0.001,0.75,0.2);
       fOutTH1DRatioPads[th1d]->SetTopMargin(0);
       fOutTH1DRatioPads[th1d]->SetBottomMargin(0.2);
       fOutTH1DRatioLines[th1d] = new TLine();
@@ -546,6 +571,7 @@ void Combiner::InitTH1DNames(){
   
   // higgs & met variables
   fTH1DNames.push_back("mgg");
+  fIndexMgg = fTH1DNames.size()-1;
   fTH1DNames.push_back("ptgg");
   fTH1DNames.push_back("nvtx"); 
   fTH1DNames.push_back("t1pfmetphi");

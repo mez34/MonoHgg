@@ -3,12 +3,13 @@
 #include "../../../DataFormats/Math/interface/deltaPhi.h"
 //#include "mkPlotsLivia/CMS_lumi.C"
 
-Plotter::Plotter( TString inName, TString outName, TString inSpecies, const DblVec puweights, const Double_t lumi, Bool_t sigMC){
+Plotter::Plotter( TString inName, TString outName, TString inSpecies, const DblVec puweights, const Double_t lumi, Bool_t sigMC, Bool_t Data){
 
   // Get ROOT file
   name = inName;
   species = inSpecies;
   isSigMC = sigMC;
+  isData = Data;
   inFile = TFile::Open(Form("%s%s.root",name.Data(),species.Data()));
   CheckValidFile(inFile,Form("%s%s.root",name.Data(),species.Data()));  
   // Open Tree from inFile
@@ -17,6 +18,17 @@ Plotter::Plotter( TString inName, TString outName, TString inSpecies, const DblV
 
   fLumi = lumi;
   fPUWeights = puweights;
+
+  fSelection.resize(6);
+  TH1D *fSel = (TH1D*)inFile->Get("h_selection");
+  CheckValidTH1D(fSel,"h_selection",Form("%s%s.root",name.Data(),species.Data()));
+  for (UInt_t i=0; i<6; i++){ 
+    // values of i correspond to passing: 
+    // 1=trigger, 2=presel, 3=selection, 4=pt1>30,pt2>20, 5=pt1>mgg/3,pt2>mgg/4, 6=goodVtx
+    if (!Data) fSelection[i]=fLumi*fSel->GetBinContent(i); 
+    else fSelection[i]=fSel->GetBinContent(i);
+  }
+  std::cout << "Finished getting the h_selection" << std::endl;  
 
   // Make output directory
   fName = outName;
@@ -63,6 +75,11 @@ void Plotter::DoPlots(){
   Double_t effptd[60]={0};
 
   fTH1DMap["hlt"]->Fill(0.5,nentries);
+  // fSelection[i]-> 1=trigger, 2=presel, 3=selection, 4=pt1>30,pt2>20, 5=pt1>mgg/3,pt2>mgg/4, 6=goodVtx
+  for (UInt_t i=0; i<6; i++){
+    fTH1DMap["selection"]->Fill(i+0.5,fSelection[i]);
+  }
+  fTH1DMap["eff_sel"]->Fill(10.5,fSelection[2]);
 
   for (UInt_t entry = 0; entry < nentries; entry++){
     tpho->GetEntry(entry);
@@ -269,7 +286,7 @@ void Plotter::DoPlots(){
   fTH1DMap["eff_sel"]->GetXaxis()->SetBinLabel(8,"passHoe");
   fTH1DMap["eff_sel"]->GetXaxis()->SetBinLabel(9,"passMgg");
   fTH1DMap["eff_sel"]->GetXaxis()->SetBinLabel(10,"passMet");  
-
+  fTH1DMap["eff_sel"]->GetXaxis()->SetBinLabel(11,"passPreSel");
 
   fTH1DMap["hlt"]->GetXaxis()->SetBinLabel(1,"nentries");
   fTH1DMap["hlt"]->GetXaxis()->SetBinLabel(2,"Pho26Pho16M60");
@@ -281,7 +298,7 @@ void Plotter::DoPlots(){
   fTH1DMap["hlt"]->GetXaxis()->SetBinLabel(8,"Dipho30M55PV");
   fTH1DMap["hlt"]->GetXaxis()->SetBinLabel(9,"Dipho30M55EB");
 
-  std::cout << "phi1 " << fTH1DMap["phi1_n-1"]->Integral() <<  " phi2 " << fTH1DMap["phi2_n-1"]->Integral() << std::endl;
+  //std::cout << "phi1 " << fTH1DMap["phi1_n-1"]->Integral() <<  " phi2 " << fTH1DMap["phi2_n-1"]->Integral() << std::endl;
 
   Plotter::SavePlots();
 
@@ -323,21 +340,21 @@ void Plotter::SetUpPlots(){
   fTH1DMap["phi2_pho1pass"]     = Plotter::MakeTH1DPlot("phi2_pho1pass","",80,-4.,4.,"","");
 
   // n minus 1 plots
-  fTH1DMap["nvtx_n-1"]		= Plotter::MakeTH1DPlot("nvtx_n-1","",60,0.,60.,"nvtx","");
-  fTH1DMap["mgg_n-1"]		= Plotter::MakeTH1DPlot("mgg_n-1","",60,100.,200.,"m_{#gamma#gamma} (GeV)","");  
-  fTH1DMap["ptgg_n-1"]		= Plotter::MakeTH1DPlot("ptgg_n-1","",100,0.,1000.,"p_{T,#gamma#gamma} (GeV)","");
-  fTH1DMap["t1pfmet_n-1"]	= Plotter::MakeTH1DPlot("t1pfmet_n-1","",100,0.,1000.,"t1PF MET (GeV)","");
+  fTH1DMap["nvtx_n-1"]		= Plotter::MakeTH1DPlot("nvtx_n-1","",40,0.,40.,"nvtx","");
+  fTH1DMap["mgg_n-1"]		= Plotter::MakeTH1DPlot("mgg_n-1","",30,100.,180.,"m_{#gamma#gamma} (GeV)","");  
+  fTH1DMap["ptgg_n-1"]		= Plotter::MakeTH1DPlot("ptgg_n-1","",15,0.,300.,"p_{T,#gamma#gamma} (GeV)","");
+  fTH1DMap["t1pfmet_n-1"]	= Plotter::MakeTH1DPlot("t1pfmet_n-1","",25,0.,200.,"t1PF MET (GeV)","");
   fTH1DMap["t1pfmetphi_n-1"]	= Plotter::MakeTH1DPlot("t1pfmetphi_n-1","",80,-4.,4.,"t1PF MET #phi","");
   fTH1DMap["pfmet_n-1"]		= Plotter::MakeTH1DPlot("pfmet_n-1","",100,0.,1000,"PF MET (GeV)","");
   fTH1DMap["pfmetphi_n-1"]	= Plotter::MakeTH1DPlot("pfmetphi_n-1","",80,-4.,4.,"PF MET #phi","");
   fTH1DMap["calomet_n-1"]	= Plotter::MakeTH1DPlot("calomet_n-1","",100,0.,1000,"calo MET (GeV)","");
   fTH1DMap["calometphi_n-1"]	= Plotter::MakeTH1DPlot("calometphi_n-1","",80,-4.,4.,"calo MET #phi","");
-  fTH1DMap["phi1_n-1"]		= Plotter::MakeTH1DPlot("phi1_n-1","",80,-4.,4.,"#phi(#gamma1)","");
-  fTH1DMap["phi2_n-1"]		= Plotter::MakeTH1DPlot("phi2_n-1","",80,-4.,4.,"#phi(#gamma2)","");
-  fTH1DMap["eta1_n-1"]		= Plotter::MakeTH1DPlot("eta1_n-1","",100,-5.,5.,"#eta(#gamma1)","");
-  fTH1DMap["eta2_n-1"]		= Plotter::MakeTH1DPlot("eta2_n-1","",100,-5.,5.,"#eta(#gamma2)","");
-  fTH1DMap["pt1_n-1"]		= Plotter::MakeTH1DPlot("pt1_n-1","",50,0.,500.,"p_{T,#gamma1} (GeV)","");
-  fTH1DMap["pt2_n-1"]		= Plotter::MakeTH1DPlot("pt2_n-1","",50,0.,500.,"p_{T,#gamma2} (GeV)","");
+  fTH1DMap["phi1_n-1"]		= Plotter::MakeTH1DPlot("phi1_n-1","",20,-4.,4.,"#phi(#gamma1)","");
+  fTH1DMap["phi2_n-1"]		= Plotter::MakeTH1DPlot("phi2_n-1","",20,-4.,4.,"#phi(#gamma2)","");
+  fTH1DMap["eta1_n-1"]		= Plotter::MakeTH1DPlot("eta1_n-1","",20,-3.,3.,"#eta(#gamma1)","");
+  fTH1DMap["eta2_n-1"]		= Plotter::MakeTH1DPlot("eta2_n-1","",20,-3.,3.,"#eta(#gamma2)","");
+  fTH1DMap["pt1_n-1"]		= Plotter::MakeTH1DPlot("pt1_n-1","",15,0.,300.,"p_{T,#gamma1} (GeV)","");
+  fTH1DMap["pt2_n-1"]		= Plotter::MakeTH1DPlot("pt2_n-1","",15,0.,300.,"p_{T,#gamma2} (GeV)","");
   fTH1DMap["chiso1_n-1"]	= Plotter::MakeTH1DPlot("chiso1_n-1","",75,-5.,15.,"CHiso(#gamma1)","");
   fTH1DMap["chiso2_n-1"]	= Plotter::MakeTH1DPlot("chiso2_n-1","",75,-5.,15.,"CHiso(#gamma2)","");
   fTH1DMap["neuiso1_n-1"]	= Plotter::MakeTH1DPlot("neuiso1_n-1","",75,-5.,15.,"NHiso(#gamma1)","");
@@ -358,7 +375,8 @@ void Plotter::SetUpPlots(){
   fTH1DMap["mgg_selt1pfmet"]	= Plotter::MakeTH1DPlot("mgg_selt1pfmet","",40,100.,300.,"m_{#gamma#gamma} (GeV)","");
 
   // efficiency plots
-  fTH1DMap["eff_sel"]		= Plotter::MakeTH1DPlot("eff_sel","",10,0.,10.,"","");
+  fTH1DMap["eff_sel"]		= Plotter::MakeTH1DPlot("eff_sel","",11,0.,11.,"","");
+  fTH1DMap["selection"]		= Plotter::MakeTH1DPlot("selection","",6,0.,6.,"","");
   fTH1DMap["eff_PU"]		= Plotter::MakeTH1DPlot("eff_PU","",60,0.,60.,"","");
   fTH1DMap["eff_pt"]		= Plotter::MakeTH1DPlot("eff_pt","",60,0.,600.,"","");
   fTH1DMap["hlt"]		= Plotter::MakeTH1DPlot("hlt","",10,0.,10,"","");

@@ -38,11 +38,11 @@ int main(){
   bool sortMC = false;		// use if want to sort bkg smallest to biggest
   bool makePURWfiles = false;	// recompute PURW and make files
   bool doReweightPU = false;	// use PURW from old files if !makePURWfiles
-  bool doPlots = false;		// make plots for each sample individually
-  bool doComb = false;		// make stack/overlay plots
+  bool doPlots = true;		// make plots for each sample individually
+  bool doComb = true;		// make stack/overlay plots
   bool doABCD = true;		// run ABCD method 
 
-  Double_t lumi = 41.64; // in pb^-1 
+  Double_t lumi = 40.0; //41.64; // in pb^-1 
   UInt_t nBins_vtx = 60; // number of bins for PURW 
   
   //for CMSSW_7_0_pre9: run with root
@@ -192,74 +192,74 @@ int main(){
 
   if (doFakeData){
     std::cout << "Working on FakeData sample" << std::endl;
-    Plotter * FakeData = new Plotter(inDir,outDir,"DiPhoton_test",puweights_Data,lumi,false);
+    Plotter * FakeData = new Plotter(inDir,outDir,"DiPhoton_test",puweights_Data,lumi,false,true);
     FakeData->DoPlots();
     delete FakeData;
     std::cout << "Finished FakeData sample" << std::endl;
   }
   if (doPlots){
     std::cout << "Working on DoubleEG sample" << std::endl;
-    Plotter * dEG = new Plotter(inDir,outDir,"DoubleEG",puweights_Data,lumi,false);
+    Plotter * dEG = new Plotter(inDir,outDir,"DoubleEG",puweights_Data,lumi,false,true);
     dEG->DoPlots();
     delete dEG;
     std::cout << "Finished DoubleEG sample" << std::endl;
 
     std::cout << "Working on GJets sample" << std::endl;
-    Plotter * GJets = new Plotter(inDir,outDir,"GJets",puweights_GJets,lumi,false);
+    Plotter * GJets = new Plotter(inDir,outDir,"GJets",puweights_GJets,lumi,false,false);
     GJets->DoPlots();
     delete GJets;
     std::cout << "Finished GJets sample" << std::endl;
 
     std::cout << "Working on QCD sample" << std::endl;
-    Plotter * QCD = new Plotter(inDir,outDir,"QCD",puweights_QCD,lumi,false);
+    Plotter * QCD = new Plotter(inDir,outDir,"QCD",puweights_QCD,lumi,false,false);
     QCD->DoPlots();
     delete QCD;
     std::cout << "Finished QCD sample" << std::endl;
 
     std::cout << "Working on WZH sample" << std::endl;
-    Plotter * WZH = new Plotter(inDir,outDir,"VH",puweights_WZH,lumi,false);
+    Plotter * WZH = new Plotter(inDir,outDir,"VH",puweights_WZH,lumi,false,false);
     WZH->DoPlots();
     delete WZH;
     std::cout << "Finished WZH sample" << std::endl;
 
     std::cout << "Working on GluGluH sample" << std::endl;
-    Plotter * GGHGG = new Plotter(inDir,outDir,"GluGluHToGG",puweights_GGHGG,lumi,false);
+    Plotter * GGHGG = new Plotter(inDir,outDir,"GluGluHToGG",puweights_GGHGG,lumi,false,false);
     GGHGG->DoPlots();
     delete GGHGG;
     std::cout << "Finished GluGluH sample" << std::endl;
   
     std::cout << "Working on DiPhoton sample" << std::endl;
-    Plotter * GG = new Plotter(inDir,outDir,"DiPhoton",puweights_GG,lumi,false);
+    Plotter * GG = new Plotter(inDir,outDir,"DiPhoton",puweights_GG,lumi,false,false);
     GG->DoPlots();
     delete GG;
     std::cout << "Finished GluGluH sample" << std::endl;
 
     std::cout << "Working on DYJets sample" << std::endl;
-    Plotter * DY = new Plotter(inDir,outDir,"DYJetsToLL",puweights_DY,lumi,false);
+    Plotter * DY = new Plotter(inDir,outDir,"DYJetsToLL",puweights_DY,lumi,false,false);
     DY->DoPlots();
     delete DY;
     std::cout << "Finished DYJets sample" << std::endl;
 
     std::cout << "Working on DMHgg M1000 sample" << std::endl;
-    Plotter * DMH_M1000 = new Plotter(inDir,outDir,"DMHtoGG_M1000",puweights_sig1000,lumi,true);
+    Plotter * DMH_M1000 = new Plotter(inDir,outDir,"DMHtoGG_M1000",puweights_sig1000,lumi,true,false);
     DMH_M1000->DoPlots();
     delete DMH_M1000;
     std::cout << "Finished DMHgg M1000 sample" << std::endl;
   
     std::cout << "Working on DMHgg M100 sample" << std::endl;
-    Plotter * DMH_M100 = new Plotter(inDir,outDir,"DMHtoGG_M100",puweights_sig100,lumi,true);
+    Plotter * DMH_M100 = new Plotter(inDir,outDir,"DMHtoGG_M100",puweights_sig100,lumi,true,false);
     DMH_M100->DoPlots();
     delete DMH_M100;
     std::cout << "Finished DMHgg M100 sample" << std::endl;
   
     std::cout << "Working on DMHgg M10 sample" << std::endl;
-    Plotter * DMH_M10 = new Plotter(inDir,outDir,"DMHtoGG_M10",puweights_sig10,lumi,true);
+    Plotter * DMH_M10 = new Plotter(inDir,outDir,"DMHtoGG_M10",puweights_sig10,lumi,true,false);
     DMH_M10->DoPlots();
     delete DMH_M10;
     std::cout << "Finished DMHgg M10 sample" << std::endl;
   
     std::cout << "Working on DMHgg M1 sample" << std::endl;
-    Plotter * DMH_M1 = new Plotter(inDir,outDir,"DMHtoGG_M1",puweights_sig1,lumi,true);
+    Plotter * DMH_M1 = new Plotter(inDir,outDir,"DMHtoGG_M1",puweights_sig1,lumi,true,false);
     DMH_M1->DoPlots();
     delete DMH_M1;
     std::cout << "Finished DMHgg M1 sample" << std::endl;
@@ -282,15 +282,15 @@ int main(){
   // setup all samples for Combiner and ABCD
   ColorMap colorMap;
   colorMap["QCD"] 			= kYellow+8;
-  colorMap["GJets"] 			= kAzure+8;
-  colorMap["VH"]			= kPink+7;//kCyan+3;
-  colorMap["GluGluHToGG"]		= kMagenta+7;//kCyan;
-  colorMap["DiPhoton"]			= kSpring+7;
-  colorMap["DYJetsToLL"]		= kOrange+7;
-  colorMap["DMHtoGG_M1"]		= kRed;
-  colorMap["DMHtoGG_M10"]		= kRed+1;
-  colorMap["DMHtoGG_M100"]		= kMagenta+1;
-  colorMap["DMHtoGG_M1000"]		= kMagenta;
+  colorMap["GJets"] 			= kGreen-9;
+  colorMap["VH"]			= kOrange-3;
+  colorMap["GluGluHToGG"]		= kOrange-2;
+  colorMap["DiPhoton"]			= kTeal-1;
+  colorMap["DYJetsToLL"]		= kTeal-7;
+  colorMap["DMHtoGG_M1"]		= kPink-2;
+  colorMap["DMHtoGG_M10"]		= kPink-6;
+  colorMap["DMHtoGG_M100"]		= kPink+6;
+  colorMap["DMHtoGG_M1000"]		= kPink+8;
   colorMap["DoubleEG"]			= kBlack;
   if (doFakeData) colorMap["FakeData"]	= kBlack; 
 

@@ -39,7 +39,7 @@ typedef TH2DMap::iterator		TH2DMapIter;
 
 class Plotter{
 public:
-  Plotter(const TString inName, const TString outName, const TString inSpecies, const DblVec puweights, const Double_t lumi, Bool_t sigMC);
+  Plotter(const TString inName, const TString outName, const TString inSpecies, const DblVec puweights, const Double_t lumi, Bool_t sigMC, Bool_t Data);
   ~Plotter();
 
   void DoPlots();  
@@ -60,11 +60,13 @@ private:
   TString 	fName;
   TString 	species;
   Bool_t	isSigMC;
+  Bool_t	isData;
   TFile * 	inFile;
   TFile * 	outFile;
 
   DblVec	fPUWeights;
   Double_t 	fLumi;
+  DblVec	fSelection;
 
   TTree * 	tpho;
   Int_t		nentries;

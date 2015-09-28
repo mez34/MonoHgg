@@ -8,10 +8,10 @@
 
 # 50ns samples
 
-#./submitBatchDiPho.py --cfg diPhoAnaBATCH.py Higgs_scalar_nohdecay_gg_1000GeV	1 100   /afs/cern.ch/user/m/mzientek/private/MonoHggCMSSW/CMSSW_7_4_6_patch2/src/MonoHgg/analysis/scripts/PURW_sig.root 0.01 1 #10fb xsec
-#./submitBatchDiPho.py --cfg diPhoAnaBATCH.py Higgs_scalar_nohdecay_gg_100GeV	1 101   /afs/cern.ch/user/m/mzientek/private/MonoHggCMSSW/CMSSW_7_4_6_patch2/src/MonoHgg/analysis/scripts/PURW_sig.root 0.01 1
-#./submitBatchDiPho.py --cfg diPhoAnaBATCH.py Higgs_scalar_nohdecay_gg_10GeV	1 102   /afs/cern.ch/user/m/mzientek/private/MonoHggCMSSW/CMSSW_7_4_6_patch2/src/MonoHgg/analysis/scripts/PURW_sig.root 0.01 1
-#./submitBatchDiPho.py --cfg diPhoAnaBATCH.py Higgs_scalar_nohdecay_gg_1GeV	1 103   /afs/cern.ch/user/m/mzientek/private/MonoHggCMSSW/CMSSW_7_4_6_patch2/src/MonoHgg/analysis/scripts/PURW_sig.root 0.01 1
+./submitBatchDiPho.py --cfg diPhoAnaBATCH.py Higgs_scalar_nohdecay_gg_1000GeV	1 100   /afs/cern.ch/user/m/mzientek/private/MonoHggCMSSW/CMSSW_7_4_6_patch2/src/MonoHgg/analysis/scripts/PURW_bkg.root 0.01 1 #10fb xsec
+./submitBatchDiPho.py --cfg diPhoAnaBATCH.py Higgs_scalar_nohdecay_gg_100GeV	1 101   /afs/cern.ch/user/m/mzientek/private/MonoHggCMSSW/CMSSW_7_4_6_patch2/src/MonoHgg/analysis/scripts/PURW_bkg.root 0.01 1
+./submitBatchDiPho.py --cfg diPhoAnaBATCH.py Higgs_scalar_nohdecay_gg_10GeV	1 102   /afs/cern.ch/user/m/mzientek/private/MonoHggCMSSW/CMSSW_7_4_6_patch2/src/MonoHgg/analysis/scripts/PURW_bkg.root 0.01 1
+./submitBatchDiPho.py --cfg diPhoAnaBATCH.py Higgs_scalar_nohdecay_gg_1GeV	1 103   /afs/cern.ch/user/m/mzientek/private/MonoHggCMSSW/CMSSW_7_4_6_patch2/src/MonoHgg/analysis/scripts/PURW_bkg.root 0.01 1
 
 ./submitBatchDiPho.py --cfg diPhoAnaBATCH.py DiPhoton				1 15    /afs/cern.ch/user/m/mzientek/private/MonoHggCMSSW/CMSSW_7_4_6_patch2/src/MonoHgg/analysis/scripts/PURW_bkg.root 84.0 1
 

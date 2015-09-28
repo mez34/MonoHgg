@@ -60,6 +60,7 @@ private:
   UInt_t	fNSig;
 
   UInt_t	fIndexEff;
+  UInt_t	fIndexMgg;
 
   UInt_t	fNTH1D;
   TStrVec	fTH1DNames;
