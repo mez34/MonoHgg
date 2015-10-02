@@ -27,7 +27,7 @@
 
 ./submitBatchDiPho.py --cfg diPhoAnaBATCH.py GluGluHToGG	     		1  10   /afs/cern.ch/user/m/mzientek/private/MonoHggCMSSW/CMSSW_7_4_6_patch2/src/MonoHgg/analysis/scripts/PURW_bkg.root  0.08784 1 #value=xsec*br (xsec=43.92,br=0.002)
 
-#./submitBatchDiPho.py --cfg diPhoAnaBATCH.py VH					1  11   /afs/cern.ch/user/m/mzientek/private/MonoHggCMSSW/CMSSW_7_4_6_patch2/src/MonoHgg/analysis/scripts/PURW_bkg.root  0.0044992 1 #value=xsec(ZH+WH)*br (xsec=2.2496,br=0.002)
+./submitBatchDiPho.py --cfg diPhoAnaBATCH.py VH					1  11   /afs/cern.ch/user/m/mzientek/private/MonoHggCMSSW/CMSSW_7_4_6_patch2/src/MonoHgg/analysis/scripts/PURW_bkg.root  0.0044992 1 #value=xsec(ZH+WH)*br (xsec=2.2496,br=0.002)
 
 ./submitBatchDiPho.py --cfg diPhoAnaBATCH.py DYJetsToLL				1  12   /afs/cern.ch/user/m/mzientek/private/MonoHggCMSSW/CMSSW_7_4_6_patch2/src/MonoHgg/analysis/scripts/PURW_bkg.root  6025.2 1 
 

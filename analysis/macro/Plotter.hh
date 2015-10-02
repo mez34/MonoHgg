@@ -18,6 +18,7 @@
 #include "TLegend.h"
 #include "TPaveText.h"
 #include "TLatex.h"
+#include "TLorentzVector.h"
 
 #include <iostream>
 #include <cmath>
@@ -56,24 +57,28 @@ public:
   void DeleteHists();
 
 private:
-  TString 	name;
-  TString 	fName;
-  TString 	species;
-  Bool_t	isSigMC;
-  Bool_t	isData;
-  TFile * 	inFile;
-  TFile * 	outFile;
+  TString 		name;
+  TString 		fName;
+  TString 		species;
+  Bool_t		isSigMC;
+  Bool_t		isData;
+  TFile * 		inFile;
+  TFile * 		outFile;
 
-  DblVec	fPUWeights;
-  Double_t 	fLumi;
-  DblVec	fSelection;
+  TLorentzVector	fLorenzVec1;
+  TLorentzVector	fLorenzVec2;
+  TLorentzVector	fLorenzVecgg;
 
-  TTree * 	tpho;
-  Int_t		nentries;
+  DblVec		fPUWeights;
+  Double_t 		fLumi;
+  DblVec		fSelection;
 
-  TH1DMap	fTH1DMap;
-  TH1DMap	fTH1DNewMap; //these histos have overflow bin
-  TH2DMap	fTH2DMap;
+  TTree * 		tpho;
+  Int_t			nentries;
+
+  TH1DMap		fTH1DMap;
+  TH1DMap		fTH1DNewMap; //these histos have overflow bin
+  TH2DMap		fTH2DMap;
 
   // variables for branches
   Int_t 	nvtx;

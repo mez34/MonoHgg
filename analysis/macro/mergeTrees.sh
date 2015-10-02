@@ -4,22 +4,24 @@
 #for new samples all in FLASHgg version Spring15BetaV4
 mkdir -p data/50ns_betaV4/
 
-hadd data/50ns_betaV4/GluGluHToGG.root		../../output/job_2015927_0205/GluGluHToGG/GluGluHToGG*.root
-hadd data/50ns_betaV4/VH.root			../../output/job_2015927_0913/VH/VH*.root
-hadd data/50ns_betaV4/DYJetsToLL.root		../../output/job_2015927_0209/DYJetsToLL/DYJetsToLL*.root
-hadd data/50ns_betaV4/GJet_Pt-20to40.root	../../output/job_2015927_01822/GJet_Pt-20to40/GJet_Pt-20to40*.root
-hadd data/50ns_betaV4/GJet_Pt-40toInf.root	../../output/job_2015927_01839/GJet_Pt-40toInf/GJet_Pt-40toInf*.root
-hadd data/50ns_betaV4/QCD_Pt-30to40.root	../../output/job_2015927_01921/QCD_Pt-30to40/QCD_Pt-30to40*.root
-hadd data/50ns_betaV4/QCD_Pt-30toInf.root	../../output/job_2015927_01934/QCD_Pt-30toInf/QCD_Pt-30toInf*.root
-hadd data/50ns_betaV4/QCD_Pt-40toInf.root	../../output/job_2015927_01952/QCD_Pt-40toInf/QCD_Pt-40toInf*.root
-hadd data/50ns_betaV4/DiPhoton.root		../../output/job_2015927_01754/DiPhoton/DiPhoton*.root
-hadd data/50ns_betaV4/DoubleEG.root		../../output/job_2015927_02227/DoubleEG/DoubleEG*.root
 
-#using Livia's PURW file:
-hadd data/50ns_betaV4/DMHtoGG_M1000.root     	../../output/job_2015928_222853/Higgs_scalar_nohdecay_gg_1000GeV/Higgs_scalar_nohdecay_gg_1000GeV_*.root  
-hadd data/50ns_betaV4/DMHtoGG_M100.root      	../../output/job_2015928_222859/Higgs_scalar_nohdecay_gg_100GeV/Higgs_scalar_nohdecay_gg_100GeV_*.root
-hadd data/50ns_betaV4/DMHtoGG_M10.root       	../../output/job_2015928_22293/Higgs_scalar_nohdecay_gg_10GeV/Higgs_scalar_nohdecay_gg_10GeV_*.root
-hadd data/50ns_betaV4/DMHtoGG_M1.root        	../../output/job_2015928_222958/Higgs_scalar_nohdecay_gg_1GeV/Higgs_scalar_nohdecay_gg_1GeV_*.root
+#using PUrw file from MonoJ 
+hadd data/50ns_betaV4/GluGluHToGG.root		../../output/job_2015102_122023/GluGluHToGG/GluGluHToGG*.root
+hadd data/50ns_betaV4/VH.root			../../output/job_2015102_122542/VH/VH*.root
+hadd data/50ns_betaV4/DYJetsToLL.root		../../output/job_2015102_122027/DYJetsToLL/DYJetsToLL*.root
+hadd data/50ns_betaV4/GJet_Pt-20to40.root	../../output/job_2015102_121810/GJet_Pt-20to40/GJet_Pt-20to40*.root
+hadd data/50ns_betaV4/GJet_Pt-40toInf.root	../../output/job_2015102_121831/GJet_Pt-40toInf/GJet_Pt-40toInf*.root
+hadd data/50ns_betaV4/QCD_Pt-30to40.root	../../output/job_2015102_121915/QCD_Pt-30to40/QCD_Pt-30to40*.root
+hadd data/50ns_betaV4/QCD_Pt-30toInf.root	../../output/job_2015102_121926/QCD_Pt-30toInf/QCD_Pt-30toInf*.root
+hadd data/50ns_betaV4/QCD_Pt-40toInf.root	../../output/job_2015102_12201/QCD_Pt-40toInf/QCD_Pt-40toInf*.root
+hadd data/50ns_betaV4/DiPhoton.root		../../output/job_2015102_121738/DiPhoton/DiPhoton*.root
+hadd data/50ns_betaV4/DoubleEG.root		../../output/job_2015102_122313/DoubleEG/DoubleEG*.root
+hadd data/50ns_betaV4/DMHtoGG_M1000.root     	../../output/job_2015102_121722/Higgs_scalar_nohdecay_gg_1000GeV/Higgs_scalar_nohdecay_gg_1000GeV_*.root  
+hadd data/50ns_betaV4/DMHtoGG_M100.root      	../../output/job_2015102_121725/Higgs_scalar_nohdecay_gg_100GeV/Higgs_scalar_nohdecay_gg_100GeV_*.root
+hadd data/50ns_betaV4/DMHtoGG_M10.root       	../../output/job_2015102_121729/Higgs_scalar_nohdecay_gg_10GeV/Higgs_scalar_nohdecay_gg_10GeV_*.root
+hadd data/50ns_betaV4/DMHtoGG_M1.root        	../../output/job_2015102_121733/Higgs_scalar_nohdecay_gg_1GeV/Higgs_scalar_nohdecay_gg_1GeV_*.root
+
+
 
 
 #my PUrw file:
@@ -27,8 +29,6 @@ hadd data/50ns_betaV4/DMHtoGG_M1.root        	../../output/job_2015928_222958/Hi
 #hadd data/50ns_betaV4/DMHtoGG_M100.root      	../../output/job_2015926_20937/Higgs_scalar_nohdecay_gg_100GeV/Higgs_scalar_nohdecay_gg_100GeV_*.root
 #hadd data/50ns_betaV4/DMHtoGG_M10.root       	../../output/job_2015926_20941/Higgs_scalar_nohdecay_gg_10GeV/Higgs_scalar_nohdecay_gg_10GeV_*.root
 #hadd data/50ns_betaV4/DMHtoGG_M1.root        	../../output/job_2015926_20944/Higgs_scalar_nohdecay_gg_1GeV/Higgs_scalar_nohdecay_gg_1GeV_*.root
-
-
 
 #mdkir -p data/50ns/
 #hadd data/50ns/DMHtoGG_M1000.root   ../../output/job_201594_17733/Higgs_scalar_nohdecay_gg_1000GeV/Higgs_scalar_nohdecay_gg_1000GeV_*.root  

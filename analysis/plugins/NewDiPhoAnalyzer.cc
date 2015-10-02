@@ -363,6 +363,8 @@ void NewDiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& 
     const auto & eveWeights = genInfo->weights();
     if(!eveWeights.empty()) perEveW = eveWeights[0];
   }
+  bool isSig = false;
+  if (sampleID>100 && sampleID<110) isSig = true; 
 
   // To keep track of the sum of weights
   if (!isFilled) {
@@ -371,7 +373,7 @@ void NewDiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& 
   }
 
   // Events breakdown
-  if(hltDiphoton30Mass95)h_selection->Fill(0.,perEveW);
+  if (hltDiphoton30Mass95 || isSig) h_selection->Fill(0.,perEveW);
 
 
   // Get MET
@@ -408,7 +410,7 @@ void NewDiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& 
 
 
     if (preselDipho.size()>0) {
-      h_selection->Fill(1.,perEveW);
+      if (hltDiphoton30Mass95 || isSig) h_selection->Fill(1.,perEveW);
       
       // Diphoton candidates: Id/isolation selection
       vector<int> selectedDipho;
@@ -482,7 +484,7 @@ void NewDiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& 
       }
      
       if (selectedDipho.size()>0) {
-	h_selection->Fill(2.,perEveW);
+	if (hltDiphoton30Mass95 || isSig) h_selection->Fill(2.,perEveW);
 
 	// Diphoton candidates: pT cuts
 	vector<int> kineDipho;
@@ -501,7 +503,7 @@ void NewDiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& 
 
 
 	if (kineDipho.size()>0) {
-	  h_selection->Fill(3.,perEveW);
+	  if (hltDiphoton30Mass95 || isSig) h_selection->Fill(3.,perEveW);
 
 	  // Diphoton candidates: mgg cut
 	  vector<int> massDipho;
@@ -523,7 +525,7 @@ void NewDiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& 
 	  }
   
 	  if (massDipho.size()>0) {
-	    h_selection->Fill(4.,perEveW);
+	    if (hltDiphoton30Mass95 || isSig) h_selection->Fill(4.,perEveW);
 
 	    // chiara: studiare il numero di candidati
 
@@ -563,7 +565,7 @@ void NewDiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& 
 	      // chiara: studiare quanti sono e quante volte e' il primo
 	      
 	      if (goodVtx) {
-		h_selection->Fill(5.,perEveW);
+		if (hltDiphoton30Mass95 || isSig) h_selection->Fill(5.,perEveW);
 
 		// to be kept in the tree
 		float ptgg, mgg;
@@ -606,7 +608,15 @@ void NewDiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& 
 		ptgg = candDiphoPtr->pt();
 		mgg  = candDiphoPtr->mass();
 				
-		if ( mgg >= 110 && mgg <= 130 && t1pfmet >= 100 ) eff_end++;
+		if (hltDiphoton30Mass95 || isSig){
+		  if (mgg >= 110 && mgg <= 130){
+	 	    h_selection->Fill(6.,perEveW);
+		    if (t1pfmet >= 100){
+		      eff_end++;
+		      h_selection->Fill(7.,perEveW);
+		    }
+		  }
+		}
 
 		//-------> individual photon properties
 		//std::vector<float> leadCovnoZS = lazyToolnoZS->localCovariances(*(candDiphoPtr->leadingPhoton()->superCluster()->seed())) ;
@@ -932,7 +942,7 @@ void NewDiPhoAnalyzer::beginJob() {
   isFilled = false;
   
   // for the event breakdown
-  h_selection = fs_->make<TH1F>("h_selection", "h_selection", 6, -0.5, 5.5);
+  h_selection = fs_->make<TH1F>("h_selection", "h_selection", 8, -0.5, 7.5);
   h_selection->Sumw2();
 
   // Trees

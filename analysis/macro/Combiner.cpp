@@ -144,52 +144,28 @@ void Combiner::MakeEffPlots(){
   Double_t num_err = 0.;
   Double_t den_err = 0.;
   Double_t eff_err = 0.;
-  //Double_t err,er1,er2 = 0.;
-  std::vector<Double_t> numer = {4864,6780,10451,18428};
-  std::vector<Double_t> denom = {40918,57500,55092,56656};
-  std::vector<Double_t> value = {0,0,0,0};
-  std::vector<Double_t> error = {0,0,0,0};
+  //std::vector<Double_t> numer = {4864,6780,10451,18428};
+  //std::vector<Double_t> denom = {40918,57500,55092,56656};
+  //std::vector<Double_t> value = {0,0,0,0};
+  //std::vector<Double_t> error = {0,0,0,0};
   std::vector<Double_t> mass = {1,10,100,1000}; 
   Int_t binForMass = 0;
 
   for (UInt_t mc = 0; mc < fNSig; mc++){
-    value[mc]  = numer[mc]/denom[mc];
-    error[mc]  = TMath::Sqrt(value[mc]*(1.0-value[mc])/denom[mc]);
+    eff_num = fInSigTH1DHists[fIndexEff][mc]->GetBinContent(10); // events passing sel,mgg,met
+    eff_den = fInSigTH1DHists[fIndexEff][mc]->GetBinContent(1);  // events only require pass presel
+    num_err = TMath::Sqrt(eff_num);
+    den_err = TMath::Sqrt(eff_den);
+    if (eff_den > 0) eff_val = eff_num/eff_den;
+    eff_err = TMath::Sqrt(eff_val*(1.0-eff_val)/eff_den); 
     binForMass = eff_mDM->FindBin(mass[mc]);
-    eff_mDM->SetBinContent(binForMass,value[mc]);
-    eff_mDM->SetBinError(binForMass,error[mc]);
+    eff_mDM->SetBinContent(binForMass,eff_val);
+    eff_mDM->SetBinError(binForMass,eff_err);
+    //value[mc]  = numer[mc]/denom[mc];
+    //error[mc]  = TMath::Sqrt(value[mc]*(1.0-value[mc])/denom[mc]);
+    //eff_mDM->SetBinContent(binForMass,value[mc]);
+    //eff_mDM->SetBinError(binForMass,error[mc]);
   }
-  
-
-
-
-  //for (UInt_t mc = 0; mc < fNSig; mc++){
-  //  eff_num = numer[mc];
-  //  eff_den = denom[mc];
-  //  // f_selection has problem when reweighted, TEMP fix get values from counters printed out from samples
-  //  // values from the counters are in the numer&denom vectors above ( FIXME )
-  //  //eff_num = 25*fInSigTH1DHists[fIndexEff][mc]->GetBinContent(10); // events passing sel,mgg,met
-  //  //eff_den = 25*fInSigTH1DHists[fIndexEff][mc]->GetBinContent(11); // events only require pass presel
-  //  num_err = TMath::Sqrt(eff_num);
-  //  den_err = TMath::Sqrt(eff_den); 
-  //  if (eff_den > 0) eff_val = eff_num/eff_den; 
-  //  std::cout << mass[mc] << std::endl;
-  //  binForMass=eff_mDM->FindBin(mass[mc]);
-  //  std::cout << "bin " << binForMass << std::endl;
-  //  eff_mDM->SetBinContent(binForMass,eff_val); 
-  //  //eff_mDM->GetXaxis()->SetBinLabel(mc+1,fSigNames[mc]);// bins start at 1 not 0 so need mc+1
-  //  eff_err = TMath::Sqrt(eff_val*(1.0-eff_val)/eff_den);
-  //  std::cout << eff_num << " / " << eff_den << " err " << eff_err << std::endl;
-  //  std::cout << "eff_val " << eff_val << std::endl; 
-  //  // eff_err = TMath::Sqrt(TMath::Power(num_err/eff_den,2)+TMath::Power(eff_num*den_err/(eff_den*eff_den),2)); 
-  //  //er1 = TMath::Min(eff_err,eff_val);
-  //  //er2 = TMath::Min(eff_err,1-eff_val);
-  //  //err = TMath::Min(eff_err,1.);
-  //  //std::cout << eff_err << " low " << er1 << " hi " << er2 << " blah " << err << std::endl;
-
-  //  eff_mDM->SetBinError(binForMass,eff_err);
-  //  std::cout << "binCon " << eff_mDM->GetBinContent(mc+1) << " err " << eff_mDM->GetBinError(mc+1) << std::endl; 
-  //}
 
   eff_mDM->SetMaximum(1.0);
   eff_mDM->SetMinimum(0.0);
@@ -618,7 +594,6 @@ void Combiner::InitTH1DNames(){
   fTH1DNames.push_back("eta2");
   fTH1DNames.push_back("phi1");
   fTH1DNames.push_back("phi2");
-
   fTH1DNames.push_back("r91");
   fTH1DNames.push_back("r92");
 
@@ -642,6 +617,9 @@ void Combiner::InitTH1DNames(){
     fTH1DNames.push_back("t1pfmet_selmgg");
     fTH1DNames.push_back("phigg");
     fTH1DNames.push_back("dphi_ggmet");
+    fTH1DNames.push_back("phigg_fromLV");
+    fTH1DNames.push_back("dphi_ggmet_fromLV");
+    fTH1DNames.push_back("selection");
     fTH1DNames.push_back("eff_sel");
     fIndexEff = fTH1DNames.size()-1;
   }

@@ -954,8 +954,8 @@ void MakePlotCutFlowDataMC(RooWorkspace* w ) {
   // h_gj->Scale(40);
   //h_qcd->Scale(40);
   //h_diphot->Scale(40);
-  h_ggh->Scale(0.002);
-  h_vh->Scale(0.002);
+  //h_ggh->Scale(0.002);
+  //h_vh->Scale(0.002);
   //h_m1->Scale(40);
   //h_m10->Scale(40);
   //h_m100->Scale(40);

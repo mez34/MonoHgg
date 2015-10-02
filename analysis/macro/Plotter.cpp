@@ -19,16 +19,21 @@ Plotter::Plotter( TString inName, TString outName, TString inSpecies, const DblV
   fLumi = lumi;
   fPUWeights = puweights;
 
-  fSelection.resize(6);
+  fSelection.resize(8);
   TH1D *fSel = (TH1D*)inFile->Get("h_selection");
   CheckValidTH1D(fSel,"h_selection",Form("%s%s.root",name.Data(),species.Data()));
-  for (UInt_t i=0; i<6; i++){ 
-    // values of i correspond to passing: 
-    // 1=trigger, 2=presel, 3=selection, 4=pt1>30,pt2>20, 5=pt1>mgg/3,pt2>mgg/4, 6=goodVtx
-    if (!Data) fSelection[i]=fSel->GetBinContent(i); 
-    else fSelection[i]=fSel->GetBinContent(i);
+  for (UInt_t i=0; i<8; i++){ 
+    // values of bin i correspond to passing (all cuts previous + one listed below):  
+    // 1=trigger, 2=presel, 3=selection, 4=pt1>30,pt2>20, 5=pt1>mgg/3,pt2>mgg/4, 6=goodVtx, 7=mgg, 8=met
+    fSelection[i]=fSel->GetBinContent(i+1);
   }
   std::cout << "Finished getting the h_selection" << std::endl;  
+
+  // Make TLorentzVector for the photons
+  TLorentzVector *fLorenzVec1  = new TLorentzVector();
+  TLorentzVector *fLorenzVec2  = new TLorentzVector();
+  TLorentzVector *fLorenzVecgg = new TLorentzVector();
+
 
   // Make output directory
   fName = outName;
@@ -75,14 +80,19 @@ void Plotter::DoPlots(){
   Double_t effptd[60]={0};
 
   fTH1DMap["hlt"]->Fill(0.5,nentries);
-  // fSelection[i]-> 1=trigger, 2=presel, 3=selection, 4=pt1>30,pt2>20, 5=pt1>mgg/3,pt2>mgg/4, 6=goodVtx
-  for (UInt_t i=0; i<6; i++){
+  // fSelection[i]-> 1=trigger, 2=presel, 3=selection, 4=pt1>30,pt2>20, 5=pt1>mgg/3,pt2>mgg/4, 6=goodVtx, 7=mgg, 8=met
+  for (UInt_t i=0; i<7; i++){
     fTH1DMap["selection"]->Fill(i+0.5,fSelection[i]);
   }
-  fTH1DMap["eff_sel"]->Fill(10.5,fSelection[2]);
 
   for (UInt_t entry = 0; entry < nentries; entry++){
     tpho->GetEntry(entry);
+
+    // Fill TLorentzVector
+    fLorenzVec1.SetPtEtaPhiM(pt1,eta1,phi1,0.);
+    fLorenzVec2.SetPtEtaPhiM(pt2,eta2,phi2,0.);
+    fLorenzVecgg = fLorenzVec1 + fLorenzVec2;
+
 
     // calculate the weight
     Double_t Weight = (weight)*fPUWeights[nvtx];
@@ -168,8 +178,9 @@ void Plotter::DoPlots(){
         fTH2DMap["mgg_ptgg"]->Fill(ptgg,mgg,Weight);
         fTH2DMap["t1pfmet_PU"]->Fill(nvtx,t1pfmet,Weight);
         fTH2DMap["t1pfmet_ptgg"]->Fill(ptgg,t1pfmet,Weight);
-   
-
+	fTH1DMap["mgg_fromLV"]->Fill(fLorenzVecgg.M(),Weight);
+  	fTH1DMap["phigg_fromLV"]->Fill(fLorenzVecgg.Phi(),Weight); 
+        fTH1DMap["dphi_ggmet_fromLV"]->Fill(deltaPhi(fLorenzVecgg.Phi(),t1pfmetphi),Weight);
 
 
         //std::cout << passCH1 <<" "<< passNH1 <<" "<< passPH1 <<" "<< passHE1 <<" "<< passS1 << std::endl; 
@@ -286,7 +297,6 @@ void Plotter::DoPlots(){
   fTH1DMap["eff_sel"]->GetXaxis()->SetBinLabel(8,"passHoe");
   fTH1DMap["eff_sel"]->GetXaxis()->SetBinLabel(9,"passMgg");
   fTH1DMap["eff_sel"]->GetXaxis()->SetBinLabel(10,"passMet");  
-  fTH1DMap["eff_sel"]->GetXaxis()->SetBinLabel(11,"passPreSel");
 
   fTH1DMap["hlt"]->GetXaxis()->SetBinLabel(1,"nentries");
   fTH1DMap["hlt"]->GetXaxis()->SetBinLabel(2,"Pho26Pho16M60");
@@ -308,7 +318,7 @@ void Plotter::DoPlots(){
 void Plotter::SetUpPlots(){
   // fill all plots from tree
   fTH1DMap["nvtx"]		= Plotter::MakeTH1DPlot("nvtx","",60,0.,60.,"nvtx","");
-  fTH1DMap["mgg"]		= Plotter::MakeTH1DPlot("mgg","",40,100.,300.,"m_{#gamma#gamma} (GeV)","");  
+  fTH1DMap["mgg"]		= Plotter::MakeTH1DPlot("mgg","",30,100.,180.,"m_{#gamma#gamma} (GeV)","");  
   fTH1DMap["ptgg"]		= Plotter::MakeTH1DPlot("ptgg","",100,0.,1000.,"p_{T,#gamma#gamma} (GeV)","");
   fTH1DMap["t1pfmet"]		= Plotter::MakeTH1DPlot("t1pfmet","",100,0.,1000,"t1PF MET (GeV)","");
   fTH1DMap["t1pfmetphi"]	= Plotter::MakeTH1DPlot("t1pfmetphi","",80,-4.,4.,"t1PF MET #phi","");
@@ -335,9 +345,6 @@ void Plotter::SetUpPlots(){
   fTH1DMap["r91"]		= Plotter::MakeTH1DPlot("r91","",100,0.,1.1,"R9(#gamma1)","");
   fTH1DMap["r92"]		= Plotter::MakeTH1DPlot("r92","",100,0.,1.1,"R9(#gamma2)","");
   fTH1DMap["t1pfmet_zoom"]	= Plotter::MakeTH1DPlot("t1pfmet_zoom","",60,0.,300.,"t1PF MET (GEV)","");
-
-  fTH1DMap["phi1_pho2pass"]     = Plotter::MakeTH1DPlot("phi1_pho2pass","",80,-4.,4.,"","");
-  fTH1DMap["phi2_pho1pass"]     = Plotter::MakeTH1DPlot("phi2_pho1pass","",80,-4.,4.,"","");
 
   // n minus 1 plots
   fTH1DMap["nvtx_n-1"]		= Plotter::MakeTH1DPlot("nvtx_n-1","",40,0.,40.,"nvtx","");
@@ -373,9 +380,14 @@ void Plotter::SetUpPlots(){
   fTH1DMap["dphi_ggmet"]	= Plotter::MakeTH1DPlot("dphi_ggmet","",80,-4.,4.,"#Delta#phi(#gamma#gamma,MET)","");
   fTH1DMap["t1pfmet_selmgg"]	= Plotter::MakeTH1DPlot("t1pfmet_selmgg","",100,0.,1000.,"t1PF MET (GeV)","");
   fTH1DMap["mgg_selt1pfmet"]	= Plotter::MakeTH1DPlot("mgg_selt1pfmet","",40,100.,300.,"m_{#gamma#gamma} (GeV)","");
+  fTH1DMap["phi1_pho2pass"]     = Plotter::MakeTH1DPlot("phi1_pho2pass","",80,-4.,4.,"","");
+  fTH1DMap["phi2_pho1pass"]     = Plotter::MakeTH1DPlot("phi2_pho1pass","",80,-4.,4.,"","");
+  fTH1DMap["mgg_fromLV"]	= Plotter::MakeTH1DPlot("mgg_fromLV","",30,100.,180.,"m_{#gamma#gamma} (GeV)","");  
+  fTH1DMap["phigg_fromLV"]	= Plotter::MakeTH1DPlot("phigg_fromLV","",80,-4.,4.,"#phi(#gamma#gamma)",""); 
+  fTH1DMap["dphi_ggmet_fromLV"] = Plotter::MakeTH1DPlot("dphi_ggmet_fromLV","",80,-4.,4.,"#Delta#phi(#gamma#gamma,MET)","");
 
   // efficiency plots
-  fTH1DMap["eff_sel"]		= Plotter::MakeTH1DPlot("eff_sel","",11,0.,11.,"","");
+  fTH1DMap["eff_sel"]		= Plotter::MakeTH1DPlot("eff_sel","",10,0.,10.,"","");
   fTH1DMap["selection"]		= Plotter::MakeTH1DPlot("selection","",6,0.,6.,"","");
   fTH1DMap["eff_PU"]		= Plotter::MakeTH1DPlot("eff_PU","",60,0.,60.,"","");
   fTH1DMap["eff_pt"]		= Plotter::MakeTH1DPlot("eff_pt","",60,0.,600.,"","");
