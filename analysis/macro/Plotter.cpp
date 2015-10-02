@@ -25,7 +25,7 @@ Plotter::Plotter( TString inName, TString outName, TString inSpecies, const DblV
   for (UInt_t i=0; i<6; i++){ 
     // values of i correspond to passing: 
     // 1=trigger, 2=presel, 3=selection, 4=pt1>30,pt2>20, 5=pt1>mgg/3,pt2>mgg/4, 6=goodVtx
-    if (!Data) fSelection[i]=fLumi*fSel->GetBinContent(i); 
+    if (!Data) fSelection[i]=fSel->GetBinContent(i); 
     else fSelection[i]=fSel->GetBinContent(i);
   }
   std::cout << "Finished getting the h_selection" << std::endl;  
@@ -90,11 +90,11 @@ void Plotter::DoPlots(){
     if (hltPhoton26Photon16Mass60 == 1) fTH1DMap["hlt"]->Fill(1.5,1);
     if (hltPhoton36Photon22Mass15 == 1) fTH1DMap["hlt"]->Fill(2.5,1);
     if (hltPhoton42Photon25Mass15 == 1) fTH1DMap["hlt"]->Fill(3.5,1);
-    if (hltDiphoton30Mass95 == 1)   fTH1DMap["hlt"]->Fill(4.5,1);
-    if (hltDiphoton30Mass70 == 1)   fTH1DMap["hlt"]->Fill(5.5,1);
-    if (hltDiphoton30Mass55 == 1)   fTH1DMap["hlt"]->Fill(6.5,1);
-    if (hltDiphoton30Mass55PV == 1) fTH1DMap["hlt"]->Fill(7.5,1);
-    if (hltDiphoton30Mass55EB == 1) fTH1DMap["hlt"]->Fill(8.5,1);
+    if (hltDiphoton30Mass95 == 1)   	fTH1DMap["hlt"]->Fill(4.5,1);
+    if (hltDiphoton30Mass70 == 1)   	fTH1DMap["hlt"]->Fill(5.5,1);
+    if (hltDiphoton30Mass55 == 1)   	fTH1DMap["hlt"]->Fill(6.5,1);
+    if (hltDiphoton30Mass55PV == 1) 	fTH1DMap["hlt"]->Fill(7.5,1);
+    if (hltDiphoton30Mass55EB == 1) 	fTH1DMap["hlt"]->Fill(8.5,1);
 
     fTH1DMap["eff_sel"]->Fill(0.5,Weight);
 

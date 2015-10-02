@@ -202,6 +202,11 @@ private:
 
   // events breakdown
   TH1F *h_selection;
+
+  // counters to get eff
+  Int_t eff_start = 0;
+  Int_t eff_end = 0;
+
 };
    
 
@@ -229,7 +234,10 @@ NewDiPhoAnalyzer::NewDiPhoAnalyzer(const edm::ParameterSet& iConfig):
   genInfo_      = iConfig.getParameter<edm::InputTag>("generatorInfo"); 
 };
 
-NewDiPhoAnalyzer::~NewDiPhoAnalyzer() { };
+NewDiPhoAnalyzer::~NewDiPhoAnalyzer() { 
+  std::cout << "Number of Initial Events = " << eff_start << std::endl;
+  std::cout << "Number Events After Sel. = " << eff_end   << std::endl;
+};
 
 void NewDiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup){
 
@@ -266,6 +274,8 @@ void NewDiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& 
   //EcalClusterLazyTools lazyTools(iEvent, iSetup, reducedBarrelRecHitCollectionToken_, reducedEndcapRecHitCollectionToken_);
   // To keep track of the total number of events
   h_entries->Fill(5);
+
+  eff_start++;
 
   Handle<View<pat::MET> > METs;
   iEvent.getByToken( METToken_, METs );
@@ -596,6 +606,8 @@ void NewDiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& 
 		ptgg = candDiphoPtr->pt();
 		mgg  = candDiphoPtr->mass();
 				
+		if ( mgg >= 110 && mgg <= 130 && t1pfmet >= 100 ) eff_end++;
+
 		//-------> individual photon properties
 		//std::vector<float> leadCovnoZS = lazyToolnoZS->localCovariances(*(candDiphoPtr->leadingPhoton()->superCluster()->seed())) ;
 		//std::vector<float> subleadCovnoZS = lazyToolnoZS->localCovariances(*(candDiphoPtr->subLeadingPhoton()->superCluster()->seed())) ;

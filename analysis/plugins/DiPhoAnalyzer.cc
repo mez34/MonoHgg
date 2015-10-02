@@ -186,6 +186,10 @@ private:
   float kfac_;
   float sumDataset_;
 
+  // counters to track efficiency
+  //Int_t eff_start = 0;
+  //Int_t eff_end = 0;
+
   // to compute weights for pileup
   std::vector<Double_t> puweights_;
 
@@ -266,6 +270,8 @@ void DiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
   //EcalClusterLazyTools lazyTools(iEvent, iSetup, reducedBarrelRecHitCollectionToken_, reducedEndcapRecHitCollectionToken_);
   // To keep track of the total number of events
   h_entries->Fill(5);
+
+  //eff_start++;
 
   Handle<View<pat::MET> > METs;
   iEvent.getByToken( METToken_, METs );
