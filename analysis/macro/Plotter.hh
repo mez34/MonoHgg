@@ -122,6 +122,8 @@ private:
   Int_t		passSieie2;
   Int_t		passHoe1;
   Int_t		passHoe2;
+  Int_t 	eleveto1;
+  Int_t 	eleveto2;
   Int_t		hltPhoton26Photon16Mass60;
   Int_t		hltPhoton36Photon22Mass15;
   Int_t		hltPhoton42Photon25Mass15;
@@ -130,6 +132,7 @@ private:
   Int_t		hltDiphoton30Mass55;
   Int_t		hltDiphoton30Mass55PV;
   Int_t		hltDiphoton30Mass55EB;
+
 
   // branches
   TBranch 	*b_nvtx;
@@ -173,6 +176,8 @@ private:
   TBranch	*b_passSieie2;
   TBranch	*b_passHoe1;
   TBranch	*b_passHoe2;
+  TBranch	*b_eleveto1;
+  TBranch	*b_eleveto2;
   TBranch	*b_hltPhoton26Photon16Mass60;
   TBranch	*b_hltPhoton36Photon22Mass15;
   TBranch	*b_hltPhoton42Photon25Mass15;

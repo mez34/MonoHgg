@@ -40,7 +40,7 @@ int main(){
   bool doReweightPU = false;	// use PURW from old files if !makePURWfiles
   bool doPlots = false;		// make plots for each sample individually
   bool doComb = true;		// make stack/overlay plots
-  bool doABCD = true;		// run ABCD method 
+  bool doABCD = false;		// run ABCD method 
 
   Double_t lumi = 40.0; //41.64; // in pb^-1 
   UInt_t nBins_vtx = 60; // number of bins for PURW 

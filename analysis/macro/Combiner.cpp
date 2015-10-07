@@ -610,6 +610,8 @@ void Combiner::InitTH1DNames(){
   fTH1DNames.push_back("neuiso2");
 
   if (addText!="_n-1"){ // plots that don't have n-1 versions 
+    fTH1DNames.push_back("eleveto1");
+    fTH1DNames.push_back("eleveto2");
     fTH1DNames.push_back("phi1_pho2pass");
     fTH1DNames.push_back("phi2_pho1pass");
     fTH1DNames.push_back("t1pfmet_zoom");
@@ -617,8 +619,7 @@ void Combiner::InitTH1DNames(){
     fTH1DNames.push_back("t1pfmet_selmgg");
     fTH1DNames.push_back("phigg");
     fTH1DNames.push_back("dphi_ggmet");
-    fTH1DNames.push_back("phigg_fromLV");
-    fTH1DNames.push_back("dphi_ggmet_fromLV");
+    fTH1DNames.push_back("absdphi_ggmet");
     fTH1DNames.push_back("selection");
     fTH1DNames.push_back("eff_sel");
     fIndexEff = fTH1DNames.size()-1;

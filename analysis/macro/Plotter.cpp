@@ -171,16 +171,17 @@ void Plotter::DoPlots(){
         fTH1DMap["hoe2"]->Fill(hoe2,Weight);
         fTH1DMap["r91"]->Fill(r91,Weight);
         fTH1DMap["r92"]->Fill(r92,Weight);
+	fTH1DMap["eleveto1"]->Fill(eleveto1,Weight);
+	fTH1DMap["eleveto2"]->Fill(eleveto2,Weight);
+
         fTH1DMap["t1pfmet_zoom"]->Fill(t1pfmet,Weight);
-
-
         fTH2DMap["mgg_PU"]->Fill(nvtx,mgg,Weight);
         fTH2DMap["mgg_ptgg"]->Fill(ptgg,mgg,Weight);
         fTH2DMap["t1pfmet_PU"]->Fill(nvtx,t1pfmet,Weight);
         fTH2DMap["t1pfmet_ptgg"]->Fill(ptgg,t1pfmet,Weight);
-	fTH1DMap["mgg_fromLV"]->Fill(fLorenzVecgg.M(),Weight);
-  	fTH1DMap["phigg_fromLV"]->Fill(fLorenzVecgg.Phi(),Weight); 
-        fTH1DMap["dphi_ggmet_fromLV"]->Fill(deltaPhi(fLorenzVecgg.Phi(),t1pfmetphi),Weight);
+  	fTH1DMap["phigg"]->Fill(fLorenzVecgg.Phi(),Weight); 
+        fTH1DMap["dphi_ggmet"]->Fill(deltaPhi(fLorenzVecgg.Phi(),t1pfmetphi),Weight);
+        fTH1DMap["absdphi_ggmet"]->Fill(TMath::Abs(deltaPhi(fLorenzVecgg.Phi(),t1pfmetphi)),Weight);
 
 
         //std::cout << passCH1 <<" "<< passNH1 <<" "<< passPH1 <<" "<< passHE1 <<" "<< passS1 << std::endl; 
@@ -260,13 +261,6 @@ void Plotter::DoPlots(){
           }
         }
  
-        // calculate phi of the Higgs
-        Float_t phigg = TMath::ATan((pt1*TMath::Sin(phi1) - pt2*TMath::Sin(phi2)) / (pt1*TMath::Cos(phi1) - pt2*TMath::Cos(phi2)));
-        fTH1DMap["phigg"]->Fill(phigg,Weight);
-        // calculate delta phi of Higgs & MET
-        Float_t dphi_ggmet = deltaPhi(phigg,t1pfmetphi);
-        fTH1DMap["dphi_ggmet"]->Fill(dphi_ggmet,Weight);
-
       }// end if passes trigger
     }// end if passes pt cuts 
     
@@ -344,12 +338,13 @@ void Plotter::SetUpPlots(){
   fTH1DMap["hoe2"]		= Plotter::MakeTH1DPlot("hoe2","",125,0.,0.025,"H/E(#gamma2)","");
   fTH1DMap["r91"]		= Plotter::MakeTH1DPlot("r91","",100,0.,1.1,"R9(#gamma1)","");
   fTH1DMap["r92"]		= Plotter::MakeTH1DPlot("r92","",100,0.,1.1,"R9(#gamma2)","");
-  fTH1DMap["t1pfmet_zoom"]	= Plotter::MakeTH1DPlot("t1pfmet_zoom","",60,0.,300.,"t1PF MET (GEV)","");
+  fTH1DMap["eleveto1"]		= Plotter::MakeTH1DPlot("eleveto1","",2,-0.5,1.5,"Electron Veto(#gamma1)","");
+  fTH1DMap["eleveto2"]		= Plotter::MakeTH1DPlot("eleveto2","",2,-0.5,1.5,"Electron Veto(#gamma2)","");
 
   // n minus 1 plots
   fTH1DMap["nvtx_n-1"]		= Plotter::MakeTH1DPlot("nvtx_n-1","",40,0.,40.,"nvtx","");
   fTH1DMap["mgg_n-1"]		= Plotter::MakeTH1DPlot("mgg_n-1","",30,100.,180.,"m_{#gamma#gamma} (GeV)","");  
-  fTH1DMap["ptgg_n-1"]		= Plotter::MakeTH1DPlot("ptgg_n-1","",15,0.,300.,"p_{T,#gamma#gamma} (GeV)","");
+  fTH1DMap["ptgg_n-1"]		= Plotter::MakeTH1DPlot("ptgg_n-1","",30,0.,300.,"p_{T,#gamma#gamma} (GeV)","");
   fTH1DMap["t1pfmet_n-1"]	= Plotter::MakeTH1DPlot("t1pfmet_n-1","",25,0.,200.,"t1PF MET (GeV)","");
   fTH1DMap["t1pfmetphi_n-1"]	= Plotter::MakeTH1DPlot("t1pfmetphi_n-1","",80,-4.,4.,"t1PF MET #phi","");
   fTH1DMap["pfmet_n-1"]		= Plotter::MakeTH1DPlot("pfmet_n-1","",100,0.,1000,"PF MET (GeV)","");
@@ -376,15 +371,14 @@ void Plotter::SetUpPlots(){
   fTH1DMap["r92_n-1"]		= Plotter::MakeTH1DPlot("r92_n-1","",100,0.,1.1,"R9(#gamma2)","");
 
   // special plots
-  fTH1DMap["phigg"]		= Plotter::MakeTH1DPlot("phigg","",80,-4.,4.,"#phi(#gamma#gamma)","");
-  fTH1DMap["dphi_ggmet"]	= Plotter::MakeTH1DPlot("dphi_ggmet","",80,-4.,4.,"#Delta#phi(#gamma#gamma,MET)","");
+  fTH1DMap["phigg"]		= Plotter::MakeTH1DPlot("phigg","",40,-4.,4.,"#phi(#gamma#gamma)","");
+  fTH1DMap["dphi_ggmet"]	= Plotter::MakeTH1DPlot("dphi_ggmet","",40,-4.,4.,"#Delta#phi(#gamma#gamma,MET)","");
+  fTH1DMap["absdphi_ggmet"]	= Plotter::MakeTH1DPlot("absdphi_ggmet","",20,0.,4.,"|#Delta#phi(#gamma#gamma,MET)|","");
   fTH1DMap["t1pfmet_selmgg"]	= Plotter::MakeTH1DPlot("t1pfmet_selmgg","",100,0.,1000.,"t1PF MET (GeV)","");
   fTH1DMap["mgg_selt1pfmet"]	= Plotter::MakeTH1DPlot("mgg_selt1pfmet","",40,100.,300.,"m_{#gamma#gamma} (GeV)","");
   fTH1DMap["phi1_pho2pass"]     = Plotter::MakeTH1DPlot("phi1_pho2pass","",80,-4.,4.,"","");
   fTH1DMap["phi2_pho1pass"]     = Plotter::MakeTH1DPlot("phi2_pho1pass","",80,-4.,4.,"","");
-  fTH1DMap["mgg_fromLV"]	= Plotter::MakeTH1DPlot("mgg_fromLV","",30,100.,180.,"m_{#gamma#gamma} (GeV)","");  
-  fTH1DMap["phigg_fromLV"]	= Plotter::MakeTH1DPlot("phigg_fromLV","",80,-4.,4.,"#phi(#gamma#gamma)",""); 
-  fTH1DMap["dphi_ggmet_fromLV"] = Plotter::MakeTH1DPlot("dphi_ggmet_fromLV","",80,-4.,4.,"#Delta#phi(#gamma#gamma,MET)","");
+  fTH1DMap["t1pfmet_zoom"]	= Plotter::MakeTH1DPlot("t1pfmet_zoom","",60,0.,300.,"t1PF MET (GEV)","");
 
   // efficiency plots
   fTH1DMap["eff_sel"]		= Plotter::MakeTH1DPlot("eff_sel","",10,0.,10.,"","");
