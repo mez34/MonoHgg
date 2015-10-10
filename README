@@ -71,10 +71,7 @@ From MicroAOD to diPhotonAnaTrees
 Copy the diphoton Analyzer analysis framework from github
 -------------------------------
 
-
-scram project -n EXO_7_4_0_pre9 CMSSW CMSSW_7_4_0_pre9
-cd EXO_7_4_0_pre9/src
-
+cmsrel CMSSW_7_4_12
 cmsenv 
 
 cd ${CMSSW_BASE}/src
@@ -83,17 +80,24 @@ git cms-init
 # clone flashgg 
 cd ${CMSSW_BASE}/src
 git clone https://github.com/cms-analysis/flashgg.git
+cd flashgg
+
+# get latest version of FLASHgg
+git checkout Spring15BetaV5
 
 cd ${CMSSW_BASE}/src
 bash flashgg/setup.sh | tee setup.log
 
 # clone this repository
 cd ${CMSSW_BASE}/src
-git clone https://github.com/lsoffi/MonoHgg.git
+git clone git@github.com:mez34/MonoHgg.git
+
+# add Math package
+git cms-addpkg DataFormats/Math
 
 # now compile everything
 cd ${CMSSW_BASE}/src
-scram b -j 10
+scram b -j 16
 
 
 

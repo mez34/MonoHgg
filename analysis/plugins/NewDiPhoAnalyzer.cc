@@ -596,9 +596,9 @@ void NewDiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& 
 		t1pfmet = theMET->pt();
 		t1pfmetPhi = theMET->phi();
 		t1pfmetSumEt = theMET->sumEt();
-		pfmet = theMET->uncorrectedPt();
-		pfmetPhi = theMET->uncorrectedPhi();
-		pfmetSumEt = theMET->uncorrectedSumEt();
+		pfmet = theMET->uncorPt();
+		pfmetPhi = theMET->uncorPhi();
+		pfmetSumEt = theMET->uncorSumEt();
 		calomet = theMET->caloMETPt();
 		calometPhi = theMET->caloMETPhi();
 		calometSumEt = theMET->caloMETSumEt();
