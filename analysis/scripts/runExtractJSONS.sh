@@ -3,16 +3,16 @@
 
 # All FLASHgg version Spring15BetaV4:
 
-python extractJSONS.py -i datasets_746_betaV4/datasets_746_betaV4_all.json	-o DiPhoton		-d lists_50ns_betaV4/MC
-python extractJSONS.py -i datasets_746_betaV4/datasets_746_betaV4_all.json	-o DYJetsToLL		-d lists_50ns_betaV4/MC
-python extractJSONS.py -i datasets_746_betaV4/datasets_746_betaV4_all.json      -o QCD_Pt-30to40	-d lists_50ns_betaV4/MC
-python extractJSONS.py -i datasets_746_betaV4/datasets_746_betaV4_all.json      -o QCD_Pt-40toInf	-d lists_50ns_betaV4/MC
-python extractJSONS.py -i datasets_746_betaV4/datasets_746_betaV4_all.json      -o QCD_Pt-30toInf	-d lists_50ns_betaV4/MC
-python extractJSONS.py -i datasets_746_betaV4/datasets_746_betaV4_all.json      -o GJet_Pt-20to40	-d lists_50ns_betaV4/MC
-python extractJSONS.py -i datasets_746_betaV4/datasets_746_betaV4_all.json      -o GJet_Pt-40toInf	-d lists_50ns_betaV4/MC
-python extractJSONS.py -i datasets_746_betaV4/datasets_746_betaV4_all.json      -o GluGluHToGG_M-125	-d lists_50ns_betaV4/MC
-python extractJSONS.py -i datasets_746_betaV4/datasets_746_betaV4_all.json      -o VHToGG_M125		-d lists_50ns_betaV4/MC
-python extractJSONS.py -i datasets_746_betaV4/datasets_746_betaV4_all.json	-o DoubleEG		-d lists_50ns_betaV4/Data
+python extractJSONS.py -i datasets/datasets_7412_betaV5_all.json	-o DiPhoton		-d lists_25ns/MC
+python extractJSONS.py -i datasets/datasets_7412_betaV5_all.json	-o DYJetsToLL		-d lists_25ns/MC
+python extractJSONS.py -i datasets/datasets_7412_betaV5_all.json	-o QCD_Pt-30to40	-d lists_25ns/MC
+python extractJSONS.py -i datasets/datasets_7412_betaV5_all.json	-o QCD_Pt-40toInf	-d lists_25ns/MC
+python extractJSONS.py -i datasets/datasets_7412_betaV5_all.json	-o QCD_Pt-30toInf	-d lists_25ns/MC
+python extractJSONS.py -i datasets/datasets_7412_betaV5_all.json	-o GJet_Pt-20to40	-d lists_25ns/MC
+python extractJSONS.py -i datasets/datasets_7412_betaV5_all.json	-o GJet_Pt-40toInf	-d lists_25ns/MC
+python extractJSONS.py -i datasets/datasets_7412_betaV5_all.json	-o GluGluHToGG_M-125	-d lists_25ns/MC
+python extractJSONS.py -i datasets/datasets_7412_betaV5_all.json	-o VHToGG_M125		-d lists_25ns/MC
+#python extractJSONS.py -i datasets/datasets_7412_betaV5_all.json	-o DoubleEG		-d lists_25ns/Data
 
 
 

@@ -44,7 +44,7 @@ def main(argv):
          target.write(lines[i])
          target.write(lines[i+1])
          target.write(lines[i+2])
-	 #target.write(lines[i+3])
+	 target.write(lines[i+3])
 
    target.close()        
    print 'Output file is ', outputname
