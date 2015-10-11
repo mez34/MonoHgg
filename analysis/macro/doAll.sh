@@ -5,5 +5,3 @@
 ./mergeTrees.sh
 ./weightTrees.sh 1
 ./mergeSpecies.sh
-rm -r diphotPlots
-mkdir diphotPlots
