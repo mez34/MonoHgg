@@ -3,5 +3,5 @@
 # also the directory for plots is made
 
 ./mergeTrees.sh
-./weightTrees.sh 1
+./weightTrees.sh 500
 ./mergeSpecies.sh

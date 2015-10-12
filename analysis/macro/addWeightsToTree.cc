@@ -96,6 +96,8 @@ void addWeights(const char* filename, float lumiForW, float massTrue=1) {
   Float_t         chiso2;
   Float_t         phoiso2;
   Float_t         neuiso2;
+  Int_t		  eleveto1;
+  Int_t		  eleveto2;
   Int_t           presel1;
   Int_t           presel2;
   Int_t           sel1;
@@ -180,6 +182,8 @@ void addWeights(const char* filename, float lumiForW, float massTrue=1) {
   TBranch        *b_chiso2;  
   TBranch        *b_phoiso2; 
   TBranch        *b_neuiso2;   
+  TBranch	 *b_eleveto1;
+  TBranch	 *b_eleveto2;
   TBranch        *b_presel1;
   TBranch        *b_presel2;
   TBranch        *b_sel1;
@@ -264,6 +268,8 @@ void addWeights(const char* filename, float lumiForW, float massTrue=1) {
   treeOrig->SetBranchAddress("chiso2", &chiso2, &b_chiso2);
   treeOrig->SetBranchAddress("phoiso2", &phoiso2, &b_phoiso2);
   treeOrig->SetBranchAddress("neuiso2", &neuiso2, &b_neuiso2);
+  treeOrig->SetBranchAddress("eleveto1",&eleveto1,&b_eleveto1);
+  treeOrig->SetBranchAddress("eleveto2",&eleveto2,&b_eleveto2);
   treeOrig->SetBranchAddress("presel1",&presel1,&b_presel1);
   treeOrig->SetBranchAddress("presel2",&presel2,&b_presel2);
   treeOrig->SetBranchAddress("sel1",&sel1,&b_sel1);
@@ -366,6 +372,8 @@ void addWeights(const char* filename, float lumiForW, float massTrue=1) {
     theTreeNew->Branch("chiso2", &chiso2, "chiso2/F");
     theTreeNew->Branch("phoiso2", &phoiso2, "phoiso2/F");
     theTreeNew->Branch("neuiso2", &neuiso2, "neuiso2/F");
+    theTreeNew->Branch("eleveto1",&eleveto1,"eleveto1/I");
+    theTreeNew->Branch("eleveto2",&eleveto2,"eleveto2/I");
     theTreeNew->Branch("presel1",&presel1,"presel1/I");
     theTreeNew->Branch("presel2",&presel2,"presel2/I");
     theTreeNew->Branch("sel1",&sel1,"sel1/I");
