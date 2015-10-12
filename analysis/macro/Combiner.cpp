@@ -1,9 +1,13 @@
 #include "Combiner.hh"
 
-Combiner::Combiner( SamplePairVec Samples, const Double_t inLumi, const ColorMap colorMap, const TString outdir, const Bool_t doNmin1){
+Combiner::Combiner( SamplePairVec Samples, const Double_t inLumi, const ColorMap colorMap, const TString outdir, const Bool_t doNmin1, const Bool_t do_stack){
 
   if (doNmin1) addText = "_n-1";
   else addText="";
+
+  doStack = false;
+  if (do_stack) doStack = true;
+
 
   lumi	= inLumi;
   fOutDir = outdir;
@@ -82,12 +86,6 @@ Combiner::~Combiner(){
 }// end Combiner::~Combiner
 
 void Combiner::DoComb(){
-  Combiner::OverlayPlots();
-
-}// end Combiner::DoComb
-
-
-void Combiner::OverlayPlots(){
   // copy th1d plots into output hists/stacks
   for (UInt_t th1d = 0; th1d < fNTH1D; th1d++){
     // data : copy first histogram & add all others too it 
@@ -96,14 +94,16 @@ void Combiner::OverlayPlots(){
         if (data == 0) fOutDataTH1DHists[th1d] = (TH1D*)fInDataTH1DHists[th1d][data]->Clone(); 
         else fOutDataTH1DHists[th1d]->Add(fInDataTH1DHists[th1d][data]);
       }
-     //if (fNData > 0)  fTH1DLegends[th1d]->AddEntry(fOutDataTH1DHists[th1d],"Data","pl"); //add data entry to legend
-   // }// end if ndata>0
+     if (fNData > 0 && doStack) fTH1DLegends[th1d]->AddEntry(fOutDataTH1DHists[th1d],"Data","pl"); //add data entry to legend
+    //}// end if ndata>0
 
     // bkg : copy histos and add to stacks
     for (UInt_t mc = 0; mc < fNBkg; mc++){
       //fInBkgTH1DHists[th1d][mc]->Scale(lumi);
       fOutBkgTH1DStacks[th1d]->Add(fInBkgTH1DHists[th1d][mc]);
-      fTH1DLegends[th1d]->AddEntry(fInBkgTH1DHists[th1d][mc],fSampleTitleMap[fBkgNames[mc]],"f");
+      // draw bkg in legend as box for stack plots, and line for overlay plot
+      if (doStack) fTH1DLegends[th1d]->AddEntry(fInBkgTH1DHists[th1d][mc],fSampleTitleMap[fBkgNames[mc]],"f");
+      else fTH1DLegends[th1d]->AddEntry(fInBkgTH1DHists[th1d][mc],fSampleTitleMap[fBkgNames[mc]],"l");
       if (mc == 0){
         fOutBkgTH1DHists[th1d] = (TH1D*)fInBkgTH1DHists[th1d][mc]->Clone();
       }
@@ -124,10 +124,10 @@ void Combiner::OverlayPlots(){
     }
   }// end loop over th1d histos
 
-  if (addText!="_n-1") Combiner::MakeEffPlots();
+  //if (addText!="_n-1") Combiner::MakeEffPlots();
   Combiner::MakeOutputCanvas();
 
-}// end Combiner::OverlayPlots
+}// end Combiner::DoComb
 
 
 void Combiner::MakeEffPlots(){
@@ -192,19 +192,18 @@ void Combiner::MakeOutputCanvas(){
     }
     if (fNData > 0) fOutDataTH1DHists[th1d]->Scale(lumi);
 */
-    // do stack plots first
     Bool_t isLogY = true;
-    Combiner::DrawCanvasStack(th1d,isLogY);
-    isLogY = false;
-    Combiner::DrawCanvasStack(th1d,isLogY);
-    isLogY = true;
-    
-    if (fNData > 0) fOutTH1DRatioPads[th1d]->Clear(); //delete the ratio plot for overlay plots
-    // do overlay next 
-    isLogY = true;
-    Combiner::DrawCanvasOverlay(th1d,isLogY);
-    isLogY = false;
-    Combiner::DrawCanvasOverlay(th1d,isLogY);
+    if (doStack){// do Stack plots
+      Combiner::DrawCanvasStack(th1d,isLogY);
+      isLogY = false;
+      Combiner::DrawCanvasStack(th1d,isLogY);
+      if (fNData > 0) fOutTH1DRatioPads[th1d]->Clear(); //delete the ratio plot for overlay plots
+    }
+    else{// do overlay next 
+      Combiner::DrawCanvasOverlay(th1d,isLogY);
+      isLogY = false;
+      Combiner::DrawCanvasOverlay(th1d,isLogY);
+    }
   }
 }// end Combiner::MakeOutputCanvas
 
@@ -327,12 +326,10 @@ void Combiner::DrawCanvasStack(const UInt_t th1d, const Bool_t isLogY){
 
   fOutTH1DCanvases[th1d]->cd();
 
-  // if (fNData > 0){
-  Combiner::MakeRatioPlots();
-  Combiner::MakeRatioLine(th1d);
-  //}
+  if (fNData > 0){ // make & draw ratio plots
+    Combiner::MakeRatioPlots();
+    Combiner::MakeRatioLine(th1d);
 
-  if (fNData > 0){ // draw ratio plots
     fOutTH1DRatioPads[th1d]->Draw();
     fOutTH1DRatioPads[th1d]->cd();
 
@@ -612,8 +609,8 @@ void Combiner::InitTH1DNames(){
   if (addText!="_n-1"){ // plots that don't have n-1 versions 
     fTH1DNames.push_back("eleveto1");
     fTH1DNames.push_back("eleveto2");
-    fTH1DNames.push_back("phi1_pho2pass");
-    fTH1DNames.push_back("phi2_pho1pass");
+    //fTH1DNames.push_back("phi1_pho2pass");
+    //fTH1DNames.push_back("phi2_pho1pass");
     fTH1DNames.push_back("t1pfmet_zoom");
     fTH1DNames.push_back("mgg_selt1pfmet");
     fTH1DNames.push_back("t1pfmet_selmgg");

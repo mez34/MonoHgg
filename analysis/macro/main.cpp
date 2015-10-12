@@ -31,15 +31,15 @@ static bool sortByYield(const SampleYieldPair& mcpair1, const SampleYieldPair& m
 int main(){
   setTDRStyle();
 
-  TString inDir = "./data/50ns_betaV4/";
-  TString outDir = "./diPhoPlots/50ns_betaV4/";
+  TString inDir = "./data/25ns/";
+  TString outDir = "./diPhoPlots/25ns/";
 
-  bool doFakeData = false;	// use FakeData to test combiner
+  bool doFakeData = true;	// use FakeData to test combiner
   bool sortMC = false;		// use if want to sort bkg smallest to biggest
   bool makePURWfiles = false;	// recompute PURW and make files
   bool doReweightPU = false;	// use PURW from old files if !makePURWfiles
   bool doPlots = false;		// make plots for each sample individually
-  bool doComb = true;		// make stack/overlay plots
+  bool doComb = false;		// make stack/overlay plots
   bool doABCD = false;		// run ABCD method 
 
   Double_t lumi = 40.0; //41.64; // in pb^-1 
@@ -192,17 +192,17 @@ int main(){
 
   if (doFakeData){
     std::cout << "Working on FakeData sample" << std::endl;
-    Plotter * FakeData = new Plotter(inDir,outDir,"DiPhoton_test",puweights_Data,lumi,false,true);
+    Plotter * FakeData = new Plotter(inDir,outDir,"FakeData",puweights_Data,lumi,false,true);
     FakeData->DoPlots();
     delete FakeData;
     std::cout << "Finished FakeData sample" << std::endl;
   }
   if (doPlots){
-    std::cout << "Working on DoubleEG sample" << std::endl;
-    Plotter * dEG = new Plotter(inDir,outDir,"DoubleEG",puweights_Data,lumi,false,true);
-    dEG->DoPlots();
-    delete dEG;
-    std::cout << "Finished DoubleEG sample" << std::endl;
+    //std::cout << "Working on DoubleEG sample" << std::endl;
+    //Plotter * dEG = new Plotter(inDir,outDir,"DoubleEG",puweights_Data,lumi,false,true);
+    //dEG->DoPlots();
+    //delete dEG;
+    //std::cout << "Finished DoubleEG sample" << std::endl;
 
     std::cout << "Working on GJets sample" << std::endl;
     Plotter * GJets = new Plotter(inDir,outDir,"GJets",puweights_GJets,lumi,false,false);
@@ -240,29 +240,29 @@ int main(){
     delete DY;
     std::cout << "Finished DYJets sample" << std::endl;
 
-    std::cout << "Working on DMHgg M1000 sample" << std::endl;
-    Plotter * DMH_M1000 = new Plotter(inDir,outDir,"DMHtoGG_M1000",puweights_sig1000,lumi,true,false);
-    DMH_M1000->DoPlots();
-    delete DMH_M1000;
-    std::cout << "Finished DMHgg M1000 sample" << std::endl;
+    //std::cout << "Working on DMHgg M1000 sample" << std::endl;
+    //Plotter * DMH_M1000 = new Plotter(inDir,outDir,"DMHtoGG_M1000",puweights_sig1000,lumi,true,false);
+    //DMH_M1000->DoPlots();
+    //delete DMH_M1000;
+    //std::cout << "Finished DMHgg M1000 sample" << std::endl;
   
-    std::cout << "Working on DMHgg M100 sample" << std::endl;
-    Plotter * DMH_M100 = new Plotter(inDir,outDir,"DMHtoGG_M100",puweights_sig100,lumi,true,false);
-    DMH_M100->DoPlots();
-    delete DMH_M100;
-    std::cout << "Finished DMHgg M100 sample" << std::endl;
+    //std::cout << "Working on DMHgg M100 sample" << std::endl;
+    //Plotter * DMH_M100 = new Plotter(inDir,outDir,"DMHtoGG_M100",puweights_sig100,lumi,true,false);
+    //DMH_M100->DoPlots();
+    //delete DMH_M100;
+    //std::cout << "Finished DMHgg M100 sample" << std::endl;
   
-    std::cout << "Working on DMHgg M10 sample" << std::endl;
-    Plotter * DMH_M10 = new Plotter(inDir,outDir,"DMHtoGG_M10",puweights_sig10,lumi,true,false);
-    DMH_M10->DoPlots();
-    delete DMH_M10;
-    std::cout << "Finished DMHgg M10 sample" << std::endl;
+    //std::cout << "Working on DMHgg M10 sample" << std::endl;
+    //Plotter * DMH_M10 = new Plotter(inDir,outDir,"DMHtoGG_M10",puweights_sig10,lumi,true,false);
+    //DMH_M10->DoPlots();
+    //delete DMH_M10;
+    //std::cout << "Finished DMHgg M10 sample" << std::endl;
   
-    std::cout << "Working on DMHgg M1 sample" << std::endl;
-    Plotter * DMH_M1 = new Plotter(inDir,outDir,"DMHtoGG_M1",puweights_sig1,lumi,true,false);
-    DMH_M1->DoPlots();
-    delete DMH_M1;
-    std::cout << "Finished DMHgg M1 sample" << std::endl;
+    //std::cout << "Working on DMHgg M1 sample" << std::endl;
+    //Plotter * DMH_M1 = new Plotter(inDir,outDir,"DMHtoGG_M1",puweights_sig1,lumi,true,false);
+    //DMH_M1->DoPlots();
+    //delete DMH_M1;
+    //std::cout << "Finished DMHgg M1 sample" << std::endl;
 
   }// end doPlots
 
@@ -287,11 +287,11 @@ int main(){
   colorMap["GluGluHToGG"]		= kOrange-2;
   colorMap["DiPhoton"]			= kTeal-1;
   colorMap["DYJetsToLL"]		= kTeal-7;
-  colorMap["DMHtoGG_M1"]		= kPink-2;
-  colorMap["DMHtoGG_M10"]		= kPink-6;
-  colorMap["DMHtoGG_M100"]		= kPink+6;
-  colorMap["DMHtoGG_M1000"]		= kPink+8;
-  colorMap["DoubleEG"]			= kBlack;
+  //colorMap["DMHtoGG_M1"]		= kPink-2;
+  //colorMap["DMHtoGG_M10"]		= kPink-6;
+  //colorMap["DMHtoGG_M100"]		= kPink+6;
+  //colorMap["DMHtoGG_M1000"]		= kPink+8;
+  //colorMap["DoubleEG"]		= kBlack;
   if (doFakeData) colorMap["FakeData"]	= kBlack; 
 
   SamplePairVec Samples; // vector to also be used for stack plots
@@ -302,11 +302,12 @@ int main(){
   Samples.push_back(SamplePair("DYJetsToLL",1));
   Samples.push_back(SamplePair("QCD",1)); 
   Samples.push_back(SamplePair("GJets",1)); 
-  Samples.push_back(SamplePair("DMHtoGG_M1",0)); 
-  Samples.push_back(SamplePair("DMHtoGG_M10",0)); 
-  Samples.push_back(SamplePair("DMHtoGG_M100",0)); 
-  Samples.push_back(SamplePair("DMHtoGG_M1000",0)); 
-  Samples.push_back(SamplePair("DoubleEG",5));
+  Samples.push_back(SamplePair("test",0));
+  //Samples.push_back(SamplePair("DMHtoGG_M1",0)); 
+  //Samples.push_back(SamplePair("DMHtoGG_M10",0)); 
+  //Samples.push_back(SamplePair("DMHtoGG_M100",0)); 
+  //Samples.push_back(SamplePair("DMHtoGG_M1000",0)); 
+  //Samples.push_back(SamplePair("DoubleEG",5));
   if (doFakeData) Samples.push_back(SamplePair("FakeData",5));
 
   UInt_t nbkg = 0;
@@ -374,20 +375,31 @@ int main(){
   // 2rd : lumi
   // 3rd : ColorMap for samples
   // 4th : output directory
-  // 5th : bool do N-1 plots 
+  // 5th : bool do N-1 plots
+  // 6th : bool do Stack plots (false = do overlay) 
   //
   ////////////////////////////////////////////////////
 
-  if (doComb){
-    // make overlayed and stack plots
-    // Combiner( Samples, lumi, colorMap , outDir, doNmin1plots )
-    Combiner *combAll = new Combiner(Samples,lumi,colorMap,outDir,false);
+  if (doComb){// make overlayed and stack plots
+    // Combiner( Samples, lumi, colorMap , outDir, doNmin1plots, doStack)
+    
+    // do overlay plots for normal plots
+    Combiner *combAll = new Combiner(Samples,lumi,colorMap,outDir,false,false);
     combAll->DoComb();
     delete combAll;   
-  
-    Combiner *combAlln1 = new Combiner(Samples,lumi,colorMap,outDir,true);
-    combAlln1->DoComb();
-    delete combAlln1;   
+    // do stack plots for normal plots
+    Combiner *stackAll = new Combiner(Samples,lumi,colorMap,outDir,false,true);
+    stackAll->DoComb();
+    delete stackAll;   
+ 
+    //// do overlay plots for n-1 plots
+    //Combiner *combAlln1 = new Combiner(Samples,lumi,colorMap,outDir,true,false);
+    //combAlln1->DoComb();
+    //delete combAlln1;   
+    //// do stack plots for n-1 plots 
+    //Combiner *stackAlln1 = new Combiner(Samples,lumi,colorMap,outDir,true,true);
+    //stackAlln1->DoComb();
+    //delete stackAlln1;   
   }// end doComb
 
   ////////////////////////////////////////////////////

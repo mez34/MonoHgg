@@ -311,21 +311,21 @@ void Plotter::DoPlots(){
 
 void Plotter::SetUpPlots(){
   // fill all plots from tree
-  fTH1DMap["nvtx"]		= Plotter::MakeTH1DPlot("nvtx","",60,0.,60.,"nvtx","");
+  fTH1DMap["nvtx"]		= Plotter::MakeTH1DPlot("nvtx","",40,0.,40.,"nvtx","");
   fTH1DMap["mgg"]		= Plotter::MakeTH1DPlot("mgg","",30,100.,180.,"m_{#gamma#gamma} (GeV)","");  
-  fTH1DMap["ptgg"]		= Plotter::MakeTH1DPlot("ptgg","",100,0.,1000.,"p_{T,#gamma#gamma} (GeV)","");
-  fTH1DMap["t1pfmet"]		= Plotter::MakeTH1DPlot("t1pfmet","",100,0.,1000,"t1PF MET (GeV)","");
+  fTH1DMap["ptgg"]		= Plotter::MakeTH1DPlot("ptgg","",30,0.,300.,"p_{T,#gamma#gamma} (GeV)","");
+  fTH1DMap["t1pfmet"]		= Plotter::MakeTH1DPlot("t1pfmet","",25,0.,200,"t1PF MET (GeV)","");
   fTH1DMap["t1pfmetphi"]	= Plotter::MakeTH1DPlot("t1pfmetphi","",80,-4.,4.,"t1PF MET #phi","");
   fTH1DMap["pfmet"]		= Plotter::MakeTH1DPlot("pfmet","",100,0.,1000,"PF MET (GeV)","");
   fTH1DMap["pfmetphi"]		= Plotter::MakeTH1DPlot("pfmetphi","",80,-4.,4.,"PF MET #phi","");
   fTH1DMap["calomet"]		= Plotter::MakeTH1DPlot("calomet","",100,0.,1000,"calo MET (GeV)","");
   fTH1DMap["calometphi"]	= Plotter::MakeTH1DPlot("calometphi","",80,-4.,4.,"calo MET #phi","");
-  fTH1DMap["phi1"]		= Plotter::MakeTH1DPlot("phi1","",80,-4.,4.,"#phi(#gamma1)","");
-  fTH1DMap["phi2"]		= Plotter::MakeTH1DPlot("phi2","",80,-4.,4.,"#phi(#gamma2)","");
-  fTH1DMap["eta1"]		= Plotter::MakeTH1DPlot("eta1","",100,-5.,5.,"#eta(#gamma1)","");
-  fTH1DMap["eta2"]		= Plotter::MakeTH1DPlot("eta2","",100,-5.,5.,"#eta(#gamma2)","");
-  fTH1DMap["pt1"]		= Plotter::MakeTH1DPlot("pt1","",50,0.,500.,"p_{T,#gamma1} (GeV)","");
-  fTH1DMap["pt2"]		= Plotter::MakeTH1DPlot("pt2","",50,0.,500.,"p_{T,#gamma2} (GeV)","");
+  fTH1DMap["phi1"]		= Plotter::MakeTH1DPlot("phi1","",20,-4.,4.,"#phi(#gamma1)","");
+  fTH1DMap["phi2"]		= Plotter::MakeTH1DPlot("phi2","",20,-4.,4.,"#phi(#gamma2)","");
+  fTH1DMap["eta1"]		= Plotter::MakeTH1DPlot("eta1","",20,-3.,3.,"#eta(#gamma1)","");
+  fTH1DMap["eta2"]		= Plotter::MakeTH1DPlot("eta2","",20,-3.,3.,"#eta(#gamma2)","");
+  fTH1DMap["pt1"]		= Plotter::MakeTH1DPlot("pt1","",15,0.,300.,"p_{T,#gamma1} (GeV)","");
+  fTH1DMap["pt2"]		= Plotter::MakeTH1DPlot("pt2","",15,0.,300.,"p_{T,#gamma2} (GeV)","");
   fTH1DMap["chiso1"]		= Plotter::MakeTH1DPlot("chiso1","",75,-5.,15.,"CHiso(#gamma1)","");
   fTH1DMap["chiso2"]		= Plotter::MakeTH1DPlot("chiso2","",75,-5.,15.,"CHiso(#gamma2)","");
   fTH1DMap["neuiso1"]		= Plotter::MakeTH1DPlot("neuiso1","",75,-5.,15.,"NHiso(#gamma1)","");
@@ -338,8 +338,8 @@ void Plotter::SetUpPlots(){
   fTH1DMap["hoe2"]		= Plotter::MakeTH1DPlot("hoe2","",125,0.,0.025,"H/E(#gamma2)","");
   fTH1DMap["r91"]		= Plotter::MakeTH1DPlot("r91","",100,0.,1.1,"R9(#gamma1)","");
   fTH1DMap["r92"]		= Plotter::MakeTH1DPlot("r92","",100,0.,1.1,"R9(#gamma2)","");
-  fTH1DMap["eleveto1"]		= Plotter::MakeTH1DPlot("eleveto1","",2,-0.5,1.5,"Electron Veto(#gamma1)","");
-  fTH1DMap["eleveto2"]		= Plotter::MakeTH1DPlot("eleveto2","",2,-0.5,1.5,"Electron Veto(#gamma2)","");
+  fTH1DMap["eleveto1"]		= Plotter::MakeTH1DPlot("eleveto1","",2,0,2.0,"Electron Veto(#gamma1)","");
+  fTH1DMap["eleveto2"]		= Plotter::MakeTH1DPlot("eleveto2","",2,0,2.0,"Electron Veto(#gamma2)","");
 
   // n minus 1 plots
   fTH1DMap["nvtx_n-1"]		= Plotter::MakeTH1DPlot("nvtx_n-1","",40,0.,40.,"nvtx","");
@@ -450,7 +450,7 @@ void Plotter::SavePlots(){
   TCanvas * canv2d = new TCanvas();
 
   for (TH2DMapIter mapiter = fTH2DMap.begin(); mapiter != fTH2DMap.end(); mapiter++){
-    canv->Clear();
+    //canv->Clear();
 
     if ((*mapiter).second == (TH2D*) NULL)	{std::cout << "TH2D Null" << std::endl;}
     if (outFile == (TFile*) NULL)		{std::cout << "OutFile Null" << std::endl;}
