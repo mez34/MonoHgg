@@ -263,7 +263,6 @@ void Combiner::DrawCanvasOverlay(const UInt_t th1d, const Bool_t isLogY){
   }
   //if (fNData > 0) fOutDataTH1DHists[th1d]->Draw("PE SAME");
 
-  fOutBkgTH1DHists[th1d]->Draw("E2 SAME");
   fTH1DLegends[th1d]->Draw("SAME"); 
 
   TString suffix = "";
