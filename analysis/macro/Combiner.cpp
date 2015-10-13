@@ -46,7 +46,7 @@ Combiner::Combiner( SamplePairVec Samples, const Double_t inLumi, const ColorMap
   fSampleTitleMap["DMHtoGG_M10"]	= "m_{#chi} = 10 GeV";//#bar{#chi}#chi HH ,m_{#chi} = 10 GeV";
   fSampleTitleMap["DMHtoGG_M100"]	= "m_{#chi} = 100 GeV";//#bar{#chi}#chi HH ,m_{#chi} = 100 GeV";
   fSampleTitleMap["DMHtoGG_M1000"]	= "m_{#chi} = 1000 GeV";//#bar{#chi}#chi HH ,m_{#chi} = 1000 GeV";
-  
+  fSampleTitleMap["FakeData"]		= "Test";  
 
   //for (std::map<TString,TString>::iterator iter = fSampleTitleMap.begin(); iter != fSampleTitleMap.end(); ++iter) {
   //  std::cout << (*iter).first << "  " << (*iter).second << std::endl;
@@ -68,6 +68,7 @@ Combiner::~Combiner(){
     //}
     delete fOutBkgTH1DHists[th1d];
     delete fOutBkgTH1DStacks[th1d];
+    delete fOutBkgTH1DStacksForUncer[th1d];
     delete fTH1DLegends[th1d];
     delete fOutTH1DStackPads[th1d];
     delete fOutTH1DCanvases[th1d];
@@ -101,6 +102,7 @@ void Combiner::DoComb(){
     for (UInt_t mc = 0; mc < fNBkg; mc++){
       //fInBkgTH1DHists[th1d][mc]->Scale(lumi);
       fOutBkgTH1DStacks[th1d]->Add(fInBkgTH1DHists[th1d][mc]);
+      fOutBkgTH1DStacksForUncer[th1d]->Add(fInBkgTH1DHists[th1d][mc]);
       // draw bkg in legend as box for stack plots, and line for overlay plot
       if (doStack) fTH1DLegends[th1d]->AddEntry(fInBkgTH1DHists[th1d][mc],fSampleTitleMap[fBkgNames[mc]],"f");
       else fTH1DLegends[th1d]->AddEntry(fInBkgTH1DHists[th1d][mc],fSampleTitleMap[fBkgNames[mc]],"l");
@@ -112,10 +114,17 @@ void Combiner::DoComb(){
       }
     } 
     //fOutBkgTH1DHists[th1d]->Sumw2();
-    fOutBkgTH1DHists[th1d]->SetFillColor(kBlack);
+    //std::cout << "histo# " << th1d << std::endl;
+    //std::cout << "maxbin " << fOutBkgTH1DHists[th1d]->GetSize() << std::endl;
+    //for (UInt_t bin = 1; bin < fOutBkgTH1DHists[th1d]->GetSize(); bin++){
+    //  std::cout << "bin " << bin << " Val = " << fOutBkgTH1DHists[th1d]->GetBinContent(bin) << " Err = " << fOutBkgTH1DHists[th1d]->GetBinError(bin) << std::endl;
+    //}
+    fOutBkgTH1DHists[th1d]->SetFillColor(kGray+3);
     fOutBkgTH1DHists[th1d]->SetFillStyle(3003);
     fOutBkgTH1DHists[th1d]->SetMarkerSize(0);
-    //fTH1DLegends[th1d]->AddEntry(fOutBkgTH1DHists[th1d],"Bkg Uncertainty","F");
+    // add uncertainty in stack plot
+    fOutBkgTH1DStacksForUncer[th1d]->Add(fOutBkgTH1DHists[th1d],"E2");
+    if (doStack) fTH1DLegends[th1d]->AddEntry(fOutBkgTH1DHists[th1d],"Bkg Uncertainty","F");
 
     // sig: just add to legend
     for (UInt_t mc = 0; mc < fNSig; mc++){
@@ -253,6 +262,7 @@ void Combiner::DrawCanvasOverlay(const UInt_t th1d, const Bool_t isLogY){
     fInSigTH1DHists[th1d][mc]->Draw("HIST SAME");
   }
   //if (fNData > 0) fOutDataTH1DHists[th1d]->Draw("PE SAME");
+
   fOutBkgTH1DHists[th1d]->Draw("E2 SAME");
   fTH1DLegends[th1d]->Draw("SAME"); 
 
@@ -305,6 +315,8 @@ void Combiner::DrawCanvasStack(const UInt_t th1d, const Bool_t isLogY){
   fInSigTH1DHists[th1d][0]->Draw("HIST");
 
   fOutBkgTH1DStacks[th1d]->Draw("HIST SAME");
+  //fOutBkgTH1DHists[th1d]->Draw("E2 SAME");//E2 draws error as rectangle
+  //fOutBkgTH1DStacksForUncer[th1d]->Draw("nostack E2 SAME");
 
   if (fNData > 0){
     fOutDataTH1DHists[th1d]->Draw("PE SAME");
@@ -316,7 +328,8 @@ void Combiner::DrawCanvasStack(const UInt_t th1d, const Bool_t isLogY){
       fInSigTH1DHists[th1d][mc]->Draw("AXIS SAME");
     }
   }
-
+  
+  fOutBkgTH1DHists[th1d]->Draw("E2 SAME");//E2 draws error as rectangle
   fTH1DLegends[th1d]->Draw("SAME"); 
 
   TString suffix = "";
@@ -526,8 +539,10 @@ void Combiner::InitCanvAndHists(){
   // output histos
   fOutDataTH1DHists.resize(fNTH1D);
   fOutBkgTH1DStacks.resize(fNTH1D);
+  fOutBkgTH1DStacksForUncer.resize(fNTH1D);
   for (UInt_t th1d = 0; th1d < fNTH1D; th1d++){
     fOutBkgTH1DStacks[th1d] = new THStack("","");
+    fOutBkgTH1DStacksForUncer[th1d] = new THStack("","");
   }
 
   fTH1DLegends.resize(fNTH1D);

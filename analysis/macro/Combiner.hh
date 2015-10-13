@@ -92,6 +92,7 @@ private:
 
   TH1DVec	fOutTH1DComb;
   THStackVec    fOutBkgTH1DStacks;
+  THStackVec	fOutBkgTH1DStacksForUncer;
   TLegVec	fTH1DLegends;
   TCanvVec	fOutTH1DCanvases;
 

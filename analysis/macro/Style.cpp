@@ -166,9 +166,7 @@ void CMSLumi(TCanvas *& canvas, const Int_t iPosX, const Double_t inlumi){
 
 
 
-void setTDRStyle() {
-  TStyle *tdrStyle = new TStyle("tdrStyle","Style for P-TDR");
-
+void SetTDRStyle(TStyle *& tdrStyle) {
   // For the canvas:
   tdrStyle->SetCanvasBorderMode(0);
   tdrStyle->SetCanvasColor(kWhite);
@@ -207,9 +205,10 @@ void setTDRStyle() {
 
   tdrStyle->SetEndErrorSize(2);
   //tdrStyle->SetErrorMarker(20);
-  tdrStyle->SetErrorX(0.);
+  tdrStyle->SetErrorX(0.5);
   
   tdrStyle->SetMarkerStyle(20);
+  tdrStyle->SetMarkerSize(0.6);
 
   //For the fit/function:
   tdrStyle->SetOptFit(1);
@@ -240,9 +239,9 @@ void setTDRStyle() {
 
   // Margins:
   tdrStyle->SetPadTopMargin(0.05);
-  tdrStyle->SetPadBottomMargin(0.13);
-  tdrStyle->SetPadLeftMargin(0.13);
-  tdrStyle->SetPadRightMargin(0.05);
+  tdrStyle->SetPadBottomMargin(0.14);
+  tdrStyle->SetPadLeftMargin(0.18);
+  tdrStyle->SetPadRightMargin(0.10);
 
   // For the Global title:
 
@@ -267,7 +266,7 @@ void setTDRStyle() {
   // tdrStyle->SetTitleXSize(Float_t size = 0.02); // Another way to set the size?
   // tdrStyle->SetTitleYSize(Float_t size = 0.02);
   tdrStyle->SetTitleXOffset(0.9);
-  tdrStyle->SetTitleYOffset(1.05);
+  tdrStyle->SetTitleYOffset(1.0);
   // tdrStyle->SetTitleOffset(1.1, "Y"); // Another way to set the Offset
 
   // For the axis labels:
@@ -282,7 +281,7 @@ void setTDRStyle() {
   tdrStyle->SetAxisColor(1, "XYZ");
   tdrStyle->SetStripDecimals(kTRUE);
   tdrStyle->SetTickLength(0.03, "XYZ");
-  tdrStyle->SetNdivisions(510, "XYZ");
+  tdrStyle->SetNdivisions(505, "XYZ");
   tdrStyle->SetPadTickX(1);  // To get tick marks on the opposite side of the frame
   tdrStyle->SetPadTickY(1);
 

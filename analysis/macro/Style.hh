@@ -34,7 +34,7 @@ void CheckValidTree(TTree*& tree, const TString tname, const TString fname);
 void CheckValidTH1D(TH1D*& plot, const TString pname, const TString fname);
 void CheckValidTH2D(TH2D*& plot, const TString pname, const TString fname);
 void CMSLumi(TCanvas *& canvas, const Int_t iPosX, const Double_t inlumi);
-void setTDRStyle(); 
+void SetTDRStyle(TStyle *& tdrStyle); 
 
 class Style{
 public:

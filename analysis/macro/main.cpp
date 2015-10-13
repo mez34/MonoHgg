@@ -29,7 +29,12 @@ static bool sortByYield(const SampleYieldPair& mcpair1, const SampleYieldPair& m
 }
 
 int main(){
-  setTDRStyle();
+  // instead of : setTDRStyle();
+  // force TDR style
+  //
+  TStyle * tdrStyle = new TStyle("tdrStyle","Style for P-TDR");
+  SetTDRStyle(tdrStyle);
+  gROOT->ForceStyle();
 
   TString inDir = "./data/25ns/";
   TString outDir = "./diPhoPlots/25ns/";
@@ -39,7 +44,7 @@ int main(){
   bool makePURWfiles = false;	// recompute PURW and make files
   bool doReweightPU = false;	// use PURW from old files if !makePURWfiles
   bool doPlots = false;		// make plots for each sample individually
-  bool doComb = false;		// make stack/overlay plots
+  bool doComb = true;		// make stack/overlay plots
   bool doABCD = false;		// run ABCD method 
 
   Double_t lumi = 40.0; //41.64; // in pb^-1 
@@ -190,13 +195,13 @@ int main(){
   //
   /////////////////////////////////////////////////////
 
-  if (doFakeData){
-    std::cout << "Working on FakeData sample" << std::endl;
-    Plotter * FakeData = new Plotter(inDir,outDir,"FakeData",puweights_Data,lumi,false,true);
-    FakeData->DoPlots();
-    delete FakeData;
-    std::cout << "Finished FakeData sample" << std::endl;
-  }
+  //if (doFakeData){
+  //  std::cout << "Working on FakeData sample" << std::endl;
+  //  Plotter * FakeData = new Plotter(inDir,outDir,"FakeData",puweights_Data,lumi,false,true);
+  //  FakeData->DoPlots();
+  //  delete FakeData;
+  //  std::cout << "Finished FakeData sample" << std::endl;
+  //}
   if (doPlots){
     //std::cout << "Working on DoubleEG sample" << std::endl;
     //Plotter * dEG = new Plotter(inDir,outDir,"DoubleEG",puweights_Data,lumi,false,true);
@@ -292,7 +297,7 @@ int main(){
   //colorMap["DMHtoGG_M100"]		= kPink+6;
   //colorMap["DMHtoGG_M1000"]		= kPink+8;
   //colorMap["DoubleEG"]		= kBlack;
-  if (doFakeData) colorMap["FakeData"]	= kBlack; 
+  if (doFakeData) colorMap["FakeData"]	= kMagenta; 
 
   SamplePairVec Samples; // vector to also be used for stack plots
   //ordered to match Livia
@@ -302,13 +307,12 @@ int main(){
   Samples.push_back(SamplePair("DYJetsToLL",1));
   Samples.push_back(SamplePair("QCD",1)); 
   Samples.push_back(SamplePair("GJets",1)); 
-  Samples.push_back(SamplePair("test",0));
   //Samples.push_back(SamplePair("DMHtoGG_M1",0)); 
   //Samples.push_back(SamplePair("DMHtoGG_M10",0)); 
   //Samples.push_back(SamplePair("DMHtoGG_M100",0)); 
   //Samples.push_back(SamplePair("DMHtoGG_M1000",0)); 
   //Samples.push_back(SamplePair("DoubleEG",5));
-  if (doFakeData) Samples.push_back(SamplePair("FakeData",5));
+  if (doFakeData) Samples.push_back(SamplePair("FakeData",0));
 
   UInt_t nbkg = 0;
   UInt_t nsig = 0;
@@ -419,4 +423,5 @@ int main(){
     delete abcd; 
   }// end doABCD
 
+  delete tdrStyle;
 }// end main
