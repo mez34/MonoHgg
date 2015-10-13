@@ -140,7 +140,7 @@ void Plotter::DoPlots(){
     //start full selection for plots
     if ( pt1 > mgg/3 && pt2 > mgg/4){
       fTH1DMap["eff_sel"]->Fill(1.5,Weight);
-      if ( isSigMC ||  hltDiphoton30Mass95==1){ //passes trigger
+      if (hltDiphoton30Mass95==1){ //passes trigger
 
         fTH1DMap["eff_sel"]->Fill(2.5,Weight);
         //Fill histograms
@@ -264,7 +264,7 @@ void Plotter::DoPlots(){
       }// end if passes trigger
     }// end if passes pt cuts 
     
-    if ( isSigMC ||  hltDiphoton30Mass95==1){ //passes trigger
+    if (hltDiphoton30Mass95==1){ //passes trigger
       if(passAll2 && pt2 > mgg/4) fTH1DMap["phi1_pho2pass"]->Fill(phi1,Weight);
       if(passAll1 && pt1 > mgg/3) fTH1DMap["phi2_pho1pass"]->Fill(phi2,Weight);
     }
@@ -514,6 +514,12 @@ void Plotter::SetBranchAddresses(){
   tpho->SetBranchAddress("phi2", &phi2, &b_phi2);   
   tpho->SetBranchAddress("eta1", &eta1, &b_eta1);   
   tpho->SetBranchAddress("eta2", &eta2, &b_eta2);   
+  tpho->SetBranchAddress("eleveto1", &eleveto1, &b_eleveto1);   
+  tpho->SetBranchAddress("eleveto2", &eleveto2, &b_eleveto2);  
+  tpho->SetBranchAddress("presel1", &presel1, &b_presel1); 
+  tpho->SetBranchAddress("presel2", &presel2, &b_presel2); 
+  tpho->SetBranchAddress("sel1", &sel1, &b_sel1); 
+  tpho->SetBranchAddress("sel2", &sel2, &b_sel2); 
   tpho->SetBranchAddress("passCHiso1", &passCHiso1, &b_passCHiso1);   
   tpho->SetBranchAddress("passCHiso2", &passCHiso2, &b_passCHiso2);   
   tpho->SetBranchAddress("passNHiso1", &passNHiso1, &b_passNHiso1);   

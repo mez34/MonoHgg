@@ -124,6 +124,10 @@ private:
   Int_t		passHoe2;
   Int_t 	eleveto1;
   Int_t 	eleveto2;
+  Int_t		sel1;
+  Int_t		sel2;
+  Int_t		presel1;
+  Int_t		presel2;
   Int_t		hltPhoton26Photon16Mass60;
   Int_t		hltPhoton36Photon22Mass15;
   Int_t		hltPhoton42Photon25Mass15;
@@ -178,6 +182,10 @@ private:
   TBranch	*b_passHoe2;
   TBranch	*b_eleveto1;
   TBranch	*b_eleveto2;
+  TBranch	*b_sel1;
+  TBranch	*b_sel2;
+  TBranch	*b_presel1;
+  TBranch	*b_presel2;
   TBranch	*b_hltPhoton26Photon16Mass60;
   TBranch	*b_hltPhoton36Photon22Mass15;
   TBranch	*b_hltPhoton42Photon25Mass15;
