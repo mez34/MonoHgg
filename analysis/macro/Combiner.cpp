@@ -46,7 +46,8 @@ Combiner::Combiner( SamplePairVec Samples, const Double_t inLumi, const ColorMap
   fSampleTitleMap["DMHtoGG_M10"]	= "m_{#chi} = 10 GeV";//#bar{#chi}#chi HH ,m_{#chi} = 10 GeV";
   fSampleTitleMap["DMHtoGG_M100"]	= "m_{#chi} = 100 GeV";//#bar{#chi}#chi HH ,m_{#chi} = 100 GeV";
   fSampleTitleMap["DMHtoGG_M1000"]	= "m_{#chi} = 1000 GeV";//#bar{#chi}#chi HH ,m_{#chi} = 1000 GeV";
-  fSampleTitleMap["FakeData"]		= "Test";  
+  fSampleTitleMap["FakeData"]		= "FakeData";  
+  fSampleTitleMap["FakeDataII"]		= "Test";
 
   //for (std::map<TString,TString>::iterator iter = fSampleTitleMap.begin(); iter != fSampleTitleMap.end(); ++iter) {
   //  std::cout << (*iter).first << "  " << (*iter).second << std::endl;
@@ -358,8 +359,8 @@ void Combiner::DrawCanvasStack(const UInt_t th1d, const Bool_t isLogY){
     fOutRatioTH1DHists[th1d]->GetYaxis()->SetTitleSize(0.15);
     fOutRatioTH1DHists[th1d]->GetYaxis()->SetTitleOffset(0.5);
 
+    fOutRatioTH1DHistsCopy[th1d]->Draw("E2 SAME");
     fOutRatioTH1DHists[th1d]->Draw("EP SAME");
-    //fOutRatioTH1DHistsCopy[th1d]->Draw("E2 SAME");
   } 
 
 
@@ -442,6 +443,10 @@ Double_t ratErr = 0.;
       }
       else ratErr = 0.;
       //std::cout << "RatioErr2 = " << ratErr << std::endl;
+      fOutRatioTH1DHistsCopy[th1d]->SetFillColor(kGray+3);
+      fOutRatioTH1DHistsCopy[th1d]->SetFillStyle(3003);
+      fOutRatioTH1DHistsCopy[th1d]->SetMarkerSize(0);
+      fOutRatioTH1DHistsCopy[th1d]->SetBinContent(bin,1.0);
       fOutRatioTH1DHistsCopy[th1d]->SetBinError(bin,ratErr);
     }
   }// end loop over hists

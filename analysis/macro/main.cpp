@@ -39,7 +39,8 @@ int main(){
   TString inDir = "./data/25ns/";
   TString outDir = "./diPhoPlots/25ns/";
 
-  bool doFakeData = true;	// use FakeData to test combiner
+  bool doFakeData = false;	// use FakeData to test combiner (mimicks data)
+  bool doFakeSig = true;	// use FakeDataII to test combiner (mimicks signal)--TEMP 
   bool sortMC = false;		// use if want to sort bkg smallest to biggest
   bool makePURWfiles = false;	// recompute PURW and make files
   bool doReweightPU = false;	// use PURW from old files if !makePURWfiles
@@ -47,7 +48,7 @@ int main(){
   bool doComb = true;		// make stack/overlay plots
   bool doABCD = false;		// run ABCD method 
 
-  Double_t lumi = 40.0; //41.64; // in pb^-1 
+  Double_t lumi = 500.0; // in pb^-1 
   UInt_t nBins_vtx = 60; // number of bins for PURW 
   
   //for CMSSW_7_0_pre9: run with root
@@ -191,17 +192,25 @@ int main(){
   // 2nd : output data location
   // 3rd : name of sample 
   // 4th : lumi of data
-  // 5th : bool isSigMC (overrides trigger)
+  // 5th : bool isSigMC ------> FIXME (not needed?)
+  // 6th : bool isData
   //
   /////////////////////////////////////////////////////
 
-  //if (doFakeData){
-  //  std::cout << "Working on FakeData sample" << std::endl;
-  //  Plotter * FakeData = new Plotter(inDir,outDir,"FakeData",puweights_Data,lumi,false,true);
-  //  FakeData->DoPlots();
-  //  delete FakeData;
-  //  std::cout << "Finished FakeData sample" << std::endl;
-  //}
+  if (doFakeData && doPlots){
+    std::cout << "Working on FakeData sample" << std::endl;
+    Plotter * FakeData = new Plotter(inDir,outDir,"FakeData",puweights_Data,lumi,false,true);
+    FakeData->DoPlots();
+    delete FakeData;
+    std::cout << "Finished FakeData sample" << std::endl;
+  }
+  if (doFakeSig && doPlots){
+    std::cout << "Working on FakeDataII sample" << std::endl;
+    Plotter * FakeDataII = new Plotter(inDir,outDir,"FakeDataII",puweights_Data,lumi,true,false);
+    FakeDataII->DoPlots();
+    delete FakeDataII;
+    std::cout << "Finished FakeDataII sample" << std::endl;
+  }
   if (doPlots){
     //std::cout << "Working on DoubleEG sample" << std::endl;
     //Plotter * dEG = new Plotter(inDir,outDir,"DoubleEG",puweights_Data,lumi,false,true);
@@ -292,12 +301,14 @@ int main(){
   colorMap["GluGluHToGG"]		= kOrange-2;
   colorMap["DiPhoton"]			= kTeal-1;
   colorMap["DYJetsToLL"]		= kTeal-7;
-  //colorMap["DMHtoGG_M1"]		= kPink-2;
-  //colorMap["DMHtoGG_M10"]		= kPink-6;
-  //colorMap["DMHtoGG_M100"]		= kPink+6;
-  //colorMap["DMHtoGG_M1000"]		= kPink+8;
-  //colorMap["DoubleEG"]		= kBlack;
-  if (doFakeData) colorMap["FakeData"]	= kMagenta; 
+  colorMap["DMHtoGG_M1"]		= kPink-2;
+  colorMap["DMHtoGG_M10"]		= kPink-6;
+  colorMap["DMHtoGG_M100"]		= kPink+6;
+  colorMap["DMHtoGG_M1000"]		= kPink+8;
+  colorMap["DoubleEG"]			= kBlack;
+  colorMap["FakeData"]			= kBlack;
+  colorMap["FakeDataII"]		= kMagenta; 
+
 
   SamplePairVec Samples; // vector to also be used for stack plots
   //ordered to match Livia
@@ -312,7 +323,8 @@ int main(){
   //Samples.push_back(SamplePair("DMHtoGG_M100",0)); 
   //Samples.push_back(SamplePair("DMHtoGG_M1000",0)); 
   //Samples.push_back(SamplePair("DoubleEG",5));
-  if (doFakeData) Samples.push_back(SamplePair("FakeData",0));
+  if (doFakeData) Samples.push_back(SamplePair("FakeData",5));
+  if (doFakeSig)  Samples.push_back(SamplePair("FakeDataII",0));
 
   UInt_t nbkg = 0;
   UInt_t nsig = 0;
