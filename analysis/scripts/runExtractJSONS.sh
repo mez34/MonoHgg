@@ -1,8 +1,11 @@
 #! /bin/sh
 #run extractJSONS.py for all samples in file
 
-# All FLASHgg version Spring15BetaV4:
-
+# All FLASHgg version Spring15BetaV5:
+python extractJSONS.py -i datasets/datasets_7412_betaV5_sig.json	-o 2HDM_MZP600		-d lists_25ns/MC
+python extractJSONS.py -i datasets/datasets_7412_betaV5_sig.json	-o 2HDM_MZP1200		-d lists_25ns/MC
+python extractJSONS.py -i datasets/datasets_7412_betaV5_sig.json	-o 2HDM_MZP1700		-d lists_25ns/MC
+python extractJSONS.py -i datasets/datasets_7412_betaV5_sig.json	-o 2HDM_MZP2500		-d lists_25ns/MC
 python extractJSONS.py -i datasets/datasets_7412_betaV5_all.json	-o DiPhoton		-d lists_25ns/MC
 python extractJSONS.py -i datasets/datasets_7412_betaV5_all.json	-o DYJetsToLL		-d lists_25ns/MC
 python extractJSONS.py -i datasets/datasets_7412_betaV5_all.json	-o QCD_Pt-30to40	-d lists_25ns/MC

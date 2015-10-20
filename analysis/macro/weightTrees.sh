@@ -17,6 +17,11 @@ addWeights("data/25ns/DiPhoton.root", $lumi);
 addWeights("data/25ns/VH.root", $lumi);
 addWeights("data/25ns/DYJetsToLL.root", $lumi);
 
+addWeights("data/25ns/2HDM_mZP600.root", $lumi);
+addWeights("data/25ns/2HDM_mZP1200.root", $lumi);
+addWeights("data/25ns/2HDM_mZP1700.root", $lumi);
+addWeights("data/25ns/2HDM_mZP2500.root", $lumi);
+
 .q
 
 EOF

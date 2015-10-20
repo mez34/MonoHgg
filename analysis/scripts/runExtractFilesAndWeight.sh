@@ -3,6 +3,11 @@
 
 
 # all 25ns, Spring15BetaV5 
+python extractFilesAndWeight.py -i lists_25ns/MC/2HDM_MZP600.json	-o 2HDM_MZP600		-d lists_25ns
+python extractFilesAndWeight.py -i lists_25ns/MC/2HDM_MZP1200.json	-o 2HDM_MZP1200		-d lists_25ns
+python extractFilesAndWeight.py -i lists_25ns/MC/2HDM_MZP1700.json	-o 2HDM_MZP1700		-d lists_25ns
+python extractFilesAndWeight.py -i lists_25ns/MC/2HDM_MZP2500.json	-o 2HDM_MZP2500		-d lists_25ns
+
 python extractFilesAndWeight.py -i lists_25ns/MC/GJet_Pt-20to40.json	-o GJet_Pt-20to40	-d lists_25ns
 python extractFilesAndWeight.py -i lists_25ns/MC/GJet_Pt-40toInf.json	-o GJet_Pt-40toInf	-d lists_25ns
 python extractFilesAndWeight.py -i lists_25ns/MC/VHToGG_M125.json	-o VH			-d lists_25ns
