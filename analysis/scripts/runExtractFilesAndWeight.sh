@@ -17,7 +17,7 @@ python extractFilesAndWeight.py -i lists_25ns/MC/QCD_Pt-30toInf.json	-o QCD_Pt-3
 python extractFilesAndWeight.py -i lists_25ns/MC/DiPhoton.json		-o DiPhoton		-d lists_25ns
 python extractFilesAndWeight.py -i lists_25ns/MC/GluGluHToGG_M-125.json	-o GluGluHToGG		-d lists_25ns
 python extractFilesAndWeight.py -i lists_25ns/MC/DYJetsToLL.json	-o DYJetsToLL		-d lists_25ns
-#python extractFilesAndWeight.py -i lists_25ns/Data/DoubleEG.json	-o DoubleEG		-d lists_25ns
+python extractFilesAndWeight.py -i lists_25ns/Data/DoubleEG.json	-o DoubleEG		-d lists_25ns
 
 
 

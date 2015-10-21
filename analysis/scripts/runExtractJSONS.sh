@@ -15,7 +15,7 @@ python extractJSONS.py -i datasets/datasets_7412_betaV5_all.json	-o GJet_Pt-20to
 python extractJSONS.py -i datasets/datasets_7412_betaV5_all.json	-o GJet_Pt-40toInf	-d lists_25ns/MC
 python extractJSONS.py -i datasets/datasets_7412_betaV5_all.json	-o GluGluHToGG_M-125	-d lists_25ns/MC
 python extractJSONS.py -i datasets/datasets_7412_betaV5_all.json	-o VHToGG_M125		-d lists_25ns/MC
-#python extractJSONS.py -i datasets/datasets_7412_betaV5_all.json	-o DoubleEG		-d lists_25ns/Data
+python extractJSONS.py -i datasets/datasets_7412_betaV5_all.json	-o DoubleEG		-d lists_25ns/Data
 
 
 

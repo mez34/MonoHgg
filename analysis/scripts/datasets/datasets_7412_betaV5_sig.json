@@ -1,0 +1,342 @@
+{
+    "/MonoHgg_2HDM_MZP1200_A0300_13TeV/mzientek-mzientek_MonoH_2HDM_MZP1200_MA0300_RunIISpring15-25ns-Spring15BetaV5-133296a1b6d326002653fb318e995bd8/USER": {
+        "files": [
+            {
+                "bad": false, 
+                "events": 100, 
+                "name": "/store/user/mzientek/MonoHgg_2HDM_MZP1200_A0300_13TeV/mzientek_MonoH_2HDM_MZP1200_MA0300_RunIISpring15-25ns-Spring15BetaV5/151020_135209/0000/myMicroAODOutputFile_1.root", 
+                "nevents": 100, 
+                "totEvents": 100, 
+                "weights": 100.0
+            }, 
+            {
+                "bad": false, 
+                "events": 100, 
+                "name": "/store/user/mzientek/MonoHgg_2HDM_MZP1200_A0300_13TeV/mzientek_MonoH_2HDM_MZP1200_MA0300_RunIISpring15-25ns-Spring15BetaV5/151020_135209/0000/myMicroAODOutputFile_10.root", 
+                "nevents": 100, 
+                "totEvents": 100, 
+                "weights": 100.0
+            }, 
+            {
+                "bad": false, 
+                "events": 100, 
+                "name": "/store/user/mzientek/MonoHgg_2HDM_MZP1200_A0300_13TeV/mzientek_MonoH_2HDM_MZP1200_MA0300_RunIISpring15-25ns-Spring15BetaV5/151020_135209/0000/myMicroAODOutputFile_2.root", 
+                "nevents": 100, 
+                "totEvents": 100, 
+                "weights": 100.0
+            }, 
+            {
+                "bad": false, 
+                "events": 100, 
+                "name": "/store/user/mzientek/MonoHgg_2HDM_MZP1200_A0300_13TeV/mzientek_MonoH_2HDM_MZP1200_MA0300_RunIISpring15-25ns-Spring15BetaV5/151020_135209/0000/myMicroAODOutputFile_3.root", 
+                "nevents": 100, 
+                "totEvents": 100, 
+                "weights": 100.0
+            }, 
+            {
+                "bad": false, 
+                "events": 100, 
+                "name": "/store/user/mzientek/MonoHgg_2HDM_MZP1200_A0300_13TeV/mzientek_MonoH_2HDM_MZP1200_MA0300_RunIISpring15-25ns-Spring15BetaV5/151020_135209/0000/myMicroAODOutputFile_4.root", 
+                "nevents": 100, 
+                "totEvents": 100, 
+                "weights": 100.0
+            }, 
+            {
+                "bad": false, 
+                "events": 100, 
+                "name": "/store/user/mzientek/MonoHgg_2HDM_MZP1200_A0300_13TeV/mzientek_MonoH_2HDM_MZP1200_MA0300_RunIISpring15-25ns-Spring15BetaV5/151020_135209/0000/myMicroAODOutputFile_5.root", 
+                "nevents": 100, 
+                "totEvents": 100, 
+                "weights": 100.0
+            }, 
+            {
+                "bad": false, 
+                "events": 100, 
+                "name": "/store/user/mzientek/MonoHgg_2HDM_MZP1200_A0300_13TeV/mzientek_MonoH_2HDM_MZP1200_MA0300_RunIISpring15-25ns-Spring15BetaV5/151020_135209/0000/myMicroAODOutputFile_6.root", 
+                "nevents": 100, 
+                "totEvents": 100, 
+                "weights": 100.0
+            }, 
+            {
+                "bad": false, 
+                "events": 100, 
+                "name": "/store/user/mzientek/MonoHgg_2HDM_MZP1200_A0300_13TeV/mzientek_MonoH_2HDM_MZP1200_MA0300_RunIISpring15-25ns-Spring15BetaV5/151020_135209/0000/myMicroAODOutputFile_7.root", 
+                "nevents": 100, 
+                "totEvents": 100, 
+                "weights": 100.0
+            }, 
+            {
+                "bad": false, 
+                "events": 100, 
+                "name": "/store/user/mzientek/MonoHgg_2HDM_MZP1200_A0300_13TeV/mzientek_MonoH_2HDM_MZP1200_MA0300_RunIISpring15-25ns-Spring15BetaV5/151020_135209/0000/myMicroAODOutputFile_8.root", 
+                "nevents": 100, 
+                "totEvents": 100, 
+                "weights": 100.0
+            }, 
+            {
+                "bad": false, 
+                "events": 100, 
+                "name": "/store/user/mzientek/MonoHgg_2HDM_MZP1200_A0300_13TeV/mzientek_MonoH_2HDM_MZP1200_MA0300_RunIISpring15-25ns-Spring15BetaV5/151020_135209/0000/myMicroAODOutputFile_9.root", 
+                "nevents": 100, 
+                "totEvents": 100, 
+                "weights": 100.0
+            }
+        ], 
+        "vetted": true
+    }, 
+    "/MonoHgg_2HDM_MZP1700_A0300_13TeV/mzientek-mzientek_MonoH_2HDM_MZP1700_MA0300_RunIISpring15-25ns-Spring15BetaV5-133296a1b6d326002653fb318e995bd8/USER": {
+        "files": [
+            {
+                "bad": false, 
+                "events": 100, 
+                "name": "/store/user/mzientek/MonoHgg_2HDM_MZP1700_A0300_13TeV/mzientek_MonoH_2HDM_MZP1700_MA0300_RunIISpring15-25ns-Spring15BetaV5/151020_135612/0000/myMicroAODOutputFile_1.root", 
+                "nevents": 100, 
+                "totEvents": 100, 
+                "weights": 100.0
+            }, 
+            {
+                "bad": false, 
+                "events": 100, 
+                "name": "/store/user/mzientek/MonoHgg_2HDM_MZP1700_A0300_13TeV/mzientek_MonoH_2HDM_MZP1700_MA0300_RunIISpring15-25ns-Spring15BetaV5/151020_135612/0000/myMicroAODOutputFile_10.root", 
+                "nevents": 100, 
+                "totEvents": 100, 
+                "weights": 100.0
+            }, 
+            {
+                "bad": false, 
+                "events": 100, 
+                "name": "/store/user/mzientek/MonoHgg_2HDM_MZP1700_A0300_13TeV/mzientek_MonoH_2HDM_MZP1700_MA0300_RunIISpring15-25ns-Spring15BetaV5/151020_135612/0000/myMicroAODOutputFile_2.root", 
+                "nevents": 100, 
+                "totEvents": 100, 
+                "weights": 100.0
+            }, 
+            {
+                "bad": false, 
+                "events": 100, 
+                "name": "/store/user/mzientek/MonoHgg_2HDM_MZP1700_A0300_13TeV/mzientek_MonoH_2HDM_MZP1700_MA0300_RunIISpring15-25ns-Spring15BetaV5/151020_135612/0000/myMicroAODOutputFile_3.root", 
+                "nevents": 100, 
+                "totEvents": 100, 
+                "weights": 100.0
+            }, 
+            {
+                "bad": false, 
+                "events": 100, 
+                "name": "/store/user/mzientek/MonoHgg_2HDM_MZP1700_A0300_13TeV/mzientek_MonoH_2HDM_MZP1700_MA0300_RunIISpring15-25ns-Spring15BetaV5/151020_135612/0000/myMicroAODOutputFile_4.root", 
+                "nevents": 100, 
+                "totEvents": 100, 
+                "weights": 100.0
+            }, 
+            {
+                "bad": false, 
+                "events": 100, 
+                "name": "/store/user/mzientek/MonoHgg_2HDM_MZP1700_A0300_13TeV/mzientek_MonoH_2HDM_MZP1700_MA0300_RunIISpring15-25ns-Spring15BetaV5/151020_135612/0000/myMicroAODOutputFile_5.root", 
+                "nevents": 100, 
+                "totEvents": 100, 
+                "weights": 100.0
+            }, 
+            {
+                "bad": false, 
+                "events": 100, 
+                "name": "/store/user/mzientek/MonoHgg_2HDM_MZP1700_A0300_13TeV/mzientek_MonoH_2HDM_MZP1700_MA0300_RunIISpring15-25ns-Spring15BetaV5/151020_135612/0000/myMicroAODOutputFile_6.root", 
+                "nevents": 100, 
+                "totEvents": 100, 
+                "weights": 100.0
+            }, 
+            {
+                "bad": false, 
+                "events": 100, 
+                "name": "/store/user/mzientek/MonoHgg_2HDM_MZP1700_A0300_13TeV/mzientek_MonoH_2HDM_MZP1700_MA0300_RunIISpring15-25ns-Spring15BetaV5/151020_135612/0000/myMicroAODOutputFile_7.root", 
+                "nevents": 100, 
+                "totEvents": 100, 
+                "weights": 100.0
+            }, 
+            {
+                "bad": false, 
+                "events": 100, 
+                "name": "/store/user/mzientek/MonoHgg_2HDM_MZP1700_A0300_13TeV/mzientek_MonoH_2HDM_MZP1700_MA0300_RunIISpring15-25ns-Spring15BetaV5/151020_135612/0000/myMicroAODOutputFile_8.root", 
+                "nevents": 100, 
+                "totEvents": 100, 
+                "weights": 100.0
+            }, 
+            {
+                "bad": false, 
+                "events": 100, 
+                "name": "/store/user/mzientek/MonoHgg_2HDM_MZP1700_A0300_13TeV/mzientek_MonoH_2HDM_MZP1700_MA0300_RunIISpring15-25ns-Spring15BetaV5/151020_135612/0000/myMicroAODOutputFile_9.root", 
+                "nevents": 100, 
+                "totEvents": 100, 
+                "weights": 100.0
+            }
+        ], 
+        "vetted": true
+    }, 
+    "/MonoHgg_2HDM_MZP2500_A0300_13TeV/mzientek-mzientek_MonoH_2HDM_MZP2500_MA0300_RunIISpring15-25ns-Spring15BetaV5-133296a1b6d326002653fb318e995bd8/USER": {
+        "files": [
+            {
+                "bad": false, 
+                "events": 100, 
+                "name": "/store/user/mzientek/MonoHgg_2HDM_MZP2500_A0300_13TeV/mzientek_MonoH_2HDM_MZP2500_MA0300_RunIISpring15-25ns-Spring15BetaV5/151020_135653/0000/myMicroAODOutputFile_1.root", 
+                "nevents": 100, 
+                "totEvents": 100, 
+                "weights": 100.0
+            }, 
+            {
+                "bad": false, 
+                "events": 100, 
+                "name": "/store/user/mzientek/MonoHgg_2HDM_MZP2500_A0300_13TeV/mzientek_MonoH_2HDM_MZP2500_MA0300_RunIISpring15-25ns-Spring15BetaV5/151020_135653/0000/myMicroAODOutputFile_10.root", 
+                "nevents": 100, 
+                "totEvents": 100, 
+                "weights": 100.0
+            }, 
+            {
+                "bad": false, 
+                "events": 100, 
+                "name": "/store/user/mzientek/MonoHgg_2HDM_MZP2500_A0300_13TeV/mzientek_MonoH_2HDM_MZP2500_MA0300_RunIISpring15-25ns-Spring15BetaV5/151020_135653/0000/myMicroAODOutputFile_2.root", 
+                "nevents": 100, 
+                "totEvents": 100, 
+                "weights": 100.0
+            }, 
+            {
+                "bad": false, 
+                "events": 100, 
+                "name": "/store/user/mzientek/MonoHgg_2HDM_MZP2500_A0300_13TeV/mzientek_MonoH_2HDM_MZP2500_MA0300_RunIISpring15-25ns-Spring15BetaV5/151020_135653/0000/myMicroAODOutputFile_3.root", 
+                "nevents": 100, 
+                "totEvents": 100, 
+                "weights": 100.0
+            }, 
+            {
+                "bad": false, 
+                "events": 100, 
+                "name": "/store/user/mzientek/MonoHgg_2HDM_MZP2500_A0300_13TeV/mzientek_MonoH_2HDM_MZP2500_MA0300_RunIISpring15-25ns-Spring15BetaV5/151020_135653/0000/myMicroAODOutputFile_4.root", 
+                "nevents": 100, 
+                "totEvents": 100, 
+                "weights": 100.0
+            }, 
+            {
+                "bad": false, 
+                "events": 100, 
+                "name": "/store/user/mzientek/MonoHgg_2HDM_MZP2500_A0300_13TeV/mzientek_MonoH_2HDM_MZP2500_MA0300_RunIISpring15-25ns-Spring15BetaV5/151020_135653/0000/myMicroAODOutputFile_5.root", 
+                "nevents": 100, 
+                "totEvents": 100, 
+                "weights": 100.0
+            }, 
+            {
+                "bad": false, 
+                "events": 100, 
+                "name": "/store/user/mzientek/MonoHgg_2HDM_MZP2500_A0300_13TeV/mzientek_MonoH_2HDM_MZP2500_MA0300_RunIISpring15-25ns-Spring15BetaV5/151020_135653/0000/myMicroAODOutputFile_6.root", 
+                "nevents": 100, 
+                "totEvents": 100, 
+                "weights": 100.0
+            }, 
+            {
+                "bad": false, 
+                "events": 100, 
+                "name": "/store/user/mzientek/MonoHgg_2HDM_MZP2500_A0300_13TeV/mzientek_MonoH_2HDM_MZP2500_MA0300_RunIISpring15-25ns-Spring15BetaV5/151020_135653/0000/myMicroAODOutputFile_7.root", 
+                "nevents": 100, 
+                "totEvents": 100, 
+                "weights": 100.0
+            }, 
+            {
+                "bad": false, 
+                "events": 100, 
+                "name": "/store/user/mzientek/MonoHgg_2HDM_MZP2500_A0300_13TeV/mzientek_MonoH_2HDM_MZP2500_MA0300_RunIISpring15-25ns-Spring15BetaV5/151020_135653/0000/myMicroAODOutputFile_8.root", 
+                "nevents": 100, 
+                "totEvents": 100, 
+                "weights": 100.0
+            }, 
+            {
+                "bad": false, 
+                "events": 100, 
+                "name": "/store/user/mzientek/MonoHgg_2HDM_MZP2500_A0300_13TeV/mzientek_MonoH_2HDM_MZP2500_MA0300_RunIISpring15-25ns-Spring15BetaV5/151020_135653/0000/myMicroAODOutputFile_9.root", 
+                "nevents": 100, 
+                "totEvents": 100, 
+                "weights": 100.0
+            }
+        ], 
+        "vetted": true
+    }, 
+    "/MonoHgg_2HDM_MZP600_A0300_13TeV/mzientek-mzientek_MonoH_2HDM_MZP600_MA0300_RunIISpring15-25ns-Spring15BetaV5-133296a1b6d326002653fb318e995bd8/USER": {
+        "files": [
+            {
+                "bad": false, 
+                "events": 100, 
+                "name": "/store/user/mzientek/MonoHgg_2HDM_MZP600_A0300_13TeV/mzientek_MonoH_2HDM_MZP600_MA0300_RunIISpring15-25ns-Spring15BetaV5/151020_134437/0000/myMicroAODOutputFile_1.root", 
+                "nevents": 100, 
+                "totEvents": 100, 
+                "weights": 100.0
+            }, 
+            {
+                "bad": false, 
+                "events": 100, 
+                "name": "/store/user/mzientek/MonoHgg_2HDM_MZP600_A0300_13TeV/mzientek_MonoH_2HDM_MZP600_MA0300_RunIISpring15-25ns-Spring15BetaV5/151020_134437/0000/myMicroAODOutputFile_10.root", 
+                "nevents": 100, 
+                "totEvents": 100, 
+                "weights": 100.0
+            }, 
+            {
+                "bad": false, 
+                "events": 100, 
+                "name": "/store/user/mzientek/MonoHgg_2HDM_MZP600_A0300_13TeV/mzientek_MonoH_2HDM_MZP600_MA0300_RunIISpring15-25ns-Spring15BetaV5/151020_134437/0000/myMicroAODOutputFile_2.root", 
+                "nevents": 100, 
+                "totEvents": 100, 
+                "weights": 100.0
+            }, 
+            {
+                "bad": false, 
+                "events": 100, 
+                "name": "/store/user/mzientek/MonoHgg_2HDM_MZP600_A0300_13TeV/mzientek_MonoH_2HDM_MZP600_MA0300_RunIISpring15-25ns-Spring15BetaV5/151020_134437/0000/myMicroAODOutputFile_3.root", 
+                "nevents": 100, 
+                "totEvents": 100, 
+                "weights": 100.0
+            }, 
+            {
+                "bad": false, 
+                "events": 100, 
+                "name": "/store/user/mzientek/MonoHgg_2HDM_MZP600_A0300_13TeV/mzientek_MonoH_2HDM_MZP600_MA0300_RunIISpring15-25ns-Spring15BetaV5/151020_134437/0000/myMicroAODOutputFile_4.root", 
+                "nevents": 100, 
+                "totEvents": 100, 
+                "weights": 100.0
+            }, 
+            {
+                "bad": false, 
+                "events": 100, 
+                "name": "/store/user/mzientek/MonoHgg_2HDM_MZP600_A0300_13TeV/mzientek_MonoH_2HDM_MZP600_MA0300_RunIISpring15-25ns-Spring15BetaV5/151020_134437/0000/myMicroAODOutputFile_5.root", 
+                "nevents": 100, 
+                "totEvents": 100, 
+                "weights": 100.0
+            }, 
+            {
+                "bad": false, 
+                "events": 100, 
+                "name": "/store/user/mzientek/MonoHgg_2HDM_MZP600_A0300_13TeV/mzientek_MonoH_2HDM_MZP600_MA0300_RunIISpring15-25ns-Spring15BetaV5/151020_134437/0000/myMicroAODOutputFile_6.root", 
+                "nevents": 100, 
+                "totEvents": 100, 
+                "weights": 100.0
+            }, 
+            {
+                "bad": false, 
+                "events": 100, 
+                "name": "/store/user/mzientek/MonoHgg_2HDM_MZP600_A0300_13TeV/mzientek_MonoH_2HDM_MZP600_MA0300_RunIISpring15-25ns-Spring15BetaV5/151020_134437/0000/myMicroAODOutputFile_7.root", 
+                "nevents": 100, 
+                "totEvents": 100, 
+                "weights": 100.0
+            }, 
+            {
+                "bad": false, 
+                "events": 100, 
+                "name": "/store/user/mzientek/MonoHgg_2HDM_MZP600_A0300_13TeV/mzientek_MonoH_2HDM_MZP600_MA0300_RunIISpring15-25ns-Spring15BetaV5/151020_134437/0000/myMicroAODOutputFile_8.root", 
+                "nevents": 100, 
+                "totEvents": 100, 
+                "weights": 100.0
+            }, 
+            {
+                "bad": false, 
+                "events": 100, 
+                "name": "/store/user/mzientek/MonoHgg_2HDM_MZP600_A0300_13TeV/mzientek_MonoH_2HDM_MZP600_MA0300_RunIISpring15-25ns-Spring15BetaV5/151020_134437/0000/myMicroAODOutputFile_9.root", 
+                "nevents": 100, 
+                "totEvents": 100, 
+                "weights": 100.0
+            }
+        ], 
+        "vetted": true
+    }
+}
