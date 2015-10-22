@@ -44,9 +44,9 @@ int main(){
   bool doBlind = true;		// use to blind the analysis for Data (don't use distributions for met>100 & 110<mgg<130)
   bool makePURWfiles = false;	// recompute PURW and make files
   bool doReweightPU = false;	// use PURW from old files if !makePURWfiles
-  bool doPlots = true;		// make plots for each sample individually
-  bool doComb = true;		// make stack/overlay plots
-  bool doABCD = false;		// run ABCD method 
+  bool doPlots = false;		// make plots for each sample individually
+  bool doComb = false;		// make stack/overlay plots
+  bool doABCD = true;		// run ABCD method 
 
   Double_t lumi = 150.0; // in pb^-1 
   UInt_t nBins_vtx = 40; // number of bins for PURW 
@@ -402,7 +402,7 @@ int main(){
   ////////////////////////////////////////////////////
 
   if (doABCD){
-    ABCDMethod *abcd = new ABCDMethod(Samples,lumi,outDir);
+    ABCDMethod *abcd = new ABCDMethod(Samples,lumi,outDir,doBlind);
     abcd->DoAnalysis();
     delete abcd; 
   }// end doABCD

@@ -1,12 +1,13 @@
 #include "ABCDMethod.hh"
 
-ABCDMethod::ABCDMethod( SamplePairVec Samples, const Double_t inLumi, const TString outdir){
+ABCDMethod::ABCDMethod( SamplePairVec Samples, const Double_t inLumi, const TString outdir, Bool_t Blind){
 
   // load RooFit
   gSystem->Load("libRooFit");
   //using namespace RooFit;
 
   lumi = inLumi;
+  doBlind = Blind;
   fInDir = outdir;
   fOutDir = outdir+"ABCD";
 
@@ -20,17 +21,21 @@ ABCDMethod::ABCDMethod( SamplePairVec Samples, const Double_t inLumi, const TStr
   met_maxD   = 400.;
 
   // titles for output Latex table
-  //fSampleTitleMap["Data"]		= "Data";
+  fSampleTitleMap["Data"]		= "Data";
   fSampleTitleMap["QCD"] 		= "QCD";
   fSampleTitleMap["GJets"]		= "$\\gamma$ + Jets";
   fSampleTitleMap["VH"]			= "V + H";
   fSampleTitleMap["DYJetsToLL"]		= "Drell-Yan";
   fSampleTitleMap["GluGluHToGG"]	= "$H \\rightarrow \\gamma \\gamma$ (ggH)";
   fSampleTitleMap["DiPhoton"]		= "$\\gamma\\gamma$";
-  fSampleTitleMap["DMHtoGG_M1"]		= "$\\bar{\\chi}\\chi HH, m_{\\chi}$ = 1 GeV (10 fb)";
-  fSampleTitleMap["DMHtoGG_M10"]	= "$\\bar{\\chi}\\chi HH, m_{\\chi}$ = 10 GeV (10 fb)";
-  fSampleTitleMap["DMHtoGG_M100"]	= "$\\bar{\\chi}\\chi HH, m_{\\chi}$ = 100 GeV (10 fb)";
-  fSampleTitleMap["DMHtoGG_M1000"]	= "$\\bar{\\chi}\\chi HH, m_{\\chi}$ = 1000 GeV (10 fb)";
+  //fSampleTitleMap["DMHtoGG_M1"]	= "$\\bar{\\chi}\\chi HH, m_{\\chi}$ = 1 GeV (10 fb)";
+  //fSampleTitleMap["DMHtoGG_M10"]	= "$\\bar{\\chi}\\chi HH, m_{\\chi}$ = 10 GeV (10 fb)";
+  //fSampleTitleMap["DMHtoGG_M100"]	= "$\\bar{\\chi}\\chi HH, m_{\\chi}$ = 100 GeV (10 fb)";
+  //fSampleTitleMap["DMHtoGG_M1000"]	= "$\\bar{\\chi}\\chi HH, m_{\\chi}$ = 1000 GeV (10 fb)";
+  fSampleTitleMap["2HDM_mZP600"]	= "2HDM, $m_{Z'} = 600 GeV, m_{A0} = 300 GeV$";
+  fSampleTitleMap["2HDM_mZP1200"]	= "2HDM, $m_{Z'} = 1200 GeV, m_{A0} = 300 GeV$";
+  fSampleTitleMap["2HDM_mZP1700"]	= "2HDM, $m_{Z'} = 1700 GeV, m_{A0} = 300 GeV$";
+  fSampleTitleMap["2HDM_mZP2500"]	= "2HDM, $m_{Z'} = 2500 GeV, m_{A0} = 300 GeV$";
 
   // make output txt file with output table
   fOutTableTxtFile.open(Form("%s/ResultsTableForLatex.tex",fOutDir.Data()));
@@ -118,10 +123,11 @@ void ABCDMethod::DoAnalysis(){
  
     // sum over nonresonant bkgs only
     // FIXME NEED TO CLONE FIRST SAMPLE THAT APPEARS, OTHERWISE SEGFAULTS
-    if (fBkgNames[mc] == "DiPhoton")   fOutSelBkgTH2DHists[0] = (TH2D*)fInBkgTH2DHists[0][mc]->Clone();
+    if (fBkgNames[mc] == "DYJetsToLL") fOutSelBkgTH2DHists[0] = (TH2D*)fInBkgTH2DHists[0][mc]->Clone();
+    if (fBkgNames[mc] == "DiPhoton")   fOutSelBkgTH2DHists[0]->Add(fInBkgTH2DHists[0][mc]);
     if (fBkgNames[mc] == "GJets")      fOutSelBkgTH2DHists[0]->Add(fInBkgTH2DHists[0][mc]); 
     if (fBkgNames[mc] == "QCD")        fOutSelBkgTH2DHists[0]->Add(fInBkgTH2DHists[0][mc]);    
-    if (fBkgNames[mc] == "DYJetsToLL") fOutSelBkgTH2DHists[0]->Add(fInBkgTH2DHists[0][mc]);
+
 
     // use below if summing over all backgrounds
     if (mc == 0) fOutBkgTH2DHists[0] = (TH2D*)fInBkgTH2DHists[0][mc]->Clone();
@@ -264,7 +270,7 @@ void ABCDMethod::DoAnalysis(){
   ABCDMethod::FillTable();
 
   for (UInt_t mc = 0; mc < fNSig; mc++){
-    ABCDMethod::WriteDataCard(fSigNames[mc].Data());
+    ABCDMethod::WriteDataCard(fSigNames[mc].Data(),fRooSig[2][mc],fExpSig[mc],fRooBkg[2],fExpBkg);
   }
 }
 
@@ -382,13 +388,13 @@ void ABCDMethod::FillTable(){
 
      ABCDMethod::SetRooVariables();
      fOutTableTxtFile << "Data &  " << *(fRData[0]->format(2,"EXPF")) <<  " \\\\" << std::endl;
-     std::cout << "Data &  " << *(fRData[0]->format(2,"EXPF")) << std::endl;
+     //std::cout << "Data &  " << *(fRData[0]->format(2,"EXPF")) << std::endl;
      fOutTableTxtFile << "\\hline" << std::endl;
 
      TString name = "";
      for (UInt_t mc = 0; mc < fNBkg; mc++){
-       fOutTableTxtFile << fSampleTitleMap[fBkgNames[mc]] << " &  " << *(fRBkg[mc]->format(2,"EXPP")) <<  " \\\\" << std::endl;
-       std::cout << fBkgNames[mc].Data() <<  " &  " << *(fRBkg[mc]->format(2,"EXPF")) << std::endl;
+       fOutTableTxtFile << fSampleTitleMap[fBkgNames[mc]] << " &  " << *(fRBkg[mc]->format(2,"EXPF")) <<  " \\\\" << std::endl;
+       //std::cout << fBkgNames[mc].Data() <<  " &  " << *(fRBkg[mc]->format(2,"EXPF")) << std::endl;
      }
      fOutTableTxtFile << "\\hline" << std::endl;
        fOutTableTxtFile << "Total Bkg &  " << *(fRBkg[fNBkg]->format(2,"EXPF")) <<  " \\\\" << std::endl;
@@ -396,7 +402,7 @@ void ABCDMethod::FillTable(){
      
      for (UInt_t mc = 0; mc < fNSig; mc++){
        fOutTableTxtFile << fSampleTitleMap[fSigNames[mc]] << " &  " << *(fRSig[mc]->format(2,"EXPF")) <<  " \\\\" << std::endl; 
-       std::cout << fSigNames[mc] <<  " &  " << *(fRSig[mc]->format(2,"EXPF")) << std::endl;
+       //std::cout << fSigNames[mc] <<  " &  " << *(fRSig[mc]->format(2,"EXPF")) << std::endl;
      }
  
      fOutTableTxtFile << "\\hline \\hline" <<std::endl;
@@ -415,12 +421,12 @@ void ABCDMethod::FillTable(){
 
      ABCDMethod::SetRooVariables();
      fOutTableTxtFile << "Data &  " << *(fRooData[2][0]->format(2,"EXPF")) <<  " \\\\" << std::endl;
-     std::cout << "Data &  " << *(fRooData[2][0]->format(2,"EXPF")) << std::endl;
+     //std::cout << "Data &  " << *(fRooData[2][0]->format(2,"EXPF")) << std::endl;
      fOutTableTxtFile << "\\hline" << std::endl;
 
      for (UInt_t mc = 0; mc < fNBkg; mc++){
-       fOutTableTxtFile << fSampleTitleMap[fBkgNames[mc]] << " &  " << *(fRooBkg[2][mc]->format(2,"EXPP")) <<  " \\\\" << std::endl;
-       std::cout << fBkgNames[mc].Data() <<  " &  " << *(fRooBkg[2][mc]->format(2,"EXPF")) << std::endl;
+       fOutTableTxtFile << fSampleTitleMap[fBkgNames[mc]] << " &  " << *(fRooBkg[2][mc]->format(2,"EXPF")) <<  " \\\\" << std::endl;
+       //std::cout << fBkgNames[mc].Data() <<  " &  " << *(fRooBkg[2][mc]->format(2,"EXPF")) << std::endl;
      }
      fOutTableTxtFile << "\\hline" << std::endl;
        fOutTableTxtFile << "Total Bkg &  " << *(fRooBkg[2][fNBkg]->format(2,"EXPF")) <<  " \\\\" << std::endl;
@@ -428,7 +434,7 @@ void ABCDMethod::FillTable(){
      
      for (UInt_t mc = 0; mc < fNSig; mc++){
        fOutTableTxtFile << fSampleTitleMap[fSigNames[mc]] << " &  " << *(fRooSig[2][mc]->format(2,"EXPF")) <<  " \\\\" << std::endl; 
-       std::cout << fSigNames[mc] <<  " &  " << *(fRooSig[2][mc]->format(2,"EXPF")) << std::endl;
+       //std::cout << fSigNames[mc] <<  " &  " << *(fRooSig[2][mc]->format(2,"EXPF")) << std::endl;
      }
  
      fOutTableTxtFile << "\\hline \\hline" <<std::endl;
@@ -449,38 +455,38 @@ void ABCDMethod::FillTable(){
      fOutTableTxtFile << "\\hline" <<std::endl;
 
      fOutTableTxtFile << "Data &  $" << fCorrData[0] << "$ &  " <<
-        *(fRooData[0][0]->format(2,"EXPP")) << " &  " << 
-        *(fRooData[1][0]->format(2,"EXPP")) << " &  " << 
-        *(fRooData[3][0]->format(2,"EXPP")) << " &  " <<  
-        *(fRooData[2][0]->format(2,"EXPP")) << " &  $" << 
+        *(fRooData[0][0]->format(2,"EXPF")) << " &  " << 
+        *(fRooData[1][0]->format(2,"EXPF")) << " &  " << 
+        *(fRooData[3][0]->format(2,"EXPF")) << " &  " <<  
+        *(fRooData[2][0]->format(2,"EXPF")) << " &  $" << 
         fExpData[0] << "\\pm" << fExpErrData[0] << "$ &  $" << 
         fDiffData[0] <<"$ \\\\" << std::endl;
      fOutTableTxtFile << "\\hline" << std::endl;
 
      for (UInt_t mc = 0; mc < fNBkg; mc++){
        fOutTableTxtFile << fSampleTitleMap[fBkgNames[mc]] << " &  $" << fCorrBkg[mc] << "$ &  " << 
-         *(fRooBkg[0][mc]->format(2,"EXPP")) << " &  " << 
-         *(fRooBkg[1][mc]->format(2,"EXPP")) << " &  " << 
-         *(fRooBkg[3][mc]->format(2,"EXPP")) << " &  " <<  
-         *(fRooBkg[2][mc]->format(2,"EXPP")) << " &  $" << 
+         *(fRooBkg[0][mc]->format(2,"EXPF")) << " &  " << 
+         *(fRooBkg[1][mc]->format(2,"EXPF")) << " &  " << 
+         *(fRooBkg[3][mc]->format(2,"EXPF")) << " &  " <<  
+         *(fRooBkg[2][mc]->format(2,"EXPF")) << " &  $" << 
          fExpBkg[mc] << "\\pm" << fExpErrBkg[mc] << "$ &  $" << 
          fDiffBkg[mc] <<"$ \\\\" << std::endl;
      }
      fOutTableTxtFile << "\\hline" << std::endl;
        fOutTableTxtFile << "Total Bkg &  $" << fCorrBkg[fNBkg+1] << "$ &  " << // only non-resonant bkg here 
-         *(fRooBkg[0][fNBkg+1]->format(2,"EXPP")) << " &  " << 
-         *(fRooBkg[1][fNBkg+1]->format(2,"EXPP")) << " &  " << 
-         *(fRooBkg[3][fNBkg+1]->format(2,"EXPP")) << " &  " <<  
-         *(fRooBkg[2][fNBkg+1]->format(2,"EXPP")) << " &  $" << 
+         *(fRooBkg[0][fNBkg+1]->format(2,"EXPF")) << " &  " << 
+         *(fRooBkg[1][fNBkg+1]->format(2,"EXPF")) << " &  " << 
+         *(fRooBkg[3][fNBkg+1]->format(2,"EXPF")) << " &  " <<  
+         *(fRooBkg[2][fNBkg+1]->format(2,"EXPF")) << " &  $" << 
          fExpBkg[fNBkg+1] << "\\pm" << fExpErrBkg[fNBkg+1] << "$ &  $" << 
          fDiffBkg[fNBkg+1] <<"$ \\\\" << std::endl;
      fOutTableTxtFile << "\\hline" << std::endl;
      for (UInt_t mc = 0; mc < fNSig; mc++){
        fOutTableTxtFile << fSampleTitleMap[fSigNames[mc]] << " &  $" << fCorrSig[mc] << "$ &  " << 
-         *(fRooSig[0][mc]->format(2,"EXPP")) << " &  " << 
-         *(fRooSig[1][mc]->format(2,"EXPP")) << " &  " << 
-         *(fRooSig[3][mc]->format(2,"EXPP")) << " &  " <<  
-         *(fRooSig[2][mc]->format(2,"EXPP")) << " &  $" << 
+         *(fRooSig[0][mc]->format(2,"EXPF")) << " &  " << 
+         *(fRooSig[1][mc]->format(2,"EXPF")) << " &  " << 
+         *(fRooSig[3][mc]->format(2,"EXPF")) << " &  " <<  
+         *(fRooSig[2][mc]->format(2,"EXPF")) << " &  $" << 
          fExpSig[mc] << "\\pm" << fExpErrSig[mc] << "$ &  $" << 
          fDiffSig[mc] <<"$ \\\\" << std::endl;
      }
@@ -494,32 +500,32 @@ void ABCDMethod::FillTable(){
      fOutTableTxtFile << "\\end{document}" <<std::endl;
      std::cout << "Writing ResultsTable in " << Form("%s/ResultsTableForLatex.tex",fOutDir.Data()) << std::endl;
 
-     std::cout << "Data: A    =  " << *(fRooData[0][0]->format(2,"EXPP")) << std::endl;
-     std::cout << "Data: B    =  " << *(fRooData[1][0]->format(2,"EXPP")) << std::endl;
-     std::cout << "Data: C    =  " << *(fRooData[3][0]->format(2,"EXPP")) << std::endl;
-     std::cout << "Data: D    =  " << *(fRooData[2][0]->format(2,"EXPP")) << std::endl;
-     std::cout << "Data: corr =  " << fCorrData[0]  << std::endl;
-     std::cout << "Data: ExpD =  " << fExpData[0] << " \\pm " << fExpErrData[0] << std::endl;
+     //std::cout << "Data: A    =  " << *(fRooData[0][0]->format(2,"EXPF")) << std::endl;
+     //std::cout << "Data: B    =  " << *(fRooData[1][0]->format(2,"EXPF")) << std::endl;
+     //std::cout << "Data: C    =  " << *(fRooData[3][0]->format(2,"EXPF")) << std::endl;
+     //std::cout << "Data: D    =  " << *(fRooData[2][0]->format(2,"EXPF")) << std::endl;
+     //std::cout << "Data: corr =  " << fCorrData[0]  << std::endl;
+     //std::cout << "Data: ExpD =  " << fExpData[0] << " \\pm " << fExpErrData[0] << std::endl;
   
      TString bkgname="";
      for (UInt_t mc = 0; mc < fNBkg+2; mc++){
        if (mc == fNBkg) bkgname="Total Bkg";
        else if (mc==fNBkg+1) bkgname="Non-res Bkg";
        else bkgname = fBkgNames[mc]; 
-       std::cout << bkgname << ": A    =  " << *(fRooBkg[0][mc]->format(2,"EXPP")) << std::endl;
-       std::cout << bkgname << ": B    =  " << *(fRooBkg[1][mc]->format(2,"EXPP")) << std::endl;
-       std::cout << bkgname << ": C    =  " << *(fRooBkg[3][mc]->format(2,"EXPP")) << std::endl;
-       std::cout << bkgname << ": D    =  " << *(fRooBkg[2][mc]->format(2,"EXPP")) << std::endl;
-       std::cout << bkgname << ": corr =  " << fCorrBkg[mc]  << std::endl;
-       std::cout << bkgname << ": ExpD =  " << fExpBkg[mc] << " \\pm " << fExpErrBkg[mc] << std::endl;
+       //std::cout << bkgname << ": A    =  " << *(fRooBkg[0][mc]->format(2,"EXPF")) << std::endl;
+       //std::cout << bkgname << ": B    =  " << *(fRooBkg[1][mc]->format(2,"EXPF")) << std::endl;
+       //std::cout << bkgname << ": C    =  " << *(fRooBkg[3][mc]->format(2,"EXPF")) << std::endl;
+       //std::cout << bkgname << ": D    =  " << *(fRooBkg[2][mc]->format(2,"EXPF")) << std::endl;
+       //std::cout << bkgname << ": corr =  " << fCorrBkg[mc]  << std::endl;
+       //std::cout << bkgname << ": ExpD =  " << fExpBkg[mc] << " \\pm " << fExpErrBkg[mc] << std::endl;
      }
      for (UInt_t mc = 0; mc < fNSig; mc++){
-       std::cout << fSigNames[mc] << ": A    =  " << *(fRooSig[0][mc]->format(2,"EXPP")) << std::endl;
-       std::cout << fSigNames[mc] << ": B    =  " << *(fRooSig[1][mc]->format(2,"EXPP")) << std::endl;
-       std::cout << fSigNames[mc] << ": C    =  " << *(fRooSig[3][mc]->format(2,"EXPP")) << std::endl;
-       std::cout << fSigNames[mc] << ": D    =  " << *(fRooSig[2][mc]->format(2,"EXPP")) << std::endl;
-       std::cout << fSigNames[mc] << ": corr =  " << fCorrSig[mc]  << std::endl;
-       std::cout << fSigNames[mc] << ": ExpD =  " << fExpSig[mc] << " \\pm " << fExpErrSig[mc] << std::endl;
+       //std::cout << fSigNames[mc] << ": A    =  " << *(fRooSig[0][mc]->format(2,"EXPF")) << std::endl;
+       //std::cout << fSigNames[mc] << ": B    =  " << *(fRooSig[1][mc]->format(2,"EXPF")) << std::endl;
+       //std::cout << fSigNames[mc] << ": C    =  " << *(fRooSig[3][mc]->format(2,"EXPF")) << std::endl;
+       //std::cout << fSigNames[mc] << ": D    =  " << *(fRooSig[2][mc]->format(2,"EXPF")) << std::endl;
+       //std::cout << fSigNames[mc] << ": corr =  " << fCorrSig[mc]  << std::endl;
+       //std::cout << fSigNames[mc] << ": ExpD =  " << fExpSig[mc] << " \\pm " << fExpErrSig[mc] << std::endl;
      }
   }
   else std::cout << "Unable to open ResultsTable Output File" <<std::endl;
@@ -589,8 +595,15 @@ void ABCDMethod::SetRooVariables(){
 
 }
 
-void ABCDMethod::WriteDataCard( const TString fSigName){
-
+void ABCDMethod::WriteDataCard( const TString fSigName, const RooRealVar* sigrate, const Double_t expsig, const RooVec bkgrates, const DblVec expbkg){
+  TString sig = *sigrate->format(2,"");
+  TString vh  = *bkgrates[0]->format(2,"");
+  TString hgg = *bkgrates[1]->format(2,"");
+  TString dy  = *bkgrates[2]->format(2,"");
+  TString gg  = *bkgrates[3]->format(2,"");
+  TString qcd = *bkgrates[4]->format(2,"");
+  std::cout << "sig = " << sig << " vh " << vh << " hgg " << hgg << " dy " << dy << " gg " << gg << "qcd " << qcd << std::endl; 
+ 
   std::cout << "Writing data card in: " << fOutDir.Data() << "/DataCard_" << fSigName.Data() <<".txt" << std::endl;
   fOutTxtFile.open(Form("%s/DataCard_%s.txt",fOutDir.Data(),fSigName.Data())); 
   // print out the Data Card file
@@ -606,21 +619,21 @@ void ABCDMethod::WriteDataCard( const TString fSigName){
     fOutTxtFile << "bin 1"<< std::endl;
     fOutTxtFile <<  "observation  0 "  << std::endl;
     fOutTxtFile << "------------------------------" << std::endl;
-    fOutTxtFile << "bin     1             1            1           1            1               1 "<< std::endl;
-    fOutTxtFile << "process DM            Xgg          pp          pf           hgg             Vh " << std::endl;
-    fOutTxtFile << "process 0             1            2           3            4               5 " << std::endl;
-    fOutTxtFile << Form("rate %.3f          0.57         1.98        0.13         0.043           1.2 ",0.01)<< std::endl; //FIXME sigrate
+    fOutTxtFile << "bin     1		1		1		1		1		1 "<< std::endl;
+    fOutTxtFile << "process DM		gg		dy		qcd		hgg		Vh " << std::endl;
+    fOutTxtFile << "process 0		1		2		3		4		5 " << std::endl;
+    fOutTxtFile << Form("rate   %s	%s	%s	%s	%s	%s ",sig.Data(),gg.Data(),dy.Data(),qcd.Data(),hgg.Data(),vh.Data()) << std::endl; 
     fOutTxtFile << "--------------------------------" << std::endl;
-    fOutTxtFile << "#signal related" << std::endl;
-    fOutTxtFile << "lumi_8TeV     lnN     1.026000      -          -          -       1.02600   1.02600" << std::endl;
-    fOutTxtFile << "eff_trig      lnN     1.010000      -          -          -       1.01000   1.01000" << std::endl;
-    fOutTxtFile << "id_eff_eb     lnN     1.02000       -          -          -       1.02000   1.02000   " << std::endl;    
-    fOutTxtFile << "vtxEff        lnN   0.996/1.008     -          -          -     0.996/1.008  0.996/1.008" << std::endl; 
+    fOutTxtFile << "#signal related" << std::endl; //just took these numbers from Livia's example (all estimates from 8TeV)
+    fOutTxtFile << "lumi_13TeV    lnN     1.1000        -          -          -       1.1000       1.1000" << std::endl;
+    fOutTxtFile << "eff_trig      lnN     1.010000      -          -          -       1.01000      1.01000" << std::endl;
+    fOutTxtFile << "id_eff_eb     lnN     1.02000       -          -          -       1.02000      1.02000   " << std::endl;    
+    fOutTxtFile << "vtxEff        lnN     0.996/1.008   -          -          -       0.996/1.008  0.996/1.008" << std::endl; 
     fOutTxtFile << "#background related" << std::endl;
-    fOutTxtFile << "abcd_estimate lnN       -         1.26000    1.26000    1.26000      -         -  " << std::endl;
-    fOutTxtFile << "Xgg_norm      gmN 19 -         0.03         -          -          -         -  " << std::endl;
-    fOutTxtFile << "pp_norm       gmN 36617 -           -        0.000054     -          -         -  " << std::endl;
-    fOutTxtFile << "pf_norm       gmN 24408 -           -          -       0.0000053     -         -  " << std::endl;
+    fOutTxtFile << "abcd_estimate  lnN       -         1.27000    1.27000    1.27000      -         -  " << std::endl;
+    fOutTxtFile << "gg_norm        gmN 19    -         0.03         -          -          -         -  " << std::endl;
+    fOutTxtFile << "dy_norm        gmN 36617 -           -        0.000054     -          -         -  " << std::endl;
+    fOutTxtFile << "qcd_norm       gmN 24408 -           -          -       0.0000053     -         -  " << std::endl;
 
 
    

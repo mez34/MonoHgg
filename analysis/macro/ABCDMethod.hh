@@ -38,7 +38,7 @@ typedef std::vector<RooVec>	 RooVecVec;
 
 class ABCDMethod{
 public: 
-  ABCDMethod(const SamplePairVec Samples, const Double_t inLumi, const TString outname);
+  ABCDMethod(const SamplePairVec Samples, const Double_t inLumi, const TString outname, Bool_t Blind);
   void DoAnalysis();
   Double_t ComputeIntAndErr(TH2D *& h, Double_t & error, const Double_t minX, const Double_t maxX, const Double_t minY, const Double_t maxY, const UInt_t isReg);
   void GetFinalValuesForABCDReg();
@@ -47,7 +47,7 @@ public:
   Double_t FindExpectedValuesInD(const Double_t NA, const Double_t NB, const Double_t NC, const Double_t NAerr, const Double_t NBerr, const Double_t NCerr, Double_t & NDerr);
   void SetRooVariables();
   void FillTable();
-  void WriteDataCard(const TString fSampleName);
+  void WriteDataCard(const TString fSampleName, const RooRealVar* sigrate, const Double_t expsig, const RooVec bkgrates, const DblVec expbkg);
   void InitHists();
   void InitVariables();
   ~ABCDMethod();
@@ -108,6 +108,7 @@ private:
   DblVec	fDiffSig;
 
   Double_t	lumi;
+  Bool_t	doBlind;
   TString	fInDir;
   TString	fOutDir;
   TFile *	fOutFile;
