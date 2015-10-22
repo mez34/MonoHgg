@@ -22,6 +22,8 @@ addWeights("data/25ns/2HDM_mZP1200.root", $lumi);
 addWeights("data/25ns/2HDM_mZP1700.root", $lumi);
 addWeights("data/25ns/2HDM_mZP2500.root", $lumi);
 
+addWeights("data/25ns/DoubleEG.root", $lumi);
+
 .q
 
 EOF

@@ -27,6 +27,7 @@
 ./submitBatchDiPho.py --cfg diPhoAnaBATCH.py 2HDM_MZP2500			0  100 pippo 0.00000972  1 #4.860fb xsec * 0.002br
 
 ./submitBatchDiPho.py --cfg diPhoAnaBATCH.py DoubleEG           		0 10000 pippo  1 1
+./submitBatchDiPho.py --cfg diPhoAnaBATCH.py SingleE				0 10001 pippo  1 1 
 
 # 50ns Data
 #./submitBatchDiPho.py --cfg diPhoAnaBATCH.py DoubleEG           		0 10000 pippo  1 1

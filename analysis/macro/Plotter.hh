@@ -40,7 +40,7 @@ typedef TH2DMap::iterator		TH2DMapIter;
 
 class Plotter{
 public:
-  Plotter(const TString inName, const TString outName, const TString inSpecies, const DblVec puweights, const Double_t lumi, Bool_t sigMC, Bool_t Data);
+  Plotter(const TString inName, const TString outName, const TString inSpecies, const DblVec puweights, const Double_t lumi, Bool_t sigMC, Bool_t Data, Bool_t Blind);
   ~Plotter();
 
   void DoPlots();  
@@ -62,6 +62,7 @@ private:
   TString 		species;
   Bool_t		isSigMC;
   Bool_t		isData;
+  Bool_t		doBlind;
   TFile * 		inFile;
   TFile * 		outFile;
 

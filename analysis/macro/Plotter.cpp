@@ -3,13 +3,14 @@
 #include "../../../DataFormats/Math/interface/deltaPhi.h"
 //#include "mkPlotsLivia/CMS_lumi.C"
 
-Plotter::Plotter( TString inName, TString outName, TString inSpecies, const DblVec puweights, const Double_t lumi, Bool_t sigMC, Bool_t Data){
+Plotter::Plotter( TString inName, TString outName, TString inSpecies, const DblVec puweights, const Double_t lumi, Bool_t sigMC, Bool_t Data, Bool_t Blind){
 
   // Get ROOT file
   name = inName;
   species = inSpecies;
   isSigMC = sigMC;
   isData = Data;
+  doBlind = Blind;
   inFile = TFile::Open(Form("%s%s.root",name.Data(),species.Data()));
   CheckValidFile(inFile,Form("%s%s.root",name.Data(),species.Data()));  
   // Open Tree from inFile
@@ -22,10 +23,19 @@ Plotter::Plotter( TString inName, TString outName, TString inSpecies, const DblV
   fSelection.resize(8);
   TH1D *fSel = (TH1D*)inFile->Get("h_selection");
   CheckValidTH1D(fSel,"h_selection",Form("%s%s.root",name.Data(),species.Data()));
-  for (UInt_t i=0; i<8; i++){ 
-    // values of bin i correspond to passing (all cuts previous + one listed below):  
-    // 1=trigger, 2=presel, 3=selection, 4=pt1>30,pt2>20, 5=pt1>mgg/3,pt2>mgg/4, 6=goodVtx, 7=mgg, 8=met
-    fSelection[i]=fSel->GetBinContent(i+1);
+  if (isData && doBlind){
+    for (UInt_t i=0; i<6; i++){
+      fSelection[i]=fSel->GetBinContent(i+1);
+    }
+    fSelection[6]=0;
+    fSelection[7]=0;
+  }
+  else{
+    for (UInt_t i=0; i<8; i++){ 
+      // values of bin i correspond to passing (all cuts previous + one listed below):  
+      // 1=trigger, 2=presel, 3=selection, 4=pt1>30,pt2>20, 5=pt1>mgg/3,pt2>mgg/4, 6=goodVtx, 7=mgg, 8=met
+      fSelection[i]=fSel->GetBinContent(i+1);
+    }
   }
   std::cout << "Finished getting the h_selection" << std::endl;  
 
@@ -95,7 +105,7 @@ void Plotter::DoPlots(){
 
 
     // calculate the weight
-    Double_t Weight = (weight)*fPUWeights[nvtx];
+    Double_t Weight = (weight)*fPUWeights[nvtx];// PURW[0] corresponds to bin1=0vtx
 
     if (hltPhoton26Photon16Mass60 == 1) fTH1DMap["hlt"]->Fill(1.5,1);
     if (hltPhoton36Photon22Mass15 == 1) fTH1DMap["hlt"]->Fill(2.5,1);
@@ -144,16 +154,38 @@ void Plotter::DoPlots(){
 
         fTH1DMap["eff_sel"]->Fill(2.5,Weight);
         //Fill histograms
-        fTH1DMap["mgg"]->Fill(mgg,Weight);
+        if (isData && doBlind){ // BLIND THE DATA mgg and met distributions
+	  if (mgg < 110 || mgg > 130){
+	    fTH1DMap["mgg"]->Fill(mgg,Weight);
+            fTH2DMap["mgg_PU"]->Fill(nvtx,mgg,Weight);
+            fTH2DMap["mgg_ptgg"]->Fill(ptgg,mgg,Weight);
+	  }
+	  if (t1pfmet < 100){
+            fTH1DMap["t1pfmet"]->Fill(t1pfmet,Weight);
+            fTH1DMap["t1pfmet_zoom"]->Fill(t1pfmet,Weight);
+            fTH2DMap["t1pfmet_PU"]->Fill(nvtx,t1pfmet,Weight);
+            fTH2DMap["t1pfmet_ptgg"]->Fill(ptgg,t1pfmet,Weight);
+	  }
+          if (pfmet < 100) fTH1DMap["pfmet"]->Fill(pfmet,Weight);
+          if (calomet < 100) fTH1DMap["calomet"]->Fill(calomet,Weight);
+	}
+        else{
+	  fTH1DMap["mgg"]->Fill(mgg,Weight);
+          fTH1DMap["t1pfmet"]->Fill(t1pfmet,Weight);
+          fTH1DMap["pfmet"]->Fill(pfmet,Weight);
+          fTH1DMap["calomet"]->Fill(calomet,Weight);
+          fTH1DMap["t1pfmet_zoom"]->Fill(t1pfmet,Weight);
+          fTH2DMap["mgg_PU"]->Fill(nvtx,mgg,Weight);
+          fTH2DMap["mgg_ptgg"]->Fill(ptgg,mgg,Weight);
+          fTH2DMap["t1pfmet_PU"]->Fill(nvtx,t1pfmet,Weight);
+          fTH2DMap["t1pfmet_ptgg"]->Fill(ptgg,t1pfmet,Weight);
+	}
         fTH1DMap["nvtx"]->Fill(nvtx,Weight);
         fTH1DMap["ptgg"]->Fill(ptgg,Weight);
         fTH1DMap["pt1"]->Fill(pt1,Weight);
         fTH1DMap["pt2"]->Fill(pt2,Weight);
-        fTH1DMap["t1pfmet"]->Fill(t1pfmet,Weight);
         fTH1DMap["t1pfmetphi"]->Fill(t1pfmetphi,Weight);
-        fTH1DMap["pfmet"]->Fill(pfmet,Weight);
         fTH1DMap["pfmetphi"]->Fill(pfmetphi,Weight);
-        fTH1DMap["calomet"]->Fill(calomet,Weight);
         fTH1DMap["calometphi"]->Fill(calometphi,Weight);
         fTH1DMap["phi1"]->Fill(phi1,Weight);
         fTH1DMap["phi2"]->Fill(phi2,Weight);
@@ -174,11 +206,6 @@ void Plotter::DoPlots(){
 	fTH1DMap["eleveto1"]->Fill(eleveto1,Weight);
 	fTH1DMap["eleveto2"]->Fill(eleveto2,Weight);
 
-        fTH1DMap["t1pfmet_zoom"]->Fill(t1pfmet,Weight);
-        fTH2DMap["mgg_PU"]->Fill(nvtx,mgg,Weight);
-        fTH2DMap["mgg_ptgg"]->Fill(ptgg,mgg,Weight);
-        fTH2DMap["t1pfmet_PU"]->Fill(nvtx,t1pfmet,Weight);
-        fTH2DMap["t1pfmet_ptgg"]->Fill(ptgg,t1pfmet,Weight);
   	fTH1DMap["phigg"]->Fill(fLorenzVecgg.Phi(),Weight); 
         fTH1DMap["dphi_ggmet"]->Fill(deltaPhi(fLorenzVecgg.Phi(),t1pfmetphi),Weight);
         fTH1DMap["absdphi_ggmet"]->Fill(TMath::Abs(deltaPhi(fLorenzVecgg.Phi(),t1pfmetphi)),Weight);
@@ -214,18 +241,32 @@ void Plotter::DoPlots(){
           fTH1DMap["eta2_n-1"]->Fill(eta2,Weight);
         } 
         if (passBoth){
-          fTH2DMap["t1pfmet_mgg"]->Fill(mgg,t1pfmet,Weight);
           fTH1DMap["nvtx_n-1"]->Fill(nvtx,Weight);
-          fTH1DMap["mgg_n-1"]->Fill(mgg,Weight);  
           fTH1DMap["ptgg_n-1"]->Fill(ptgg,Weight);  
-          fTH1DMap["t1pfmet_n-1"]->Fill(t1pfmet,Weight);  
           fTH1DMap["t1pfmetphi_n-1"]->Fill(t1pfmetphi,Weight);  
-          fTH1DMap["pfmet_n-1"]->Fill(pfmet,Weight);
           fTH1DMap["pfmetphi_n-1"]->Fill(pfmetphi,Weight);
-          fTH1DMap["calomet_n-1"]->Fill(calomet,Weight);
           fTH1DMap["calometphi_n-1"]->Fill(calometphi,Weight);
-          if (mgg >= 110 && mgg <= 130) fTH1DMap["t1pfmet_selmgg"]->Fill(t1pfmet,Weight); 
-          if (t1pfmet >= 100) fTH1DMap["mgg_selt1pfmet"]->Fill(mgg,Weight); 
+	  if (isData && doBlind){// BLIND THE DATA
+            if (mgg < 110 || mgg > 130){
+	      fTH1DMap["mgg_n-1"]->Fill(mgg,Weight);  
+              if (t1pfmet < 100) fTH2DMap["t1pfmet_mgg"]->Fill(mgg,t1pfmet,Weight);
+	    }
+            if (t1pfmet < 100) fTH1DMap["t1pfmet_n-1"]->Fill(t1pfmet,Weight);  
+            if (pfmet < 100)   fTH1DMap["pfmet_n-1"]->Fill(pfmet,Weight);
+            if (calomet < 100) fTH1DMap["calomet_n-1"]->Fill(calomet,Weight);
+            //if (mgg >= 110 && mgg <= 130) fTH1DMap["t1pfmet_selmgg"]->Fill(t1pfmet,Weight); 
+            //if (t1pfmet >= 100) fTH1DMap["mgg_selt1pfmet"]->Fill(mgg,Weight); 
+	  }
+	  else{
+            fTH1DMap["mgg_n-1"]->Fill(mgg,Weight);  
+            fTH2DMap["t1pfmet_mgg"]->Fill(mgg,t1pfmet,Weight);
+            fTH1DMap["t1pfmet_n-1"]->Fill(t1pfmet,Weight);  
+            fTH1DMap["pfmet_n-1"]->Fill(pfmet,Weight);
+            fTH1DMap["calomet_n-1"]->Fill(calomet,Weight);
+            if (mgg >= 110 && mgg <= 130) fTH1DMap["t1pfmet_selmgg"]->Fill(t1pfmet,Weight); 
+            if (t1pfmet >= 100) fTH1DMap["mgg_selt1pfmet"]->Fill(mgg,Weight); 
+	  }
+
         }
 
         if (passCH1 && passCH2){
@@ -238,12 +279,14 @@ void Plotter::DoPlots(){
                 fTH1DMap["eff_sel"]->Fill(6.5,Weight);
          	if (passHE1 && passHE2){
                   fTH1DMap["eff_sel"]->Fill(7.5,Weight);
-                  if (mgg >= 110 && mgg <= 130){
-            	    fTH1DMap["eff_sel"]->Fill(8.5,Weight);
-            	    if (t1pfmet >= 100){
-            	      fTH1DMap["eff_sel"]->Fill(9.5,Weight);
-            	    }
-                  }
+		  if (!isData || !doBlind){// BLIND THE DATA
+                    if (mgg >= 110 && mgg <= 130){
+            	      fTH1DMap["eff_sel"]->Fill(8.5,Weight);
+            	      if (t1pfmet >= 100){
+            	        fTH1DMap["eff_sel"]->Fill(9.5,Weight);
+            	      }
+                    }
+		  }
                 }
               }
             }

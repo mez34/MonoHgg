@@ -18,6 +18,7 @@ hadd data/25ns/GluGluHToGG.root		../../output/job_20151011_212615/GluGluHToGG/Gl
 hadd data/25ns/VH.root			../../output/job_20151011_212620/VH/VH*.root
 hadd data/25ns/DYJetsToLL.root		../../output/job_20151011_212626/DYJetsToLL/DYJetsToLL*.root
 
+hadd data/25ns/DoubleEG.root		../../output/job_20151021_152622/DoubleEG/DoubleEG*.root
 
 #using PUrw file from MonoJ 
 #hadd data/50ns_betaV4/GluGluHToGG.root		../../output/job_2015102_122023/GluGluHToGG/GluGluHToGG*.root

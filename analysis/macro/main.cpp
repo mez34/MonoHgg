@@ -40,16 +40,16 @@ int main(){
   TString outDir = "./diPhoPlots/25ns/";
 
   bool doFakeData = false;	// use FakeData to test combiner (mimicks data)
-  bool doFakeSig = false;	// use FakeDataII to test combiner (mimicks signal)--TEMP 
   bool sortMC = false;		// use if want to sort bkg smallest to biggest
+  bool doBlind = true;		// use to blind the analysis for Data (don't use distributions for met>100 & 110<mgg<130)
   bool makePURWfiles = false;	// recompute PURW and make files
   bool doReweightPU = false;	// use PURW from old files if !makePURWfiles
-  bool doPlots = false;		// make plots for each sample individually
+  bool doPlots = true;		// make plots for each sample individually
   bool doComb = true;		// make stack/overlay plots
   bool doABCD = false;		// run ABCD method 
 
-  Double_t lumi = 500.0; // in pb^-1 
-  UInt_t nBins_vtx = 60; // number of bins for PURW 
+  Double_t lumi = 150.0; // in pb^-1 
+  UInt_t nBins_vtx = 40; // number of bins for PURW 
   
   //for CMSSW_7_0_pre9: run with root
   //gROOT->LoadMacro("Plotter.cpp++g");
@@ -70,118 +70,73 @@ int main(){
   /////////////////////////////////////////////////////
 
   DblVec	puweights_Data;
-
-  DblVec 	puweights_QCD;
-  DblVec 	puweights_GJets;
-  DblVec	puweights_GGHGG;
-  DblVec	puweights_WZH;
-  DblVec	puweights_GG;
-  DblVec	puweights_DY;
-
-  DblVec	puweights_sig1;
-  DblVec	puweights_sig10;
-  DblVec	puweights_sig100;
-  DblVec	puweights_sig1000;	
+  DblVec 	puweights_MC;
 
   // no puweight for data 
   for (UInt_t i=1; i<=nBins_vtx; i++){ puweights_Data.push_back(1.0); }
 
   if (doReweightPU){
     if (makePURWfiles){ 
-      std::cout << "Doing PU Reweighting QCD" << std::endl;
+      std::cout << "Doing PU Reweighting" << std::endl;
       ReweightPU * reweightQCD = new ReweightPU("QCD","DoubleEG",lumi, nBins_vtx, inDir, outDir+"purw/");
-      puweights_QCD = reweightQCD->GetPUWeights();
+      puweights_MC = reweightQCD->GetPUWeights();
       delete reweightQCD;
 
-      std::cout << "Doing PU Reweighting DMHtoGG_M1000" << std::endl;
-      ReweightPU * reweightDMH1000 = new ReweightPU("DMHtoGG_M1000","DoubleEG",lumi, nBins_vtx, inDir, outDir+"purw/");
-      puweights_sig1000 = reweightDMH1000->GetPUWeights();
-      delete reweightDMH1000;
-
-      puweights_WZH = puweights_QCD;
-      puweights_GGHGG = puweights_QCD;
-      puweights_GJets = puweights_QCD;
-      puweights_GG = puweights_QCD;
-      puweights_DY = puweights_QCD;
-      puweights_sig100 = puweights_sig1000;
-      puweights_sig10 = puweights_sig1000;
-      puweights_sig1 = puweights_sig1000;
-
+      //std::cout << "Doing PU Reweighting Sig" << std::endl;
+      //ReweightPU * reweightDMH = new ReweightPU("2HDM_mZP1200","DoubleEG",lumi, nBins_vtx, inDir, outDir+"purw/");
+      //puweights_Sig = reweightDMH->GetPUWeights();
+      //delete reweightDMH;
 
       // create text files with purw values
       std::ofstream fOutPURWFileBkg;
       fOutPURWFileBkg.open(Form("%spurw/purw_bkg.txt",outDir.Data()));  
-      std::ofstream fOutPURWFileSig;
-      fOutPURWFileSig.open(Form("%spurw/purw_sig.txt",outDir.Data()));  
+      //std::ofstream fOutPURWFileSig;
+      //fOutPURWFileSig.open(Form("%spurw/purw_sig.txt",outDir.Data()));  
 
-      for (UInt_t i=1; i<=nBins_vtx; i++){
-        fOutPURWFileBkg << puweights_QCD[i]     << std::endl;
-        fOutPURWFileSig << puweights_sig1000[i] << std::endl;
+      for (UInt_t i=0; i<=nBins_vtx; i++){ //i=0 corresponds to bin1 in nvtx distribution
+        fOutPURWFileBkg << puweights_MC[i]     << std::endl;
+        //fOutPURWFileSig << puweights_sig1000[i] << std::endl;
       }
       fOutPURWFileBkg.close();
-      fOutPURWFileSig.close();
+      //fOutPURWFileSig.close();
 
     }// end if makePURWfiles
 
     else{ // load PURW from already made files
-      TString fSigName = Form("%spurw/PURW_DMHtoGG_M1000.root",outDir.Data());
-      TString fBkgName = Form("%spurw/PURW_QCD.root",outDir.Data());
-      TFile *fSig = TFile::Open(fSigName.Data());
-      CheckValidFile(fSig,fSigName);
+      TString fBkgName = Form("%spurw/PURW_MC.root",outDir.Data());
       TFile *fBkg = TFile::Open(fBkgName.Data());
       CheckValidFile(fBkg,fBkgName);
-      TH1D *fSigRatio = (TH1D*)fSig->Get("nvtx_dataOverMC");  
-      CheckValidTH1D(fSigRatio,"nvtx_dataOverMC",fSigName);
       TH1D *fBkgRatio = (TH1D*)fBkg->Get("nvtx_dataOverMC");  
       CheckValidTH1D(fBkgRatio,"nvtx_dataOverMC",fBkgName);
+      //TString fSigName = Form("%spurw/PURW_2HDM_mZP1200.root",outDir.Data());
+      //TFile *fSig = TFile::Open(fSigName.Data());
+      //CheckValidFile(fSig,fSigName);
+      //TH1D *fSigRatio = (TH1D*)fSig->Get("nvtx_dataOverMC");  
+      //CheckValidTH1D(fSigRatio,"nvtx_dataOverMC",fSigName);
        
-      for (UInt_t i=1; i<=nBins_vtx; i++){
-        puweights_QCD.push_back(fBkgRatio->GetBinContent(i));
-        puweights_GJets.push_back(fBkgRatio->GetBinContent(i));
-        puweights_GGHGG.push_back(fBkgRatio->GetBinContent(i));
-        puweights_WZH.push_back(fBkgRatio->GetBinContent(i));
-        puweights_GG.push_back(fBkgRatio->GetBinContent(i));
-	puweights_DY.push_back(fBkgRatio->GetBinContent(i));
-
-        puweights_sig1000.push_back(fSigRatio->GetBinContent(i));
-        puweights_sig100.push_back(fSigRatio->GetBinContent(i));
-        puweights_sig10.push_back(fSigRatio->GetBinContent(i));
-        puweights_sig1.push_back(fSigRatio->GetBinContent(i));
+      for (UInt_t i=0; i<=nBins_vtx; i++){
+        puweights_MC.push_back(fBkgRatio->GetBinContent(i));
+        //puweights_sig.push_back(fSigRatio->GetBinContent(i));
       }
     }
   }// end doReweightPU 
 
   else{ // if not doReweightPU, set puweights to 1
     std::cout << "No PU Reweighting applied" << std::endl;
-    for (UInt_t i=1; i<=nBins_vtx; i++){
-      puweights_QCD.push_back(1.0);
-      puweights_GJets.push_back(1.0);
-      puweights_GGHGG.push_back(1.0);
-      puweights_WZH.push_back(1.0);
-      puweights_GG.push_back(1.0);
-      puweights_DY.push_back(1.0);
-      puweights_sig1000.push_back(1.0);
-      puweights_sig100.push_back(1.0);
-      puweights_sig10.push_back(1.0);
-      puweights_sig1.push_back(1.0);
+    for (UInt_t i=0; i<=nBins_vtx; i++){
+      puweights_MC.push_back(1.0);
+      //puweights_sig.push_back(1.0);
     }
   }  
 
-//  std::cout << "PU reweight values "<<std::endl;
-//  for (UInt_t i=1; i<=nBins_vtx; i++){
-//    std::cout << "puweights_Data    " << puweights_Data[i]    << std::endl;
-//    std::cout << "puweights_QCD     " << puweights_QCD[i]     << std::endl;   
-//    std::cout << "puweights_GJets   " << puweights_GJets[i]   << std::endl;
-//    std::cout << "puweights_GGHGG   " << puweights_GGHGG[i]   << std::endl;
-//    std::cout << "puweights_GG      " << puweights_GG[i]	<< std::endl;
-//    std::cout << "puweights_DY      " << puweights_DY[i]	<< std::endl;
-//    std::cout << "puweights_sig1000 " << puweights_sig1000[i] << std::endl; 
-//    std::cout << "puweights_sig100  " << puweights_sig100[i]  << std::endl;
-//    std::cout << "puweights_sig10   " << puweights_sig10[i]   << std::endl;
-//    std::cout << "puweights_sig1    " << puweights_sig1[i]    << std::endl;
-//  }
+  //std::cout << "PU reweight values "<<std::endl;
+  //for (UInt_t i=1; i<=nBins_vtx; i++){
+  //  std::cout << "puweights_Data " << puweights_Data[i]    << std::endl;
+  //  std::cout << "puweights_MC   " << puweights_MC[i]     << std::endl;   
+  //  std::cout << "puweights_sig  " << puweights_sig[i]    << std::endl;
+  //}
 
-  std::cout << "Finished PU Reweighting" << std::endl;
+  if (doReweightPU) std::cout << "Finished PU Reweighting" << std::endl;
 
   /////////////////////////////////////////////////////
   //
@@ -194,111 +149,105 @@ int main(){
   // 4th : lumi of data
   // 5th : bool isSigMC ------> FIXME (not needed?)
   // 6th : bool isData
+  // 7th : bool doBlinding
   //
   /////////////////////////////////////////////////////
 
   if (doFakeData && doPlots){
     std::cout << "Working on FakeData sample" << std::endl;
-    Plotter * FakeData = new Plotter(inDir,outDir,"FakeData",puweights_Data,lumi,false,true);
+    Plotter * FakeData = new Plotter(inDir,outDir,"FakeData",puweights_Data,lumi,false,true,doBlind);
     FakeData->DoPlots();
     delete FakeData;
     std::cout << "Finished FakeData sample" << std::endl;
   }
-  if (doFakeSig && doPlots){
-    std::cout << "Working on FakeDataII sample" << std::endl;
-    Plotter * FakeDataII = new Plotter(inDir,outDir,"FakeDataII",puweights_Data,lumi,true,false);
-    FakeDataII->DoPlots();
-    delete FakeDataII;
-    std::cout << "Finished FakeDataII sample" << std::endl;
-  }
   if (doPlots){
-    //std::cout << "Working on DoubleEG sample" << std::endl;
-    //Plotter * dEG = new Plotter(inDir,outDir,"DoubleEG",puweights_Data,lumi,false,true);
-    //dEG->DoPlots();
-    //delete dEG;
-    //std::cout << "Finished DoubleEG sample" << std::endl;
+    std::cout << "Working on DoubleEG sample" << std::endl;
+    Plotter * dEG = new Plotter(inDir,outDir,"DoubleEG",puweights_Data,lumi,false,true,doBlind);
+    dEG->DoPlots();
+    delete dEG;
+    std::cout << "Finished DoubleEG sample" << std::endl;
 
     std::cout << "Working on GJets sample" << std::endl;
-    Plotter * GJets = new Plotter(inDir,outDir,"GJets",puweights_GJets,lumi,false,false);
+    Plotter * GJets = new Plotter(inDir,outDir,"GJets",puweights_MC,lumi,false,false,doBlind);
     GJets->DoPlots();
     delete GJets;
     std::cout << "Finished GJets sample" << std::endl;
 
     std::cout << "Working on QCD sample" << std::endl;
-    Plotter * QCD = new Plotter(inDir,outDir,"QCD",puweights_QCD,lumi,false,false);
+    Plotter * QCD = new Plotter(inDir,outDir,"QCD",puweights_MC,lumi,false,false,doBlind);
     QCD->DoPlots();
     delete QCD;
     std::cout << "Finished QCD sample" << std::endl;
 
     std::cout << "Working on WZH sample" << std::endl;
-    Plotter * WZH = new Plotter(inDir,outDir,"VH",puweights_WZH,lumi,false,false);
+    Plotter * WZH = new Plotter(inDir,outDir,"VH",puweights_MC,lumi,false,false,doBlind);
     WZH->DoPlots();
     delete WZH;
     std::cout << "Finished WZH sample" << std::endl;
 
     std::cout << "Working on GluGluH sample" << std::endl;
-    Plotter * GGHGG = new Plotter(inDir,outDir,"GluGluHToGG",puweights_GGHGG,lumi,false,false);
+    Plotter * GGHGG = new Plotter(inDir,outDir,"GluGluHToGG",puweights_MC,lumi,false,false,doBlind);
     GGHGG->DoPlots();
     delete GGHGG;
     std::cout << "Finished GluGluH sample" << std::endl;
   
     std::cout << "Working on DiPhoton sample" << std::endl;
-    Plotter * GG = new Plotter(inDir,outDir,"DiPhoton",puweights_GG,lumi,false,false);
+    Plotter * GG = new Plotter(inDir,outDir,"DiPhoton",puweights_MC,lumi,false,false,doBlind);
     GG->DoPlots();
     delete GG;
     std::cout << "Finished GluGluH sample" << std::endl;
 
     std::cout << "Working on DYJets sample" << std::endl;
-    Plotter * DY = new Plotter(inDir,outDir,"DYJetsToLL",puweights_DY,lumi,false,false);
+    Plotter * DY = new Plotter(inDir,outDir,"DYJetsToLL",puweights_MC,lumi,false,false,doBlind);
     DY->DoPlots();
     delete DY;
     std::cout << "Finished DYJets sample" << std::endl;
 
     std::cout << "Working on DMHgg 2HDM MZP600 sample" << std::endl;
-    Plotter * DMH_mZP600 = new Plotter(inDir,outDir,"2HDM_mZP600",puweights_sig1000,lumi,true,false);
+    Plotter * DMH_mZP600 = new Plotter(inDir,outDir,"2HDM_mZP600",puweights_MC,lumi,true,false,doBlind);
     DMH_mZP600->DoPlots();
     delete DMH_mZP600;
     std::cout << "Finished DMHgg 2HDM MZP600 sample" << std::endl;
    
     std::cout << "Working on DMHgg 2HDM MZP1200 sample" << std::endl;
-    Plotter * DMH_mZP1200 = new Plotter(inDir,outDir,"2HDM_mZP1200",puweights_sig1000,lumi,true,false);
+    Plotter * DMH_mZP1200 = new Plotter(inDir,outDir,"2HDM_mZP1200",puweights_MC,lumi,true,false,doBlind);
     DMH_mZP1200->DoPlots();
     delete DMH_mZP1200;
     std::cout << "Finished DMHgg 2HDM MZP1200 sample" << std::endl;
 
     std::cout << "Working on DMHgg 2HDM MZP1700 sample" << std::endl;
-    Plotter * DMH_mZP1700 = new Plotter(inDir,outDir,"2HDM_mZP1700",puweights_sig1000,lumi,true,false);
+    Plotter * DMH_mZP1700 = new Plotter(inDir,outDir,"2HDM_mZP1700",puweights_MC,lumi,true,false,doBlind);
     DMH_mZP1700->DoPlots();
     delete DMH_mZP1700;
     std::cout << "Finished DMHgg 2HDM MZP1700 sample" << std::endl;
 
     std::cout << "Working on DMHgg 2HDM MZP2500 sample" << std::endl;
-    Plotter * DMH_mZP2500 = new Plotter(inDir,outDir,"2HDM_mZP2500",puweights_sig1000,lumi,true,false);
+    Plotter * DMH_mZP2500 = new Plotter(inDir,outDir,"2HDM_mZP2500",puweights_MC,lumi,true,false,doBlind);
     DMH_mZP2500->DoPlots();
     delete DMH_mZP2500;
     std::cout << "Finished DMHgg 2HDM MZP2500 sample" << std::endl;
 
 
     //std::cout << "Working on DMHgg M1000 sample" << std::endl;
-    //Plotter * DMH_M1000 = new Plotter(inDir,outDir,"DMHtoGG_M1000",puweights_sig1000,lumi,true,false);
+    //Plotter * DMH_M1000 = new Plotter(inDir,outDir,"DMHtoGG_M1000",puweights_sig,lumi,true,false,doBlind);
     //DMH_M1000->DoPlots();
     //delete DMH_M1000;
     //std::cout << "Finished DMHgg M1000 sample" << std::endl;
   
     //std::cout << "Working on DMHgg M100 sample" << std::endl;
-    //Plotter * DMH_M100 = new Plotter(inDir,outDir,"DMHtoGG_M100",puweights_sig100,lumi,true,false);
+    //Plotter * DMH_M100 = new Plotter(inDir,outDir,"DMHtoGG_M100",puweights_sig,lumi,true,false,doBlind);
     //DMH_M100->DoPlots();
     //delete DMH_M100;
     //std::cout << "Finished DMHgg M100 sample" << std::endl;
   
     //std::cout << "Working on DMHgg M10 sample" << std::endl;
-    //Plotter * DMH_M10 = new Plotter(inDir,outDir,"DMHtoGG_M10",puweights_sig10,lumi,true,false);
+    //Plotter * DMH_M10 = new Plotter(inDir,outDir,"DMHtoGG_M10",puweights_sig,lumi,true,false,doBlind);
     //DMH_M10->DoPlots();
     //delete DMH_M10;
     //std::cout << "Finished DMHgg M10 sample" << std::endl;
   
     //std::cout << "Working on DMHgg M1 sample" << std::endl;
-    //Plotter * DMH_M1 = new Plotter(inDir,outDir,"DMHtoGG_M1",puweights_sig1,lumi,true,false);
+    //Plotter * DMH_M1 = new Plotter(inDir,outDir,"DMHtoGG_M1",puweights_sig,lumi,true,false,doBlind);
     //DMH_M1->DoPlots();
     //delete DMH_M1;
     //std::cout << "Finished DMHgg M1 sample" << std::endl;
@@ -307,16 +256,8 @@ int main(){
 
   //clear the vectors after they have been used
   puweights_Data.clear();
-  puweights_QCD.clear();
-  puweights_GJets.clear();
-  puweights_GGHGG.clear();
-  puweights_WZH.clear();
-  puweights_GG.clear();
-  puweights_DY.clear();
-  puweights_sig1000.clear();
-  puweights_sig100.clear();
-  puweights_sig10.clear();
-  puweights_sig1.clear();
+  puweights_MC.clear();
+  //puweights_sig.clear();
 
   // setup all samples for Combiner and ABCD
   ColorMap colorMap;
@@ -338,22 +279,20 @@ int main(){
   colorMap["2HDM_mZP1700"]		= kPink+6;
   colorMap["2HDM_mZP2500"]		= kPink+8;
 
-
   SamplePairVec Samples; // vector to also be used for stack plots
   //ordered to match Livia
   Samples.push_back(SamplePair("VH",1));
   Samples.push_back(SamplePair("GluGluHToGG",1)); 
-  Samples.push_back(SamplePair("DiPhoton",1));
   Samples.push_back(SamplePair("DYJetsToLL",1));
+  Samples.push_back(SamplePair("DiPhoton",1));
   Samples.push_back(SamplePair("QCD",1)); 
   Samples.push_back(SamplePair("GJets",1)); 
   //Samples.push_back(SamplePair("DMHtoGG_M1",0)); 
   //Samples.push_back(SamplePair("DMHtoGG_M10",0)); 
   //Samples.push_back(SamplePair("DMHtoGG_M100",0)); 
   //Samples.push_back(SamplePair("DMHtoGG_M1000",0)); 
-  //Samples.push_back(SamplePair("DoubleEG",5));
+  Samples.push_back(SamplePair("DoubleEG",5));
   if (doFakeData) Samples.push_back(SamplePair("FakeData",5));
-  if (doFakeSig)  Samples.push_back(SamplePair("FakeDataII",0));
   Samples.push_back(SamplePair("2HDM_mZP600",0)); 
   Samples.push_back(SamplePair("2HDM_mZP1200",0)); 
   Samples.push_back(SamplePair("2HDM_mZP1700",0)); 
