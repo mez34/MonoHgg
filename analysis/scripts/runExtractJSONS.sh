@@ -3,8 +3,12 @@
 
 # All FLASHgg version Spring15BetaV5:
 python extractJSONS.py -i datasets/datasets_7412_betaV5_sig.json	-o 2HDM_MZP600		-d lists_25ns/MC
+python extractJSONS.py -i datasets/datasets_7412_betaV5_sig.json	-o 2HDM_MZP800		-d lists_25ns/MC
+python extractJSONS.py -i datasets/datasets_7412_betaV5_sig.json	-o 2HDM_MZP1000		-d lists_25ns/MC
 python extractJSONS.py -i datasets/datasets_7412_betaV5_sig.json	-o 2HDM_MZP1200		-d lists_25ns/MC
+python extractJSONS.py -i datasets/datasets_7412_betaV5_sig.json	-o 2HDM_MZP1400		-d lists_25ns/MC
 python extractJSONS.py -i datasets/datasets_7412_betaV5_sig.json	-o 2HDM_MZP1700		-d lists_25ns/MC
+python extractJSONS.py -i datasets/datasets_7412_betaV5_sig.json	-o 2HDM_MZP2000		-d lists_25ns/MC
 python extractJSONS.py -i datasets/datasets_7412_betaV5_sig.json	-o 2HDM_MZP2500		-d lists_25ns/MC
 python extractJSONS.py -i datasets/datasets_7412_betaV5_all.json	-o DiPhoton		-d lists_25ns/MC
 python extractJSONS.py -i datasets/datasets_7412_betaV5_all.json	-o DYJetsToLL		-d lists_25ns/MC
