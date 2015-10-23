@@ -19,5 +19,7 @@ analysis/scripts/job*
 
 #ignore data and output plots
 *.root
+*.png
+*.pdf
 analysis/macro/data/
 analysis/macro/diPhoPlots/

@@ -35,7 +35,7 @@ ReweightPU::ReweightPU(const TString MC, const TString Data, const Double_t lumi
   fOutDataOverMCNvtx->Sumw2();
 
   // Initialize Output root file to be used by other macros ... eventually could integrate... no need now
-  fOutFile = new TFile(Form("%s/PURW_%s.root",fOutDir.Data(),fMCName.Data()),"RECREATE");
+  fOutFile = new TFile(Form("%s/PURW_MC.root",fOutDir.Data()),"RECREATE");
 }
 
 ReweightPU::~ReweightPU() {
