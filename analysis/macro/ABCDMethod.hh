@@ -47,12 +47,20 @@ public:
   Double_t FindExpectedValuesInD(const Double_t NA, const Double_t NB, const Double_t NC, const Double_t NAerr, const Double_t NBerr, const Double_t NCerr, Double_t & NDerr);
   void SetRooVariables();
   void FillTable();
-  void WriteDataCard(const TString fSampleName, const RooRealVar* sigrate, const Double_t expsig, const RooVec bkgrates, const DblVec expbkg);
+  void WriteDataCard(const TString fSampleName, const RooRealVar* sigrate, const Double_t expsig, const DblVecVec bkgrates);
   void InitHists();
   void InitVariables();
   ~ABCDMethod();
 
 private:
+  //indices to keep track of bkg samples
+  UInt_t	i_vh;
+  UInt_t 	i_hgg;
+  UInt_t	i_qcd;
+  UInt_t	i_gg;
+  UInt_t	i_gj;
+  UInt_t	i_dy;
+
   Double_t	mgg_minAB1;
   Double_t	mgg_minCD;
   Double_t	mgg_maxCD;

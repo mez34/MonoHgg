@@ -115,7 +115,28 @@ void ABCDMethod::DoAnalysis(){
   //std::cout << "number entries in data" << fOutDataTH2DHists[0]->GetEntries() << std::endl;
 
   // scale bkg and then make one copy of histos where bkg added together
+
+  fSampleTitleMap["QCD"] 		= "QCD";
+  fSampleTitleMap["GJets"]		= "$\\gamma$ + Jets";
+  fSampleTitleMap["VH"]			= "V + H";
+  fSampleTitleMap["DYJetsToLL"]		= "Drell-Yan";
+  fSampleTitleMap["GluGluHToGG"]	= "$H \\rightarrow \\gamma \\gamma$ (ggH)";
   
+  for (UInt_t mc = 0; mc < fNBkg; mc++){
+    if (fBkgNames[mc] == "VH")		i_vh  = mc;
+    if (fBkgNames[mc] == "QCD")		i_qcd = mc;
+    if (fBkgNames[mc] == "DiPhoton")	i_gg  = mc;
+    if (fBkgNames[mc] == "GJets")	i_gj  = mc;
+    if (fBkgNames[mc] == "DYJetsToLL")  i_dy  = mc;
+    if (fBkgNames[mc] == "GluGluHToGG") i_hgg = mc;
+  }
+
+  //sum over nonresonant bkgs only
+  fOutSelBkgTH2DHists[0] = (TH2D*)fInBkgTH2DHists[0][i_dy]->Clone();
+  fOutSelBkgTH2DHists[0]->Add(fInBkgTH2DHists[0][i_gg]);
+  fOutSelBkgTH2DHists[0]->Add(fInBkgTH2DHists[0][i_gj]); 
+  fOutSelBkgTH2DHists[0]->Add(fInBkgTH2DHists[0][i_qcd]);    
+ 
   
   for (UInt_t mc = 0; mc < fNBkg; mc++){
     //fInBkgTH2DHists[0][mc]->Scale(300000./40.);// in order to scale to 300fb-1
@@ -123,10 +144,10 @@ void ABCDMethod::DoAnalysis(){
  
     // sum over nonresonant bkgs only
     // FIXME NEED TO CLONE FIRST SAMPLE THAT APPEARS, OTHERWISE SEGFAULTS
-    if (fBkgNames[mc] == "DYJetsToLL") fOutSelBkgTH2DHists[0] = (TH2D*)fInBkgTH2DHists[0][mc]->Clone();
-    if (fBkgNames[mc] == "DiPhoton")   fOutSelBkgTH2DHists[0]->Add(fInBkgTH2DHists[0][mc]);
-    if (fBkgNames[mc] == "GJets")      fOutSelBkgTH2DHists[0]->Add(fInBkgTH2DHists[0][mc]); 
-    if (fBkgNames[mc] == "QCD")        fOutSelBkgTH2DHists[0]->Add(fInBkgTH2DHists[0][mc]);    
+    //if (fBkgNames[mc] == "DYJetsToLL") fOutSelBkgTH2DHists[0] = (TH2D*)fInBkgTH2DHists[0][mc]->Clone();
+    //if (fBkgNames[mc] == "DiPhoton")   fOutSelBkgTH2DHists[0]->Add(fInBkgTH2DHists[0][mc]);
+    //if (fBkgNames[mc] == "GJets")      fOutSelBkgTH2DHists[0]->Add(fInBkgTH2DHists[0][mc]); 
+    //if (fBkgNames[mc] == "QCD")        fOutSelBkgTH2DHists[0]->Add(fInBkgTH2DHists[0][mc]);    
 
 
     // use below if summing over all backgrounds
@@ -270,7 +291,7 @@ void ABCDMethod::DoAnalysis(){
   ABCDMethod::FillTable();
 
   for (UInt_t mc = 0; mc < fNSig; mc++){
-    ABCDMethod::WriteDataCard(fSigNames[mc].Data(),fRooSig[2][mc],fExpSig[mc],fRooBkg[2],fExpBkg);
+    ABCDMethod::WriteDataCard(fSigNames[mc].Data(),fRooSig[2][mc],fExpSig[mc],fBkg_Int);
   }
 }
 
@@ -595,14 +616,29 @@ void ABCDMethod::SetRooVariables(){
 
 }
 
-void ABCDMethod::WriteDataCard( const TString fSigName, const RooRealVar* sigrate, const Double_t expsig, const RooVec bkgrates, const DblVec expbkg){
+void ABCDMethod::WriteDataCard( const TString fSigName, const RooRealVar* sigrate, const Double_t expsig, const DblVecVec bkgrates){
   TString sig = *sigrate->format(2,"");
-  TString vh  = *bkgrates[0]->format(2,"");
-  TString hgg = *bkgrates[1]->format(2,"");
-  TString dy  = *bkgrates[2]->format(2,"");
-  TString gg  = *bkgrates[3]->format(2,"");
-  TString qcd = *bkgrates[4]->format(2,"");
-  std::cout << "sig = " << sig << " vh " << vh << " hgg " << hgg << " dy " << dy << " gg " << gg << "qcd " << qcd << std::endl; 
+  Double_t vh  = bkgrates[2][i_vh]; 
+  Double_t hgg = bkgrates[2][i_hgg];
+  Double_t dy  = bkgrates[2][i_dy]; 
+  Double_t gg  = bkgrates[2][i_gg]; 
+  Double_t qcd = bkgrates[2][i_qcd];
+  Double_t gj  = bkgrates[2][i_gj];
+  std::cout << "sig = " << sig << " vh " << vh << " hgg " << hgg << " dy " << dy << " gg " << gg << " qcd " << qcd << " gj " << gj << std::endl; 
+
+  DblVec N_A,N_B,N_C,mult;
+  N_A.resize(fNBkg);
+  N_B.resize(fNBkg);
+  N_C.resize(fNBkg);
+  mult.resize(fNBkg);
+   
+  for (UInt_t mc=0; mc < fNBkg; mc++){
+    N_A[mc] = bkgrates[0][mc];
+    N_B[mc] = bkgrates[1][mc];
+    N_C[mc] = bkgrates[3][mc];
+    mult[mc]= N_A[mc]/N_B[mc];
+  }
+
  
   std::cout << "Writing data card in: " << fOutDir.Data() << "/DataCard_" << fSigName.Data() <<".txt" << std::endl;
   fOutTxtFile.open(Form("%s/DataCard_%s.txt",fOutDir.Data(),fSigName.Data())); 
@@ -619,29 +655,28 @@ void ABCDMethod::WriteDataCard( const TString fSigName, const RooRealVar* sigrat
     fOutTxtFile << "bin 1"<< std::endl;
     fOutTxtFile <<  "observation  0 "  << std::endl;
     fOutTxtFile << "------------------------------" << std::endl;
-    fOutTxtFile << "bin     1		1		1		1		1		1 "<< std::endl;
-    fOutTxtFile << "process DM		gg		dy		qcd		hgg		Vh " << std::endl;
-    fOutTxtFile << "process 0		1		2		3		4		5 " << std::endl;
-    fOutTxtFile << Form("rate   %s	%s	%s	%s	%s	%s ",sig.Data(),gg.Data(),dy.Data(),qcd.Data(),hgg.Data(),vh.Data()) << std::endl; 
+    fOutTxtFile << "bin     1		1		1		1		1		1		1"<< std::endl;
+    fOutTxtFile << "process DM		gg		dy		qcd		gj		hgg		vh" << std::endl;
+    fOutTxtFile << "process 0		1		2		3		4		5 		6" << std::endl;
+    fOutTxtFile << Form("rate   %s	%f	%f	%f	%f	%f 	%f",sig.Data(),gg,dy,qcd,gj,hgg,vh) << std::endl; 
     fOutTxtFile << "--------------------------------" << std::endl;
     fOutTxtFile << "#signal related" << std::endl; //just took these numbers from Livia's example (all estimates from 8TeV)
-    fOutTxtFile << "lumi_13TeV    lnN     1.1000        -          -          -       1.1000       1.1000" << std::endl;
-    fOutTxtFile << "eff_trig      lnN     1.010000      -          -          -       1.01000      1.01000" << std::endl;
-    fOutTxtFile << "id_eff_eb     lnN     1.02000       -          -          -       1.02000      1.02000   " << std::endl;    
-    fOutTxtFile << "vtxEff        lnN     0.996/1.008   -          -          -       0.996/1.008  0.996/1.008" << std::endl; 
+    fOutTxtFile << "lumi_13TeV    lnN     1.1000        -          -          -       -       1.1000       1.1000" << std::endl;
+    fOutTxtFile << "eff_trig      lnN     1.010000      -          -          -       -       1.01000      1.01000" << std::endl;
+    fOutTxtFile << "id_eff_eb     lnN     1.02000       -          -          -       -       1.02000      1.02000   " << std::endl;    
+    fOutTxtFile << "vtxEff        lnN     0.996/1.008   -          -          -       -       0.996/1.008  0.996/1.008" << std::endl; 
     fOutTxtFile << "#background related" << std::endl;
-    fOutTxtFile << "abcd_estimate  lnN       -         1.27000    1.27000    1.27000      -         -  " << std::endl;
-    fOutTxtFile << "gg_norm        gmN 19    -         0.03         -          -          -         -  " << std::endl;
-    fOutTxtFile << "dy_norm        gmN 36617 -           -        0.000054     -          -         -  " << std::endl;
-    fOutTxtFile << "qcd_norm       gmN 24408 -           -          -       0.0000053     -         -  " << std::endl;
-
-
-   
+    fOutTxtFile << "abcd_estimate  lnN		-	1.27000    1.27000	1.27000	1.27000	-	-  " << std::endl;
+    fOutTxtFile << Form("gg_norm        gmN %f	-	%f	   -		-	-	-	-  ",N_C[i_gg],mult[i_gg]) << std::endl;
+    fOutTxtFile << Form("dy_norm        gmN %f	-	-	   %f		-	-	-	-  ",N_C[i_dy],mult[i_dy]) << std::endl;
+    fOutTxtFile << Form("qcd_norm       gmN %f	-	- 	   -		%f	-	-	-  ",N_C[i_qcd],mult[i_qcd]) << std::endl;
+    fOutTxtFile << Form("gj_norm        gmN %f	-	-	   -		-	%f	-	-  ",N_C[i_gj],mult[i_gj]) << std::endl;
 
   }
   else std::cout << "Unable to open DataCard Output File" << std::endl;
-
+ 
   fOutTxtFile.close();
+  std::cout << "Finished Writing DataCard" << std::endl;
 }
 
 Double_t ABCDMethod::ComputeIntAndErr(TH2D *& h, Double_t & error, const Double_t minX, const Double_t maxX, const Double_t minY, const Double_t maxY, const UInt_t isReg ){
