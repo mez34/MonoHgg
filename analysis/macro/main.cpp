@@ -7,18 +7,14 @@
   // ./main
   //
 
-
-
 #include "Plotter.hh"
 #include "Combiner.hh"
 #include "ReweightPU.hh"
 #include "ABCDMethod.hh"
 #include "Style.hh"
 
-
 #include "TROOT.h"
 #include "TStyle.h"
-
 #include <iostream>
 
 typedef std::pair<TString,Double_t>  SampleYieldPair;
@@ -29,18 +25,24 @@ static bool sortByYield(const SampleYieldPair& mcpair1, const SampleYieldPair& m
 }
 
 int main(){
-  // instead of : setTDRStyle();
-  // force TDR style
-  //
+  // force TDR style instead of : setTDRStyle(); 
   TStyle * tdrStyle = new TStyle("tdrStyle","Style for P-TDR");
   SetTDRStyle(tdrStyle);
   gROOT->ForceStyle();
+ 
+  //////////////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////////////
+  //
+  // SET MAIN PARAMETERS HERE
+  //
+  //////////////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////////////
 
-  TString inDir = "./data/25ns/";
-  TString outDir = "./diPhoPlots/25ns/";
+  TString inDir = "./data/25ns/"; 		// input directory of the samples
+  TString outDir = "./diPhoPlots/25ns/";	// output directory to send results
 
   bool doFakeData = false;	// use FakeData to test combiner (mimicks data)
-  bool sortMC = false;		// use if want to sort bkg smallest to biggest
+  bool sortMC = false;		// use if want to sort bkg smallest to biggest, else uses order given
   bool doBlind = true;		// use to blind the analysis for Data (don't use distributions for met>100 & 110<mgg<130)
   bool makePURWfiles = false;	// recompute PURW and make files
   bool doReweightPU = true;	// use PURW from old files if !makePURWfiles
@@ -51,6 +53,10 @@ int main(){
   Double_t lumi = 150.0; // in pb^-1 
   UInt_t nBins_vtx = 40; // number of bins for PURW 
   
+  //////////////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////////////////////////////////////////////////////
+ 
+  // Protect against unblinding accidentally 
   std::string input;
   if (doBlind) std::cout << "Doing Analysis Blinding Data" << std::endl;
   else {
@@ -59,7 +65,8 @@ int main(){
     std::cin >> input;
     if (input == "y") std::cout << "Proceeding with Unblinding" << std::endl;  
     else{
-      std::cout << "Canceling" << std::endl;
+      std::cout << "CANCELLING" << std::endl;
+      std::cout << "Please set 'doBlind=true'." << std::endl;
       doPlots = false;
       doComb = false;
       doABCD = false;

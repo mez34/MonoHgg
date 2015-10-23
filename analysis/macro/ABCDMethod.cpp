@@ -528,26 +528,26 @@ void ABCDMethod::FillTable(){
      //std::cout << "Data: corr =  " << fCorrData[0]  << std::endl;
      //std::cout << "Data: ExpD =  " << fExpData[0] << " \\pm " << fExpErrData[0] << std::endl;
   
-     TString bkgname="";
-     for (UInt_t mc = 0; mc < fNBkg+2; mc++){
-       if (mc == fNBkg) bkgname="Total Bkg";
-       else if (mc==fNBkg+1) bkgname="Non-res Bkg";
-       else bkgname = fBkgNames[mc]; 
-       //std::cout << bkgname << ": A    =  " << *(fRooBkg[0][mc]->format(2,"EXPF")) << std::endl;
-       //std::cout << bkgname << ": B    =  " << *(fRooBkg[1][mc]->format(2,"EXPF")) << std::endl;
-       //std::cout << bkgname << ": C    =  " << *(fRooBkg[3][mc]->format(2,"EXPF")) << std::endl;
-       //std::cout << bkgname << ": D    =  " << *(fRooBkg[2][mc]->format(2,"EXPF")) << std::endl;
-       //std::cout << bkgname << ": corr =  " << fCorrBkg[mc]  << std::endl;
-       //std::cout << bkgname << ": ExpD =  " << fExpBkg[mc] << " \\pm " << fExpErrBkg[mc] << std::endl;
-     }
-     for (UInt_t mc = 0; mc < fNSig; mc++){
-       //std::cout << fSigNames[mc] << ": A    =  " << *(fRooSig[0][mc]->format(2,"EXPF")) << std::endl;
-       //std::cout << fSigNames[mc] << ": B    =  " << *(fRooSig[1][mc]->format(2,"EXPF")) << std::endl;
-       //std::cout << fSigNames[mc] << ": C    =  " << *(fRooSig[3][mc]->format(2,"EXPF")) << std::endl;
-       //std::cout << fSigNames[mc] << ": D    =  " << *(fRooSig[2][mc]->format(2,"EXPF")) << std::endl;
-       //std::cout << fSigNames[mc] << ": corr =  " << fCorrSig[mc]  << std::endl;
-       //std::cout << fSigNames[mc] << ": ExpD =  " << fExpSig[mc] << " \\pm " << fExpErrSig[mc] << std::endl;
-     }
+     //TString bkgname="";
+     //for (UInt_t mc = 0; mc < fNBkg+2; mc++){
+     //  if (mc == fNBkg) bkgname="Total Bkg";
+     //  else if (mc==fNBkg+1) bkgname="Non-res Bkg";
+     //  else bkgname = fBkgNames[mc]; 
+     //  std::cout << bkgname << ": A    =  " << *(fRooBkg[0][mc]->format(2,"EXPF")) << std::endl;
+     //  std::cout << bkgname << ": B    =  " << *(fRooBkg[1][mc]->format(2,"EXPF")) << std::endl;
+     //  std::cout << bkgname << ": C    =  " << *(fRooBkg[3][mc]->format(2,"EXPF")) << std::endl;
+     //  std::cout << bkgname << ": D    =  " << *(fRooBkg[2][mc]->format(2,"EXPF")) << std::endl;
+     //  std::cout << bkgname << ": corr =  " << fCorrBkg[mc]  << std::endl;
+     //  std::cout << bkgname << ": ExpD =  " << fExpBkg[mc] << " \\pm " << fExpErrBkg[mc] << std::endl;
+     //}
+     //for (UInt_t mc = 0; mc < fNSig; mc++){
+     //  std::cout << fSigNames[mc] << ": A    =  " << *(fRooSig[0][mc]->format(2,"EXPF")) << std::endl;
+     //  std::cout << fSigNames[mc] << ": B    =  " << *(fRooSig[1][mc]->format(2,"EXPF")) << std::endl;
+     //  std::cout << fSigNames[mc] << ": C    =  " << *(fRooSig[3][mc]->format(2,"EXPF")) << std::endl;
+     //  std::cout << fSigNames[mc] << ": D    =  " << *(fRooSig[2][mc]->format(2,"EXPF")) << std::endl;
+     //  std::cout << fSigNames[mc] << ": corr =  " << fCorrSig[mc]  << std::endl;
+     //  std::cout << fSigNames[mc] << ": ExpD =  " << fExpSig[mc] << " \\pm " << fExpErrSig[mc] << std::endl;
+     //}
   }
   else std::cout << "Unable to open ResultsTable Output File" <<std::endl;
 
@@ -624,7 +624,7 @@ void ABCDMethod::WriteDataCard( const TString fSigName, const RooRealVar* sigrat
   Double_t gg  = bkgrates[2][i_gg]; 
   Double_t qcd = bkgrates[2][i_qcd];
   Double_t gj  = bkgrates[2][i_gj];
-  std::cout << "sig = " << sig << " vh " << vh << " hgg " << hgg << " dy " << dy << " gg " << gg << " qcd " << qcd << " gj " << gj << std::endl; 
+  //std::cout << "sig = " << sig << " vh " << vh << " hgg " << hgg << " dy " << dy << " gg " << gg << " qcd " << qcd << " gj " << gj << std::endl; 
 
   DblVec N_A,N_B,N_C,mult;
   N_A.resize(fNBkg);
@@ -655,22 +655,22 @@ void ABCDMethod::WriteDataCard( const TString fSigName, const RooRealVar* sigrat
     fOutTxtFile << "bin 1"<< std::endl;
     fOutTxtFile <<  "observation  0 "  << std::endl;
     fOutTxtFile << "------------------------------" << std::endl;
-    fOutTxtFile << "bin     1		1		1		1		1		1		1"<< std::endl;
-    fOutTxtFile << "process DM		gg		dy		qcd		gj		hgg		vh" << std::endl;
-    fOutTxtFile << "process 0		1		2		3		4		5 		6" << std::endl;
-    fOutTxtFile << Form("rate   %s	%f	%f	%f	%f	%f 	%f",sig.Data(),gg,dy,qcd,gj,hgg,vh) << std::endl; 
+    fOutTxtFile << "bin			1		1		1		1		1		1		1"<< std::endl;
+    fOutTxtFile << "process		DM		gg		dy		qcd		gj		hgg		vh" << std::endl;
+    fOutTxtFile << "process		0		1		2		3		4		5 		6" << std::endl;
+    fOutTxtFile << Form("rate		%s	%f	%f	%f	%f	%f 	%f",sig.Data(),gg,dy,qcd,gj,hgg,vh) << std::endl; 
     fOutTxtFile << "--------------------------------" << std::endl;
     fOutTxtFile << "#signal related" << std::endl; //just took these numbers from Livia's example (all estimates from 8TeV)
-    fOutTxtFile << "lumi_13TeV    lnN     1.1000        -          -          -       -       1.1000       1.1000" << std::endl;
-    fOutTxtFile << "eff_trig      lnN     1.010000      -          -          -       -       1.01000      1.01000" << std::endl;
-    fOutTxtFile << "id_eff_eb     lnN     1.02000       -          -          -       -       1.02000      1.02000   " << std::endl;    
-    fOutTxtFile << "vtxEff        lnN     0.996/1.008   -          -          -       -       0.996/1.008  0.996/1.008" << std::endl; 
+    fOutTxtFile << "lumi_13TeV		lnN     1.1000        -          -          -       -       1.1000       1.1000" << std::endl;
+    fOutTxtFile << "eff_trig		lnN     1.010000      -          -          -       -       1.01000      1.01000" << std::endl;
+    fOutTxtFile << "id_eff_eb		lnN     1.02000       -          -          -       -       1.02000      1.02000   " << std::endl;    
+    fOutTxtFile << "vtxEff		lnN     0.996/1.008   -          -          -       -       0.996/1.008  0.996/1.008" << std::endl; 
     fOutTxtFile << "#background related" << std::endl;
-    fOutTxtFile << "abcd_estimate  lnN		-	1.27000    1.27000	1.27000	1.27000	-	-  " << std::endl;
-    fOutTxtFile << Form("gg_norm        gmN %f	-	%f	   -		-	-	-	-  ",N_C[i_gg],mult[i_gg]) << std::endl;
-    fOutTxtFile << Form("dy_norm        gmN %f	-	-	   %f		-	-	-	-  ",N_C[i_dy],mult[i_dy]) << std::endl;
-    fOutTxtFile << Form("qcd_norm       gmN %f	-	- 	   -		%f	-	-	-  ",N_C[i_qcd],mult[i_qcd]) << std::endl;
-    fOutTxtFile << Form("gj_norm        gmN %f	-	-	   -		-	%f	-	-  ",N_C[i_gj],mult[i_gj]) << std::endl;
+    fOutTxtFile << "abcd_estimate	lnN	-	1.27000	1.27000	   1.27000	1.27000	-	-	-  " << std::endl;
+    fOutTxtFile << Form("gg_norm	gmN 	%f	-	%f	   -		-	-	-	-  ",N_C[i_gg],mult[i_gg]) << std::endl;
+    fOutTxtFile << Form("dy_norm	gmN 	%f	-	-	   %f		-	-	-	-  ",N_C[i_dy],mult[i_dy]) << std::endl;
+    fOutTxtFile << Form("qcd_norm	gmN 	%f	-	- 	   -		%f	-	-	-  ",N_C[i_qcd],mult[i_qcd]) << std::endl;
+    fOutTxtFile << Form("gj_norm	gmN 	%f	-	-	   -		-	%f	-	-  ",N_C[i_gj],mult[i_gj]) << std::endl;
 
   }
   else std::cout << "Unable to open DataCard Output File" << std::endl;
