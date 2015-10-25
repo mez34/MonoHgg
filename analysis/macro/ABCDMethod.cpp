@@ -15,10 +15,10 @@ ABCDMethod::ABCDMethod( SamplePairVec Samples, const Double_t inLumi, const TStr
   mgg_minAB1 = 100.;
   mgg_minCD  = 110.;
   mgg_maxCD  = 130.;
-  mgg_maxAB2 = 180.; 
-  met_minB   = 70.;
+  mgg_maxAB2 = 300.; 
+  met_minB   = 0.;
   met_minD   = 100.;
-  met_maxD   = 400.;
+  met_maxD   = 300.;
 
   // titles for output Latex table
   fSampleTitleMap["Data"]		= "Data";
@@ -92,7 +92,7 @@ ABCDMethod::~ABCDMethod(){
   for (UInt_t mc = 0; mc < fNBkg+2; mc++){ delete fRBkg[mc]; }
   for (UInt_t mc = 0; mc < fNSig; mc++){ delete fRSig[mc]; }
 
-  for (UInt_t cat = 0; cat < 4; cat++){
+  for (UInt_t cat = 0; cat < 6; cat++){
     delete fRooData[cat][0];
     for (UInt_t mc = 0; mc < fNBkg+2; mc++){ delete fRooBkg[cat][mc]; }
     for (UInt_t mc = 0; mc < fNSig; mc++){ delete fRooSig[cat][mc]; }
@@ -479,40 +479,44 @@ void ABCDMethod::FillTable(){
      fOutTableTxtFile << "Sample & Corr($m_{\\gamma\\gamma}$,MET) & $N_A$ & $N_B$ & $N_C$ & $N_D$ & Expected D & Diff  \\\\" << std::endl;
      fOutTableTxtFile << "\\hline" <<std::endl;
 
-     fOutTableTxtFile << "Data &  $" << fCorrData[0] << "$ &  " <<
+     fOutTableTxtFile << "Data &  " << 
+	*(fRooData[5][0]->format(2,"XPF")) << " &  " <<
         *(fRooData[0][0]->format(2,"EXPF")) << " &  " << 
         *(fRooData[1][0]->format(2,"EXPF")) << " &  " << 
         *(fRooData[3][0]->format(2,"EXPF")) << " &  " <<  
-        *(fRooData[2][0]->format(2,"EXPF")) << " &  $" << 
-        fExpData[0] << "\\pm" << fExpErrData[0] << "$ &  $" << 
+        *(fRooData[2][0]->format(2,"EXPF")) << " &  " << 
+	*(fRooData[4][0]->format(2,"EXPF")) << " &  $" <<
         fDiffData[0] <<"$ \\\\" << std::endl;
      fOutTableTxtFile << "\\hline" << std::endl;
 
      for (UInt_t mc = 0; mc < fNBkg; mc++){
-       fOutTableTxtFile << fSampleTitleMap[fBkgNames[mc]] << " &  $" << fCorrBkg[mc] << "$ &  " << 
+       fOutTableTxtFile << fSampleTitleMap[fBkgNames[mc]] << " &  " << 
+         *(fRooBkg[5][mc]->format(2,"XPF")) << " &  " << 
          *(fRooBkg[0][mc]->format(2,"EXPF")) << " &  " << 
          *(fRooBkg[1][mc]->format(2,"EXPF")) << " &  " << 
          *(fRooBkg[3][mc]->format(2,"EXPF")) << " &  " <<  
-         *(fRooBkg[2][mc]->format(2,"EXPF")) << " &  $" << 
-         fExpBkg[mc] << "\\pm" << fExpErrBkg[mc] << "$ &  $" << 
+         *(fRooBkg[2][mc]->format(2,"EXPF")) << " &  " <<
+         *(fRooBkg[4][mc]->format(2,"EXPF")) << " &  $" <<
          fDiffBkg[mc] <<"$ \\\\" << std::endl;
      }
      fOutTableTxtFile << "\\hline" << std::endl;
-       fOutTableTxtFile << "Total Bkg &  $" << fCorrBkg[fNBkg+1] << "$ &  " << // only non-resonant bkg here 
+       fOutTableTxtFile << "NonRes Bkg" << " &  " << // only non-resonant bkg here 
+         *(fRooBkg[5][fNBkg+1]->format(2,"XPF")) << " &  " << 
          *(fRooBkg[0][fNBkg+1]->format(2,"EXPF")) << " &  " << 
          *(fRooBkg[1][fNBkg+1]->format(2,"EXPF")) << " &  " << 
          *(fRooBkg[3][fNBkg+1]->format(2,"EXPF")) << " &  " <<  
-         *(fRooBkg[2][fNBkg+1]->format(2,"EXPF")) << " &  $" << 
-         fExpBkg[fNBkg+1] << "\\pm" << fExpErrBkg[fNBkg+1] << "$ &  $" << 
+         *(fRooBkg[2][fNBkg+1]->format(2,"EXPF")) << " &  " << 
+         *(fRooBkg[4][fNBkg+1]->format(2,"EXPF")) << " &  $" << 
          fDiffBkg[fNBkg+1] <<"$ \\\\" << std::endl;
      fOutTableTxtFile << "\\hline" << std::endl;
      for (UInt_t mc = 0; mc < fNSig; mc++){
-       fOutTableTxtFile << fSampleTitleMap[fSigNames[mc]] << " &  $" << fCorrSig[mc] << "$ &  " << 
+       fOutTableTxtFile << fSampleTitleMap[fSigNames[mc]] << " &  " << 
+         *(fRooSig[5][mc]->format(2,"XPF")) << " &  " << 
          *(fRooSig[0][mc]->format(2,"EXPF")) << " &  " << 
          *(fRooSig[1][mc]->format(2,"EXPF")) << " &  " << 
          *(fRooSig[3][mc]->format(2,"EXPF")) << " &  " <<  
-         *(fRooSig[2][mc]->format(2,"EXPF")) << " &  $" << 
-         fExpSig[mc] << "\\pm" << fExpErrSig[mc] << "$ &  $" << 
+         *(fRooSig[2][mc]->format(2,"EXPF")) << " &  " << 
+         *(fRooSig[4][mc]->format(2,"EXPF")) << " &  $" << 
          fDiffSig[mc] <<"$ \\\\" << std::endl;
      }
  
@@ -559,14 +563,14 @@ void ABCDMethod::FillTable(){
 
 void ABCDMethod::SetRooVariables(){
 
-  UInt_t fNReg = 4;
+  UInt_t fNReg = 6;
   fRooData.resize(fNReg);
   fRooBkg.resize(fNReg);
   fRooSig.resize(fNReg);
   TString cat_name = "";
   TString name = "";
 
-  for (UInt_t cat = 0; cat < fNReg; cat++){// loop over A,B,C,D
+  for (UInt_t cat = 0; cat < fNReg; cat++){// loop over A,B,C,D,ExpD,Corr
     fRooData[cat].resize(1);
     fRooBkg[cat].resize(fNBkg+2);
     fRooSig[cat].resize(fNSig);
@@ -575,24 +579,52 @@ void ABCDMethod::SetRooVariables(){
     if (cat==1) cat_name = "_B";
     if (cat==2) cat_name = "_D";
     if (cat==3) cat_name = "_C";
+    if (cat==4) cat_name = "_ExpD";
+    if (cat==5) cat_name = "_Corr";
  
     name = Form("Data%s",cat_name.Data());
+    if (cat < 4){
+      fRooData[cat][0] = new RooRealVar(name,name,fData_Int[cat][0]); 
+      fRooData[cat][0]->setError(fData_IntErr[cat][0]);
+    }
+    if (cat == 4){
+      fRooData[cat][0] = new RooRealVar(name,name,fExpData[0]);
+      fRooData[cat][0]->setError(fExpErrData[0]);
+    }
+    if (cat == 5){
+      fRooData[cat][0] = new RooRealVar(name,name,fCorrData[0]);
+    } 
 
-    fRooData[cat][0]= new RooRealVar(name,name,fData_Int[cat][0]); 
-    fRooData[cat][0]->setError(fData_IntErr[cat][0]);
-  
     for (UInt_t mc = 0; mc < fNBkg+2; mc++){
      if (mc<fNBkg) name = Form("%s%s",fBkgNames[mc].Data(),cat_name.Data());
      else if (mc == fNBkg) name = Form("TotBkg%s",cat_name.Data());
      else name = Form("SelBkg%s",cat_name.Data());
-      fRooBkg[cat][mc] = new RooRealVar(name,name,fBkg_Int[cat][mc]);
-      fRooBkg[cat][mc]->setError(fBkg_IntErr[cat][mc]);
+     if (cat < 4){
+       fRooBkg[cat][mc] = new RooRealVar(name,name,fBkg_Int[cat][mc]);
+       fRooBkg[cat][mc]->setError(fBkg_IntErr[cat][mc]);
+     }
+     if (cat == 4){
+       fRooBkg[cat][mc] = new RooRealVar(name,name,fExpBkg[mc]);
+       fRooBkg[cat][mc]->setError(fExpErrBkg[mc]);
+     }
+     if (cat == 5){
+       fRooBkg[cat][mc] = new RooRealVar(name,name,fCorrBkg[mc]);
+     } 
     }
    
     for (UInt_t mc = 0; mc < fNSig; mc++){
       name = Form("%s%s",fSigNames[mc].Data(),cat_name.Data());
-      fRooSig[cat][mc] = new RooRealVar(name,name,fSig_Int[cat][mc]);
-      fRooSig[cat][mc]->setError(fSig_IntErr[cat][mc]);
+      if (cat < 4){
+        fRooSig[cat][mc] = new RooRealVar(name,name,fSig_Int[cat][mc]);
+        fRooSig[cat][mc]->setError(fSig_IntErr[cat][mc]);
+      }
+     if (cat == 4){
+       fRooSig[cat][mc] = new RooRealVar(name,name,fExpSig[mc]);
+       fRooSig[cat][mc]->setError(fExpErrSig[mc]);
+     }
+     if (cat == 5){
+       fRooSig[cat][mc] = new RooRealVar(name,name,fCorrSig[mc]);
+     } 
     }
     
   }// end loop over categories
