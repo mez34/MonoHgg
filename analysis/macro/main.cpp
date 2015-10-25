@@ -47,7 +47,7 @@ int main(){
   bool makePURWfiles = false;	// recompute PURW and make files
   bool doReweightPU = true;	// use PURW from old files if !makePURWfiles
   bool doPlots = false;		// make plots for each sample individually
-  bool doComb = false;		// make stack/overlay plots
+  bool doComb = true;		// make stack/overlay plots
   bool doABCD = true;		// run ABCD method 
 
   Double_t lumi = 150.0; // in pb^-1 
@@ -230,17 +230,41 @@ int main(){
     delete DMH_mZP600;
     std::cout << "Finished DMHgg 2HDM MZP600 sample" << std::endl;
    
+    std::cout << "Working on DMHgg 2HDM MZP800 sample" << std::endl;
+    Plotter * DMH_mZP800 = new Plotter(inDir,outDir,"2HDM_mZP800",puweights_MC,lumi,true,false,doBlind);
+    DMH_mZP800->DoPlots();
+    delete DMH_mZP800;
+    std::cout << "Finished DMHgg 2HDM MZP800 sample" << std::endl;
+   
+    std::cout << "Working on DMHgg 2HDM MZP1000 sample" << std::endl;
+    Plotter * DMH_mZP1000 = new Plotter(inDir,outDir,"2HDM_mZP1000",puweights_MC,lumi,true,false,doBlind);
+    DMH_mZP1000->DoPlots();
+    delete DMH_mZP1000;
+    std::cout << "Finished DMHgg 2HDM MZP1000 sample" << std::endl;
+   
     std::cout << "Working on DMHgg 2HDM MZP1200 sample" << std::endl;
     Plotter * DMH_mZP1200 = new Plotter(inDir,outDir,"2HDM_mZP1200",puweights_MC,lumi,true,false,doBlind);
     DMH_mZP1200->DoPlots();
     delete DMH_mZP1200;
     std::cout << "Finished DMHgg 2HDM MZP1200 sample" << std::endl;
 
+    std::cout << "Working on DMHgg 2HDM MZP1400 sample" << std::endl;
+    Plotter * DMH_mZP1400 = new Plotter(inDir,outDir,"2HDM_mZP1400",puweights_MC,lumi,true,false,doBlind);
+    DMH_mZP1400->DoPlots();
+    delete DMH_mZP1400;
+    std::cout << "Finished DMHgg 2HDM MZP1400 sample" << std::endl;
+
     std::cout << "Working on DMHgg 2HDM MZP1700 sample" << std::endl;
     Plotter * DMH_mZP1700 = new Plotter(inDir,outDir,"2HDM_mZP1700",puweights_MC,lumi,true,false,doBlind);
     DMH_mZP1700->DoPlots();
     delete DMH_mZP1700;
     std::cout << "Finished DMHgg 2HDM MZP1700 sample" << std::endl;
+
+    std::cout << "Working on DMHgg 2HDM MZP2000 sample" << std::endl;
+    Plotter * DMH_mZP2000 = new Plotter(inDir,outDir,"2HDM_mZP2000",puweights_MC,lumi,true,false,doBlind);
+    DMH_mZP2000->DoPlots();
+    delete DMH_mZP2000;
+    std::cout << "Finished DMHgg 2HDM MZP2500 sample" << std::endl;
 
     std::cout << "Working on DMHgg 2HDM MZP2500 sample" << std::endl;
     Plotter * DMH_mZP2500 = new Plotter(inDir,outDir,"2HDM_mZP2500",puweights_MC,lumi,true,false,doBlind);
@@ -294,10 +318,13 @@ int main(){
   colorMap["DMHtoGG_M1000"]		= kPink+8;
   colorMap["DoubleEG"]			= kBlack;
   colorMap["FakeData"]			= kBlack;
-  colorMap["FakeDataII"]		= kMagenta; 
   colorMap["2HDM_mZP600"]		= kPink-2;
+  colorMap["2HDM_mZP800"]		= kPink;
+  colorMap["2HDM_mZP1000"]		= kMagenta;
   colorMap["2HDM_mZP1200"]		= kPink-6;
+  colorMap["2HDM_mZP1400"]		= kPink+4;
   colorMap["2HDM_mZP1700"]		= kPink+6;
+  colorMap["2HDM_mZP2000"]		= kPink-1;
   colorMap["2HDM_mZP2500"]		= kPink+8;
 
   SamplePairVec Samples; // vector to also be used for stack plots
@@ -315,8 +342,12 @@ int main(){
   Samples.push_back(SamplePair("DoubleEG",5));
   if (doFakeData) Samples.push_back(SamplePair("FakeData",5));
   Samples.push_back(SamplePair("2HDM_mZP600",0)); 
+  Samples.push_back(SamplePair("2HDM_mZP800",0)); 
+  Samples.push_back(SamplePair("2HDM_mZP1000",0)); 
   Samples.push_back(SamplePair("2HDM_mZP1200",0)); 
+  Samples.push_back(SamplePair("2HDM_mZP1400",0)); 
   Samples.push_back(SamplePair("2HDM_mZP1700",0)); 
+  Samples.push_back(SamplePair("2HDM_mZP2000",0));  
   Samples.push_back(SamplePair("2HDM_mZP2500",0));  
 
   UInt_t nbkg = 0;

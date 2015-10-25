@@ -4,8 +4,12 @@
 #for new samples all in FLASHgg version Spring15BetaV4
 mkdir -p data/25ns/
 hadd data/25ns/2HDM_mZP600.root		../../output/job_20151020_22315/2HDM_MZP600/2HDM_MZP600*.root
+hadd data/25ns/2HDM_mZP800.root		../../output/job_20151023_11048/2HDM_MZP800/2HDM_MZP800*.root
+hadd data/25ns/2HDM_mZP1000.root	../../output/job_20151023_11050/2HDM_MZP1000/2HDM_MZP1000*.root
 hadd data/25ns/2HDM_mZP1200.root	../../output/job_20151020_22322/2HDM_MZP1200/2HDM_MZP1200*.root
+hadd data/25ns/2HDM_mZP1400.root	../../output/job_20151023_11210/2HDM_MZP1400/2HDM_MZP1400*.root
 hadd data/25ns/2HDM_mZP1700.root	../../output/job_20151020_223234/2HDM_MZP1700/2HDM_MZP1700*.root
+hadd data/25ns/2HDM_mZP2000.root	../../output/job_20151023_11233/2HDM_MZP2000/2HDM_MZP2000*.root
 hadd data/25ns/2HDM_mZP2500.root	../../output/job_20151020_223257/2HDM_MZP2500/2HDM_MZP2500*.root
 
 hadd data/25ns/DiPhoton.root		../../output/job_20151011_211929/DiPhoton/DiPhoton*.root

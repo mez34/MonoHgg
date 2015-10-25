@@ -33,8 +33,12 @@ ABCDMethod::ABCDMethod( SamplePairVec Samples, const Double_t inLumi, const TStr
   //fSampleTitleMap["DMHtoGG_M100"]	= "$\\bar{\\chi}\\chi HH, m_{\\chi}$ = 100 GeV (10 fb)";
   //fSampleTitleMap["DMHtoGG_M1000"]	= "$\\bar{\\chi}\\chi HH, m_{\\chi}$ = 1000 GeV (10 fb)";
   fSampleTitleMap["2HDM_mZP600"]	= "2HDM, $m_{Z'} = 600 GeV, m_{A0} = 300 GeV$";
+  fSampleTitleMap["2HDM_mZP800"]	= "2HDM, $m_{Z'} = 800 GeV, m_{A0} = 300 GeV$";
+  fSampleTitleMap["2HDM_mZP1000"]	= "2HDM, $m_{Z'} = 1000 GeV, m_{A0} = 300 GeV$";
   fSampleTitleMap["2HDM_mZP1200"]	= "2HDM, $m_{Z'} = 1200 GeV, m_{A0} = 300 GeV$";
+  fSampleTitleMap["2HDM_mZP1400"]	= "2HDM, $m_{Z'} = 1400 GeV, m_{A0} = 300 GeV$";
   fSampleTitleMap["2HDM_mZP1700"]	= "2HDM, $m_{Z'} = 1700 GeV, m_{A0} = 300 GeV$";
+  fSampleTitleMap["2HDM_mZP2000"]	= "2HDM, $m_{Z'} = 2000 GeV, m_{A0} = 300 GeV$";
   fSampleTitleMap["2HDM_mZP2500"]	= "2HDM, $m_{Z'} = 2500 GeV, m_{A0} = 300 GeV$";
 
   // make output txt file with output table
@@ -661,16 +665,16 @@ void ABCDMethod::WriteDataCard( const TString fSigName, const RooRealVar* sigrat
     fOutTxtFile << Form("rate		%s	%f	%f	%f	%f	%f 	%f",sig.Data(),gg,dy,qcd,gj,hgg,vh) << std::endl; 
     fOutTxtFile << "--------------------------------" << std::endl;
     fOutTxtFile << "#signal related" << std::endl; //just took these numbers from Livia's example (all estimates from 8TeV)
-    fOutTxtFile << "lumi_13TeV		lnN     1.1000        -          -          -       -       1.1000       1.1000" << std::endl;
-    fOutTxtFile << "eff_trig		lnN     1.010000      -          -          -       -       1.01000      1.01000" << std::endl;
-    fOutTxtFile << "id_eff_eb		lnN     1.02000       -          -          -       -       1.02000      1.02000   " << std::endl;    
-    fOutTxtFile << "vtxEff		lnN     0.996/1.008   -          -          -       -       0.996/1.008  0.996/1.008" << std::endl; 
+    fOutTxtFile << "lumi_13TeV	lnN	1.1000        -          -          -       -       1.1000       1.1000" << std::endl;
+    fOutTxtFile << "eff_trig	lnN	1.010000      -          -          -       -       1.01000      1.01000" << std::endl;
+    fOutTxtFile << "id_eff_eb	lnN	1.02000       -          -          -       -       1.02000      1.02000   " << std::endl;    
+    fOutTxtFile << "vtxEff	lnN	0.996/1.008   -          -          -       -       0.996/1.008  0.996/1.008" << std::endl; 
     fOutTxtFile << "#background related" << std::endl;
-    fOutTxtFile << "abcd_estimate	lnN	-	1.27000	1.27000	   1.27000	1.27000	-	-	-  " << std::endl;
-    fOutTxtFile << Form("gg_norm	gmN 	%f	-	%f	   -		-	-	-	-  ",N_C[i_gg],mult[i_gg]) << std::endl;
-    fOutTxtFile << Form("dy_norm	gmN 	%f	-	-	   %f		-	-	-	-  ",N_C[i_dy],mult[i_dy]) << std::endl;
-    fOutTxtFile << Form("qcd_norm	gmN 	%f	-	- 	   -		%f	-	-	-  ",N_C[i_qcd],mult[i_qcd]) << std::endl;
-    fOutTxtFile << Form("gj_norm	gmN 	%f	-	-	   -		-	%f	-	-  ",N_C[i_gj],mult[i_gj]) << std::endl;
+    fOutTxtFile << "abcd_estimate  lnN	-	1.27000	1.27000	   1.27000	1.27000	-	-	-  " << std::endl;
+    fOutTxtFile << Form("gg_norm   gmN 	%f	-	%f	   -		-	-	-	-  ",N_C[i_gg],mult[i_gg]) << std::endl;
+    fOutTxtFile << Form("dy_norm   gmN 	%f	-	-	   %f		-	-	-	-  ",N_C[i_dy],mult[i_dy]) << std::endl;
+    fOutTxtFile << Form("qcd_norm  gmN 	%f	-	- 	   -		%f	-	-	-  ",N_C[i_qcd],mult[i_qcd]) << std::endl;
+    fOutTxtFile << Form("gj_norm   gmN 	%f	-	-	   -		-	%f	-	-  ",N_C[i_gj],mult[i_gj]) << std::endl;
 
   }
   else std::cout << "Unable to open DataCard Output File" << std::endl;
