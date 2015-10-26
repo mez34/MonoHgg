@@ -40,14 +40,14 @@ class ABCDMethod{
 public: 
   ABCDMethod(const SamplePairVec Samples, const Double_t inLumi, const TString outname, Bool_t Blind);
   void DoAnalysis();
-  Double_t ComputeIntAndErr(TH2D *& h, Double_t & error, const Double_t minX, const Double_t maxX, const Double_t minY, const Double_t maxY, const UInt_t isReg);
+  Double_t ComputeIntAndErr(TH2D *& h, Double_t & error, const UInt_t minX, const UInt_t maxX, const UInt_t minY, const UInt_t maxY);
   void GetFinalValuesForABCDReg();
   void DoABCDCalculations();
   Double_t FindDiff(const Double_t NA, const Double_t NB, const Double_t NC, const Double_t ND);
   Double_t FindExpectedValuesInD(const Double_t NA, const Double_t NB, const Double_t NC, const Double_t NAerr, const Double_t NBerr, const Double_t NCerr, Double_t & NDerr);
   void SetRooVariables();
   void FillTable();
-  void WriteDataCard(const TString fSampleName, const RooRealVar* sigrate, const Double_t expsig, const DblVecVec bkgrates);
+  void WriteDataCard(const TString fSampleName, const RooRealVar* sigrate, const Double_t expsig, const DblVecVec bkgrates, const RooVecVec bkgrate);
   void InitHists();
   void InitVariables();
   ~ABCDMethod();
@@ -69,18 +69,7 @@ private:
   Double_t	met_minD;
   Double_t	met_maxD;
 
-  RooVec	fRData;
-  RooVec	fRBkg;
-  RooVec	fRSig;
-
   TStrMap	fSampleTitleMap;
-
-  DblVec	fFullData_Int;
-  DblVec	fFullData_IntErr;
-  DblVec	fFullBkg_Int;
-  DblVec	fFullBkg_IntErr;
-  DblVec	fFullSig_Int;
-  DblVec	fFullSig_IntErr;
 
   RooVecVec	fRooData;
   RooVecVec	fRooBkg;
