@@ -7,6 +7,11 @@
 
 
 # 25ns samples
+./submitBatchDiPho.py --cfg diPhoAnaBATCH.py DoubleEG_2015D_05Oct2015_v1	0 10002 pippo 1 1 
+./submitBatchDiPho.py --cfg diPhoAnaBATCH.py DoubleEG_2015D_PromptV0		0 10003 pippo 1 1 
+./submitBatchDiPho.py --cfg diPhoAnaBATCH.py DoubleEG_2015D_PromptV1		0 10004 pippo 1 1 
+./submitBatchDiPho.py --cfg diPhoAnaBATCH.py DoubleEG_2015D_PromptV2		0 10005 pippo 1 1 
+
 ./submitBatchDiPho.py --cfg diPhoAnaBATCH.py DiPhoton				0 15  pippo  84.0 1
 ./submitBatchDiPho.py --cfg diPhoAnaBATCH.py GJet_Pt-20to40     		0  1  pippo  218.6108 1  
 ./submitBatchDiPho.py --cfg diPhoAnaBATCH.py GJet_Pt-40toInf    		0  2  pippo  863.1088 1
