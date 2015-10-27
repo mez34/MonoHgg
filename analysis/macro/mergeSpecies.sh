@@ -3,9 +3,9 @@
 
 #mkdir -p data/mergedFinal
 
-hadd data/25ns/GJets.root data/25ns/GJet_Pt-20to40.root data/25ns/GJet_Pt-40toInf.root 
-hadd data/25ns/QCD.root   data/25ns/QCD_Pt-30to40.root  data/25ns/QCD_Pt-30toInf.root   data/25ns/QCD_Pt-40toInf.root 
-
+hadd data/25ns_v7/GJets.root	data/25ns_v7/GJet_Pt-20to40.root   data/25ns_v7/GJet_Pt-40toInf.root 
+hadd data/25ns_v7/QCD.root	data/25ns_v7/QCD_Pt-30to40.root	   data/25ns_v7/QCD_Pt-30toInf.root	data/25ns_v7/QCD_Pt-40toInf.root 
+hadd data/25ns_v7/DoubleEG.root	data/25ns_v7/DoubleEG_p.root	   data/25ns_v7/DoubleEG_0.root		data/25ns_v7/DoubleEG_1.root		data/25ns_v7/DoubleEG_2.root 
 
 #hadd data/50ns/GJets.root data/50ns/GJet_Pt-20to40.root data/50ns/GJet_Pt-40toInf.root 
 #hadd data/50ns/QCD.root data/50ns/QCD_Pt-30to40.root data/50ns/QCD_Pt-30toInf.root data/50ns/QCD_Pt-40toInf.root 

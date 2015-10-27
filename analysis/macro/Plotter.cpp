@@ -155,7 +155,7 @@ void Plotter::DoPlots(){
         fTH1DMap["eff_sel"]->Fill(2.5,Weight);
         //Fill histograms
         if (isData && doBlind){ // BLIND THE DATA mgg and met distributions
-	  if (mgg < 110 || mgg > 130){
+	  if (mgg < 110 || mgg > 150){
 	    fTH1DMap["mgg"]->Fill(mgg,Weight);
             fTH2DMap["mgg_PU"]->Fill(nvtx,mgg,Weight);
             fTH2DMap["mgg_ptgg"]->Fill(ptgg,mgg,Weight);
@@ -247,7 +247,7 @@ void Plotter::DoPlots(){
           fTH1DMap["pfmetphi_n-1"]->Fill(pfmetphi,Weight);
           fTH1DMap["calometphi_n-1"]->Fill(calometphi,Weight);
 	  if (isData && doBlind){// BLIND THE DATA
-            if (mgg < 110 || mgg > 130){
+            if (mgg < 110 || mgg > 150){
 	      fTH1DMap["mgg_n-1"]->Fill(mgg,Weight);  
               if (t1pfmet < 100) fTH2DMap["t1pfmet_mgg"]->Fill(mgg,t1pfmet,Weight);
 	    }

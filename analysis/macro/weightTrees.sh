@@ -6,27 +6,30 @@ echo "Adding weights for " $lumi " pb-1..."
 root -l -b <<EOF
 .L addWeightsToTree.cc+  
  
-addWeights("data/25ns/GJet_Pt-20to40.root", $lumi);
-addWeights("data/25ns/GJet_Pt-40toInf.root", $lumi);
-addWeights("data/25ns/QCD_Pt-30to40.root", $lumi);
-addWeights("data/25ns/QCD_Pt-30toInf.root", $lumi);
-addWeights("data/25ns/QCD_Pt-40toInf.root", $lumi);
+addWeights("data/25ns_v7/GJet_Pt-20to40.root", $lumi);
+addWeights("data/25ns_v7/GJet_Pt-40toInf.root", $lumi);
+addWeights("data/25ns_v7/QCD_Pt-30to40.root", $lumi);
+addWeights("data/25ns_v7/QCD_Pt-30toInf.root", $lumi);
+addWeights("data/25ns_v7/QCD_Pt-40toInf.root", $lumi);
 
-addWeights("data/25ns/GluGluHToGG.root", $lumi);
-addWeights("data/25ns/DiPhoton.root", $lumi);
-addWeights("data/25ns/VH.root", $lumi);
-addWeights("data/25ns/DYJetsToLL.root", $lumi);
+addWeights("data/25ns_v7/GluGluHToGG.root", $lumi);
+addWeights("data/25ns_v7/DiPhoton.root", $lumi);
+addWeights("data/25ns_v7/VH.root", $lumi);
+addWeights("data/25ns_v7/DYJetsToLL.root", $lumi);
 
-addWeights("data/25ns/2HDM_mZP600.root", $lumi);
-addWeights("data/25ns/2HDM_mZP800.root", $lumi);
-addWeights("data/25ns/2HDM_mZP1000.root", $lumi);
-addWeights("data/25ns/2HDM_mZP1200.root", $lumi);
-addWeights("data/25ns/2HDM_mZP1400.root", $lumi);
-addWeights("data/25ns/2HDM_mZP1700.root", $lumi);
-addWeights("data/25ns/2HDM_mZP2000.root", $lumi);
-addWeights("data/25ns/2HDM_mZP2500.root", $lumi);
+addWeights("data/25ns_v7/2HDM_mZP600.root", $lumi);
+addWeights("data/25ns_v7/2HDM_mZP800.root", $lumi);
+addWeights("data/25ns_v7/2HDM_mZP1000.root", $lumi);
+addWeights("data/25ns_v7/2HDM_mZP1200.root", $lumi);
+addWeights("data/25ns_v7/2HDM_mZP1400.root", $lumi);
+addWeights("data/25ns_v7/2HDM_mZP1700.root", $lumi);
+addWeights("data/25ns_v7/2HDM_mZP2000.root", $lumi);
+addWeights("data/25ns_v7/2HDM_mZP2500.root", $lumi);
 
-addWeights("data/25ns/DoubleEG.root", $lumi);
+addWeights("data/25ns_v7/DoubleEG_p.root", $lumi);
+addWeights("data/25ns_v7/DoubleEG_0.root", $lumi);
+addWeights("data/25ns_v7/DoubleEG_1.root", $lumi);
+addWeights("data/25ns_v7/DoubleEG_2.root", $lumi);
 
 .q
 

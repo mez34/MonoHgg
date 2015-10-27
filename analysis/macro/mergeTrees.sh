@@ -2,27 +2,31 @@
 # this scripts creates a merged root file in the self-created merged
 
 #for new samples all in FLASHgg version Spring15BetaV4
-mkdir -p data/25ns/
-hadd data/25ns/2HDM_mZP600.root		../../output/job_20151020_22315/2HDM_MZP600/2HDM_MZP600*.root
-hadd data/25ns/2HDM_mZP800.root		../../output/job_20151023_11048/2HDM_MZP800/2HDM_MZP800*.root
-hadd data/25ns/2HDM_mZP1000.root	../../output/job_20151023_11050/2HDM_MZP1000/2HDM_MZP1000*.root
-hadd data/25ns/2HDM_mZP1200.root	../../output/job_20151020_22322/2HDM_MZP1200/2HDM_MZP1200*.root
-hadd data/25ns/2HDM_mZP1400.root	../../output/job_20151023_11210/2HDM_MZP1400/2HDM_MZP1400*.root
-hadd data/25ns/2HDM_mZP1700.root	../../output/job_20151020_223234/2HDM_MZP1700/2HDM_MZP1700*.root
-hadd data/25ns/2HDM_mZP2000.root	../../output/job_20151023_11233/2HDM_MZP2000/2HDM_MZP2000*.root
-hadd data/25ns/2HDM_mZP2500.root	../../output/job_20151020_223257/2HDM_MZP2500/2HDM_MZP2500*.root
+mkdir -p data/25ns_v7/
+#hadd ../../output/25ns_v5/2HDM_mZP600.root	../../output/job_20151020_22315/2HDM_MZP600/2HDM_MZP600*.root
+#hadd ../../output/25ns_v5/2HDM_mZP800.root	../../output/job_20151023_11048/2HDM_MZP800/2HDM_MZP800*.root
+#hadd ../../output/25ns_v5/2HDM_mZP1000.root	../../output/job_20151023_11050/2HDM_MZP1000/2HDM_MZP1000*.root
+#hadd ../../output/25ns_v5/2HDM_mZP1200.root	../../output/job_20151020_22322/2HDM_MZP1200/2HDM_MZP1200*.root
+#hadd ../../output/25ns_v5/2HDM_mZP1400.root	../../output/job_20151023_11210/2HDM_MZP1400/2HDM_MZP1400*.root
+#hadd ../../output/25ns_v5/2HDM_mZP1700.root	../../output/job_20151020_223234/2HDM_MZP1700/2HDM_MZP1700*.root
+#hadd ../../output/25ns_v5/2HDM_mZP2000.root	../../output/job_20151023_11233/2HDM_MZP2000/2HDM_MZP2000*.root
+#hadd ../../output/25ns_v5/2HDM_mZP2500.root	../../output/job_20151020_223257/2HDM_MZP2500/2HDM_MZP2500*.root
 
-hadd data/25ns/DiPhoton.root		../../output/job_20151011_211929/DiPhoton/DiPhoton*.root
-hadd data/25ns/GJet_Pt-20to40.root	../../output/job_20151011_21218/GJet_Pt-20to40/GJet_Pt-20to40*.root
-hadd data/25ns/GJet_Pt-40toInf.root	../../output/job_20151011_212216/GJet_Pt-40toInf/GJet_Pt-40toInf*.root
-hadd data/25ns/QCD_Pt-30to40.root	../../output/job_20151011_212415/QCD_Pt-30to40/QCD_Pt-30to40*.root
-hadd data/25ns/QCD_Pt-30toInf.root	../../output/job_20151011_212444/QCD_Pt-30toInf/QCD_Pt-30toInf*.root
-hadd data/25ns/QCD_Pt-40toInf.root	../../output/job_20151011_212538/QCD_Pt-40toInf/QCD_Pt-40toInf*.root
-hadd data/25ns/GluGluHToGG.root		../../output/job_20151011_212615/GluGluHToGG/GluGluHToGG*.root
-hadd data/25ns/VH.root			../../output/job_20151011_212620/VH/VH*.root
-hadd data/25ns/DYJetsToLL.root		../../output/job_20151011_212626/DYJetsToLL/DYJetsToLL*.root
+hadd ../../output/25ns_v7/DiPhoton.root		../../output/job_20151027_12546/DiPhoton/DiPhoton*.root
+hadd ../../output/25ns_v7/GJet_Pt-20to40.root	../../output/job_20151027_125427/GJet_Pt-20to40/GJet_Pt-20to40*.root
+hadd ../../output/25ns_v7/GJet_Pt-40toInf.root	../../output/job_20151027_125434/GJet_Pt-40toInf/GJet_Pt-40toInf*.root
+hadd ../../output/25ns_v7/QCD_Pt-30to40.root	../../output/job_20151027_125453/QCD_Pt-30to40/QCD_Pt-30to40*.root
+hadd ../../output/25ns_v7/QCD_Pt-30toInf.root	../../output/job_20151027_125459/QCD_Pt-30toInf/QCD_Pt-30toInf*.root
+hadd ../../output/25ns_v7/QCD_Pt-40toInf.root	../../output/job_20151027_125514/QCD_Pt-40toInf/QCD_Pt-40toInf*.root
+hadd ../../output/25ns_v7/GluGluHToGG.root	../../output/job_20151027_125522/GluGluHToGG/GluGluHToGG*.root
+hadd ../../output/25ns_v7/VH.root		../../output/job_20151027_125524/VH/VH*.root
+hadd ../../output/25ns_v7/DYJetsToLL.root	../../output/job_20151027_125625/DYJetsToLL/DYJetsToLL*.root
 
-hadd data/25ns/DoubleEG.root		../../output/job_20151021_152622/DoubleEG/DoubleEG*.root
+hadd ../../output/25ns_v7/DoubleEG_p.root	../../output/job_20151027_11257/DoubleEG_2015D_05Oct2015_v1/DoubleEG*.root
+hadd ../../output/25ns_v7/DoubleEG_0.root	../../output/job_20151027_122350/DoubleEG_2015D_PromptV0/DoubleEG*.root
+hadd ../../output/25ns_v7/DoubleEG_1.root	../../output/job_20151027_123658/DoubleEG_2015D_PromptV1/DoubleEG*.root
+hadd ../../output/25ns_v7/DoubleEG_2.root	../../output/job_20151027_104120/DoubleEG_2015D_PromptV2/DoubleEG*.root
+
 
 #using PUrw file from MonoJ 
 #hadd data/50ns_betaV4/GluGluHToGG.root		../../output/job_2015102_122023/GluGluHToGG/GluGluHToGG*.root
