@@ -606,10 +606,10 @@ void Combiner::InitTH1DNames(){
   fTH1DNames.push_back("nvtx"); 
   fTH1DNames.push_back("t1pfmetphi");
   fTH1DNames.push_back("t1pfmet");
-  fTH1DNames.push_back("pfmetphi");
-  fTH1DNames.push_back("pfmet");
-  fTH1DNames.push_back("calometphi");
-  fTH1DNames.push_back("calomet");
+  //fTH1DNames.push_back("pfmetphi");
+  //fTH1DNames.push_back("pfmet");
+  //fTH1DNames.push_back("calometphi");
+  //fTH1DNames.push_back("calomet");
 
   // photon variables
   fTH1DNames.push_back("pt1");
@@ -634,8 +634,8 @@ void Combiner::InitTH1DNames(){
   fTH1DNames.push_back("neuiso2");
 
   if (addText!="_n-1"){ // plots that don't have n-1 versions 
-    fTH1DNames.push_back("eleveto1");
-    fTH1DNames.push_back("eleveto2");
+    //fTH1DNames.push_back("eleveto1");
+    //fTH1DNames.push_back("eleveto2");
     //fTH1DNames.push_back("phi1_pho2pass");
     //fTH1DNames.push_back("phi2_pho1pass");
     fTH1DNames.push_back("t1pfmet_zoom");

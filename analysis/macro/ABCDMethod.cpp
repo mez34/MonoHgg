@@ -254,8 +254,8 @@ void ABCDMethod::DoAnalysis(){
   //std::cout << "Data: Exp D = " << fExpData[0] << " Exp D err " << fExpErrData[0] << std::endl;
   for (UInt_t mc = 0; mc < fNBkg+2; mc++){
     fExpBkg[mc]=ABCDMethod::FindExpectedValuesInD(fBkg_Int[0][mc],fBkg_Int[1][mc],fBkg_Int[3][mc],fBkg_IntErr[0][mc],fBkg_IntErr[1][mc],fBkg_IntErr[3][mc],fExpErrBkg[mc]);
-    std::cout << fBkgNames[mc] << ": nA = " << fBkg_Int[0][mc] << " nB = " << fBkg_Int[1][mc] << " nC = " << fBkg_Int[3][mc] << std::endl;
-    std::cout << fBkgNames[mc] << ": Exp D = " << fExpBkg[mc] << " Exp D err " << fExpErrBkg[mc] << std::endl;
+    //std::cout << fBkgNames[mc] << ": nA = " << fBkg_Int[0][mc] << " nB = " << fBkg_Int[1][mc] << " nC = " << fBkg_Int[3][mc] << std::endl;
+    //std::cout << fBkgNames[mc] << ": Exp D = " << fExpBkg[mc] << " Exp D err " << fExpErrBkg[mc] << std::endl;
   }
   for (UInt_t mc = 0; mc < fNSig; mc++){
     fExpSig[mc]=ABCDMethod::FindExpectedValuesInD(fSig_Int[0][mc],fSig_Int[1][mc],fSig_Int[3][mc],fSig_IntErr[0][mc],fSig_IntErr[1][mc],fSig_IntErr[3][mc],fExpErrSig[mc]);
@@ -350,7 +350,7 @@ void ABCDMethod::DoABCDCalculations(){
 Double_t ABCDMethod::FindDiff(const Double_t NA, const Double_t NB, const Double_t NC, const Double_t ND){
   Double_t Diff = 0.;
   if ( NB-ND != 0 && NA > 0 && NB > 0 && NC > 0 ){
-    Diff = TMath::Abs((NC*NA/NB-ND)/(NC*NA/NB)); 
+    Diff = TMath::Abs(((NC*NA/NB)-ND)/(NC*NA/NB));// This does: (Dexp-Dobs)/Dexp 
   }  
   return Diff;
 }
@@ -456,7 +456,7 @@ void ABCDMethod::FillTable(){
         *(fRooData[3][0]->format(2,"EXPF")) << " &  " <<  
         *(fRooData[2][0]->format(2,"EXPF")) << " &  " << 
 	*(fRooData[7][0]->format(2,"EXPF")) << " &  $" <<
-        fDiffData[0] <<"$ \\\\" << std::endl;
+        Form("%f",fDiffData[0]) <<"$ \\\\" << std::endl;
      fOutTableTxtFile << "\\hline" << std::endl;
 
      for (UInt_t mc = 0; mc < fNBkg; mc++){
@@ -467,7 +467,7 @@ void ABCDMethod::FillTable(){
          *(fRooBkg[3][mc]->format(2,"EXPF")) << " &  " <<  
          *(fRooBkg[2][mc]->format(2,"EXPF")) << " &  " <<
          *(fRooBkg[7][mc]->format(2,"EXPF")) << " &  $" <<
-         fDiffBkg[mc] <<"$ \\\\" << std::endl;
+         Form("%f",fDiffBkg[mc]) <<"$ \\\\" << std::endl;
      }
      fOutTableTxtFile << "\\hline" << std::endl;
        fOutTableTxtFile << "NonRes Bkg" << " &  " << // only non-resonant bkg here 
@@ -477,7 +477,7 @@ void ABCDMethod::FillTable(){
          *(fRooBkg[3][fNBkg+1]->format(2,"EXPF")) << " &  " <<  
          *(fRooBkg[2][fNBkg+1]->format(2,"EXPF")) << " &  " << 
          *(fRooBkg[7][fNBkg+1]->format(2,"EXPF")) << " &  $" << 
-         fDiffBkg[fNBkg+1] <<"$ \\\\" << std::endl;
+         Form("%f",fDiffBkg[fNBkg+1]) <<"$ \\\\" << std::endl;
      fOutTableTxtFile << "\\hline" << std::endl;
      for (UInt_t mc = 0; mc < fNSig; mc++){
        fOutTableTxtFile << fSampleTitleMap[fSigNames[mc]] << " &  " << 
@@ -487,7 +487,7 @@ void ABCDMethod::FillTable(){
          *(fRooSig[3][mc]->format(2,"EXPF")) << " &  " <<  
          *(fRooSig[2][mc]->format(2,"EXPF")) << " &  " << 
          *(fRooSig[7][mc]->format(2,"EXPF")) << " &  $" << 
-         Form("0.3f",fDiffSig[mc]) <<"$ \\\\" << std::endl;
+         Form("%f",fDiffSig[mc]) <<"$ \\\\" << std::endl;
      }
  
      fOutTableTxtFile << "\\hline \\hline" <<std::endl;
@@ -618,19 +618,19 @@ void ABCDMethod::SetRooVariables(){
 
 void ABCDMethod::WriteDataCard( const TString fSigName, const RooRealVar* sigrate, const Double_t expsig, const DblVecVec bkgrates, const RooVecVec bkgrate){
   TString sig = *sigrate->format(2,"");
-  TString vh  = *bkgrate[2][i_vh]->format(2,"");
-  TString hgg = *bkgrate[2][i_hgg]->format(2,"");
-  TString dy  = *bkgrate[2][i_dy]->format(2,"");
-  TString gg  = *bkgrate[2][i_gg]->format(2,"");
-  TString qcd = *bkgrate[2][i_qcd]->format(2,""); 
-  TString gj  = *bkgrate[2][i_gj]->format(2,"");
-  std::cout << "sig = " << sig << " vh " << vh << " hgg " << hgg << " dy " << dy << " gg " << gg << " qcd " << qcd << " gj " << gj << std::endl; 
+  TString vh  = *bkgrate[7][i_vh]->format(2,"");
+  TString hgg = *bkgrate[7][i_hgg]->format(2,"");
+  TString dy  = *bkgrate[7][i_dy]->format(2,"");
+  TString gg  = *bkgrate[7][i_gg]->format(2,"");
+  TString qcd = *bkgrate[7][i_qcd]->format(2,""); 
+  TString gj  = *bkgrate[7][i_gj]->format(2,"");
+  //std::cout << "sig = " << sig << " vh " << vh << " hgg " << hgg << " dy " << dy << " gg " << gg << " qcd " << qcd << " gj " << gj << std::endl; 
 
   TStrVec N_C;
   N_C.resize(fNBkg);
   for (UInt_t mc = 0; mc < fNBkg; mc++){
     N_C[mc] = *bkgrate[3][mc]->format(2,"");
-    std::cout << fBkgNames[mc] << ": C = " << N_C[mc] <<std::endl;
+    //std::cout << fBkgNames[mc] << ": C = " << N_C[mc] <<std::endl;
   }
 
   TString fac_vh  = *bkgrate[6][i_vh]->format(2,"");
@@ -650,7 +650,7 @@ void ABCDMethod::WriteDataCard( const TString fSigName, const RooRealVar* sigrat
     N_A[mc] = bkgrates[0][mc];
     N_B[mc] = bkgrates[1][mc];
     mult[mc]= N_A[mc]/N_B[mc];
-    std::cout << fBkgNames[mc].Data() << " nA = " << N_A[mc] << " nB = " << N_B[mc] << " nA/nB = " << mult[mc] << std::endl;
+    //std::cout << fBkgNames[mc].Data() << " nA = " << N_A[mc] << " nB = " << N_B[mc] << " nA/nB = " << mult[mc] << std::endl;
   }
  
   std::cout << "Writing data card in: " << fOutDir.Data() << "/DataCard_" << fSigName.Data() <<".txt" << std::endl;
