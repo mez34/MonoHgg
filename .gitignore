@@ -14,6 +14,9 @@ analysis/scripts/list*/
 *.list
 *.json
 
+#ignore output from limit tools 
+analysis/limits/2HDM/*
+
 #ignore files created by batch jobs
 analysis/scripts/job*
 

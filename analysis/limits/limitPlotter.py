@@ -32,13 +32,13 @@ parser.add_option("","--nogrid",dest="nogrid",help="Remove grid from plots",acti
 # Standard Imports and calculators
 import ROOT
 import array,sys,numpy
-ROOT.gROOT.ProcessLine(".x /afs/cern.ch/work/s/soffi/CMSSW_6_1_1/src/h2gglobe/ChiaraFitLimits/tdrstyle.cc")
+ROOT.gROOT.ProcessLine(".x /afs/cern.ch/user/m/mzientek/setTDRStyle.C")
 
 ROOT.gROOT.SetBatch(True)
 ROOT.gStyle.SetOptStat(0)
 ROOT.gStyle.SetOptFit(0)
 #www_path="/afs/cern.ch/user/s/soffi/www/Limits"
-www_path="/afs/cern.ch/user/s/soffi/www/plotsMonoH"
+www_path="/afs/cern.ch/user/m/mzientek/www/Plots/25ns_Limits"
 epsilon=0.001
 
 #-------------------------------------------------------------------------
@@ -47,8 +47,8 @@ OBSmasses = []
 EXPmasses = []
 
 
-OBSmassesT = [1,10,100,1000]
-EXPmassesT = [1,10,100,1000]
+OBSmassesT = [600,800,1000,1200,1400,1700,2000,2500]#[1,10,100,1000]
+EXPmassesT = [600,800,1000,1200,1400,1700,2000,2500]#[1,10,100,1000]
 
 
 for m in OBSmassesT:
@@ -433,7 +433,7 @@ def MakeLimitPlot(MG):
     mytextPrel.SetTextSize(0.0285);
     mytextPrel.SetLineWidth(2);
     # mytext.DrawLatex(0.12,0.96,"CMS Preliminary, 19.5 fb^{-1}                                                   #sqrt{s} = 8 TeV")
-    mytextlumi.DrawLatex(0.92,0.96,"40.1 pb^{-1} (13 TeV)")
+    mytextlumi.DrawLatex(0.92,0.96,"150.1 pb^{-1} (13 TeV)")
     mytextCMS.DrawLatex(0.17915,0.89165,"CMS")
     mytextPrel.DrawLatex(0.17915,0.84665,"Preliminary")
     for t,lineT in enumerate(options.addtxt):
@@ -476,14 +476,22 @@ for i,mass,f in zip(range(len(EXPfiles)),EXPmasses,EXPfiles):
   dn95   = array.array('d',[0])
 
   if not options.doRatio:
-      if mass == 1:
-          sm=0.00227*10
-      if mass == 10:
-          sm=0.00227*10
-      if mass == 100:
-          sm=0.00227*10
+      if mass == 600:
+          sm=0.00227*0.04669
+      if mass == 800:
+          sm=0.00227*0.05174
       if mass == 1000:
-          sm=0.00227*10
+          sm=0.00227*0.04197
+      if mass == 1200:
+          sm=0.00227*0.03176
+      if mass == 1400:
+          sm=0.00227*0.02356
+      if mass == 1700:
+          sm=0.00227*0.01510
+      if mass == 2000:
+          sm=0.00227*0.009734
+      if mass == 2500:
+          sm=0.00227*0.004860
   if Method == "Asymptotic" or Method=="AsymptoticNew":   
       median[0] = getOBSERVED(f,2)
       up95[0]   = getOBSERVED(f,4)
@@ -565,14 +573,28 @@ if options.doSmooth:
   
   
   if not options.doRatio:
-     if mass == 1:
-         sm=0.00227*10
-     if mass == 10:
-         sm=0.00227*10
-     if mass == 100:
-         sm=0.00227*10
+     if mass == 600:
+         sm=0.00227*0.04669
+     if mass == 800:
+         sm=0.00227*0.05174
      if mass == 1000:
-         sm=0.00227*10
+         sm=0.00227*0.04197
+     if mass == 1200:
+         sm=0.00227*0.03176
+     if mass == 1400:
+         sm=0.00227*0.02356
+     if mass == 1700:
+         sm=0.00227*0.01510
+     if mass == 2000:
+         sm=0.00227*0.009734
+     if mass == 2500:
+          sm=0.00227*0.004860
+     #if mass == 10:
+     #    sm=0.00227*10
+     #if mass == 100:
+     #    sm=0.00227*10
+     #if mass == 1000:
+     #    sm=0.00227*10
 
   
      print "QUIQUI: "+str(mass)+"    "+str(median[0]*sm)+"   "+str(median[0]*sm*19750.)+"  "+str(up68[0]*sm)+"  "+str(dn68[0]*sm)+" "+options.width
