@@ -3,7 +3,8 @@ import FWCore.Utilities.FileUtils as FileUtils
 import FWCore.PythonUtilities.LumiList as LumiList  
 import FWCore.ParameterSet.Types as CfgTypes  
 
-isMC = False;
+isMC = True;
+is25ns = True;
 is2015D = True;
 
 process = cms.Process("diPhoAna")
@@ -19,6 +20,11 @@ from Configuration.AlCa.GlobalTag import GlobalTag
 if ((isMC==False and is2015D)):
     process.GlobalTag = GlobalTag(process.GlobalTag, '74X_dataRun2_Prompt_v2', '')
     print "74X_dataRun2_Prompt_v2"
+elif (isMC and is25ns):
+    process.GlobalTag = GlobalTag(process.GlobalTag, 'MCRUN2_74_V9', '')
+    print "MCRUN2_74_V9"
+
+
 #process.GlobalTag.globaltag = 'MCRUN2_74_V9A' 		#50ns
 #process.GlobalTag.globaltag = 'POSTLS170_V5::All' 	#Phys14
 

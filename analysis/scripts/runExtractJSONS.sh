@@ -1,25 +1,27 @@
 #! /bin/sh
 #run extractJSONS.py for all samples in file
 
-# All FLASHgg version Spring15BetaV5:
-python extractJSONS.py -i datasets/datasets_7412_betaV5_sig.json	-o 2HDM_MZP600		-d lists_25ns/MC
-python extractJSONS.py -i datasets/datasets_7412_betaV5_sig.json	-o 2HDM_MZP800		-d lists_25ns/MC
-python extractJSONS.py -i datasets/datasets_7412_betaV5_sig.json	-o 2HDM_MZP1000		-d lists_25ns/MC
-python extractJSONS.py -i datasets/datasets_7412_betaV5_sig.json	-o 2HDM_MZP1200		-d lists_25ns/MC
-python extractJSONS.py -i datasets/datasets_7412_betaV5_sig.json	-o 2HDM_MZP1400		-d lists_25ns/MC
-python extractJSONS.py -i datasets/datasets_7412_betaV5_sig.json	-o 2HDM_MZP1700		-d lists_25ns/MC
-python extractJSONS.py -i datasets/datasets_7412_betaV5_sig.json	-o 2HDM_MZP2000		-d lists_25ns/MC
-python extractJSONS.py -i datasets/datasets_7412_betaV5_sig.json	-o 2HDM_MZP2500		-d lists_25ns/MC
-python extractJSONS.py -i datasets/datasets_7412_betaV5_all.json	-o DiPhoton		-d lists_25ns/MC
-python extractJSONS.py -i datasets/datasets_7412_betaV5_all.json	-o DYJetsToLL		-d lists_25ns/MC
-python extractJSONS.py -i datasets/datasets_7412_betaV5_all.json	-o QCD_Pt-30to40	-d lists_25ns/MC
-python extractJSONS.py -i datasets/datasets_7412_betaV5_all.json	-o QCD_Pt-40toInf	-d lists_25ns/MC
-python extractJSONS.py -i datasets/datasets_7412_betaV5_all.json	-o QCD_Pt-30toInf	-d lists_25ns/MC
-python extractJSONS.py -i datasets/datasets_7412_betaV5_all.json	-o GJet_Pt-20to40	-d lists_25ns/MC
-python extractJSONS.py -i datasets/datasets_7412_betaV5_all.json	-o GJet_Pt-40toInf	-d lists_25ns/MC
-python extractJSONS.py -i datasets/datasets_7412_betaV5_all.json	-o GluGluHToGG_M-125	-d lists_25ns/MC
-python extractJSONS.py -i datasets/datasets_7412_betaV5_all.json	-o VHToGG_M125		-d lists_25ns/MC
-python extractJSONS.py -i datasets/datasets_7412_betaV5_all.json	-o DoubleEG		-d lists_25ns/Data
+# All FLASHgg version Spring15BetaV7:
+#python extractJSONS.py -i datasets/datasets_7415_betaV7_sig.json	-o 2HDM_MZP600		-d lists_25ns_v7/MC
+#python extractJSONS.py -i datasets/datasets_7415_betaV7_sig.json	-o 2HDM_MZP800		-d lists_25ns_v7/MC
+#python extractJSONS.py -i datasets/datasets_7415_betaV7_sig.json	-o 2HDM_MZP1000		-d lists_25ns_v7/MC
+#python extractJSONS.py -i datasets/datasets_7415_betaV7_sig.json	-o 2HDM_MZP1200		-d lists_25ns_v7/MC
+#python extractJSONS.py -i datasets/datasets_7415_betaV7_sig.json	-o 2HDM_MZP1400		-d lists_25ns_v7/MC
+#python extractJSONS.py -i datasets/datasets_7415_betaV7_sig.json	-o 2HDM_MZP1700		-d lists_25ns_v7/MC
+#python extractJSONS.py -i datasets/datasets_7415_betaV7_sig.json	-o 2HDM_MZP2000		-d lists_25ns_v7/MC
+#python extractJSONS.py -i datasets/datasets_7415_betaV7_sig.json	-o 2HDM_MZP2500		-d lists_25ns_v7/MC
+python extractJSONS.py -i datasets/datasets_7415_betaV7.json	-o DiPhoton		-d lists_25ns_v7/MC
+python extractJSONS.py -i datasets/datasets_7415_betaV7.json	-o DYJetsToLL		-d lists_25ns_v7/MC
+python extractJSONS.py -i datasets/datasets_7415_betaV7.json	-o QCD_Pt-30to40	-d lists_25ns_v7/MC
+python extractJSONS.py -i datasets/datasets_7415_betaV7.json	-o QCD_Pt-40toInf	-d lists_25ns_v7/MC
+python extractJSONS.py -i datasets/datasets_7415_betaV7.json	-o QCD_Pt-30toInf	-d lists_25ns_v7/MC
+python extractJSONS.py -i datasets/datasets_7415_betaV7.json	-o GJet_Pt-20to40	-d lists_25ns_v7/MC
+python extractJSONS.py -i datasets/datasets_7415_betaV7.json	-o GJet_Pt-40toInf	-d lists_25ns_v7/MC
+python extractJSONS.py -i datasets/datasets_7415_betaV7.json	-o GluGluHToGG_M-125	-d lists_25ns_v7/MC
+python extractJSONS.py -i datasets/datasets_7415_betaV7.json	-o VHToGG_M125		-d lists_25ns_v7/MC
+
+# Not using FLASHgg data (using samples mainted by Chiara now)
+#python extractJSONS.py -i datasets/datasets_7415_betaV7.json	-o DoubleEG		-d lists_25ns_v7/Data
 
 
 
