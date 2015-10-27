@@ -1,4 +1,4 @@
-#include "mkPlotsLivia/CMS_lumi.C"
+#include "CMS_lumi.C"
 using namespace RooFit;
 using namespace RooStats ;
 
@@ -11,7 +11,7 @@ void AddSigData(RooWorkspace*, Float_t);
 void AddBkgData(RooWorkspace*, Float_t);
 void MakePlotMassDataMC(RooWorkspace*);
 void MakePlotNVTXDataMC(RooWorkspace*, Float_t);
-
+void ComputeABCDnumbers(RooWorkspace*, std::string);
 
 
 RooArgSet* defineVariables() {
@@ -65,7 +65,7 @@ void MakePlotMassDataMC(RooWorkspace* w, std::string var, int BINS, double MIN, 
   TString inDir = "";
 
   // Luminosity:
-  Float_t Lum = 40.0;  
+  Float_t Lum = 150.0;  
   RooRealVar lumi("lumi","lumi",Lum);
   w->import(lumi); 
   
@@ -74,47 +74,50 @@ void MakePlotMassDataMC(RooWorkspace* w, std::string var, int BINS, double MIN, 
  
   // common preselection cut
   TString mainCut = "(mgg>=100 && mgg<200)&& hltDiphoton30Mass95";   //130-2000 abs(sceta1)>1.4442&&abs(sceta2)>1.4442&&
-  if(metCut) mainCut+="&&t1pfmet>100"; 
+  if(metCut) mainCut+="&&t1pfmet>100";
+
+  TString dataCut = "(mgg<110 || mgg>130)&& hltDiphoton30Mass95 && t1pfmet<100";
+ 
   //**********DATA***************//
-  TFile file("data/50ns_betaV4/DoubleEG.root");
+  TFile file("../data/25ns/DoubleEG.root");
   TTree* dataTree = (TTree*) file.Get("DiPhotonTree");
    
   //**********G+jets***************//
   TChain* gjTree = new TChain();
-  gjTree->Add("data/50ns_betaV4/GJets.root/DiPhotonTree");
+  gjTree->Add("../data/25ns/GJets.root/DiPhotonTree");
 
   //**********QCD***************//
   TChain* qcdTree = new TChain();
-  qcdTree->Add("data/50ns_betaV4/QCD.root/DiPhotonTree");
+  qcdTree->Add("../data/25ns/QCD.root/DiPhotonTree");
   
   //**********DIPHOT***************//
   TChain* diphotTree = new TChain();
-  diphotTree->Add("data/50ns_betaV4/DiPhoton.root/DiPhotonTree");
+  diphotTree->Add("../data/25ns/DiPhoton.root/DiPhotonTree");
 
   //**********DY***************//
   TChain* dyTree = new TChain();
-  dyTree->Add("data/50ns_betaV4/DYJetsToLL.root/DiPhotonTree");
+  dyTree->Add("../data/25ns/DYJetsToLL.root/DiPhotonTree");
 
   //**********GGH***************//
   TChain* gghTree = new TChain();
-  gghTree->Add("data/50ns_betaV4/GluGluHToGG.root/DiPhotonTree");
+  gghTree->Add("../data/25ns/GluGluHToGG.root/DiPhotonTree");
   
   //**********VH***************//
   TChain* vhTree = new TChain();
-  vhTree->Add("data/50ns_betaV4/VH.root/DiPhotonTree");
+  vhTree->Add("../data/25ns/VH.root/DiPhotonTree");
  
   //**********M1***************//
   TChain* m1Tree = new TChain();
-  m1Tree->Add("data/50ns_betaV4/DMHtoGG_M1.root/DiPhotonTree");
+  m1Tree->Add("../data/25ns/2HDM_mZP600.root/DiPhotonTree");
   ///**********M10***************//
   TChain* m10Tree = new TChain();
-  m10Tree->Add("data/50ns_betaV4/DMHtoGG_M10.root/DiPhotonTree");
+  m10Tree->Add("../data/25ns/2HDM_mZP1200.root/DiPhotonTree");
   //**********M100***************//
   TChain* m100Tree = new TChain();
-  m100Tree->Add("data/50ns_betaV4/DMHtoGG_M100.root/DiPhotonTree");
+  m100Tree->Add("../data/25ns/2HDM_mZP1700.root/DiPhotonTree");
   //**********M1000***************//
   TChain* m1000Tree = new TChain();
-  m1000Tree->Add("data/50ns_betaV4/DMHtoGG_M1000.root/DiPhotonTree");
+  m1000Tree->Add("../data/25ns/2HDM_mZP2500.root/DiPhotonTree");
 
 
   TH1F* h_data;
@@ -153,7 +156,7 @@ void MakePlotMassDataMC(RooWorkspace* w, std::string var, int BINS, double MIN, 
 
   
   
-  dataTree->Draw((var+">>h_data_cat0").c_str(), "("+mainCut+")*1");
+  dataTree->Draw((var+">>h_data_cat0").c_str(), "("+dataCut+")*1");
   gjTree->Draw((var+">>h_gj_cat0").c_str(), "("+mainCut+")*weight");
   qcdTree->Draw((var+">>h_qcd_cat0").c_str(), "("+mainCut+")*weight");
   diphotTree->Draw((var+">>h_diphot_cat0").c_str(),"("+ mainCut+")*weight");
@@ -514,46 +517,47 @@ void ComputeABCDnumbers(RooWorkspace* w, std::string var ) {
  
   // common preselection cut
   TString mainCut = "(mgg>=100 && mgg<300)&& hltDiphoton30Mass95";   //130-2000 abs(sceta1)>1.4442&&abs(sceta2)>1.4442&&
+  TString dataCut = "(mgg<110 || mgg>130)&& hltDiphoton30Mass95 && t1pfmet<100";
 
   //**********DATA***************//
-  TFile file("data/50ns_betaV4/DoubleEG.root");
+  TFile file("../data/25ns/DoubleEG.root");
   TTree* dataTree = (TTree*) file.Get("DiPhotonTree");
    
   //**********G+jets***************//
   TChain* gjTree = new TChain();
-  gjTree->Add("data/50ns_betaV4/GJets.root/DiPhotonTree");
+  gjTree->Add("../data/25ns/GJets.root/DiPhotonTree");
 
   //**********QCD***************//
   TChain* qcdTree = new TChain();
-  qcdTree->Add("data/50ns_betaV4/QCD.root/DiPhotonTree");
+  qcdTree->Add("../data/25ns/QCD.root/DiPhotonTree");
   
   //**********DIPHOT***************//
   TChain* diphotTree = new TChain();
-  diphotTree->Add("data/50ns_betaV4/DiPhoton.root/DiPhotonTree");
+  diphotTree->Add("../data/25ns/DiPhoton.root/DiPhotonTree");
 
   //**********DY***************//
   TChain* dyTree = new TChain();
-  dyTree->Add("data/50ns_betaV4/DYJetsToLL.root/DiPhotonTree");
+  dyTree->Add("../data/25ns/DYJetsToLL.root/DiPhotonTree");
 
   //**********GGH***************//
   TChain* gghTree = new TChain();
-  gghTree->Add("data/50ns_betaV4/GluGluHToGG.root/DiPhotonTree");
+  gghTree->Add("../data/25ns/GluGluHToGG.root/DiPhotonTree");
   
   //**********VH***************//
   TChain* vhTree = new TChain();
-  vhTree->Add("data/50ns_betaV4/VH.root/DiPhotonTree"); 
+  vhTree->Add("../data/25ns/VH.root/DiPhotonTree"); 
   //**********M1***************//
   TChain* m1Tree = new TChain();
-  m1Tree->Add("data/50ns_betaV4/DMHtoGG_M1.root/DiPhotonTree");
+  m1Tree->Add("../data/25ns/2HDM_mZP600.root/DiPhotonTree");
   ///**********M10***************//
   TChain* m10Tree = new TChain();
-  m10Tree->Add("data/50ns_betaV4/DMHtoGG_M10.root/DiPhotonTree");
+  m10Tree->Add("../data/25ns/2HDM_mZP1200.root/DiPhotonTree");
   //**********M100***************//
   TChain* m100Tree = new TChain();
-  m100Tree->Add("data/50ns_betaV4/DMHtoGG_M100.root/DiPhotonTree");
+  m100Tree->Add("../data/25ns/2HDM_mZP1700.root/DiPhotonTree");
   //**********M1000***************//
   TChain* m1000Tree = new TChain();
-  m1000Tree->Add("data/50ns_betaV4/DMHtoGG_M1000.root/DiPhotonTree");
+  m1000Tree->Add("../data/25ns/2HDM_mZP2500.root/DiPhotonTree");
 
   TH2F*  h_diphot;
   TH2F*  h_hgg;
@@ -874,38 +878,38 @@ void MakePlotCutFlowDataMC(RooWorkspace* w ) {
   
   
   //**********DATA***************//
-  TFile file("data/50ns_betaV4/DoubleEG.root");
+  TFile file("../data/25ns/DoubleEG.root");
   TH1F* h_data = (TH1F*) file.Get("h_selection");
    
   //**********G+jets***************//
-  TFile gjTree("data/50ns_betaV4/GJets.root");
+  TFile gjTree("../data/25ns/GJets.root");
   TH1F* h_gj = (TH1F*) gjTree.Get("h_selection");
   //**********QCD***************//
-  TFile qcdTree("data/50ns_betaV4/QCD.root");
+  TFile qcdTree("../data/25ns/QCD.root");
   TH1F* h_qcd = (TH1F*) qcdTree.Get("h_selection");
   //**********DIPHOT***************//
-  TFile diphotTree("data/50ns_betaV4/DiPhoton.root");
+  TFile diphotTree("../data/25ns/DiPhoton.root");
   TH1F* h_diphot = (TH1F*) diphotTree.Get("h_selection");
   //**********GGH***************//
-  TFile gghTree("data/50ns_betaV4/GluGluHToGG.root");
+  TFile gghTree("../data/25ns/GluGluHToGG.root");
   TH1F* h_ggh = (TH1F*) gghTree.Get("h_selection");
  //**********DY***************//
-  TFile dyTree("data/50ns_betaV4/DYJetsToLL.root");
+  TFile dyTree("../data/25ns/DYJetsToLL.root");
   TH1F* h_dy = (TH1F*) dyTree.Get("h_selection");
   //**********VH***************//
-  TFile vhTree("data/50ns_betaV4/VH.root");
+  TFile vhTree("../data/25ns/VH.root");
   TH1F* h_vh = (TH1F*) vhTree.Get("h_selection");
   //**********M1***************//
-  TFile m1Tree("data/50ns_betaV4/DMHtoGG_M1.root");
+  TFile m1Tree("../data/25ns/2HDM_mZP600.root");
   TH1F* h_m1 = (TH1F*) m1Tree.Get("h_selection");
   ///**********M10***************//
-  TFile m10Tree("data/50ns_betaV4/DMHtoGG_M10.root");
+  TFile m10Tree("../data/25ns/2HDM_mZP1200.root");
   TH1F* h_m10 = (TH1F*) m10Tree.Get("h_selection");
   //**********M100***************//
-  TFile m100Tree("data/50ns_betaV4/DMHtoGG_M100.root");
+  TFile m100Tree("../data/25ns/2HDM_mZP1700.root");
   TH1F* h_m100 = (TH1F*) m100Tree.Get("h_selection");
   //**********M1000***************//
-  TFile m1000Tree("data/50ns_betaV4/DMHtoGG_M1000.root");
+  TFile m1000Tree("../data/25ns/2HDM_mZP2500.root");
   TH1F* h_m1000 = (TH1F*) m1000Tree.Get("h_selection");
 
 
