@@ -12,20 +12,20 @@ mkdir -p data/25ns_v7/
 #hadd ../../output/25ns_v5/2HDM_mZP2000.root	../../output/job_20151023_11233/2HDM_MZP2000/2HDM_MZP2000*.root
 #hadd ../../output/25ns_v5/2HDM_mZP2500.root	../../output/job_20151020_223257/2HDM_MZP2500/2HDM_MZP2500*.root
 
-hadd ../../output/25ns_v7/DiPhoton.root		../../output/job_20151027_12546/DiPhoton/DiPhoton*.root
-hadd ../../output/25ns_v7/GJet_Pt-20to40.root	../../output/job_20151027_125427/GJet_Pt-20to40/GJet_Pt-20to40*.root
-hadd ../../output/25ns_v7/GJet_Pt-40toInf.root	../../output/job_20151027_125434/GJet_Pt-40toInf/GJet_Pt-40toInf*.root
-hadd ../../output/25ns_v7/QCD_Pt-30to40.root	../../output/job_20151027_125453/QCD_Pt-30to40/QCD_Pt-30to40*.root
-hadd ../../output/25ns_v7/QCD_Pt-30toInf.root	../../output/job_20151027_125459/QCD_Pt-30toInf/QCD_Pt-30toInf*.root
-hadd ../../output/25ns_v7/QCD_Pt-40toInf.root	../../output/job_20151027_125514/QCD_Pt-40toInf/QCD_Pt-40toInf*.root
-hadd ../../output/25ns_v7/GluGluHToGG.root	../../output/job_20151027_125522/GluGluHToGG/GluGluHToGG*.root
-hadd ../../output/25ns_v7/VH.root		../../output/job_20151027_125524/VH/VH*.root
-hadd ../../output/25ns_v7/DYJetsToLL.root	../../output/job_20151027_125625/DYJetsToLL/DYJetsToLL*.root
+hadd ../../output/25ns_v7_wPU/DiPhoton.root		../../output/job_20151028_115214/DiPhoton/DiPhoton*.root
+hadd ../../output/25ns_v7_wPU/GJet_Pt-20to40.root	../../output/job_20151028_115239/GJet_Pt-20to40/GJet_Pt-20to40*.root
+hadd ../../output/25ns_v7_wPU/GJet_Pt-40toInf.root	../../output/job_20151028_115247/GJet_Pt-40toInf/GJet_Pt-40toInf*.root
+hadd ../../output/25ns_v7_wPU/QCD_Pt-30to40.root	../../output/job_20151028_11539/QCD_Pt-30to40/QCD_Pt-30to40*.root
+hadd ../../output/25ns_v7_wPU/QCD_Pt-30toInf.root	../../output/job_20151028_115316/QCD_Pt-30toInf/QCD_Pt-30toInf*.root
+hadd ../../output/25ns_v7_wPU/QCD_Pt-40toInf.root	../../output/job_20151028_115328/QCD_Pt-40toInf/QCD_Pt-40toInf*.root
+hadd ../../output/25ns_v7_wPU/GluGluHToGG.root		../../output/job_20151028_115341/GluGluHToGG/GluGluHToGG*.root
+hadd ../../output/25ns_v7_wPU/VH.root			../../output/job_20151028_115345/VH/VH*.root
+hadd ../../output/25ns_v7_wPU/DYJetsToLL.root		../../output/job_20151028_115347/DYJetsToLL/DYJetsToLL*.root
 
-hadd ../../output/25ns_v7/DoubleEG_p.root	../../output/job_20151027_11257/DoubleEG_2015D_05Oct2015_v1/DoubleEG*.root
-hadd ../../output/25ns_v7/DoubleEG_0.root	../../output/job_20151027_122350/DoubleEG_2015D_PromptV0/DoubleEG*.root
-hadd ../../output/25ns_v7/DoubleEG_1.root	../../output/job_20151027_123658/DoubleEG_2015D_PromptV1/DoubleEG*.root
-hadd ../../output/25ns_v7/DoubleEG_2.root	../../output/job_20151027_104120/DoubleEG_2015D_PromptV2/DoubleEG*.root
+#hadd ../../output/25ns_v7/DoubleEG_p.root	../../output/job_20151027_11257/DoubleEG_2015D_05Oct2015_v1/DoubleEG*.root
+#hadd ../../output/25ns_v7/DoubleEG_0.root	../../output/job_20151027_122350/DoubleEG_2015D_PromptV0/DoubleEG*.root
+#hadd ../../output/25ns_v7/DoubleEG_1.root	../../output/job_20151027_123658/DoubleEG_2015D_PromptV1/DoubleEG*.root
+#hadd ../../output/25ns_v7/DoubleEG_2.root	../../output/job_20151027_104120/DoubleEG_2015D_PromptV2/DoubleEG*.root
 
 
 #using PUrw file from MonoJ 

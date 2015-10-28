@@ -8,33 +8,28 @@
 
 # 50ns samples
 
-./submitBatchDiPho.py --cfg diPhoAnaBATCH.py Higgs_scalar_nohdecay_gg_1000GeV	1 100   /afs/cern.ch/user/m/mzientek/private/MonoHggCMSSW/CMSSW_7_4_6_patch2/src/MonoHgg/analysis/scripts/PURW_bkg.root 0.01 1 #10fb xsec
-./submitBatchDiPho.py --cfg diPhoAnaBATCH.py Higgs_scalar_nohdecay_gg_100GeV	1 101   /afs/cern.ch/user/m/mzientek/private/MonoHggCMSSW/CMSSW_7_4_6_patch2/src/MonoHgg/analysis/scripts/PURW_bkg.root 0.01 1
-./submitBatchDiPho.py --cfg diPhoAnaBATCH.py Higgs_scalar_nohdecay_gg_10GeV	1 102   /afs/cern.ch/user/m/mzientek/private/MonoHggCMSSW/CMSSW_7_4_6_patch2/src/MonoHgg/analysis/scripts/PURW_bkg.root 0.01 1
-./submitBatchDiPho.py --cfg diPhoAnaBATCH.py Higgs_scalar_nohdecay_gg_1GeV	1 103   /afs/cern.ch/user/m/mzientek/private/MonoHggCMSSW/CMSSW_7_4_6_patch2/src/MonoHgg/analysis/scripts/PURW_bkg.root 0.01 1
+#./submitBatchDiPho.py --cfg diPhoAnaBATCH.py Higgs_scalar_nohdecay_gg_1000GeV	1 100   /afs/cern.ch/user/m/mzientek/private/MonoHggCMSSW/CMSSW_7_4_12/src/MonoHgg/analysis/scripts/PURW_MC.root 0.01 1 #10fb xsec
+#./submitBatchDiPho.py --cfg diPhoAnaBATCH.py Higgs_scalar_nohdecay_gg_100GeV	1 101   /afs/cern.ch/user/m/mzientek/private/MonoHggCMSSW/CMSSW_7_4_12/src/MonoHgg/analysis/scripts/PURW_MC.root 0.01 1
+#./submitBatchDiPho.py --cfg diPhoAnaBATCH.py Higgs_scalar_nohdecay_gg_10GeV	1 102   /afs/cern.ch/user/m/mzientek/private/MonoHggCMSSW/CMSSW_7_4_12/src/MonoHgg/analysis/scripts/PURW_MC.root 0.01 1
+#./submitBatchDiPho.py --cfg diPhoAnaBATCH.py Higgs_scalar_nohdecay_gg_1GeV	1 103   /afs/cern.ch/user/m/mzientek/private/MonoHggCMSSW/CMSSW_7_4_12/src/MonoHgg/analysis/scripts/PURW_MC.root 0.01 1
+./submitBatchDiPho.py --cfg diPhoAnaBATCH.py DiPhoton				1 15    /afs/cern.ch/user/m/mzientek/private/MonoHggCMSSW/CMSSW_7_4_12/src/MonoHgg/analysis/scripts/PURW_MC.root 84.0 1
+./submitBatchDiPho.py --cfg diPhoAnaBATCH.py GJet_Pt-20to40     		1  1    /afs/cern.ch/user/m/mzientek/private/MonoHggCMSSW/CMSSW_7_4_12/src/MonoHgg/analysis/scripts/PURW_MC.root  218.6108 1  
+./submitBatchDiPho.py --cfg diPhoAnaBATCH.py GJet_Pt-40toInf    		1  2    /afs/cern.ch/user/m/mzientek/private/MonoHggCMSSW/CMSSW_7_4_12/src/MonoHgg/analysis/scripts/PURW_MC.root  863.1088 1
 
-./submitBatchDiPho.py --cfg diPhoAnaBATCH.py DiPhoton				1 15    /afs/cern.ch/user/m/mzientek/private/MonoHggCMSSW/CMSSW_7_4_6_patch2/src/MonoHgg/analysis/scripts/PURW_bkg.root 84.0 1
+./submitBatchDiPho.py --cfg diPhoAnaBATCH.py QCD_Pt-30to40      		1  3    /afs/cern.ch/user/m/mzientek/private/MonoHggCMSSW/CMSSW_7_4_12/src/MonoHgg/analysis/scripts/PURW_MC.root  24300   1
+./submitBatchDiPho.py --cfg diPhoAnaBATCH.py QCD_Pt-30toInf     		1  4    /afs/cern.ch/user/m/mzientek/private/MonoHggCMSSW/CMSSW_7_4_12/src/MonoHgg/analysis/scripts/PURW_MC.root  259296  1
+./submitBatchDiPho.py --cfg diPhoAnaBATCH.py QCD_Pt-40toInf     		1  5    /afs/cern.ch/user/m/mzientek/private/MonoHggCMSSW/CMSSW_7_4_12/src/MonoHgg/analysis/scripts/PURW_MC.root  108240  1
 
-#./submitBatchDiPho.py --cfg diPhoAnaBATCH.py ZH				1 11    /afs/cern.ch/user/m/mzientek/private/MonoHggCMSSW/CMSSW_7_4_6_patch2/src/MonoHgg/analysis/scripts/PURW_bkg.root 0.8696 1 
-#./submitBatchDiPho.py --cfg diPhoAnaBATCH.py WminusH				1 12    /afs/cern.ch/user/m/mzientek/private/MonoHggCMSSW/CMSSW_7_4_6_patch2/src/MonoHgg/analysis/scripts/PURW_bkg.root 1.38 1
-#./submitBatchDiPho.py --cfg diPhoAnaBATCH.py WplusH				1 13    /afs/cern.ch/user/m/mzientek/private/MonoHggCMSSW/CMSSW_7_4_6_patch2/src/MonoHgg/analysis/scripts/PURW_bkg.root 1.38 1 
-./submitBatchDiPho.py --cfg diPhoAnaBATCH.py GJet_Pt-20to40     		1  1    /afs/cern.ch/user/m/mzientek/private/MonoHggCMSSW/CMSSW_7_4_6_patch2/src/MonoHgg/analysis/scripts/PURW_bkg.root  218.6108 1  
-./submitBatchDiPho.py --cfg diPhoAnaBATCH.py GJet_Pt-40toInf    		1  2    /afs/cern.ch/user/m/mzientek/private/MonoHggCMSSW/CMSSW_7_4_6_patch2/src/MonoHgg/analysis/scripts/PURW_bkg.root  863.1088 1
+./submitBatchDiPho.py --cfg diPhoAnaBATCH.py GluGluHToGG	     		1  10   /afs/cern.ch/user/m/mzientek/private/MonoHggCMSSW/CMSSW_7_4_12/src/MonoHgg/analysis/scripts/PURW_MC.root  0.08784 1 #value=xsec*br (xsec=43.92,br=0.002)
 
-./submitBatchDiPho.py --cfg diPhoAnaBATCH.py QCD_Pt-30to40      		1  3    /afs/cern.ch/user/m/mzientek/private/MonoHggCMSSW/CMSSW_7_4_6_patch2/src/MonoHgg/analysis/scripts/PURW_bkg.root  24300   1
-./submitBatchDiPho.py --cfg diPhoAnaBATCH.py QCD_Pt-30toInf     		1  4    /afs/cern.ch/user/m/mzientek/private/MonoHggCMSSW/CMSSW_7_4_6_patch2/src/MonoHgg/analysis/scripts/PURW_bkg.root  259296  1
-./submitBatchDiPho.py --cfg diPhoAnaBATCH.py QCD_Pt-40toInf     		1  5    /afs/cern.ch/user/m/mzientek/private/MonoHggCMSSW/CMSSW_7_4_6_patch2/src/MonoHgg/analysis/scripts/PURW_bkg.root  108240  1
+./submitBatchDiPho.py --cfg diPhoAnaBATCH.py VH					1  11   /afs/cern.ch/user/m/mzientek/private/MonoHggCMSSW/CMSSW_7_4_12/src/MonoHgg/analysis/scripts/PURW_MC.root  0.0044992 1 #value=xsec(ZH+WH)*br (xsec=2.2496,br=0.002)
 
-./submitBatchDiPho.py --cfg diPhoAnaBATCH.py GluGluHToGG	     		1  10   /afs/cern.ch/user/m/mzientek/private/MonoHggCMSSW/CMSSW_7_4_6_patch2/src/MonoHgg/analysis/scripts/PURW_bkg.root  0.08784 1 #value=xsec*br (xsec=43.92,br=0.002)
+./submitBatchDiPho.py --cfg diPhoAnaBATCH.py DYJetsToLL				1  12   /afs/cern.ch/user/m/mzientek/private/MonoHggCMSSW/CMSSW_7_4_12/src/MonoHgg/analysis/scripts/PURW_MC.root  6025.2 1 
 
-./submitBatchDiPho.py --cfg diPhoAnaBATCH.py VH					1  11   /afs/cern.ch/user/m/mzientek/private/MonoHggCMSSW/CMSSW_7_4_6_patch2/src/MonoHgg/analysis/scripts/PURW_bkg.root  0.0044992 1 #value=xsec(ZH+WH)*br (xsec=2.2496,br=0.002)
-
-./submitBatchDiPho.py --cfg diPhoAnaBATCH.py DYJetsToLL				1  12   /afs/cern.ch/user/m/mzientek/private/MonoHggCMSSW/CMSSW_7_4_6_patch2/src/MonoHgg/analysis/scripts/PURW_bkg.root  6025.2 1 
-
-#./submitBatchDiPho.py --cfg diPhoAnaBATCH.py ttHJetToGG_M120    		1  6    /afs/cern.ch/user/m/mzientek/private/MonoHggCMSSW/CMSSW_7_4_6_patch2/src/MonoHgg/analysis/scripts/PURW_bkg.root  0.5085 1
+#./submitBatchDiPho.py --cfg diPhoAnaBATCH.py ttHJetToGG_M120    		1  6    /afs/cern.ch/user/m/mzientek/private/MonoHggCMSSW/CMSSW_7_4_12/src/MonoHgg/analysis/scripts/PURW_MC.root  0.5085 1
 
 # 50ns Data
-./submitBatchDiPho.py --cfg diPhoAnaBATCH.py DoubleEG           		0 10000 pippo  1 1
+#./submitBatchDiPho.py --cfg diPhoAnaBATCH.py DoubleEG           		0 10000 pippo  1 1
 #./submitBatchDiPho.py --cfg diPhoAnaBATCH.py EGamma             		0  10001 pippo  1 1
 #./submitBatchDiPho.py --cfg diPhoAnaBATCH.py SinglePhoton       		0 10002 pippo  1 1
  

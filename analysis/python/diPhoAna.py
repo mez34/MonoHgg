@@ -26,7 +26,7 @@ elif (isMC and is25ns):
     process.GlobalTag = GlobalTag(process.GlobalTag, 'MCRUN2_74_V9', '')
     print "MCRUN2_74_V9"
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32( 10000 ) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32( 1000 ) )
 
 process.source = cms.Source("PoolSource",
                             fileNames=cms.untracked.vstring(
@@ -47,7 +47,19 @@ process.source = cms.Source("PoolSource",
 	#"/store/user/mzientek/RunIISpring15-50ns/Higgs_scalar/Higgs_scalar_nohdecay_gg_1000GeV_13TeV_RunIISpring15-50ns-Spring15BetaV1_MetaV3-v0-RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1/150818_162723/0000/myMicroAODOutputFile_1.root"
 	#"file:myMicroAODOutputFile.root"
 	#"/store/group/phys_higgs/cmshgg/musella/flashgg/EXOSpring15_7412_v2/diphotons_7412_v1/SingleElectron/EXOSpring15_7412_v2-diphotons_7412_v1-v2-Run2015D-PromptReco-v3/151006_034715/0000/diphotonsMicroAOD_1.root"
-	"/store/group/phys_higgs/cmshgg/sethzenz/flashgg/RunIISpring15-ReMiniAOD-BetaV7-25ns/Spring15BetaV7/VHToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8/RunIISpring15-ReMiniAOD-BetaV7-25ns-Spring15BetaV7-v0-RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/151021_152953/0000/myMicroAODOutputFile_1.root"
+	"/store/group/phys_higgs/cmshgg/sethzenz/flashgg/RunIISpring15-ReMiniAOD-BetaV7-25ns/Spring15BetaV7/VHToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8/RunIISpring15-ReMiniAOD-BetaV7-25ns-Spring15BetaV7-v0-RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/151021_152953/0000/myMicroAODOutputFile_1.root",
+	"/store/group/phys_higgs/cmshgg/musella/flashgg/EXOSpring15_7415_v2/diphotons_7415_v2/DoubleEG/EXOSpring15_7415_v2-diphotons_7415_v2-v2-Run2015D-PromptReco-v4/151020_202017/0000/diphotonsMicroAOD_1.root",
+	"/store/group/phys_higgs/cmshgg/musella/flashgg/EXOSpring15_7415_v2/diphotons_7415_v2/DoubleEG/EXOSpring15_7415_v2-diphotons_7415_v2-v2-Run2015D-PromptReco-v4/151020_202017/0000/diphotonsMicroAOD_10.root",
+	"/store/group/phys_higgs/cmshgg/musella/flashgg/EXOSpring15_7415_v2/diphotons_7415_v2/DoubleEG/EXOSpring15_7415_v2-diphotons_7415_v2-v2-Run2015D-PromptReco-v4/151020_202017/0000/diphotonsMicroAOD_100.root",
+	"/store/group/phys_higgs/cmshgg/musella/flashgg/EXOSpring15_7415_v2/diphotons_7415_v2/DoubleEG/EXOSpring15_7415_v2-diphotons_7415_v2-v2-Run2015D-PromptReco-v4/151020_202017/0000/diphotonsMicroAOD_101.root",
+	"/store/group/phys_higgs/cmshgg/musella/flashgg/EXOSpring15_7415_v2/diphotons_7415_v2/DoubleEG/EXOSpring15_7415_v2-diphotons_7415_v2-v2-Run2015D-PromptReco-v4/151020_202017/0000/diphotonsMicroAOD_102.root",
+	"/store/group/phys_higgs/cmshgg/musella/flashgg/EXOSpring15_7415_v2/diphotons_7415_v2/DoubleEG/EXOSpring15_7415_v2-diphotons_7415_v2-v2-Run2015D-PromptReco-v4/151020_202017/0000/diphotonsMicroAOD_103.root",
+	"/store/group/phys_higgs/cmshgg/musella/flashgg/EXOSpring15_7415_v2/diphotons_7415_v2/DoubleEG/EXOSpring15_7415_v2-diphotons_7415_v2-v2-Run2015D-PromptReco-v4/151020_202017/0000/diphotonsMicroAOD_104.root",
+	"/store/group/phys_higgs/cmshgg/musella/flashgg/EXOSpring15_7415_v2/diphotons_7415_v2/DoubleEG/EXOSpring15_7415_v2-diphotons_7415_v2-v2-Run2015D-PromptReco-v4/151020_202017/0000/diphotonsMicroAOD_105.root",
+	"/store/group/phys_higgs/cmshgg/musella/flashgg/EXOSpring15_7415_v2/diphotons_7415_v2/DoubleEG/EXOSpring15_7415_v2-diphotons_7415_v2-v2-Run2015D-PromptReco-v4/151020_202017/0000/diphotonsMicroAOD_106.root",
+	"/store/group/phys_higgs/cmshgg/musella/flashgg/EXOSpring15_7415_v2/diphotons_7415_v2/DoubleEG/EXOSpring15_7415_v2-diphotons_7415_v2-v2-Run2015D-PromptReco-v4/151020_202017/0000/diphotonsMicroAOD_107.root",
+	"/store/group/phys_higgs/cmshgg/musella/flashgg/EXOSpring15_7415_v2/diphotons_7415_v2/DoubleEG/EXOSpring15_7415_v2-diphotons_7415_v2-v2-Run2015D-PromptReco-v4/151020_202017/0000/diphotonsMicroAOD_108.root",
+	"/store/group/phys_higgs/cmshgg/musella/flashgg/EXOSpring15_7415_v2/diphotons_7415_v2/DoubleEG/EXOSpring15_7415_v2-diphotons_7415_v2-v2-Run2015D-PromptReco-v4/151020_202017/0000/diphotonsMicroAOD_109.root",
 	#"/store/group/phys_higgs/cmshgg/musella/flashgg/EXOSpring15_7415_v2/diphotons_7415_v2/DoubleEG/EXOSpring15_7415_v2-diphotons_7415_v2-v0-Run2015D-05Oct2015-v1/151019_005512/0000/diphotonsMicroAOD_1.root"
 	#"/store/group/phys_higgs/cmshgg/mdonega/flashgg/RunIISpring15-50ns/Spring15BetaV2/GJet_Pt-40toInf_DoubleEMEnriched_MGG-80toInf_TuneCUETP8M1_13TeV_Pythia8/RunIISpring15-50ns-Spring15BetaV2-v0-RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1/150716_155016/0000/myMicroAODOutputFile_1.root" 
 	#"/store/group/phys_higgs/soffi/flashgg/testMonoHLivia2/Phys14MicroAODV3-55-gc1f8d91/Higgs_scalar/testMonoHLivia2-Phys14MicroAODV3-55-gc1f8d91-v0-soffi-Higgs_scalar_nohdecay_gg_1000GeV_13TeV_MINIAODSIM_v11-7d492cb64f2cdaff326f939f96e45c96/150724_112944/0000/myMicroAODOutputFile_1.root"
@@ -60,6 +72,7 @@ if (isMC==False and is2015D):
     JSONfile = '/afs/cern.ch/user/c/crovelli/public/json2015/doubleEG/processedAndGolden_2015D_oct25.json'
     myLumis = LumiList.LumiList(filename = JSONfile).getCMSSWString().split(',')  
     process.source.lumisToProcess.extend(myLumis)                              
+    print myLumis 
 
 process.load("flashgg/MicroAOD/flashggPhotons_cfi")
 process.load("flashgg/MicroAOD/flashggDiPhotons_cfi")

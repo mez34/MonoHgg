@@ -3,7 +3,7 @@ import FWCore.Utilities.FileUtils as FileUtils
 import FWCore.PythonUtilities.LumiList as LumiList  
 import FWCore.ParameterSet.Types as CfgTypes  
 
-isMC = True;
+isMC = False;
 is25ns = True;
 is2015D = True;
 

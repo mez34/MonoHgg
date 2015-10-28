@@ -18,8 +18,8 @@
 ./submitBatchDiPho.py --cfg diPhoAnaBATCH.py QCD_Pt-30to40      		0  3  pippo  24300   1
 ./submitBatchDiPho.py --cfg diPhoAnaBATCH.py QCD_Pt-30toInf     		0  4  pippo  259296  1
 ./submitBatchDiPho.py --cfg diPhoAnaBATCH.py QCD_Pt-40toInf     		0  5  pippo  108240  1
-./submitBatchDiPho.py --cfg diPhoAnaBATCH.py GluGluHToGG	     		0  10 pippo  0.08784 1 #value=xsec*br (xsec=43.92,br=0.002)
-./submitBatchDiPho.py --cfg diPhoAnaBATCH.py VH					0  11 pippo  0.0044992 1 #value=xsec(ZH+WH)*br (xsec=2.2496,br=0.002)
+./submitBatchDiPho.py --cfg diPhoAnaBATCH.py GluGluHToGG	     		0  10 pippo  0.08784 1     #value=xsec*br (xsec=43.92,br=0.002)
+./submitBatchDiPho.py --cfg diPhoAnaBATCH.py VH					0  11 pippo  0.0044992 1   #value=xsec(ZH+WH)*br (xsec=2.2496,br=0.002)
 ./submitBatchDiPho.py --cfg diPhoAnaBATCH.py DYJetsToLL				0  12 pippo  6025.2 1 
 
 ./submitBatchDiPho.py --cfg diPhoAnaBATCH.py 2HDM_MZP600			0  100 pippo 0.00009338  1 #46.69fb xsec * 0.002br
@@ -31,8 +31,8 @@
 ./submitBatchDiPho.py --cfg diPhoAnaBATCH.py 2HDM_MZP2000			0  100 pippo 0.000019468 1 #9.734fb xsec * 0.002br
 ./submitBatchDiPho.py --cfg diPhoAnaBATCH.py 2HDM_MZP2500			0  100 pippo 0.00000972  1 #4.860fb xsec * 0.002br
 
-./submitBatchDiPho.py --cfg diPhoAnaBATCH.py DoubleEG           		0 10000 pippo  1 1
-./submitBatchDiPho.py --cfg diPhoAnaBATCH.py SingleE				0 10001 pippo  1 1 
+#./submitBatchDiPho.py --cfg diPhoAnaBATCH.py DoubleEG           		0 10000 pippo  1 1
+#./submitBatchDiPho.py --cfg diPhoAnaBATCH.py SingleE				0 10001 pippo  1 1 
 
 # 50ns Data
 #./submitBatchDiPho.py --cfg diPhoAnaBATCH.py DoubleEG           		0 10000 pippo  1 1
