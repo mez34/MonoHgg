@@ -131,6 +131,8 @@ void Plotter::DoPlots(){
     Bool_t passAll1 = false;
     Bool_t passAll2 = false;
     Bool_t passBoth = false;
+    Bool_t passEV1  = false; 
+    Bool_t passEV2  = false; 
 
     if (passCHiso1==1) passCH1 = true; 
     if (passCHiso2==1) passCH2 = true; 
@@ -142,13 +144,16 @@ void Plotter::DoPlots(){
     if (passSieie2==1) passS2  = true;
     if (passHoe1==1)   passHE1 = true; 
     if (passHoe2==1)   passHE2 = true; 
+    if (eleveto1==1)   passEV1 = true;
+    if (eleveto2==1)   passEV2 = true; 
 
-    if (passCH1 && passNH1 && passPH1 && passS1 && passHE1) passAll1 = true;
-    if (passCH2 && passNH2 && passPH2 && passS2 && passHE2) passAll2 = true;
+    if (passCH1 && passNH1 && passPH1 && passS1 && passHE1 && passEV1) passAll1 = true;
+    if (passCH2 && passNH2 && passPH2 && passS2 && passHE2 && passEV2) passAll2 = true;
     if (passAll1 && passAll2) passBoth = true;
 
     //start full selection for plots
-    if ( pt1 > mgg/3 && pt2 > mgg/4 && eleveto1 && eleveto2){
+    if (mgg >= 100 && passBoth){
+    //if ( pt1 > mgg/3 && pt2 > mgg/4 /*&& passEV1 && passEV2*/){
       fTH1DMap["eff_sel"]->Fill(1.5,Weight);
       if (hltDiphoton30Mass95==1){ //passes trigger
 
@@ -482,11 +487,13 @@ void Plotter::SavePlots(){
 
     CMSLumi(canv,0,fLumi);
 
-    canv->SetLogy(0);
-    canv->SaveAs(Form("%s%s/%s.png",fName.Data(),species.Data(),(*mapiter).first.Data()));
+    // UNCOMMENT THESE LINES IF WANT TO MAKE .png FILES OF ALL PLOTS
+    //canv->SetLogy(0);
+    //canv->SaveAs(Form("%s%s/%s.png",fName.Data(),species.Data(),(*mapiter).first.Data()));
 
-    canv->SetLogy(1);
-    canv->SaveAs(Form("%s%s/%s_log.png",fName.Data(),species.Data(),(*mapiter).first.Data())); 
+    //canv->SetLogy(1);
+    //canv->SaveAs(Form("%s%s/%s_log.png",fName.Data(),species.Data(),(*mapiter).first.Data())); 
+
   }// end of loop over mapiter for 1d plots
   delete canv;
 

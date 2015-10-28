@@ -18,7 +18,7 @@ ABCDMethod::ABCDMethod( SamplePairVec Samples, const Double_t inLumi, const TStr
   mgg_maxAB2 = 300.; 
   met_minB   = 0.;
   met_minD   = 100.;
-  met_maxD   = 300.;
+  met_maxD   = 800.;
 
   // titles for output Latex table
   fSampleTitleMap["Data"]		= "Data";
@@ -202,8 +202,16 @@ void ABCDMethod::DoAnalysis(){
   // cat6 = ALL
   min_x[6]=fInBkgTH2DHists[0][0]->GetXaxis()->FindBin(mgg_minAB1); 
   max_x[6]=fInBkgTH2DHists[0][0]->GetXaxis()->FindBin(mgg_maxAB2); 
-  min_y[6]=fInBkgTH2DHists[0][0]->GetYaxis()->FindBin(met_minD);   
+  min_y[6]=fInBkgTH2DHists[0][0]->GetYaxis()->FindBin(met_minB);   
   max_y[6]=fInBkgTH2DHists[0][0]->GetYaxis()->FindBin(met_maxD);   
+ 
+  //for (UInt_t cat = 0; cat < fNCat; cat++){
+  //  std::cout << "bin Xmin = " << min_x[cat] << std::endl;
+  //  std::cout << "bin Xmax = " << max_x[cat] << std::endl;
+  //  std::cout << "bin Ymin = " << min_y[cat] << std::endl;
+  //  std::cout << "bin Ymax = " << max_y[cat] << std::endl;
+  //}
+  
  
   for (UInt_t cat = 0; cat < fNCat; cat++){ // loop over each category
     Data_Int[cat].resize(1); 		// only one group for data since it is lumped together
@@ -227,18 +235,18 @@ void ABCDMethod::DoAnalysis(){
       Sig_Int[cat][mc] = ABCDMethod::ComputeIntAndErr( fInSigTH2DHists[0][mc], Sig_IntErr[cat][mc],  min_x[cat], max_x[cat], min_y[cat], max_y[cat]); 
     } 
 
-    //std::cout << "Data " << Data_Int[cat][0] << " " << Data_IntErr[cat][0] << std::endl;
+    std::cout << fBkgNames[i_gg] << " in " << cat << " int = " << Bkg_Int[cat][i_gg] << " pm " << Bkg_IntErr[cat][i_gg] << std::endl;
     //for (UInt_t mc = 0; mc < fNBkg+1; mc++){ std::cout << fBkgNames[mc] << " in " << cat << " reg "<< Bkg_Int[cat][mc] << " " << Bkg_IntErr[cat][mc] << std::endl; }
     //for (UInt_t mc = 0; mc < fNSig; mc++){   std::cout << fSigNames[mc] << " in " << cat << " reg "<< Sig_Int[cat][mc] << " " << Sig_IntErr[cat][mc] << std::endl; }
 
   }// end cat loop over A1,B1,A2,B2,C,D,All  
 
   ABCDMethod::GetFinalValuesForABCDReg(); // merge A1&A2->A and B1&B2->B
-  //for (UInt_t reg=0; reg <4; reg++){// print out A,B,D,C values
-  //  std::cout << "Data in reg " << reg << " has int = " << fData_Int[reg][0] << " and err = " << fData_IntErr[reg][0] << std::endl;
-  //  for (UInt_t mc = 0; mc < fNBkg+1; mc++){ std::cout << fBkgNames[mc] << " in reg " << reg << " has int " << fBkg_Int[reg][mc] << " and err " << fBkg_IntErr[reg][mc] << std::endl; }
-  //  for (UInt_t mc = 0; mc < fNSig; mc++){   std::cout << fSigNames[mc] << " in reg " << reg << " has int " << fSig_Int[reg][mc] << " and err " << fSig_IntErr[reg][mc] << std::endl; }
-  //}
+  for (UInt_t reg=0; reg <4; reg++){// print out A,B,D,C values
+    std::cout << fBkgNames[i_gg] << " in " << reg << " int = " << fBkg_Int[reg][i_gg] << " pm " << fBkg_IntErr[reg][i_gg] << std::endl;
+  //  for (UInt_t mc = 0; mc < fNBkg+1; mc++){ std::cout << fBkgNames[mc] << " " << reg << " has int " << fBkg_Int[reg][mc] << " pm " << fBkg_IntErr[reg][mc] << std::endl; }
+  //  for (UInt_t mc = 0; mc < fNSig; mc++){   std::cout << fSigNames[mc] << " " << reg << " has int " << fSig_Int[reg][mc] << " pm " << fSig_IntErr[reg][mc] << std::endl; }
+  }
 
 
   ABCDMethod::DoABCDCalculations(); // calculate corr & diff values
@@ -254,8 +262,10 @@ void ABCDMethod::DoAnalysis(){
   //std::cout << "Data: Exp D = " << fExpData[0] << " Exp D err " << fExpErrData[0] << std::endl;
   for (UInt_t mc = 0; mc < fNBkg+2; mc++){
     fExpBkg[mc]=ABCDMethod::FindExpectedValuesInD(fBkg_Int[0][mc],fBkg_Int[1][mc],fBkg_Int[3][mc],fBkg_IntErr[0][mc],fBkg_IntErr[1][mc],fBkg_IntErr[3][mc],fExpErrBkg[mc]);
-    //std::cout << fBkgNames[mc] << ": nA = " << fBkg_Int[0][mc] << " nB = " << fBkg_Int[1][mc] << " nC = " << fBkg_Int[3][mc] << std::endl;
-    //std::cout << fBkgNames[mc] << ": Exp D = " << fExpBkg[mc] << " Exp D err " << fExpErrBkg[mc] << std::endl;
+    if (mc == i_gg){
+      std::cout << fBkgNames[mc] << ": nA = " << fBkg_Int[0][mc] << " nB = " << fBkg_Int[1][mc] << " nC = " << fBkg_Int[3][mc] << std::endl;
+      std::cout << fBkgNames[mc] << ": Exp D = " << fExpBkg[mc] << " Exp D err " << fExpErrBkg[mc] << std::endl;
+    }
   }
   for (UInt_t mc = 0; mc < fNSig; mc++){
     fExpSig[mc]=ABCDMethod::FindExpectedValuesInD(fSig_Int[0][mc],fSig_Int[1][mc],fSig_Int[3][mc],fSig_IntErr[0][mc],fSig_IntErr[1][mc],fSig_IntErr[3][mc],fExpErrSig[mc]);
@@ -300,7 +310,7 @@ void ABCDMethod::GetFinalValuesForABCDReg(){
         fBkg_IntErr[cat][mc] = (std::sqrt(Bkg_IntErr[cat][mc]*Bkg_IntErr[cat][mc]+ Bkg_IntErr[cat+2][mc]*Bkg_IntErr[cat+2][mc])); 
       }
     }
-    else { // D or C region, just take value from calculations above
+    else { // D,C, or ALL region, just take value from calculations above
       fData_Int[cat][0] = (Data_Int[cat+2][0]); //cat+2 is the corresponding C and D regions 
       fData_IntErr[cat][0] = (Data_IntErr[cat+2][0]); 
       for (UInt_t mc = 0; mc < fNSig; mc++){ 
