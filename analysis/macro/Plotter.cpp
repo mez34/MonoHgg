@@ -152,7 +152,7 @@ void Plotter::DoPlots(){
     if (passAll1 && passAll2) passBoth = true;
 
     //start full selection for plots
-    if (mgg >= 100 && passBoth){
+    if (mgg >= 100){
     //if ( pt1 > mgg/3 && pt2 > mgg/4 /*&& passEV1 && passEV2*/){
       fTH1DMap["eff_sel"]->Fill(1.5,Weight);
       if (hltDiphoton30Mass95==1){ //passes trigger
