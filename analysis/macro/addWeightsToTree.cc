@@ -412,7 +412,10 @@ void addWeights(const char* filename, float lumiForW, float massTrue=1) {
   
   for(int i=0; i<nentriesOrig; i++) {
 
-    if (i%10000 == 0) std::cout << ">>> Weighting event # " << i << " / " << nentriesOrig << " entries" << std::endl; 
+    if (i%10000 == 0){
+       std::cout << ">>> Weighting event # " << i << " / " << nentriesOrig << " entries" << std::endl; 
+       if (sampleID<0 || sampleID>=10000) std::cout << "No weighting done for Data" << std::endl;
+    }
     treeOrig->GetEntry(i);
 
     if (i==0) xsecToWeight = totXsec;
@@ -424,6 +427,7 @@ void addWeights(const char* filename, float lumiForW, float massTrue=1) {
       mggNominal = massTrue;
       mggGen     = genmgg;
     } else { //Data   
+
       xsecWeight = 1.;
       weight     = 1.;
       mggNominal = 1.;

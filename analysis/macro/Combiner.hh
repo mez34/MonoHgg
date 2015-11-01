@@ -35,7 +35,7 @@ typedef std::vector<TLine*>   TLineVec;
 
 class Combiner{
 public:
-  Combiner(const SamplePairVec Samples, const Double_t inLumi, const ColorMap colorMap, const TString outname, const Bool_t doNmin1, const Bool_t do_stack);
+  Combiner(const SamplePairVec Samples, const Double_t inLumi, const ColorMap colorMap, const TString outname, const Bool_t doNmin1, const Bool_t do_stack, const TString type);
   void InitCanvAndHists();
   void InitTH1DNames();
   void DoComb();
@@ -54,6 +54,7 @@ private:
   TString	addText;
   Double_t 	lumi;
   Bool_t	doStack;
+  TString	fType;
 
   UInt_t	fNData;
   UInt_t	fNBkg;

@@ -1,6 +1,6 @@
 #include "ReweightPU.hh"
 
-ReweightPU::ReweightPU(const TString MC, const TString Data, const Double_t lumi, const Int_t nBins, const TString indir, const TString outdir) {
+ReweightPU::ReweightPU(const TString MC, const TString Data, const Double_t lumi, const Int_t nBins, const TString indir, const TString outdir, const TString type) {
 
   // save samples for PU weighting
   fMCName = MC;
@@ -20,7 +20,7 @@ ReweightPU::ReweightPU(const TString MC, const TString Data, const Double_t lumi
   // set outputs
   fOutDir  = outdir;
   MakeOutDirectory(outdir); 
-  fOutType = "png";
+  fOutType = type;
 
   // Initialize output TH1D's for data
   fOutDataNvtx = new TH1D("nvtx_data","",fNBins,0.,Double_t(fNBins));

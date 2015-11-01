@@ -3,14 +3,16 @@
 #include "../../../DataFormats/Math/interface/deltaPhi.h"
 //#include "mkPlotsLivia/CMS_lumi.C"
 
-Plotter::Plotter( TString inName, TString outName, TString inSpecies, const DblVec puweights, const Double_t lumi, Bool_t sigMC, Bool_t Data, Bool_t Blind){
+Plotter::Plotter( TString inName, TString outName, TString inSpecies, const DblVec puweights, const Double_t lumi, Bool_t sigMC, Bool_t Data, Bool_t Blind, TString type){
+
+  fType = type;  
+  isSigMC = sigMC;
+  isData = Data;
+  doBlind = Blind;
 
   // Get ROOT file
   name = inName;
   species = inSpecies;
-  isSigMC = sigMC;
-  isData = Data;
-  doBlind = Blind;
   inFile = TFile::Open(Form("%s%s.root",name.Data(),species.Data()));
   CheckValidFile(inFile,Form("%s%s.root",name.Data(),species.Data()));  
   // Open Tree from inFile
@@ -372,8 +374,8 @@ void Plotter::SetUpPlots(){
   fTH1DMap["phi2"]		= Plotter::MakeTH1DPlot("phi2","",20,-4.,4.,"#phi(#gamma2)","");
   fTH1DMap["eta1"]		= Plotter::MakeTH1DPlot("eta1","",20,-3.,3.,"#eta(#gamma1)","");
   fTH1DMap["eta2"]		= Plotter::MakeTH1DPlot("eta2","",20,-3.,3.,"#eta(#gamma2)","");
-  fTH1DMap["pt1"]		= Plotter::MakeTH1DPlot("pt1","",15,0.,300.,"p_{T,#gamma1} (GeV)","");
-  fTH1DMap["pt2"]		= Plotter::MakeTH1DPlot("pt2","",15,0.,300.,"p_{T,#gamma2} (GeV)","");
+  fTH1DMap["pt1"]		= Plotter::MakeTH1DPlot("pt1","",30,0.,300.,"p_{T,#gamma1} (GeV)","");
+  fTH1DMap["pt2"]		= Plotter::MakeTH1DPlot("pt2","",30,0.,300.,"p_{T,#gamma2} (GeV)","");
   fTH1DMap["chiso1"]		= Plotter::MakeTH1DPlot("chiso1","",75,-5.,15.,"CHiso(#gamma1)","");
   fTH1DMap["chiso2"]		= Plotter::MakeTH1DPlot("chiso2","",75,-5.,15.,"CHiso(#gamma2)","");
   fTH1DMap["neuiso1"]		= Plotter::MakeTH1DPlot("neuiso1","",75,-5.,15.,"NHiso(#gamma1)","");
@@ -403,8 +405,8 @@ void Plotter::SetUpPlots(){
   fTH1DMap["phi2_n-1"]		= Plotter::MakeTH1DPlot("phi2_n-1","",20,-4.,4.,"#phi(#gamma2)","");
   fTH1DMap["eta1_n-1"]		= Plotter::MakeTH1DPlot("eta1_n-1","",20,-3.,3.,"#eta(#gamma1)","");
   fTH1DMap["eta2_n-1"]		= Plotter::MakeTH1DPlot("eta2_n-1","",20,-3.,3.,"#eta(#gamma2)","");
-  fTH1DMap["pt1_n-1"]		= Plotter::MakeTH1DPlot("pt1_n-1","",15,0.,300.,"p_{T,#gamma1} (GeV)","");
-  fTH1DMap["pt2_n-1"]		= Plotter::MakeTH1DPlot("pt2_n-1","",15,0.,300.,"p_{T,#gamma2} (GeV)","");
+  fTH1DMap["pt1_n-1"]		= Plotter::MakeTH1DPlot("pt1_n-1","",30,0.,300.,"p_{T,#gamma1} (GeV)","");
+  fTH1DMap["pt2_n-1"]		= Plotter::MakeTH1DPlot("pt2_n-1","",30,0.,300.,"p_{T,#gamma2} (GeV)","");
   fTH1DMap["chiso1_n-1"]	= Plotter::MakeTH1DPlot("chiso1_n-1","",75,-5.,15.,"CHiso(#gamma1)","");
   fTH1DMap["chiso2_n-1"]	= Plotter::MakeTH1DPlot("chiso2_n-1","",75,-5.,15.,"CHiso(#gamma2)","");
   fTH1DMap["neuiso1_n-1"]	= Plotter::MakeTH1DPlot("neuiso1_n-1","",75,-5.,15.,"NHiso(#gamma1)","");
@@ -419,8 +421,8 @@ void Plotter::SetUpPlots(){
   fTH1DMap["r92_n-1"]		= Plotter::MakeTH1DPlot("r92_n-1","",50,0.,1.1,"R9(#gamma2)","");
 
   // special plots
-  fTH1DMap["phigg"]		= Plotter::MakeTH1DPlot("phigg","",40,-4.,4.,"#phi(#gamma#gamma)","");
-  fTH1DMap["dphi_ggmet"]	= Plotter::MakeTH1DPlot("dphi_ggmet","",40,-4.,4.,"#Delta#phi(#gamma#gamma,MET)","");
+  fTH1DMap["phigg"]		= Plotter::MakeTH1DPlot("phigg","",20,-4.,4.,"#phi(#gamma#gamma)","");
+  fTH1DMap["dphi_ggmet"]	= Plotter::MakeTH1DPlot("dphi_ggmet","",20,-4.,4.,"#Delta#phi(#gamma#gamma,MET)","");
   fTH1DMap["absdphi_ggmet"]	= Plotter::MakeTH1DPlot("absdphi_ggmet","",20,0.,4.,"|#Delta#phi(#gamma#gamma,MET)|","");
   fTH1DMap["t1pfmet_selmgg"]	= Plotter::MakeTH1DPlot("t1pfmet_selmgg","",100,0.,1000.,"t1PF MET (GeV)","");
   fTH1DMap["mgg_selt1pfmet"]	= Plotter::MakeTH1DPlot("mgg_selt1pfmet","",40,100.,300.,"m_{#gamma#gamma} (GeV)","");
@@ -487,12 +489,12 @@ void Plotter::SavePlots(){
 
     CMSLumi(canv,0,fLumi);
 
-    // UNCOMMENT THESE LINES IF WANT TO MAKE .png FILES OF ALL PLOTS
+    // UNCOMMENT THESE LINES IF WANT TO MAKE OUTPUT FILES OF ALL PLOTS
     //canv->SetLogy(0);
-    //canv->SaveAs(Form("%s%s/%s.png",fName.Data(),species.Data(),(*mapiter).first.Data()));
+    //canv->SaveAs(Form("%s%s/%s.%s",fName.Data(),species.Data(),(*mapiter).first.Data(),fType.Data()));
 
     //canv->SetLogy(1);
-    //canv->SaveAs(Form("%s%s/%s_log.png",fName.Data(),species.Data(),(*mapiter).first.Data())); 
+    //canv->SaveAs(Form("%s%s/%s_log.%s",fName.Data(),species.Data(),(*mapiter).first.Data(),fType.Data())); 
 
   }// end of loop over mapiter for 1d plots
   delete canv;
@@ -513,7 +515,7 @@ void Plotter::SavePlots(){
     CMSLumi(canv2d,0,fLumi);
 
     canv2d->SetLogy(0);
-    canv2d->SaveAs(Form("%s%s/%s.png",fName.Data(),species.Data(),(*mapiter).first.Data()));
+    canv2d->SaveAs(Form("%s%s/%s.%s",fName.Data(),species.Data(),(*mapiter).first.Data(),fType.Data()));
   }// end of loop over mapiter for 2d plots
   delete canv2d;
 

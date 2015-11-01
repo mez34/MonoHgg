@@ -38,20 +38,22 @@ int main(){
   //////////////////////////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////////////
 
-  TString inDir = "./data/25ns_v7_wEV/"; 		// input directory of the samples
-  TString outDir = "./diPhoPlots/25ns_v7_wEV/";	// output directory to send results
+  TString inDir = "./data/25ns_v7_wPU/"; 		// input directory of the samples
+  TString outDir = "./diPhoPlots/25ns_v7_wPU/";	// output directory to send results
 
   bool doFakeData = false;	// use FakeData to test combiner (mimicks data)
   bool sortMC = false;		// use if want to sort bkg smallest to biggest, else uses order given
   bool doBlind = true;		// use to blind the analysis for Data (don't use distributions for met>100 & 110<mgg<150)
-  bool makePURWfiles = true;	// recompute PURW and make files
-  bool doReweightPU = true;	// use PURW from old files if !makePURWfiles
-  bool doPlots = true;		// make plots for each sample individually
+  bool makePURWfiles = false;	// recompute PURW and make files (need also doReweightPU=true for this to run)
+  bool doReweightPU = false;	// use PURW from old files if !makePURWfiles
+  bool doPlots = false;		// make plots for each sample individually
   bool doComb = true;		// make stack/overlay plots
   bool doABCD = false;		// run ABCD method 
 
   Double_t lumi = 1263.9; // in pb^-1 
   UInt_t nBins_vtx = 50; // number of bins for PURW 
+  TString type = "png";
+
   
   //////////////////////////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////////////
@@ -86,6 +88,7 @@ int main(){
   // 4th : number of bins for nvtx
   // 5th : input directory of samples
   // 6th : output directory
+  // 7th : type of plots
   //
   /////////////////////////////////////////////////////
 
@@ -98,7 +101,7 @@ int main(){
   if (doReweightPU){
     if (makePURWfiles){ 
       std::cout << "Doing PU Reweighting" << std::endl;
-      ReweightPU * reweightQCD = new ReweightPU("DiPhoton","DoubleEG",lumi, nBins_vtx, inDir, outDir+"purw/");
+      ReweightPU * reweightQCD = new ReweightPU("DiPhoton","DoubleEG",lumi, nBins_vtx, inDir, outDir+"purw/", type);
       puweights_MC = reweightQCD->GetPUWeights();
       delete reweightQCD;
 
@@ -171,128 +174,129 @@ int main(){
   // 5th : bool isSigMC ------> FIXME (not needed?)
   // 6th : bool isData
   // 7th : bool doBlinding
+  // 8th : type of plots
   //
   /////////////////////////////////////////////////////
 
   if (doFakeData && doPlots){
     std::cout << "Working on FakeData sample" << std::endl;
-    Plotter * FakeData = new Plotter(inDir,outDir,"FakeData",puweights_Data,lumi,false,true,doBlind);
+    Plotter * FakeData = new Plotter(inDir,outDir,"FakeData",puweights_Data,lumi,false,true,doBlind,type);
     FakeData->DoPlots();
     delete FakeData;
     std::cout << "Finished FakeData sample" << std::endl;
   }
   if (doPlots){
     std::cout << "Working on DoubleEG sample" << std::endl;
-    Plotter * dEG = new Plotter(inDir,outDir,"DoubleEG",puweights_Data,lumi,false,true,doBlind);
+    Plotter * dEG = new Plotter(inDir,outDir,"DoubleEG",puweights_Data,lumi,false,true,doBlind,type);
     dEG->DoPlots();
     delete dEG;
     std::cout << "Finished DoubleEG sample" << std::endl;
 
     std::cout << "Working on GJets sample" << std::endl;
-    Plotter * GJets = new Plotter(inDir,outDir,"GJets",puweights_MC,lumi,false,false,doBlind);
+    Plotter * GJets = new Plotter(inDir,outDir,"GJets",puweights_MC,lumi,false,false,doBlind,type);
     GJets->DoPlots();
     delete GJets;
     std::cout << "Finished GJets sample" << std::endl;
 
     std::cout << "Working on QCD sample" << std::endl;
-    Plotter * QCD = new Plotter(inDir,outDir,"QCD",puweights_MC,lumi,false,false,doBlind);
+    Plotter * QCD = new Plotter(inDir,outDir,"QCD",puweights_MC,lumi,false,false,doBlind,type);
     QCD->DoPlots();
     delete QCD;
     std::cout << "Finished QCD sample" << std::endl;
 
     std::cout << "Working on WZH sample" << std::endl;
-    Plotter * WZH = new Plotter(inDir,outDir,"VH",puweights_MC,lumi,false,false,doBlind);
+    Plotter * WZH = new Plotter(inDir,outDir,"VH",puweights_MC,lumi,false,false,doBlind,type);
     WZH->DoPlots();
     delete WZH;
     std::cout << "Finished WZH sample" << std::endl;
 
     std::cout << "Working on GluGluH sample" << std::endl;
-    Plotter * GGHGG = new Plotter(inDir,outDir,"GluGluHToGG",puweights_MC,lumi,false,false,doBlind);
+    Plotter * GGHGG = new Plotter(inDir,outDir,"GluGluHToGG",puweights_MC,lumi,false,false,doBlind,type);
     GGHGG->DoPlots();
     delete GGHGG;
     std::cout << "Finished GluGluH sample" << std::endl;
   
     std::cout << "Working on DiPhoton sample" << std::endl;
-    Plotter * GG = new Plotter(inDir,outDir,"DiPhoton",puweights_MC,lumi,false,false,doBlind);
+    Plotter * GG = new Plotter(inDir,outDir,"DiPhoton",puweights_MC,lumi,false,false,doBlind,type);
     GG->DoPlots();
     delete GG;
     std::cout << "Finished GluGluH sample" << std::endl;
 
     std::cout << "Working on DYJets sample" << std::endl;
-    Plotter * DY = new Plotter(inDir,outDir,"DYJetsToLL",puweights_MC,lumi,false,false,doBlind);
+    Plotter * DY = new Plotter(inDir,outDir,"DYJetsToLL",puweights_MC,lumi,false,false,doBlind,type);
     DY->DoPlots();
     delete DY;
     std::cout << "Finished DYJets sample" << std::endl;
 
     std::cout << "Working on DMHgg 2HDM MZP600 sample" << std::endl;
-    Plotter * DMH_mZP600 = new Plotter(inDir,outDir,"2HDM_mZP600",puweights_MC,lumi,true,false,doBlind);
+    Plotter * DMH_mZP600 = new Plotter(inDir,outDir,"2HDM_mZP600",puweights_MC,lumi,true,false,doBlind,type);
     DMH_mZP600->DoPlots();
     delete DMH_mZP600;
     std::cout << "Finished DMHgg 2HDM MZP600 sample" << std::endl;
    
     std::cout << "Working on DMHgg 2HDM MZP800 sample" << std::endl;
-    Plotter * DMH_mZP800 = new Plotter(inDir,outDir,"2HDM_mZP800",puweights_MC,lumi,true,false,doBlind);
+    Plotter * DMH_mZP800 = new Plotter(inDir,outDir,"2HDM_mZP800",puweights_MC,lumi,true,false,doBlind,type);
     DMH_mZP800->DoPlots();
     delete DMH_mZP800;
     std::cout << "Finished DMHgg 2HDM MZP800 sample" << std::endl;
    
     std::cout << "Working on DMHgg 2HDM MZP1000 sample" << std::endl;
-    Plotter * DMH_mZP1000 = new Plotter(inDir,outDir,"2HDM_mZP1000",puweights_MC,lumi,true,false,doBlind);
+    Plotter * DMH_mZP1000 = new Plotter(inDir,outDir,"2HDM_mZP1000",puweights_MC,lumi,true,false,doBlind,type);
     DMH_mZP1000->DoPlots();
     delete DMH_mZP1000;
     std::cout << "Finished DMHgg 2HDM MZP1000 sample" << std::endl;
    
     std::cout << "Working on DMHgg 2HDM MZP1200 sample" << std::endl;
-    Plotter * DMH_mZP1200 = new Plotter(inDir,outDir,"2HDM_mZP1200",puweights_MC,lumi,true,false,doBlind);
+    Plotter * DMH_mZP1200 = new Plotter(inDir,outDir,"2HDM_mZP1200",puweights_MC,lumi,true,false,doBlind,type);
     DMH_mZP1200->DoPlots();
     delete DMH_mZP1200;
     std::cout << "Finished DMHgg 2HDM MZP1200 sample" << std::endl;
 
     std::cout << "Working on DMHgg 2HDM MZP1400 sample" << std::endl;
-    Plotter * DMH_mZP1400 = new Plotter(inDir,outDir,"2HDM_mZP1400",puweights_MC,lumi,true,false,doBlind);
+    Plotter * DMH_mZP1400 = new Plotter(inDir,outDir,"2HDM_mZP1400",puweights_MC,lumi,true,false,doBlind,type);
     DMH_mZP1400->DoPlots();
     delete DMH_mZP1400;
     std::cout << "Finished DMHgg 2HDM MZP1400 sample" << std::endl;
 
     std::cout << "Working on DMHgg 2HDM MZP1700 sample" << std::endl;
-    Plotter * DMH_mZP1700 = new Plotter(inDir,outDir,"2HDM_mZP1700",puweights_MC,lumi,true,false,doBlind);
+    Plotter * DMH_mZP1700 = new Plotter(inDir,outDir,"2HDM_mZP1700",puweights_MC,lumi,true,false,doBlind,type);
     DMH_mZP1700->DoPlots();
     delete DMH_mZP1700;
     std::cout << "Finished DMHgg 2HDM MZP1700 sample" << std::endl;
 
     std::cout << "Working on DMHgg 2HDM MZP2000 sample" << std::endl;
-    Plotter * DMH_mZP2000 = new Plotter(inDir,outDir,"2HDM_mZP2000",puweights_MC,lumi,true,false,doBlind);
+    Plotter * DMH_mZP2000 = new Plotter(inDir,outDir,"2HDM_mZP2000",puweights_MC,lumi,true,false,doBlind,type);
     DMH_mZP2000->DoPlots();
     delete DMH_mZP2000;
     std::cout << "Finished DMHgg 2HDM MZP2500 sample" << std::endl;
 
     std::cout << "Working on DMHgg 2HDM MZP2500 sample" << std::endl;
-    Plotter * DMH_mZP2500 = new Plotter(inDir,outDir,"2HDM_mZP2500",puweights_MC,lumi,true,false,doBlind);
+    Plotter * DMH_mZP2500 = new Plotter(inDir,outDir,"2HDM_mZP2500",puweights_MC,lumi,true,false,doBlind,type);
     DMH_mZP2500->DoPlots();
     delete DMH_mZP2500;
     std::cout << "Finished DMHgg 2HDM MZP2500 sample" << std::endl;
 
 
     //std::cout << "Working on DMHgg M1000 sample" << std::endl;
-    //Plotter * DMH_M1000 = new Plotter(inDir,outDir,"DMHtoGG_M1000",puweights_sig,lumi,true,false,doBlind);
+    //Plotter * DMH_M1000 = new Plotter(inDir,outDir,"DMHtoGG_M1000",puweights_sig,lumi,true,false,doBlind,type);
     //DMH_M1000->DoPlots();
     //delete DMH_M1000;
     //std::cout << "Finished DMHgg M1000 sample" << std::endl;
   
     //std::cout << "Working on DMHgg M100 sample" << std::endl;
-    //Plotter * DMH_M100 = new Plotter(inDir,outDir,"DMHtoGG_M100",puweights_sig,lumi,true,false,doBlind);
+    //Plotter * DMH_M100 = new Plotter(inDir,outDir,"DMHtoGG_M100",puweights_sig,lumi,true,false,doBlind,type);
     //DMH_M100->DoPlots();
     //delete DMH_M100;
     //std::cout << "Finished DMHgg M100 sample" << std::endl;
   
     //std::cout << "Working on DMHgg M10 sample" << std::endl;
-    //Plotter * DMH_M10 = new Plotter(inDir,outDir,"DMHtoGG_M10",puweights_sig,lumi,true,false,doBlind);
+    //Plotter * DMH_M10 = new Plotter(inDir,outDir,"DMHtoGG_M10",puweights_sig,lumi,true,false,doBlind,type);
     //DMH_M10->DoPlots();
     //delete DMH_M10;
     //std::cout << "Finished DMHgg M10 sample" << std::endl;
   
     //std::cout << "Working on DMHgg M1 sample" << std::endl;
-    //Plotter * DMH_M1 = new Plotter(inDir,outDir,"DMHtoGG_M1",puweights_sig,lumi,true,false,doBlind);
+    //Plotter * DMH_M1 = new Plotter(inDir,outDir,"DMHtoGG_M1",puweights_sig,lumi,true,false,doBlind,type);
     //DMH_M1->DoPlots();
     //delete DMH_M1;
     //std::cout << "Finished DMHgg M1 sample" << std::endl;
@@ -346,9 +350,9 @@ int main(){
   Samples.push_back(SamplePair("2HDM_mZP1000",0)); 
   Samples.push_back(SamplePair("2HDM_mZP1200",0)); 
   Samples.push_back(SamplePair("2HDM_mZP1400",0)); 
-  Samples.push_back(SamplePair("2HDM_mZP1700",0)); 
-  Samples.push_back(SamplePair("2HDM_mZP2000",0));  
-  Samples.push_back(SamplePair("2HDM_mZP2500",0));  
+  //Samples.push_back(SamplePair("2HDM_mZP1700",0)); 
+  //Samples.push_back(SamplePair("2HDM_mZP2000",0));  
+  //Samples.push_back(SamplePair("2HDM_mZP2500",0));  
 
   UInt_t nbkg = 0;
   UInt_t nsig = 0;
@@ -416,7 +420,8 @@ int main(){
   // 3rd : ColorMap for samples
   // 4th : output directory
   // 5th : bool do N-1 plots
-  // 6th : bool do Stack plots (false = do overlay) 
+  // 6th : bool do Stack plots (false = do overlay)
+  // 7th : type of plots out 
   //
   ////////////////////////////////////////////////////
 
@@ -424,20 +429,20 @@ int main(){
     // Combiner( Samples, lumi, colorMap , outDir, doNmin1plots, doStack)
     
     // do overlay plots for normal plots
-    Combiner *combAll = new Combiner(Samples,lumi,colorMap,outDir,false,false);
+    Combiner *combAll = new Combiner(Samples,lumi,colorMap,outDir,false,false,type);
     combAll->DoComb();
     delete combAll;   
     // do stack plots for normal plots
-    Combiner *stackAll = new Combiner(Samples,lumi,colorMap,outDir,false,true);
+    Combiner *stackAll = new Combiner(Samples,lumi,colorMap,outDir,false,true,type);
     stackAll->DoComb();
     delete stackAll;   
  
     //// do overlay plots for n-1 plots
-    //Combiner *combAlln1 = new Combiner(Samples,lumi,colorMap,outDir,true,false);
+    //Combiner *combAlln1 = new Combiner(Samples,lumi,colorMap,outDir,true,false,type);
     //combAlln1->DoComb();
     //delete combAlln1;   
     //// do stack plots for n-1 plots 
-    //Combiner *stackAlln1 = new Combiner(Samples,lumi,colorMap,outDir,true,true);
+    //Combiner *stackAlln1 = new Combiner(Samples,lumi,colorMap,outDir,true,true,type);
     //stackAlln1->DoComb();
     //delete stackAlln1;   
   }// end doComb

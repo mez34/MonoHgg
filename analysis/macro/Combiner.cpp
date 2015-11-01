@@ -1,6 +1,6 @@
 #include "Combiner.hh"
 
-Combiner::Combiner( SamplePairVec Samples, const Double_t inLumi, const ColorMap colorMap, const TString outdir, const Bool_t doNmin1, const Bool_t do_stack){
+Combiner::Combiner( SamplePairVec Samples, const Double_t inLumi, const ColorMap colorMap, const TString outdir, const Bool_t doNmin1, const Bool_t do_stack, const TString type){
 
   if (doNmin1) addText = "_n-1";
   else addText="";
@@ -8,7 +8,7 @@ Combiner::Combiner( SamplePairVec Samples, const Double_t inLumi, const ColorMap
   doStack = false;
   if (do_stack) doStack = true;
 
-
+  fType = type;
   lumi	= inLumi;
   fOutDir = outdir;
   TString fOut = "comb";
@@ -194,7 +194,7 @@ void Combiner::MakeEffPlots(){
   
   CMSLumi(c,0,lumi);
   c->SetLogx();
-  c->SaveAs(Form("%scomb/eff_mDM.png",fOutDir.Data()));
+  c->SaveAs(Form("%scomb/eff_mDM.%s",fOutDir.Data(),fType.Data()));
   delete c; 
 
 }// end Combiner::MakeEffPlots
@@ -282,7 +282,7 @@ void Combiner::DrawCanvasOverlay(const UInt_t th1d, const Bool_t isLogY){
 
   CMSLumi(fOutTH1DCanvases[th1d],0,lumi);
 
-  fOutTH1DCanvases[th1d]->SaveAs(Form("%scomb/%s_comb%s%s.png",fOutDir.Data(),fTH1DNames[th1d].Data(),addText.Data(),suffix.Data()));  
+  fOutTH1DCanvases[th1d]->SaveAs(Form("%scomb/%s_comb%s%s.%s",fOutDir.Data(),fTH1DNames[th1d].Data(),addText.Data(),suffix.Data(),fType.Data()));  
   fOutFile->cd();
   fOutTH1DCanvases[th1d]->Write(Form("%s%s_comb%s",fTH1DNames[th1d].Data(),suffix.Data(),addText.Data()));
 
@@ -374,7 +374,7 @@ void Combiner::DrawCanvasStack(const UInt_t th1d, const Bool_t isLogY){
 
   CMSLumi(fOutTH1DCanvases[th1d],0,lumi);
 
-  fOutTH1DCanvases[th1d]->SaveAs(Form("%scomb/%s_stack%s%s.png",fOutDir.Data(),fTH1DNames[th1d].Data(),addText.Data(),suffix.Data()));  
+  fOutTH1DCanvases[th1d]->SaveAs(Form("%scomb/%s_stack%s%s.%s",fOutDir.Data(),fTH1DNames[th1d].Data(),addText.Data(),suffix.Data(),fType.Data()));  
   fOutFile->cd();
   fOutTH1DCanvases[th1d]->Write(Form("%s%s_stack%s",fTH1DNames[th1d].Data(),suffix.Data(),addText.Data()));
 

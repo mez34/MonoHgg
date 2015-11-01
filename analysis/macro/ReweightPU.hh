@@ -20,7 +20,7 @@ class ReweightPU
 {
 public:
 
-  ReweightPU( const TString MC, const TString Data, const Double_t lumi, const Int_t nBins, const TString indir, const TString outdir);
+  ReweightPU( const TString MC, const TString Data, const Double_t lumi, const Int_t nBins, const TString indir, const TString outdir, const TString type);
   DblVec GetPUWeights();
   ~ReweightPU();
 
