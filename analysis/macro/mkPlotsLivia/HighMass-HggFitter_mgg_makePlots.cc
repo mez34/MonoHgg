@@ -33,7 +33,7 @@ void runfits() {
   RooWorkspace* w = hlf.GetWs();
  
   Double_t MMIN = 100.; //130 //livia   //100  //180   //270
-  Double_t MMAX = 800.; //450      //livia //200 // 300  //2000
+  Double_t MMAX = 150.; //450      //livia //200 // 300  //2000
   w->var("mgg")->setMin(MMIN);
   w->var("mgg")->setMax(MMAX);
 
@@ -73,51 +73,51 @@ void MakePlotMassDataMC(RooWorkspace* w, std::string var, int BINS, double MIN, 
   RooArgSet* ntplVars = defineVariables();
  
   // common preselection cut
-  TString mainCut = "(mgg>=100 && mgg<200)&& hltDiphoton30Mass95";   //130-2000 abs(sceta1)>1.4442&&abs(sceta2)>1.4442&&
+  TString mainCut = "(mgg>=100)&& hltDiphoton30Mass95";   //130-2000 abs(sceta1)>1.4442&&abs(sceta2)>1.4442&&
   if(metCut) mainCut+="&&t1pfmet>100";
 
   TString dataCut = "(mgg<110 || mgg>130)&& hltDiphoton30Mass95 && t1pfmet<100";
  
   //**********DATA***************//
-  TFile file("../data/25ns_v7_wPU/DoubleEG.root");
+  TFile file("../data/25ns_v7_wEV/DoubleEG.root");
   TTree* dataTree = (TTree*) file.Get("DiPhotonTree");
    
   //**********G+jets***************//
   TChain* gjTree = new TChain();
-  gjTree->Add("../data/25ns_v7_wPU/GJets.root/DiPhotonTree");
+  gjTree->Add("../data/25ns_v7_wEV/GJets.root/DiPhotonTree");
 
   //**********QCD***************//
   TChain* qcdTree = new TChain();
-  qcdTree->Add("../data/25ns_v7_wPU/QCD.root/DiPhotonTree");
+  qcdTree->Add("../data/25ns_v7_wEV/QCD.root/DiPhotonTree");
   
   //**********DIPHOT***************//
   TChain* diphotTree = new TChain();
-  diphotTree->Add("../data/25ns_v7_wPU/DiPhoton.root/DiPhotonTree");
+  diphotTree->Add("../data/25ns_v7_wEV/DiPhoton.root/DiPhotonTree");
 
   //**********DY***************//
   TChain* dyTree = new TChain();
-  dyTree->Add("../data/25ns_v7_wPU/DYJetsToLL.root/DiPhotonTree");
+  dyTree->Add("../data/25ns_v7_wEV/DYJetsToLL.root/DiPhotonTree");
 
   //**********GGH***************//
   TChain* gghTree = new TChain();
-  gghTree->Add("../data/25ns_v7_wPU/GluGluHToGG.root/DiPhotonTree");
+  gghTree->Add("../data/25ns_v7_wEV/GluGluHToGG.root/DiPhotonTree");
   
   //**********VH***************//
   TChain* vhTree = new TChain();
-  vhTree->Add("../data/25ns_v7_wPU/VH.root/DiPhotonTree");
+  vhTree->Add("../data/25ns_v7_wEV/VH.root/DiPhotonTree");
  
   //**********M1***************//
   TChain* m1Tree = new TChain();
-  m1Tree->Add("../data/25ns_v7_wPU/2HDM_mZP600.root/DiPhotonTree");
+  m1Tree->Add("../data/25ns_v7_wEV/2HDM_mZP600.root/DiPhotonTree");
   ///**********M10***************//
   TChain* m10Tree = new TChain();
-  m10Tree->Add("../data/25ns_v7_wPU/2HDM_mZP1200.root/DiPhotonTree");
+  m10Tree->Add("../data/25ns_v7_wEV/2HDM_mZP1200.root/DiPhotonTree");
   //**********M100***************//
   TChain* m100Tree = new TChain();
-  m100Tree->Add("../data/25ns_v7_wPU/2HDM_mZP1700.root/DiPhotonTree");
+  m100Tree->Add("../data/25ns_v7_wEV/2HDM_mZP1700.root/DiPhotonTree");
   //**********M1000***************//
   TChain* m1000Tree = new TChain();
-  m1000Tree->Add("../data/25ns_v7_wPU/2HDM_mZP2500.root/DiPhotonTree");
+  m1000Tree->Add("../data/25ns_v7_wEV/2HDM_mZP2500.root/DiPhotonTree");
 
 
   TH1F* h_data;
@@ -215,8 +215,8 @@ void MakePlotMassDataMC(RooWorkspace* w, std::string var, int BINS, double MIN, 
   THStack hs("hs","hs");
   hs.Add(h_vh);
   hs.Add(h_ggh); 
-  hs.Add(h_diphot); 
   hs.Add(h_dy); 
+  hs.Add(h_diphot); 
   hs.Add(h_gj); 
   hs.Add(h_qcd); 
 
@@ -516,48 +516,48 @@ void ComputeABCDnumbers(RooWorkspace* w, std::string var ) {
   RooArgSet* ntplVars = defineVariables();
  
   // common preselection cut
-  TString mainCut = "(mgg>=100 && mgg<300)&& hltDiphoton30Mass95";   //130-2000 abs(sceta1)>1.4442&&abs(sceta2)>1.4442&&
+  TString mainCut = "(mgg>=100)&& hltDiphoton30Mass95";   //130-2000 abs(sceta1)>1.4442&&abs(sceta2)>1.4442&&
   TString dataCut = "(mgg<110 || mgg>130)&& hltDiphoton30Mass95 && t1pfmet<100";
 
   //**********DATA***************//
-  TFile file("../data/25ns_v7_wPU/DoubleEG.root");
+  TFile file("../data/25ns_v7_wEV/DoubleEG.root");
   TTree* dataTree = (TTree*) file.Get("DiPhotonTree");
    
   //**********G+jets***************//
   TChain* gjTree = new TChain();
-  gjTree->Add("../data/25ns_v7_wPU/GJets.root/DiPhotonTree");
+  gjTree->Add("../data/25ns_v7_wEV/GJets.root/DiPhotonTree");
 
   //**********QCD***************//
   TChain* qcdTree = new TChain();
-  qcdTree->Add("../data/25ns_v7_wPU/QCD.root/DiPhotonTree");
+  qcdTree->Add("../data/25ns_v7_wEV/QCD.root/DiPhotonTree");
   
   //**********DIPHOT***************//
   TChain* diphotTree = new TChain();
-  diphotTree->Add("../data/25ns_v7_wPU/DiPhoton.root/DiPhotonTree");
+  diphotTree->Add("../data/25ns_v7_wEV/DiPhoton.root/DiPhotonTree");
 
   //**********DY***************//
   TChain* dyTree = new TChain();
-  dyTree->Add("../data/25ns_v7_wPU/DYJetsToLL.root/DiPhotonTree");
+  dyTree->Add("../data/25ns_v7_wEV/DYJetsToLL.root/DiPhotonTree");
 
   //**********GGH***************//
   TChain* gghTree = new TChain();
-  gghTree->Add("../data/25ns_v7_wPU/GluGluHToGG.root/DiPhotonTree");
+  gghTree->Add("../data/25ns_v7_wEV/GluGluHToGG.root/DiPhotonTree");
   
   //**********VH***************//
   TChain* vhTree = new TChain();
-  vhTree->Add("../data/25ns_v7_wPU/VH.root/DiPhotonTree"); 
+  vhTree->Add("../data/25ns_v7_wEV/VH.root/DiPhotonTree"); 
   //**********M1***************//
   TChain* m1Tree = new TChain();
-  m1Tree->Add("../data/25ns_v7_wPU/2HDM_mZP600.root/DiPhotonTree");
+  m1Tree->Add("../data/25ns_v7_wEV/2HDM_mZP600.root/DiPhotonTree");
   ///**********M10***************//
   TChain* m10Tree = new TChain();
-  m10Tree->Add("../data/25ns_v7_wPU/2HDM_mZP1200.root/DiPhotonTree");
+  m10Tree->Add("../data/25ns_v7_wEV/2HDM_mZP1200.root/DiPhotonTree");
   //**********M100***************//
   TChain* m100Tree = new TChain();
-  m100Tree->Add("../data/25ns_v7_wPU/2HDM_mZP1700.root/DiPhotonTree");
+  m100Tree->Add("../data/25ns_v7_wEV/2HDM_mZP1700.root/DiPhotonTree");
   //**********M1000***************//
   TChain* m1000Tree = new TChain();
-  m1000Tree->Add("../data/25ns_v7_wPU/2HDM_mZP2500.root/DiPhotonTree");
+  m1000Tree->Add("../data/25ns_v7_wEV/2HDM_mZP2500.root/DiPhotonTree");
 
   TH2F*  h_diphot;
   TH2F*  h_hgg;
@@ -570,12 +570,12 @@ void ComputeABCDnumbers(RooWorkspace* w, std::string var ) {
   TH2F* h_sum; 
   TH2F* h_pp;
   TH2F* h_pf;
-  Int_t xnbin = 120;
+  Int_t xnbin = 80;
   Double_t  xmin = 100;
-  Double_t  xmax = 300;
-  Int_t ynbin = 180;
+  Double_t  xmax = 180;
+  Int_t ynbin = 1000;
   Double_t  ymin = 0;
-  Double_t  ymax = 300;
+  Double_t  ymax = 1000;
   int c = 1;
   h_pf= new TH2F(TString::Format("h_pf",c), TString::Format("h_pf",c), xnbin, xmin, xmax, ynbin, ymin, ymax);
   h_pp= new TH2F(TString::Format("h_pp",c), TString::Format("h_pp",c), xnbin, xmin, xmax, ynbin, ymin, ymax);
@@ -594,8 +594,8 @@ void ComputeABCDnumbers(RooWorkspace* w, std::string var ) {
   qcdTree->Draw((var+">>h_pp").c_str(), "("+mainCut+")*weight");
   diphotTree->Draw((var+">>h_diphot").c_str(),"("+ mainCut+")*weight");
   dyTree->Draw((var+">>h_dy").c_str(),"("+ mainCut+")*weight");
-  gghTree->Draw((var+">>h_hgg").c_str(),"("+ mainCut+")*weight*0.002");
-  vhTree->Draw((var+">>h_Vh").c_str(),"("+ mainCut+")*weight*0.002");
+  gghTree->Draw((var+">>h_hgg").c_str(),"("+ mainCut+")*weight");
+  vhTree->Draw((var+">>h_Vh").c_str(),"("+ mainCut+")*weight");
   m1Tree->Draw((var+">>h_sig1").c_str(),"("+ mainCut+")*weight");
   m10Tree->Draw((var+">>h_sig10").c_str(),"("+ mainCut+")*weight");
   m100Tree->Draw((var+">>h_sig100").c_str(),"("+ mainCut+")*weight");
@@ -610,12 +610,12 @@ void ComputeABCDnumbers(RooWorkspace* w, std::string var ) {
   CMS_lumi( ctmp,false,iPos );
   ctmp->cd(); 
   
-  xnbin = 120;
+  xnbin = 80;//120
   xmin = 100;
-  xmax = 300;
-  ynbin = 180;
+  xmax = 180;//300
+  ynbin = 1000;//180
   ymin = 0;
-  ymax = 300;
+  ymax = 1000;//300
 
 
   
@@ -640,7 +640,7 @@ void ComputeABCDnumbers(RooWorkspace* w, std::string var ) {
     int metCmin = h_sum->GetYaxis()->FindBin(0.);
     int metCmax = h_sum->GetYaxis()->FindBin(100)-1;
     int metDmin = h_sum->GetYaxis()->FindBin(100);
-    int metDmax = h_sum->GetYaxis()->FindBin(400);
+    int metDmax = h_sum->GetYaxis()->FindBin(800);
 
 
     double ppNCerr;
@@ -878,38 +878,38 @@ void MakePlotCutFlowDataMC(RooWorkspace* w ) {
   
   
   //**********DATA***************//
-  TFile file("../data/25ns_v7_wPU/DoubleEG.root");
+  TFile file("../data/25ns_v7_wEV/DoubleEG.root");
   TH1F* h_data = (TH1F*) file.Get("h_selection");
    
   //**********G+jets***************//
-  TFile gjTree("../data/25ns_v7_wPU/GJets.root");
+  TFile gjTree("../data/25ns_v7_wEV/GJets.root");
   TH1F* h_gj = (TH1F*) gjTree.Get("h_selection");
   //**********QCD***************//
-  TFile qcdTree("../data/25ns_v7_wPU/QCD.root");
+  TFile qcdTree("../data/25ns_v7_wEV/QCD.root");
   TH1F* h_qcd = (TH1F*) qcdTree.Get("h_selection");
   //**********DIPHOT***************//
-  TFile diphotTree("../data/25ns_v7_wPU/DiPhoton.root");
+  TFile diphotTree("../data/25ns_v7_wEV/DiPhoton.root");
   TH1F* h_diphot = (TH1F*) diphotTree.Get("h_selection");
   //**********GGH***************//
-  TFile gghTree("../data/25ns_v7_wPU/GluGluHToGG.root");
+  TFile gghTree("../data/25ns_v7_wEV/GluGluHToGG.root");
   TH1F* h_ggh = (TH1F*) gghTree.Get("h_selection");
  //**********DY***************//
-  TFile dyTree("../data/25ns_v7_wPU/DYJetsToLL.root");
+  TFile dyTree("../data/25ns_v7_wEV/DYJetsToLL.root");
   TH1F* h_dy = (TH1F*) dyTree.Get("h_selection");
   //**********VH***************//
-  TFile vhTree("../data/25ns_v7_wPU/VH.root");
+  TFile vhTree("../data/25ns_v7_wEV/VH.root");
   TH1F* h_vh = (TH1F*) vhTree.Get("h_selection");
   //**********M1***************//
-  TFile m1Tree("../data/25ns_v7_wPU/2HDM_mZP600.root");
+  TFile m1Tree("../data/25ns_v7_wEV/2HDM_mZP600.root");
   TH1F* h_m1 = (TH1F*) m1Tree.Get("h_selection");
   ///**********M10***************//
-  TFile m10Tree("../data/25ns_v7_wPU/2HDM_mZP1200.root");
+  TFile m10Tree("../data/25ns_v7_wEV/2HDM_mZP1200.root");
   TH1F* h_m10 = (TH1F*) m10Tree.Get("h_selection");
   //**********M100***************//
-  TFile m100Tree("../data/25ns_v7_wPU/2HDM_mZP1700.root");
+  TFile m100Tree("../data/25ns_v7_wEV/2HDM_mZP1700.root");
   TH1F* h_m100 = (TH1F*) m100Tree.Get("h_selection");
   //**********M1000***************//
-  TFile m1000Tree("../data/25ns_v7_wPU/2HDM_mZP2500.root");
+  TFile m1000Tree("../data/25ns_v7_wEV/2HDM_mZP2500.root");
   TH1F* h_m1000 = (TH1F*) m1000Tree.Get("h_selection");
 
 
@@ -968,10 +968,12 @@ void MakePlotCutFlowDataMC(RooWorkspace* w ) {
   THStack hs("hs","hs");
   hs.Add(h_vh);
   hs.Add(h_ggh); 
-  hs.Add(h_diphot); 
   hs.Add(h_dy); 
+  hs.Add(h_diphot); 
   hs.Add(h_gj); 
   hs.Add(h_qcd); 
+
+
 
   
   std::cout<<h_sum->Integral()<<std::endl;

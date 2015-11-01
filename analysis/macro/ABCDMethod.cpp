@@ -15,9 +15,9 @@ ABCDMethod::ABCDMethod( SamplePairVec Samples, const Double_t inLumi, const TStr
   mgg_minAB1 = 100.;
   mgg_minCD  = 110.;
   mgg_maxCD  = 130.;
-  mgg_maxAB2 = 300.; 
+  mgg_maxAB2 = 180.; 
   met_minB   = 0.;
-  met_minD   = 100.;
+  met_minD   = 70.;
   met_maxD   = 800.;
 
   // titles for output Latex table
@@ -205,13 +205,12 @@ void ABCDMethod::DoAnalysis(){
   min_y[6]=fInBkgTH2DHists[0][0]->GetYaxis()->FindBin(met_minB);   
   max_y[6]=fInBkgTH2DHists[0][0]->GetYaxis()->FindBin(met_maxD);   
  
-  //for (UInt_t cat = 0; cat < fNCat; cat++){
+  for (UInt_t cat = 0; cat < fNCat; cat++){
   //  std::cout << "bin Xmin = " << min_x[cat] << std::endl;
   //  std::cout << "bin Xmax = " << max_x[cat] << std::endl;
   //  std::cout << "bin Ymin = " << min_y[cat] << std::endl;
   //  std::cout << "bin Ymax = " << max_y[cat] << std::endl;
-  //}
-  
+  }
  
   for (UInt_t cat = 0; cat < fNCat; cat++){ // loop over each category
     Data_Int[cat].resize(1); 		// only one group for data since it is lumped together

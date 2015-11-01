@@ -6,6 +6,7 @@ import FWCore.ParameterSet.Types as CfgTypes
 isMC = False;
 is25ns = True;
 is2015D = True;
+is2015DFromChiara = False;
 
 process = cms.Process("diPhoAna")
 
@@ -20,7 +21,7 @@ from Configuration.AlCa.GlobalTag import GlobalTag
 if ((isMC==False and is2015D)):
     process.GlobalTag = GlobalTag(process.GlobalTag, '74X_dataRun2_Prompt_v2', '')
     print "74X_dataRun2_Prompt_v2"
-elif (isMC and is25ns):
+elif (isMC):
     process.GlobalTag = GlobalTag(process.GlobalTag, 'MCRUN2_74_V9', '')
     print "MCRUN2_74_V9"
 
@@ -37,7 +38,7 @@ process.source = cms.Source("PoolSource",
 
 #'/store/group/phys_higgs/cmshgg/musella/flashgg/ExoPhys14_v2/diphotonsPhys14V2/RSGravToGG_kMpl001_M_5000_Tune4C_13TeV_pythia8/ExoPhys14_v2-diphotonsPhys14V2-v0-Phys14DR-PU20bx25_PHYS14_25_V1-v1/150128_133931/0000/myOutputFile_1.root'
                                                               )
-if (isMC==False and is2015D):
+if (isMC==False and is2015DFromChiara):
     print "applying 2015D json"                                
     process.source.lumisToProcess = CfgTypes.untracked(CfgTypes.VLuminosityBlockRange())  
     JSONfile = '/afs/cern.ch/user/c/crovelli/public/json2015/doubleEG/processedAndGolden_2015D_oct25.json'

@@ -44,14 +44,14 @@ int main(){
   bool doFakeData = false;	// use FakeData to test combiner (mimicks data)
   bool sortMC = false;		// use if want to sort bkg smallest to biggest, else uses order given
   bool doBlind = true;		// use to blind the analysis for Data (don't use distributions for met>100 & 110<mgg<150)
-  bool makePURWfiles = false;	// recompute PURW and make files
+  bool makePURWfiles = true;	// recompute PURW and make files
   bool doReweightPU = true;	// use PURW from old files if !makePURWfiles
-  bool doPlots = false;		// make plots for each sample individually
-  bool doComb = false;		// make stack/overlay plots
-  bool doABCD = true;		// run ABCD method 
+  bool doPlots = true;		// make plots for each sample individually
+  bool doComb = true;		// make stack/overlay plots
+  bool doABCD = false;		// run ABCD method 
 
   Double_t lumi = 1263.9; // in pb^-1 
-  UInt_t nBins_vtx = 40; // number of bins for PURW 
+  UInt_t nBins_vtx = 50; // number of bins for PURW 
   
   //////////////////////////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////////////
@@ -333,8 +333,8 @@ int main(){
   Samples.push_back(SamplePair("GluGluHToGG",1)); 
   Samples.push_back(SamplePair("DYJetsToLL",1));
   Samples.push_back(SamplePair("DiPhoton",1));
-  Samples.push_back(SamplePair("QCD",1)); 
   Samples.push_back(SamplePair("GJets",1)); 
+  Samples.push_back(SamplePair("QCD",1)); 
   //Samples.push_back(SamplePair("DMHtoGG_M1",0)); 
   //Samples.push_back(SamplePair("DMHtoGG_M10",0)); 
   //Samples.push_back(SamplePair("DMHtoGG_M100",0)); 

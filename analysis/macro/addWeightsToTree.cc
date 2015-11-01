@@ -434,7 +434,7 @@ void addWeights(const char* filename, float lumiForW, float massTrue=1) {
   }
 
   // histo scaling to get the correct normalization
-  h_selection->Scale( xsecToWeight / sampleSumWeight );  
+  //h_selection->Scale( xsecToWeight / sampleSumWeight );  
 
   // new info
   fileNew->cd();
