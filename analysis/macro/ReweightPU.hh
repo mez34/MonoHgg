@@ -31,6 +31,8 @@ private:
   
   Double_t fLumi;
   Int_t    fNBins;
+  Double_t fMin;
+  Double_t fMax;
 
   TString fInDir;
   TString fOutDir;

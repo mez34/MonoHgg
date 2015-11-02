@@ -13,9 +13,11 @@ ReweightPU::ReweightPU(const TString MC, const TString Data, const Double_t lumi
   fLumi = lumi;
 
   // set nBins for nvtx distribution
-  fNBins = nBins;
+  fNBins = nBins+1;
+  fMin = -0.5;
+  fMax = Double_t(nBins)+0.5;
 
-  std::cout << "lumi " << lumi << " nbins " << nBins << std::endl;
+ // std::cout << "lumi " << lumi << " nbins " << nBins << std::endl;
 
   // set outputs
   fOutDir  = outdir;
@@ -23,15 +25,15 @@ ReweightPU::ReweightPU(const TString MC, const TString Data, const Double_t lumi
   fOutType = type;
 
   // Initialize output TH1D's for data
-  fOutDataNvtx = new TH1D("nvtx_data","",fNBins,0.,Double_t(fNBins));
+  fOutDataNvtx = new TH1D("nvtx_data","",fNBins,fMin,fMax);
   fOutDataNvtx->Sumw2();
 
   // Initialize outputs for MC
-  fOutMCNvtx = new TH1D("nvtx_mc","",fNBins,0.,Double_t(fNBins));
+  fOutMCNvtx = new TH1D("nvtx_mc","",fNBins,fMin,fMax);
   fOutMCNvtx->Sumw2();
 
   // Intialize Ratio Hist
-  fOutDataOverMCNvtx = new TH1D("nvtx_dataOverMC","",fNBins,0.,Double_t(fNBins));
+  fOutDataOverMCNvtx = new TH1D("nvtx_dataOverMC","",fNBins,fMin,fMax);
   fOutDataOverMCNvtx->Sumw2();
 
   // Initialize Output root file to be used by other macros ... eventually could integrate... no need now
@@ -60,7 +62,7 @@ DblVec ReweightPU::GetPUWeights() {
 
   TTree * treeData = (TTree*)fileData->Get("DiPhotonTree");      
   CheckValidTree(treeData,"DiPhotonTree",filename);      
-  TH1D * tmpnvtxData = new TH1D("tmpnvtxData","",fNBins,0.,Double_t(fNBins));
+  TH1D * tmpnvtxData = new TH1D("tmpnvtxData","",fNBins,fMin,fMax);
   tmpnvtxData->Sumw2();
 
   // fill each input data nvtx
@@ -86,7 +88,7 @@ DblVec ReweightPU::GetPUWeights() {
 
   TTree * treeMC = (TTree*)fileMC->Get("DiPhotonTree");      
   CheckValidTree(treeMC,"DiPhotonTree",filename);            
-  TH1D * tmpnvtxMC = new TH1D("tmpnvtxMC","",fNBins,0.,Double_t(fNBins));
+  TH1D * tmpnvtxMC = new TH1D("tmpnvtxMC","",fNBins,fMin,fMax);
   tmpnvtxMC->Sumw2();
 
   // fill each input mc nvtx
