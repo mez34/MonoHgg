@@ -6,6 +6,7 @@
 ._*
 *__.*
 .#*
+*.pcm
 
 analysis/macro/main
 
@@ -19,7 +20,7 @@ analysis/limits/2HDM/*
 
 #ignore files created by batch jobs
 analysis/scripts/job*
-
+analysis/scripts/outputjobs*
 #ignore data and output plots
 *.root
 *.png

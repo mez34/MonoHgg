@@ -414,7 +414,8 @@ void addWeights(const char* filename, float lumiForW, float massTrue=1) {
 
     if (i%10000 == 0){
        std::cout << ">>> Weighting event # " << i << " / " << nentriesOrig << " entries" << std::endl; 
-       if (sampleID<0 || sampleID>=10000) std::cout << "No weighting done for Data" << std::endl;
+       if (sampleID>=10000) std::cout << "No weighting done for Data!" << std::endl;
+       if (sampleID<=0)     std::cout << "Not valid sampleID" << std::endl;
     }
     treeOrig->GetEntry(i);
 

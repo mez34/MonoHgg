@@ -6,7 +6,7 @@ import FWCore.ParameterSet.Types as CfgTypes
 isMC = False;
 is25ns = True;
 is2015D =  True;
-is2015DFromChiara = False;
+is2015DFromChiara = True;
 
 process = cms.Process("diPhoAna")
 
@@ -27,7 +27,7 @@ elif (isMC):
     process.GlobalTag = GlobalTag(process.GlobalTag, 'MCRUN2_74_V9', '')
     print "MCRUN2_74_V9"
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32( 1000 ) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32( 10000 ) )
 
 process.source = cms.Source("PoolSource",
                             fileNames=cms.untracked.vstring(
@@ -48,7 +48,7 @@ process.source = cms.Source("PoolSource",
 	#"/store/user/mzientek/RunIISpring15-50ns/Higgs_scalar/Higgs_scalar_nohdecay_gg_1000GeV_13TeV_RunIISpring15-50ns-Spring15BetaV1_MetaV3-v0-RunIISpring15DR74-Asympt50ns_MCRUN2_74_V9A-v1/150818_162723/0000/myMicroAODOutputFile_1.root"
 	#"file:myMicroAODOutputFile.root"
 	#"/store/group/phys_higgs/cmshgg/musella/flashgg/EXOSpring15_7412_v2/diphotons_7412_v1/SingleElectron/EXOSpring15_7412_v2-diphotons_7412_v1-v2-Run2015D-PromptReco-v3/151006_034715/0000/diphotonsMicroAOD_1.root"
-	"/store/group/phys_higgs/cmshgg/sethzenz/flashgg/RunIISpring15-ReMiniAOD-BetaV7-25ns/Spring15BetaV7/VHToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8/RunIISpring15-ReMiniAOD-BetaV7-25ns-Spring15BetaV7-v0-RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/151021_152953/0000/myMicroAODOutputFile_1.root",
+	#"/store/group/phys_higgs/cmshgg/sethzenz/flashgg/RunIISpring15-ReMiniAOD-BetaV7-25ns/Spring15BetaV7/VHToGG_M125_13TeV_amcatnloFXFX_madspin_pythia8/RunIISpring15-ReMiniAOD-BetaV7-25ns-Spring15BetaV7-v0-RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/151021_152953/0000/myMicroAODOutputFile_1.root",
 	"/store/group/phys_higgs/cmshgg/musella/flashgg/EXOSpring15_7415_v2/diphotons_7415_v2/DoubleEG/EXOSpring15_7415_v2-diphotons_7415_v2-v2-Run2015D-PromptReco-v4/151020_202017/0000/diphotonsMicroAOD_1.root",
 	"/store/group/phys_higgs/cmshgg/musella/flashgg/EXOSpring15_7415_v2/diphotons_7415_v2/DoubleEG/EXOSpring15_7415_v2-diphotons_7415_v2-v2-Run2015D-PromptReco-v4/151020_202017/0000/diphotonsMicroAOD_10.root",
 	"/store/group/phys_higgs/cmshgg/musella/flashgg/EXOSpring15_7415_v2/diphotons_7415_v2/DoubleEG/EXOSpring15_7415_v2-diphotons_7415_v2-v2-Run2015D-PromptReco-v4/151020_202017/0000/diphotonsMicroAOD_100.root",

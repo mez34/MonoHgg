@@ -32,28 +32,27 @@ int main(){
  
   //////////////////////////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////////////
-  //
-  // SET MAIN PARAMETERS HERE
-  //
+  //										      //
+  // 				SET MAIN PARAMETERS HERE 			      //
+  //										      //
   //////////////////////////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////////////
 
-  TString inDir = "./data/25ns_v7_wPU/"; 		// input directory of the samples
-  TString outDir = "./diPhoPlots/25ns_v7_wPU/";	// output directory to send results
+  TString inDir = "./data/25ns_v7/"; 		// input directory of the samples
+  TString outDir = "./diPhoPlots/25ns_v7/";	// output directory to send results
 
   bool doFakeData = false;	// use FakeData to test combiner (mimicks data)
   bool sortMC = false;		// use if want to sort bkg smallest to biggest, else uses order given
   bool doBlind = true;		// use to blind the analysis for Data (don't use distributions for met>100 & 110<mgg<150)
   bool makePURWfiles = false;	// recompute PURW and make files (need also doReweightPU=true for this to run)
   bool doReweightPU = false;	// use PURW from old files if !makePURWfiles
-  bool doPlots = false;		// make plots for each sample individually
+  bool doPlots = true;		// make plots for each sample individually
   bool doComb = true;		// make stack/overlay plots
   bool doABCD = false;		// run ABCD method 
 
   Double_t lumi = 1263.9; // in pb^-1 
   UInt_t nBins_vtx = 50; // number of bins for PURW 
-  TString type = "png";
-
+  TString type = "png"; // type of plots to be made
   
   //////////////////////////////////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////////////////////////////////
