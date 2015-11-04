@@ -170,8 +170,8 @@ void SetTDRStyle(TStyle *& tdrStyle) {
   // For the canvas:
   tdrStyle->SetCanvasBorderMode(0);
   tdrStyle->SetCanvasColor(kWhite);
-  tdrStyle->SetCanvasDefH(600); //Height of canvas
-  tdrStyle->SetCanvasDefW(700); //Width of canvas
+  tdrStyle->SetCanvasDefH(700); //Height of canvas
+  tdrStyle->SetCanvasDefW(600); //Width of canvas
   tdrStyle->SetCanvasDefX(0);   //Position on screen
   tdrStyle->SetCanvasDefY(0);
 

@@ -137,7 +137,6 @@ void ABCDMethod::DoAnalysis(){
   fOutSelBkgTH2DHists[0]->Add(fInBkgTH2DHists[0][i_gj]); 
   fOutSelBkgTH2DHists[0]->Add(fInBkgTH2DHists[0][i_qcd]);    
  
-  
   for (UInt_t mc = 0; mc < fNBkg; mc++){
     //fInBkgTH2DHists[0][mc]->Scale(300000./40.);// in order to scale to 300fb-1
     //std::cout << "number entries in bkg in " << fInBkgTH2DHists[0][mc]->GetEntries() << std::endl;

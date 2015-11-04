@@ -153,6 +153,8 @@ void Plotter::DoPlots(){
     if (passCH2 && passNH2 && passPH2 && passS2 && passHE2 && passEV2) passAll2 = true;
     if (passAll1 && passAll2) passBoth = true;
 
+    //if (!passEV1 || !passEV2) std::cout << "Eleveto didn't work! " << std::endl;
+
     //start full selection for plots
     if (mgg >= 100){
     //if ( pt1 > mgg/3 && pt2 > mgg/4 /*&& passEV1 && passEV2*/){

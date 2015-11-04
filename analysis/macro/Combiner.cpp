@@ -121,6 +121,14 @@ void Combiner::DoComb(){
       else{
         fOutBkgTH1DHists[th1d]->Add(fInBkgTH1DHists[th1d][mc]);
       }
+    }
+    if (th1d==fIndexMgg){
+      for (UInt_t mc = 0; mc < fNBkg; mc++){// print out values of integrals
+        if (addText!="_n-1"){
+          std::cout << fBkgNames[mc] << " in " << fTH1DNames[th1d] << " = " << fInBkgTH1DHists[th1d][mc]->Integral() 
+          << " %: " << fInBkgTH1DHists[th1d][mc]->Integral()/fOutBkgTH1DHists[th1d]->Integral() << std::endl;
+        }
+      }
     } 
     //fOutBkgTH1DHists[th1d]->Sumw2();
     //std::cout << "histo# " << th1d << std::endl;
@@ -140,6 +148,10 @@ void Combiner::DoComb(){
       //fInSigTH1DHists[th1d][mc]->Scale(lumi);
       fTH1DLegends[th1d]->AddEntry(fInSigTH1DHists[th1d][mc],fSampleTitleMap[fSigNames[mc]],"l");
     }
+
+
+    
+
   }// end loop over th1d histos
 
   //if (addText!="_n-1") Combiner::MakeEffPlots();
@@ -253,7 +265,7 @@ void Combiner::DrawCanvasOverlay(const UInt_t th1d, const Bool_t isLogY){
   //minOverlay = Combiner::GetMinimum(th1d, false);  
 
   // start by drawing the sig first
-  if (isLogY) fInSigTH1DHists[th1d][0]->SetMaximum(maxOverlay*10);
+  if (isLogY) fInSigTH1DHists[th1d][0]->SetMaximum(maxOverlay*50);
   else fInSigTH1DHists[th1d][0]->SetMaximum(maxOverlay*1.1);
   //if (fNData > 0) fInSigTH1DHists[th1d][0]->SetMinimum(minOverlay*0.9);
   if (th1d==fIndexMgg){ 
