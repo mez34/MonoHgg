@@ -219,7 +219,7 @@ NewDiPhoAnalyzer::NewDiPhoAnalyzer(const edm::ParameterSet& iConfig):
   //ecalHitEEToken_(consumes<EcalRecHitCollection>(iConfig.getParameter<edm::InputTag>("reducedEndcapRecHitCollection"))),
   vertexToken_(consumes<View<reco::Vertex> >(iConfig.getUntrackedParameter<InputTag> ("VertexTag", InputTag("offlineSlimmedPrimaryVertices")))),
   diPhotonToken_(consumes<View<flashgg::DiPhotonCandidate> >(iConfig.getUntrackedParameter<InputTag> ("DiPhotonTag", InputTag("flashggDiPhotons")))),
-  PileUpToken_(consumes<View<PileupSummaryInfo> >(iConfig.getUntrackedParameter<InputTag> ("PileUpTag", InputTag("addPileupInfo")))),
+  PileUpToken_(consumes<View<PileupSummaryInfo> >(iConfig.getUntrackedParameter<InputTag> ("PileUpTag", InputTag("slimmedAddPileupInfo")))),
   genPhotonExtraToken_(mayConsume<vector<flashgg::GenPhotonExtra> >(iConfig.getParameter<InputTag>("genPhotonExtraTag"))),
   genPartToken_(consumes<View<reco::GenParticle> >(iConfig.getUntrackedParameter<InputTag> ("GenParticlesTag", InputTag("flashggPrunedGenParticles")))),
   METToken_( consumes<View<pat::MET> >( iConfig.getUntrackedParameter<InputTag> ( "METTag", InputTag( "slimmedMETs" ) ) ) ),
@@ -339,14 +339,14 @@ void NewDiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& 
   float pu_weight = 1.;
   float pu_n      = -1.;
   if (sampleID>0 && sampleID<10000) {     // MC
-    //  pu_n = 0.;
+    //pu_n = 0.;
     //for( unsigned int PVI = 0; PVI < PileupInfos->size(); ++PVI ) {
-    //Int_t pu_bunchcrossing = PileupInfos->ptrAt( PVI )->getBunchCrossing();
-    //if( pu_bunchcrossing == 0 ) {
-    //	pu_n = PileupInfos->ptrAt( PVI )->getPU_NumInteractions();
+    //  Int_t pu_bunchcrossing = PileupInfos->ptrAt( PVI )->getBunchCrossing();
+    //  if( pu_bunchcrossing == 0 ) {
+    //  	pu_n = PileupInfos->ptrAt( PVI )->getPU_NumInteractions();
+    //  }
     //}
-    //}
-    if (dopureweight_) 
+  if (dopureweight_) 
       pu_weight = GetPUWeight(nvtx);         
   }
   
