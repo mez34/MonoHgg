@@ -11,6 +11,7 @@
 ./submitBatchDiPho.py --cfg diPhoAnaBATCH.py DoubleEG_2015D_PromptV0		0 10003 pippo 1 1 
 ./submitBatchDiPho.py --cfg diPhoAnaBATCH.py DoubleEG_2015D_PromptV1		0 10004 pippo 1 1 
 ./submitBatchDiPho.py --cfg diPhoAnaBATCH.py DoubleEG_2015D_PromptV2		0 10005 pippo 1 1 
+#./submitBatchDiPho.py --cfg diPhoAnaBATCH.py DoubleEG_RunD           		0 10000 pippo  1 1
 
 ./submitBatchDiPho.py --cfg diPhoAnaBATCH.py DiPhoton				0 15  pippo  84.0 1
 ./submitBatchDiPho.py --cfg diPhoAnaBATCH.py GJet_Pt-20to40     		0  1  pippo  218.6108 1  
@@ -22,16 +23,19 @@
 ./submitBatchDiPho.py --cfg diPhoAnaBATCH.py VH					0  11 pippo  0.0044992 1   #value=xsec(ZH+WH)*br (xsec=2.2496,br=0.002)
 ./submitBatchDiPho.py --cfg diPhoAnaBATCH.py DYJetsToLL				0  12 pippo  6025.2 1 
 
-./submitBatchDiPho.py --cfg diPhoAnaBATCH.py 2HDM_MZP600			0  100 pippo 0.00009338  1 #46.69fb xsec * 0.002br
-./submitBatchDiPho.py --cfg diPhoAnaBATCH.py 2HDM_MZP800			0  100 pippo 0.00010348  1 #51.74fb xsec * 0.002br
-./submitBatchDiPho.py --cfg diPhoAnaBATCH.py 2HDM_MZP1000			0  100 pippo 0.00008394  1 #41.97fb xsec * 0.002br
-./submitBatchDiPho.py --cfg diPhoAnaBATCH.py 2HDM_MZP1200			0  100 pippo 0.00006352  1 #31.76fb xsec * 0.002br
-./submitBatchDiPho.py --cfg diPhoAnaBATCH.py 2HDM_MZP1400			0  100 pippo 0.00004712  1 #23.56fb xsec * 0.002br
-./submitBatchDiPho.py --cfg diPhoAnaBATCH.py 2HDM_MZP1700			0  100 pippo 0.00003020  1 #15.10fb xsec * 0.002br
-./submitBatchDiPho.py --cfg diPhoAnaBATCH.py 2HDM_MZP2000			0  100 pippo 0.000019468 1 #9.734fb xsec * 0.002br
-./submitBatchDiPho.py --cfg diPhoAnaBATCH.py 2HDM_MZP2500			0  100 pippo 0.00000972  1 #4.860fb xsec * 0.002br
+./submitBatchDiPho.py --cfg diPhoAnaBATCH.py testSig				0  110 pippo 0.00009338  1 
 
-./submitBatchDiPho.py --cfg diPhoAnaBATCH.py DoubleEG_RunD           		0 10000 pippo  1 1
+./submitBatchDiPho.py --cfg diPhoAnaBATCH.py 2HDM_MZP600			0  100 pippo 0.00009338  1 #46.69fb xsec * 0.002br
+./submitBatchDiPho.py --cfg diPhoAnaBATCH.py 2HDM_MZP800			0  101 pippo 0.00010348  1 #51.74fb xsec * 0.002br
+./submitBatchDiPho.py --cfg diPhoAnaBATCH.py 2HDM_MZP1000			0  102 pippo 0.00008394  1 #41.97fb xsec * 0.002br
+./submitBatchDiPho.py --cfg diPhoAnaBATCH.py 2HDM_MZP1200			0  103 pippo 0.00006352  1 #31.76fb xsec * 0.002br
+./submitBatchDiPho.py --cfg diPhoAnaBATCH.py 2HDM_MZP1400			0  104 pippo 0.00004712  1 #23.56fb xsec * 0.002br
+./submitBatchDiPho.py --cfg diPhoAnaBATCH.py 2HDM_MZP1700			0  105 pippo 0.00003020  1 #15.10fb xsec * 0.002br
+./submitBatchDiPho.py --cfg diPhoAnaBATCH.py 2HDM_MZP2000			0  106 pippo 0.000019468 1 #9.734fb xsec * 0.002br
+./submitBatchDiPho.py --cfg diPhoAnaBATCH.py 2HDM_MZP2500			0  107 pippo 0.00000972  1 #4.860fb xsec * 0.002br
+
+
+
 
 # 50ns Data
 #./submitBatchDiPho.py --cfg diPhoAnaBATCH.py DoubleEG           		0 10000 pippo  1 1
