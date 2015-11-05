@@ -102,6 +102,8 @@ void addWeights(const char* filename, float lumiForW, float massTrue=1) {
   Int_t           presel2;
   Int_t           sel1;
   Int_t           sel2;
+  Int_t           tightsel1;
+  Int_t           tightsel2;
   Float_t         genmgg;
   Int_t           genmatch1;
   Int_t           genmatch2;
@@ -124,6 +126,16 @@ void addWeights(const char* filename, float lumiForW, float massTrue=1) {
   Int_t		  passSieie2;
   Int_t		  passHoe1;
   Int_t		  passHoe2;
+  Int_t		  passTightCHiso1;
+  Int_t		  passTightCHiso2;
+  Int_t		  passTightNHiso1;
+  Int_t		  passTightNHiso2;
+  Int_t		  passTightPHiso1;
+  Int_t		  passTightPHiso2;
+  Int_t		  passTightSieie1;
+  Int_t		  passTightSieie2;
+  Int_t		  passTightHoe1;
+  Int_t		  passTightHoe2;
   Int_t		  hltPhoton26Photon16Mass60;
   Int_t		  hltPhoton36Photon22Mass15;
   Int_t		  hltPhoton42Photon25Mass15;
@@ -188,6 +200,8 @@ void addWeights(const char* filename, float lumiForW, float massTrue=1) {
   TBranch        *b_presel2;
   TBranch        *b_sel1;
   TBranch        *b_sel2;
+  TBranch        *b_tightsel1;
+  TBranch        *b_tightsel2;
   TBranch        *b_genmgg; 
   TBranch        *b_genmatch1; 
   TBranch        *b_genmatch2; 
@@ -210,6 +224,16 @@ void addWeights(const char* filename, float lumiForW, float massTrue=1) {
   TBranch	 *b_passSieie2;
   TBranch	 *b_passHoe1;
   TBranch	 *b_passHoe2;
+  TBranch	 *b_passTightCHiso1;
+  TBranch	 *b_passTightCHiso2;
+  TBranch	 *b_passTightNHiso1;
+  TBranch	 *b_passTightNHiso2;
+  TBranch	 *b_passTightPHiso1;
+  TBranch	 *b_passTightPHiso2;
+  TBranch	 *b_passTightSieie1;
+  TBranch	 *b_passTightSieie2;
+  TBranch	 *b_passTightHoe1;
+  TBranch	 *b_passTightHoe2;
   TBranch	 *b_hltPhoton26Photon16Mass60;
   TBranch	 *b_hltPhoton36Photon22Mass15;
   TBranch	 *b_hltPhoton42Photon25Mass15;
@@ -274,6 +298,8 @@ void addWeights(const char* filename, float lumiForW, float massTrue=1) {
   treeOrig->SetBranchAddress("presel2",&presel2,&b_presel2);
   treeOrig->SetBranchAddress("sel1",&sel1,&b_sel1);
   treeOrig->SetBranchAddress("sel2",&sel2,&b_sel2);
+  treeOrig->SetBranchAddress("tightsel1",&tightsel1,&b_tightsel1);
+  treeOrig->SetBranchAddress("tightsel2",&tightsel2,&b_tightsel2);
   treeOrig->SetBranchAddress("genmgg", &genmgg, &b_genmgg);
   treeOrig->SetBranchAddress("genmatch1", &genmatch1, &b_genmatch1);
   treeOrig->SetBranchAddress("genmatch2", &genmatch2, &b_genmatch2);
@@ -296,6 +322,16 @@ void addWeights(const char* filename, float lumiForW, float massTrue=1) {
   treeOrig->SetBranchAddress("passSieie2", &passSieie2, &b_passSieie2);
   treeOrig->SetBranchAddress("passHoe1", &passHoe1, &b_passHoe1);
   treeOrig->SetBranchAddress("passHoe2", &passHoe2, &b_passHoe2);
+  treeOrig->SetBranchAddress("passTightCHiso1", &passTightCHiso1, &b_passTightCHiso1);
+  treeOrig->SetBranchAddress("passTightCHiso2", &passTightCHiso2, &b_passTightCHiso2);
+  treeOrig->SetBranchAddress("passTightNHiso1", &passTightNHiso1, &b_passTightNHiso1);
+  treeOrig->SetBranchAddress("passTightNHiso2", &passTightNHiso2, &b_passTightNHiso2);
+  treeOrig->SetBranchAddress("passTightPHiso1", &passTightPHiso1, &b_passTightPHiso1);
+  treeOrig->SetBranchAddress("passTightPHiso2", &passTightPHiso2, &b_passTightPHiso2);
+  treeOrig->SetBranchAddress("passTightSieie1", &passTightSieie1, &b_passTightSieie1);
+  treeOrig->SetBranchAddress("passTightSieie2", &passTightSieie2, &b_passTightSieie2);
+  treeOrig->SetBranchAddress("passTightHoe1", &passTightHoe1, &b_passTightHoe1);
+  treeOrig->SetBranchAddress("passTightHoe2", &passTightHoe2, &b_passTightHoe2);
   treeOrig->SetBranchAddress("hltPhoton26Photon16Mass60", &hltPhoton26Photon16Mass60, &b_hltPhoton26Photon16Mass60);
   treeOrig->SetBranchAddress("hltPhoton36Photon22Mass15", &hltPhoton36Photon22Mass15, &b_hltPhoton36Photon22Mass15);
   treeOrig->SetBranchAddress("hltPhoton42Photon25Mass15", &hltPhoton42Photon25Mass15, &b_hltPhoton42Photon25Mass15);
@@ -378,6 +414,8 @@ void addWeights(const char* filename, float lumiForW, float massTrue=1) {
     theTreeNew->Branch("presel2",&presel2,"presel2/I");
     theTreeNew->Branch("sel1",&sel1,"sel1/I");
     theTreeNew->Branch("sel2",&sel2,"sel2/I");
+    theTreeNew->Branch("tightsel1",&tightsel1,"tightsel1/I");
+    theTreeNew->Branch("tightsel2",&tightsel2,"tightsel2/I");
     theTreeNew->Branch("genmatch1", &genmatch1, "genmatch1/I");
     theTreeNew->Branch("genmatch2", &genmatch2, "genmatch2/I");
     theTreeNew->Branch("geniso1", &geniso1, "geniso1/F");
@@ -399,6 +437,16 @@ void addWeights(const char* filename, float lumiForW, float massTrue=1) {
     theTreeNew->Branch("passSieie2", &passSieie2, "passSieie2/I");
     theTreeNew->Branch("passHoe1", &passHoe1, "passHoe1/I");
     theTreeNew->Branch("passHoe2", &passHoe2, "passHoe2/I");
+    theTreeNew->Branch("passTightCHiso1", &passTightCHiso1, "passTightCHiso1/I");
+    theTreeNew->Branch("passTightCHiso2", &passTightCHiso2, "passTightCHiso2/I");
+    theTreeNew->Branch("passTightNHiso1", &passTightNHiso1, "passTightNHiso1/I");
+    theTreeNew->Branch("passTightNHiso2", &passTightNHiso2, "passTightNHiso2/I");
+    theTreeNew->Branch("passTightPHiso1", &passTightPHiso1, "passTightPHiso1/I");
+    theTreeNew->Branch("passTightPHiso2", &passTightPHiso2, "passTightPHiso2/I");
+    theTreeNew->Branch("passTightSieie1", &passTightSieie1, "passTightSieie1/I");
+    theTreeNew->Branch("passTightSieie2", &passTightSieie2, "passTightSieie2/I");
+    theTreeNew->Branch("passTightHoe1", &passTightHoe1, "passTightHoe1/I");
+    theTreeNew->Branch("passTightHoe2", &passTightHoe2, "passTightHoe2/I");
     theTreeNew->Branch("hltPhoton26Photon16Mass60", &hltPhoton26Photon16Mass60, "hltPhoton26Photon16Mass60/I");
     theTreeNew->Branch("hltPhoton36Photon22Mass15", &hltPhoton36Photon22Mass15, "hltPhoton36Photon22Mass15/I");
     theTreeNew->Branch("hltPhoton42Photon25Mass15", &hltPhoton42Photon25Mass15, "hltPhoton42Photon25Mass15/I");
@@ -414,8 +462,8 @@ void addWeights(const char* filename, float lumiForW, float massTrue=1) {
 
     if (i%10000 == 0){
        std::cout << ">>> Weighting event # " << i << " / " << nentriesOrig << " entries" << std::endl; 
-       if (sampleID>=10000) std::cout << "No weighting done for Data!" << std::endl;
-       if (sampleID<=0)     std::cout << "Not valid sampleID" << std::endl;
+       //if (sampleID>=10000) std::cout << "No weighting done for Data!" << std::endl;
+       //if (sampleID<=0)     std::cout << "Not valid sampleID" << std::endl;
     }
     treeOrig->GetEntry(i);
 
@@ -428,7 +476,7 @@ void addWeights(const char* filename, float lumiForW, float massTrue=1) {
       mggNominal = massTrue;
       mggGen     = genmgg;
     } else { //Data   
-
+      if (i%10000 == 0 && sampleID>=10000) std::cout << "No weighting done for Data!" << std::endl;
       xsecWeight = 1.;
       weight     = 1.;
       mggNominal = 1.;

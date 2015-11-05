@@ -13,15 +13,15 @@
 ./submitBatchDiPho.py --cfg diPhoAnaBATCH.py DoubleEG_2015D_PromptV2		0 10005 pippo 1 1 
 #./submitBatchDiPho.py --cfg diPhoAnaBATCH.py DoubleEG_RunD           		0 10000 pippo  1 1
 
-./submitBatchDiPho.py --cfg diPhoAnaBATCH.py DiPhoton				0 15  pippo  84.0 1
-./submitBatchDiPho.py --cfg diPhoAnaBATCH.py GJet_Pt-20to40     		0  1  pippo  218.6108 1  
-./submitBatchDiPho.py --cfg diPhoAnaBATCH.py GJet_Pt-40toInf    		0  2  pippo  863.1088 1
-./submitBatchDiPho.py --cfg diPhoAnaBATCH.py QCD_Pt-30to40      		0  3  pippo  24300   1
-./submitBatchDiPho.py --cfg diPhoAnaBATCH.py QCD_Pt-30toInf     		0  4  pippo  259296  1
-./submitBatchDiPho.py --cfg diPhoAnaBATCH.py QCD_Pt-40toInf     		0  5  pippo  108240  1
-./submitBatchDiPho.py --cfg diPhoAnaBATCH.py GluGluHToGG	     		0  10 pippo  0.08784 1     #value=xsec*br (xsec=43.92,br=0.002)
-./submitBatchDiPho.py --cfg diPhoAnaBATCH.py VH					0  11 pippo  0.0044992 1   #value=xsec(ZH+WH)*br (xsec=2.2496,br=0.002)
-./submitBatchDiPho.py --cfg diPhoAnaBATCH.py DYJetsToLL				0  12 pippo  6025.2 1 
+./submitBatchDiPho.py --cfg diPhoAnaBATCH.py DiPhoton				1 15  /afs/cern.ch/user/m/mzientek/public/pileupWeights___processedAndGolden_2015D_oct25.root  84.0 1
+./submitBatchDiPho.py --cfg diPhoAnaBATCH.py GJet_Pt-20to40     		1  1  /afs/cern.ch/user/m/mzientek/public/pileupWeights___processedAndGolden_2015D_oct25.root  218.6108 1  
+./submitBatchDiPho.py --cfg diPhoAnaBATCH.py GJet_Pt-40toInf    		1  2  /afs/cern.ch/user/m/mzientek/public/pileupWeights___processedAndGolden_2015D_oct25.root  863.1088 1
+./submitBatchDiPho.py --cfg diPhoAnaBATCH.py QCD_Pt-30to40      		1  3  /afs/cern.ch/user/m/mzientek/public/pileupWeights___processedAndGolden_2015D_oct25.root  24300   1
+./submitBatchDiPho.py --cfg diPhoAnaBATCH.py QCD_Pt-30toInf     		1  4  /afs/cern.ch/user/m/mzientek/public/pileupWeights___processedAndGolden_2015D_oct25.root  259296  1
+./submitBatchDiPho.py --cfg diPhoAnaBATCH.py QCD_Pt-40toInf     		1  5  /afs/cern.ch/user/m/mzientek/public/pileupWeights___processedAndGolden_2015D_oct25.root  108240  1
+./submitBatchDiPho.py --cfg diPhoAnaBATCH.py GluGluHToGG	     		1  10 /afs/cern.ch/user/m/mzientek/public/pileupWeights___processedAndGolden_2015D_oct25.root  0.08784 1     #value=xsec*br (xsec=43.92,br=0.002)
+./submitBatchDiPho.py --cfg diPhoAnaBATCH.py VH					1  11 /afs/cern.ch/user/m/mzientek/public/pileupWeights___processedAndGolden_2015D_oct25.root  0.0044992 1   #value=xsec(ZH+WH)*br (xsec=2.2496,br=0.002)
+./submitBatchDiPho.py --cfg diPhoAnaBATCH.py DYJetsToLL				1  12 /afs/cern.ch/user/m/mzientek/public/pileupWeights___processedAndGolden_2015D_oct25.root  6025.2 1 
 
 ./submitBatchDiPho.py --cfg diPhoAnaBATCH.py testSig				0  110 pippo 0.00009338  1 
 

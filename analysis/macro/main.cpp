@@ -44,10 +44,10 @@ int main(){
   bool doFakeData = false;	// use FakeData to test combiner (mimicks data)
   bool sortMC = false;		// use if want to sort bkg smallest to biggest, else uses order given
   bool doBlind = true;		// use to blind the analysis for Data (don't use distributions for met>100 & 110<mgg<150)
-  bool makePURWfiles = false;	// recompute PURW and make files (need also doReweightPU=true for this to run)
+  bool makePURWfiles = true;	// recompute PURW and make files (need also doReweightPU=true for this to run)
   bool doReweightPU = true;	// use PURW from old files if !makePURWfiles
   bool doPlots = false;		// make plots for each sample individually
-  bool doComb = true;		// make stack/overlay plots
+  bool doComb = false;		// make stack/overlay plots
   bool doABCD = false;		// run ABCD method 
 
   Double_t lumi = 1263.9; // in pb^-1 
@@ -126,7 +126,7 @@ int main(){
 
     else{ // load PURW from already made files
       TString fBkgName = Form("%spurw/PURW_MC.root",outDir.Data());
-      //TString fBkgName = Form("PURW_zmumu.root",outDir.Data());
+      //TString fBkgName = Form("%spurw/PURW_zmumu.root",outDir.Data());
       TFile *fBkg = TFile::Open(fBkgName.Data());
       CheckValidFile(fBkg,fBkgName);
       TH1D *fBkgRatio = (TH1D*)fBkg->Get("nvtx_dataOverMC");  

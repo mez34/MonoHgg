@@ -107,6 +107,8 @@ struct diphoTree_struc_ {
   int presel2;
   int sel1;
   int sel2;
+  int tightsel1;
+  int tightsel2;
   int vtxIndex;
   float vtxX; 
   float vtxY; 
@@ -129,6 +131,16 @@ struct diphoTree_struc_ {
   int passSieie2;
   int passHoe1;
   int passHoe2;
+  int passTightCHiso1;
+  int passTightCHiso2;
+  int passTightNHiso1; 
+  int passTightNHiso2;
+  int passTightPHiso1;
+  int passTightPHiso2;
+  int passTightSieie1;
+  int passTightSieie2;
+  int passTightHoe1;
+  int passTightHoe2;
 };
 
 class NewDiPhoAnalyzer : public edm::EDAnalyzer {
@@ -226,7 +238,7 @@ NewDiPhoAnalyzer::NewDiPhoAnalyzer(const edm::ParameterSet& iConfig):
   //ecalHitEEToken_(consumes<EcalRecHitCollection>(iConfig.getParameter<edm::InputTag>("reducedEndcapRecHitCollection"))),
   vertexToken_(consumes<View<reco::Vertex> >(iConfig.getUntrackedParameter<InputTag> ("VertexTag", InputTag("offlineSlimmedPrimaryVertices")))),
   diPhotonToken_(consumes<View<flashgg::DiPhotonCandidate> >(iConfig.getUntrackedParameter<InputTag> ("DiPhotonTag", InputTag("flashggDiPhotons")))),
-  PileUpToken_(consumes<View<PileupSummaryInfo> >(iConfig.getUntrackedParameter<InputTag> ("PileUpTag", InputTag("slimmedAddPileupInfo")))),
+  PileUpToken_(consumes<View<PileupSummaryInfo> >(iConfig.getUntrackedParameter<InputTag> ("PileUpTag"))),
   genPhotonExtraToken_(mayConsume<vector<flashgg::GenPhotonExtra> >(iConfig.getParameter<InputTag>("genPhotonExtraTag"))),
   genPartToken_(consumes<View<reco::GenParticle> >(iConfig.getUntrackedParameter<InputTag> ("GenParticlesTag", InputTag("flashggPrunedGenParticles")))),
   METToken_( consumes<View<pat::MET> >( iConfig.getUntrackedParameter<InputTag> ( "METTag", InputTag( "slimmedMETs" ) ) ) ),
@@ -346,17 +358,17 @@ void NewDiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& 
   float pu_weight = 1.;
   float pu_n      = -1.;
   if (sampleID>0 && sampleID<10000) {     // MC
-    //pu_n = 0.;
-    //for( unsigned int PVI = 0; PVI < PileupInfos->size(); ++PVI ) {
-    //  Int_t pu_bunchcrossing = PileupInfos->ptrAt( PVI )->getBunchCrossing();
-    //  if( pu_bunchcrossing == 0 ) {
-    //  	pu_n = PileupInfos->ptrAt( PVI )->getPU_NumInteractions();
-    //  }
-    //}
+    pu_n = 0.;
+    for( unsigned int PVI = 0; PVI < PileupInfos->size(); ++PVI ) {
+      Int_t pu_bunchcrossing = PileupInfos->ptrAt( PVI )->getBunchCrossing();
+      if( pu_bunchcrossing == 0 ) {
+	pu_n = PileupInfos->ptrAt( PVI )->getTrueNumInteractions();
+      }
+    }
   if (dopureweight_) 
-      pu_weight = GetPUWeight(nvtx);         
+      pu_weight = GetPUWeight(pu_n);         
   }
-  
+  //std::cout << pu_n << " " << nvtx << " weight = " << pu_weight << std::endl; 
  
   // x-sec * kFact for MC only 
   float totXsec = 1.;
@@ -475,21 +487,22 @@ void NewDiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& 
 	//bool  leadSelel  = testPhotonIsolation( rho, leadPt, leadScEta, leadR9noZS, leadChIso, leadNeuIso, leadPhoIso, leadHoE, leadSieienoZS, leadOkEleV); 
 
         // medium working point selection
-	//int passLeadSieie = passSieieCuts( leadScEta, leadSieienoZS );
-        //int passLeadCHiso = passCHisoCuts( leadScEta, leadChIso, leadPt );
-        //int passLeadNHiso = passNHisoCuts( leadScEta, leadNeuIso, leadPt );
-        //int passLeadPHiso = passPHisoCuts( leadScEta, leadPhoIso, leadPt );
-	//int passLeadHoe   = passHoeCuts( leadScEta, leadHoE );
+	int passLeadSieie = passSieieCuts( leadScEta, leadSieienoZS );
+        int passLeadCHiso = passCHisoCuts( leadScEta, leadChIso, leadPt );
+        int passLeadNHiso = passNHisoCuts( leadScEta, leadNeuIso, leadPt );
+        int passLeadPHiso = passPHisoCuts( leadScEta, leadPhoIso, leadPt );
+	int passLeadHoe   = passHoeCuts( leadScEta, leadHoE );
         // tight working point selection
-	int passLeadSieie = passTightSieieCuts( leadScEta, leadSieienoZS );
-        int passLeadCHiso = passTightCHisoCuts( leadScEta, leadChIso, leadPt );
-        int passLeadNHiso = passTightNHisoCuts( leadScEta, leadNeuIso, leadPt );
-        int passLeadPHiso = passTightPHisoCuts( leadScEta, leadPhoIso, leadPt );
-	int passLeadHoe   = passTightHoeCuts( leadScEta, leadHoE );
+	int passTightLeadSieie = passTightSieieCuts( leadScEta, leadSieienoZS );
+        int passTightLeadCHiso = passTightCHisoCuts( leadScEta, leadChIso, leadPt );
+        int passTightLeadNHiso = passTightNHisoCuts( leadScEta, leadNeuIso, leadPt );
+        int passTightLeadPHiso = passTightPHisoCuts( leadScEta, leadPhoIso, leadPt );
+	int passTightLeadHoe   = passTightHoeCuts( leadScEta, leadHoE );
 
         int passLeadElVeto = 0;
 	if (diphoPtr->leadingPhoton()->passElectronVeto()) passLeadElVeto = 1;
-        bool leadSelel    = testPhotonIsolation( passLeadSieie, passLeadCHiso, passLeadNHiso, passLeadPHiso, passLeadHoe, passLeadElVeto); 
+        bool leadSelel      = testPhotonIsolation( passLeadSieie, passLeadCHiso, passLeadNHiso, passLeadPHiso, passLeadHoe, passLeadElVeto); 
+        bool leadTightSelel = testPhotonIsolation( passTightLeadSieie, passTightLeadCHiso, passTightLeadNHiso, passTightLeadPHiso, passTightLeadHoe, passLeadElVeto); 
 
 	float subleadPt     = diphoPtr->subLeadingPhoton()->et();
 	float subleadScEta  = (diphoPtr->subLeadingPhoton()->superCluster())->eta();   
@@ -504,27 +517,31 @@ void NewDiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& 
 	//bool  subleadSelel  = testPhotonIsolation( rho, subleadPt, subleadScEta, subleadR9noZS, subleadChIso, subleadNeuIso, subleadPhoIso, subleadHoE, subleadSieienoZS, subleadOkEleV);  
 	
 	// medium working point selection
-	//int passSubLeadSieie = passSieieCuts( subleadScEta, subleadSieienoZS );
-        //int passSubLeadCHiso = passCHisoCuts( subleadScEta, subleadChIso, subleadPt );
-        //int passSubLeadNHiso = passNHisoCuts( subleadScEta, subleadNeuIso, subleadPt );
-        //int passSubLeadPHiso = passPHisoCuts( subleadScEta, subleadPhoIso, subleadPt );
-	//int passSubLeadHoe   = passHoeCuts( subleadScEta, subleadHoE );
+	int passSubLeadSieie = passSieieCuts( subleadScEta, subleadSieienoZS );
+        int passSubLeadCHiso = passCHisoCuts( subleadScEta, subleadChIso, subleadPt );
+        int passSubLeadNHiso = passNHisoCuts( subleadScEta, subleadNeuIso, subleadPt );
+        int passSubLeadPHiso = passPHisoCuts( subleadScEta, subleadPhoIso, subleadPt );
+	int passSubLeadHoe   = passHoeCuts( subleadScEta, subleadHoE );
 	// tight working point selection
-	int passSubLeadSieie = passTightSieieCuts( subleadScEta, subleadSieienoZS );
-        int passSubLeadCHiso = passTightCHisoCuts( subleadScEta, subleadChIso, subleadPt );
-        int passSubLeadNHiso = passTightNHisoCuts( subleadScEta, subleadNeuIso, subleadPt );
-        int passSubLeadPHiso = passTightPHisoCuts( subleadScEta, subleadPhoIso, subleadPt );
-	int passSubLeadHoe   = passTightHoeCuts( subleadScEta, subleadHoE );
+	int passTightSubLeadSieie = passTightSieieCuts( subleadScEta, subleadSieienoZS );
+        int passTightSubLeadCHiso = passTightCHisoCuts( subleadScEta, subleadChIso, subleadPt );
+        int passTightSubLeadNHiso = passTightNHisoCuts( subleadScEta, subleadNeuIso, subleadPt );
+        int passTightSubLeadPHiso = passTightPHisoCuts( subleadScEta, subleadPhoIso, subleadPt );
+	int passTightSubLeadHoe   = passTightHoeCuts( subleadScEta, subleadHoE );
+
         int passSubLeadElVeto = 0;
 	if (diphoPtr->subLeadingPhoton()->passElectronVeto()) passSubLeadElVeto = 1;
-        bool subleadSelel    = testPhotonIsolation( passSubLeadSieie, passSubLeadCHiso, passSubLeadNHiso, passSubLeadPHiso, passSubLeadHoe, passSubLeadElVeto);
+        bool subleadSelel      = testPhotonIsolation( passSubLeadSieie, passSubLeadCHiso, passSubLeadNHiso, passSubLeadPHiso, passSubLeadHoe, passSubLeadElVeto);
+        bool subleadTightSelel = testPhotonIsolation( passTightSubLeadSieie, passTightSubLeadCHiso, passTightSubLeadNHiso, passTightSubLeadPHiso, passTightSubLeadHoe, passSubLeadElVeto);
 
-        int numpassing = 0;
-	if (leadSelel || subleadSelel) numpassing++;
+        int numpassingmed = 0;
+	int numpassing = 0;
+	if (leadSelel || subleadSelel) numpassingmed++;
+	if (leadTightSelel || subleadTightSelel) numpassing++;
 	
-	if (!leadSelel || !subleadSelel ) continue; //Livia Correction: applies pho ID selection 
+	//if (!leadSelel || !subleadSelel ) continue; //Livia Correction: applies pho ID selection 
+	if (!leadTightSelel || !subleadTightSelel ) continue;  
 	// chiara: end comment x efficiencies
-	
 
 	selectedDipho.push_back(theDiphoton);    
       }
@@ -624,7 +641,7 @@ void NewDiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& 
 		float sceta2;
 		float r92, sieie2, hoe2, scRawEne2;
 		float chiso2, phoiso2, neuiso2;
-		int presel1, presel2, sel1, sel2;
+		int presel1, presel2, sel1, sel2, tightsel1, tightsel2;
 		int vtxIndex;
 		float vtxX, vtxY, vtxZ;
 		int genmatch1, genmatch2;
@@ -634,6 +651,7 @@ void NewDiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& 
 		int eleveto1, eleveto2;
 		float pfmet,pfmetPhi, pfmetSumEt,t1pfmet,t1pfmetPhi, t1pfmetSumEt,calomet,calometPhi, calometSumEt;
                 int passCHiso1, passCHiso2, passNHiso1, passNHiso2, passPHiso1, passPHiso2, passSieie1, passSieie2, passHoe1, passHoe2;
+                int passTightCHiso1, passTightCHiso2, passTightNHiso1, passTightNHiso2, passTightPHiso1, passTightPHiso2, passTightSieie1, passTightSieie2, passTightHoe1, passTightHoe2;
 
 		// fully selected event: tree re-initialization                                                                          
 		initTreeStructure();        
@@ -723,35 +741,35 @@ void NewDiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& 
 
 
                 //-------> pass each photon ID cut separately
-
 		// medium working point selection
-		//passSieie1 = passSieieCuts( sceta1, sieie1);
-		//passSieie2 = passSieieCuts( sceta2, sieie2);
-                //passCHiso1 = passCHisoCuts( sceta1, chiso1, pt1);
-                //passCHiso2 = passCHisoCuts( sceta2, chiso2, pt2);
-		//passNHiso1 = passNHisoCuts( sceta1, neuiso1, pt1);
-		//passNHiso2 = passNHisoCuts( sceta2, neuiso2, pt2);
-		//passPHiso1 = passPHisoCuts( sceta1, phoiso1, pt1);
-		//passPHiso2 = passPHisoCuts( sceta2, phoiso2, pt2);
-		//passHoe1   = passHoeCuts( sceta1, hoe1);
-		//passHoe2   = passHoeCuts( sceta2, hoe2);
+		passSieie1 = passSieieCuts( sceta1, sieie1);
+		passSieie2 = passSieieCuts( sceta2, sieie2);
+                passCHiso1 = passCHisoCuts( sceta1, chiso1, pt1);
+                passCHiso2 = passCHisoCuts( sceta2, chiso2, pt2);
+		passNHiso1 = passNHisoCuts( sceta1, neuiso1, pt1);
+		passNHiso2 = passNHisoCuts( sceta2, neuiso2, pt2);
+		passPHiso1 = passPHisoCuts( sceta1, phoiso1, pt1);
+		passPHiso2 = passPHisoCuts( sceta2, phoiso2, pt2);
+		passHoe1   = passHoeCuts( sceta1, hoe1);
+		passHoe2   = passHoeCuts( sceta2, hoe2);
 
 		// tight working point selection
-		passSieie1 = passTightSieieCuts( sceta1, sieie1);
-		passSieie2 = passTightSieieCuts( sceta2, sieie2);
-                passCHiso1 = passTightCHisoCuts( sceta1, chiso1, pt1);
-                passCHiso2 = passTightCHisoCuts( sceta2, chiso2, pt2);
-		passNHiso1 = passTightNHisoCuts( sceta1, neuiso1, pt1);
-		passNHiso2 = passTightNHisoCuts( sceta2, neuiso2, pt2);
-		passPHiso1 = passTightPHisoCuts( sceta1, phoiso1, pt1);
-		passPHiso2 = passTightPHisoCuts( sceta2, phoiso2, pt2);
-		passHoe1   = passTightHoeCuts( sceta1, hoe1);
-		passHoe2   = passTightHoeCuts( sceta2, hoe2);
-
+		passTightSieie1 = passTightSieieCuts( sceta1, sieie1);
+		passTightSieie2 = passTightSieieCuts( sceta2, sieie2);
+                passTightCHiso1 = passTightCHisoCuts( sceta1, chiso1, pt1);
+                passTightCHiso2 = passTightCHisoCuts( sceta2, chiso2, pt2);
+		passTightNHiso1 = passTightNHisoCuts( sceta1, neuiso1, pt1);
+		passTightNHiso2 = passTightNHisoCuts( sceta2, neuiso2, pt2);
+		passTightPHiso1 = passTightPHisoCuts( sceta1, phoiso1, pt1);
+		passTightPHiso2 = passTightPHisoCuts( sceta2, phoiso2, pt2);
+		passTightHoe1   = passTightHoeCuts( sceta1, hoe1);
+		passTightHoe2   = passTightHoeCuts( sceta2, hoe2);
 
  		//-------> pass all photon ID cuts above + electronVeto
 		sel1 = testPhotonIsolation( passSieie1, passCHiso1, passNHiso1, passPHiso1, passHoe1, eleveto1 );
 		sel2 = testPhotonIsolation( passSieie2, passCHiso2, passNHiso2, passPHiso2, passHoe2, eleveto2 );
+		tightsel1 = testPhotonIsolation( passTightSieie1, passTightCHiso1, passTightNHiso1, passTightPHiso1, passTightHoe1, eleveto1 );
+		tightsel2 = testPhotonIsolation( passTightSieie2, passTightCHiso2, passTightNHiso2, passTightPHiso2, passTightHoe2, eleveto2 );
 
 		//-------> event class
 		float maxEta = sceta1;
@@ -953,6 +971,8 @@ void NewDiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& 
 		treeDipho_.presel2 = presel2;
 		treeDipho_.sel1 = sel1;
 		treeDipho_.sel2 = sel2;
+		treeDipho_.tightsel1 = tightsel1;
+		treeDipho_.tightsel2 = tightsel2;
 		treeDipho_.vtxIndex = vtxIndex;
 		treeDipho_.vtxX = vtxX;
 		treeDipho_.vtxY = vtxY;
@@ -975,6 +995,16 @@ void NewDiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& 
 		treeDipho_.passSieie2 = passSieie2;
 		treeDipho_.passHoe1 = passHoe1;
 		treeDipho_.passHoe2 = passHoe2;	
+		treeDipho_.passTightCHiso1 = passTightCHiso1;
+		treeDipho_.passTightCHiso2 = passTightCHiso2;
+		treeDipho_.passTightNHiso1 = passTightNHiso1;
+		treeDipho_.passTightNHiso2 = passTightNHiso2;
+		treeDipho_.passTightPHiso1 = passTightPHiso1;
+		treeDipho_.passTightPHiso2 = passTightPHiso2;
+		treeDipho_.passTightSieie1 = passTightSieie1;
+		treeDipho_.passTightSieie2 = passTightSieie2;
+		treeDipho_.passTightHoe1 = passTightHoe1;
+		treeDipho_.passTightHoe2 = passTightHoe2;	
 	
 		// Filling the trees
 		DiPhotonTree->Fill();
@@ -1077,6 +1107,8 @@ void NewDiPhoAnalyzer::beginJob() {
   DiPhotonTree->Branch("presel2",&(treeDipho_.presel2),"presel2/I");
   DiPhotonTree->Branch("sel1",&(treeDipho_.sel1),"sel1/I");
   DiPhotonTree->Branch("sel2",&(treeDipho_.sel2),"sel2/I");
+  DiPhotonTree->Branch("tightsel1",&(treeDipho_.tightsel1),"tightsel1/I");
+  DiPhotonTree->Branch("tightsel2",&(treeDipho_.tightsel2),"tightsel2/I");
   DiPhotonTree->Branch("genmatch1",&(treeDipho_.genmatch1),"genmatch1/I");
   DiPhotonTree->Branch("genmatch2",&(treeDipho_.genmatch2),"genmatch12/I");
   DiPhotonTree->Branch("genmgg",&(treeDipho_.genmgg),"genmgg/F");
@@ -1099,6 +1131,16 @@ void NewDiPhoAnalyzer::beginJob() {
   DiPhotonTree->Branch("passSieie2",&(treeDipho_.passSieie2),"passSieie2/I");
   DiPhotonTree->Branch("passHoe1",&(treeDipho_.passHoe1),"passHoe1/I");
   DiPhotonTree->Branch("passHoe2",&(treeDipho_.passHoe2),"passHoe2/I");
+  DiPhotonTree->Branch("passTightCHiso1",&(treeDipho_.passTightCHiso1),"passTightCHiso1/I");
+  DiPhotonTree->Branch("passTightCHiso2",&(treeDipho_.passTightCHiso2),"passTightCHiso2/I");
+  DiPhotonTree->Branch("passTightNHiso1",&(treeDipho_.passTightNHiso1),"passTightNHiso1/I");
+  DiPhotonTree->Branch("passTightNHiso2",&(treeDipho_.passTightNHiso2),"passTightNHiso2/I");
+  DiPhotonTree->Branch("passTightPHiso1",&(treeDipho_.passTightPHiso1),"passTightPHiso1/I");
+  DiPhotonTree->Branch("passTightPHiso2",&(treeDipho_.passTightPHiso2),"passTightPHiso2/I");
+  DiPhotonTree->Branch("passTightSieie1",&(treeDipho_.passTightSieie1),"passTightSieie1/I");
+  DiPhotonTree->Branch("passTightSieie2",&(treeDipho_.passTightSieie2),"passTightSieie2/I");
+  DiPhotonTree->Branch("passTightHoe1",&(treeDipho_.passTightHoe1),"passTightHoe1/I");
+  DiPhotonTree->Branch("passTightHoe2",&(treeDipho_.passTightHoe2),"passTightHoe2/I");
 }
 
 void NewDiPhoAnalyzer::endJob() { }
@@ -1166,6 +1208,8 @@ void NewDiPhoAnalyzer::initTreeStructure() {
   treeDipho_.presel2 = -500;
   treeDipho_.sel1 = -500;
   treeDipho_.sel2 = -500;
+  treeDipho_.tightsel1 = -500;
+  treeDipho_.tightsel2 = -500;
   treeDipho_.vtxIndex = -500;
   treeDipho_.vtxX = -500.;
   treeDipho_.vtxY = -500.;
@@ -1188,6 +1232,16 @@ void NewDiPhoAnalyzer::initTreeStructure() {
   treeDipho_.passSieie2 = -500;
   treeDipho_.passHoe1 = -500;
   treeDipho_.passHoe2 = -500;
+  treeDipho_.passTightCHiso1 = -500;
+  treeDipho_.passTightCHiso2 = -500;
+  treeDipho_.passTightNHiso1 = -500;
+  treeDipho_.passTightNHiso2 = -500;
+  treeDipho_.passTightPHiso1 = -500;
+  treeDipho_.passTightPHiso2 = -500;
+  treeDipho_.passTightSieie1 = -500;
+  treeDipho_.passTightSieie2 = -500;
+  treeDipho_.passTightHoe1 = -500;
+  treeDipho_.passTightHoe2 = -500;
 }
 
 void NewDiPhoAnalyzer::SetPuWeights(std::string puWeightFile) {
@@ -1202,22 +1256,22 @@ void NewDiPhoAnalyzer::SetPuWeights(std::string puWeightFile) {
   f_pu->cd();
 
   TH1D *puweights = 0;
-  // TH1D *gen_pu = 0;
-  //gen_pu    = (TH1D*) f_pu->Get("generated_pu");
-  //puweights = (TH1D*) f_pu->Get("weights");
-  puweights = (TH1D*) f_pu->Get("nvtx_dataOverMC");
+  TH1D *gen_pu = 0;
+  gen_pu    = (TH1D*) f_pu->Get("generated_pu");
+  puweights = (TH1D*) f_pu->Get("weights");
+  //puweights = (TH1D*) f_pu->Get("nvtx_dataOverMC");
   //puweights = (TH1D*) f_pu->Get("puhist"); // for Livia's old PU file
 
-  if (!puweights /*|| !gen_pu*/) {
+  if (!puweights || !gen_pu) {
     std::cout << "weights histograms  not found in file " << puWeightFile << std::endl;
     return;
   }
-  //TH1D* weightedPU= (TH1D*)gen_pu->Clone("weightedPU");
-  //  weightedPU->Multiply(puweights);
+  TH1D* weightedPU= (TH1D*)gen_pu->Clone("weightedPU");
+  weightedPU->Multiply(puweights);
 
   // Rescaling weights in order to preserve same integral of events                               
-  //TH1D* weights = (TH1D*)puweights->Clone("rescaledWeights");
-  //weights->Scale( gen_pu->Integral(1,MAX_PU_REWEIGHT) / weightedPU->Integral(1,MAX_PU_REWEIGHT) );
+  TH1D* weights = (TH1D*)puweights->Clone("rescaledWeights");
+  weights->Scale( gen_pu->Integral(1,MAX_PU_REWEIGHT) / weightedPU->Integral(1,MAX_PU_REWEIGHT) );
 
   float sumPuWeights=0.;
   for (int i = 0; i<MAX_PU_REWEIGHT; i++) {
@@ -1225,6 +1279,7 @@ void NewDiPhoAnalyzer::SetPuWeights(std::string puWeightFile) {
     weight=puweights->GetBinContent(i+1);
     sumPuWeights+=weight;
     puweights_.push_back(weight);
+    //std::cout << "i= " << i << " & has weight = " << weight << std::endl;
   }
 }
 
