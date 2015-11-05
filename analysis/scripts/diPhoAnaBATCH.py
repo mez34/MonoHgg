@@ -3,10 +3,10 @@ import FWCore.Utilities.FileUtils as FileUtils
 import FWCore.PythonUtilities.LumiList as LumiList  
 import FWCore.ParameterSet.Types as CfgTypes  
 
-isMC = False;
+isMC = True;
 is25ns = True;
 is2015D = True;
-is2015DFromChiara = False;
+is2015DFromChiara = True;
 
 process = cms.Process("diPhoAna")
 
