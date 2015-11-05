@@ -1266,7 +1266,7 @@ bool NewDiPhoAnalyzer::LeadPhoTriggerSel(float eta, float hoe, float r9, float s
 bool NewDiPhoAnalyzer::SubLeadPhoTriggerSel(float eta, float hoe, float r9, float sieie, float phoiso, float chiso, float pt){
   bool passes = false;
   if (fabs(eta)<1.4442 && hoe < 0.1){
-    if (r9 > 0.85 || (sieie < 0.015 && phoiso < (6 + 0.12*pt))){
+    if (r9 > 0.85 || (sieie < 0.015 && phoiso < (6 + 0.12*pt) && chiso < (6 + 0.002*pt))){
       passes = true;
     }
   }
