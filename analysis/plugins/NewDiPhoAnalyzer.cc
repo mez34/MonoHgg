@@ -381,7 +381,13 @@ void NewDiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& 
     sumDataset = sumDataset_;
     const auto & eveWeights = genInfo->weights();
     if(!eveWeights.empty()) perEveW = eveWeights[0];
+   
+    //float difference = perEveW - genInfo->weight(); 
+    //if (difference != 0.0) std::cout << " perEveW - genInfo->weight is NOT zero! with perEveW = " << perEveW << " and genInfo " << genInfo->weight() << " diff " << difference <<  std::endl;
   }
+
+
+
   //bool isSig = false;
   //if (sampleID>100 && sampleID<110) isSig = true; 
 
@@ -501,7 +507,9 @@ void NewDiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& 
 
         int passLeadElVeto = 0;
 	if (diphoPtr->leadingPhoton()->passElectronVeto()) passLeadElVeto = 1;
-        bool leadSelel      = testPhotonIsolation( passLeadSieie, passLeadCHiso, passLeadNHiso, passLeadPHiso, passLeadHoe, passLeadElVeto); 
+	int passLeadPixelSeed = 1;
+        if (diphoPtr->leadingPhoton()->hasPixelSeed()) passLeadPixelSeed = 0;// veto events which have a PixelSeed
+        bool leadSelel      = testPhotonIsolation( passLeadSieie, passLeadCHiso, passLeadNHiso, passLeadPHiso, passLeadHoe, passLeadPixelSeed);//passLeadElVeto);// FIXME 
         bool leadTightSelel = testPhotonIsolation( passTightLeadSieie, passTightLeadCHiso, passTightLeadNHiso, passTightLeadPHiso, passTightLeadHoe, passLeadElVeto); 
 
 	float subleadPt     = diphoPtr->subLeadingPhoton()->et();
@@ -531,7 +539,9 @@ void NewDiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& 
 
         int passSubLeadElVeto = 0;
 	if (diphoPtr->subLeadingPhoton()->passElectronVeto()) passSubLeadElVeto = 1;
-        bool subleadSelel      = testPhotonIsolation( passSubLeadSieie, passSubLeadCHiso, passSubLeadNHiso, passSubLeadPHiso, passSubLeadHoe, passSubLeadElVeto);
+	int passSubLeadPixelSeed = 1;
+        if (diphoPtr->subLeadingPhoton()->hasPixelSeed()) passSubLeadPixelSeed = 0;// veto events which have a PixelSeed
+        bool subleadSelel      = testPhotonIsolation( passSubLeadSieie, passSubLeadCHiso, passSubLeadNHiso, passSubLeadPHiso, passSubLeadHoe, passSubLeadPixelSeed);// passSubLeadElVeto);// FIXME
         bool subleadTightSelel = testPhotonIsolation( passTightSubLeadSieie, passTightSubLeadCHiso, passTightSubLeadNHiso, passTightSubLeadPHiso, passTightSubLeadHoe, passSubLeadElVeto);
 
         int numpassingmed = 0;
@@ -539,8 +549,8 @@ void NewDiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& 
 	if (leadSelel || subleadSelel) numpassingmed++;
 	if (leadTightSelel || subleadTightSelel) numpassing++;
 	
-	//if (!leadSelel || !subleadSelel ) continue; //Livia Correction: applies pho ID selection 
-	if (!leadTightSelel || !subleadTightSelel ) continue;  
+	if (!leadSelel || !subleadSelel ) continue; //Livia Correction: applies pho ID selection 
+	//if (!leadTightSelel || !subleadTightSelel ) continue;  
 	// chiara: end comment x efficiencies
 
 	selectedDipho.push_back(theDiphoton);    

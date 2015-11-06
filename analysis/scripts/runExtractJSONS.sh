@@ -20,8 +20,9 @@ python extractJSONS.py -i datasets/datasets_7415_betaV7.json	-o GJet_Pt-40toInf	
 python extractJSONS.py -i datasets/datasets_7415_betaV7.json	-o GluGluHToGG_M-125	-d lists_25ns_v7/MC
 python extractJSONS.py -i datasets/datasets_7415_betaV7.json	-o VHToGG_M125		-d lists_25ns_v7/MC
 
-# Not using FLASHgg data (using samples mainted by Chiara now)
-python extractJSONS.py -i datasets/datasets_7415_betaV7.json	-o DoubleEG/RunIISpring15-ReMiniAOD-BetaV7-25ns-Spring15BetaV7-v0-Run2015D 	-d lists_25ns_v7/Data
+python extractJSONS.py -i datasets/datasets_7415_betaV7metaV1.json	-o DoubleEG 	-d lists_25ns_v7/Data
+# FLASHgg v7 data separate by runD & runC:
+#python extractJSONS.py -i datasets/datasets_7415_betaV7metaV1.json	-o DoubleEG/RunIISpring15-ReMiniAOD-BetaV7-25ns-Spring15BetaV7-v0-Run2015D 	-d lists_25ns_v7/Data
 #python extractJSONS.py -i datasets/datasets_7415_betaV7.json	-o DoubleEG/RunIISpring15-ReMiniAOD-BetaV7-25ns-Spring15BetaV7-v0-Run2015C	-d lists_25ns_v7/Data
 
 

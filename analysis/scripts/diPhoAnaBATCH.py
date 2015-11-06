@@ -4,6 +4,7 @@ import FWCore.PythonUtilities.LumiList as LumiList
 import FWCore.ParameterSet.Types as CfgTypes  
 
 isMC = True;
+#should actually not need to change the bools below
 is25ns = True;
 is2015D = True;
 is2015DFromChiara = True;
@@ -57,7 +58,7 @@ process.diPhoAna = cms.EDAnalyzer('NewDiPhoAnalyzer',
                                   reducedBarrelRecHitCollection = cms.InputTag('reducedEgamma','reducedEBRecHits'),
                                   reducedEndcapRecHitCollection = cms.InputTag('reducedEgamma','reducedEERecHits'),
                                   DiPhotonTag = cms.untracked.InputTag('flashggDiPhotons'),
-                                  PileupTag = cms.untracked.InputTag('slimmedAddPileupInfo'),
+                                  PileUpTag = cms.untracked.InputTag('slimmedAddPileupInfo'),
                                   generatorInfo = cms.InputTag("generator"),
 				  bits	        = cms.InputTag('TriggerResults::HLT'),
                                   dopureweight = PU, 

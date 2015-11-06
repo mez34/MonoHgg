@@ -3,30 +3,32 @@
 
 #for new samples all in FLASHgg version Spring15BetaV7
 mkdir -p data/25ns_v7_EV/
-hadd /afs/cern.ch/work/m/mzientek/private/25ns_v7_EV_05Nov/2HDM_mZP600.root		../../output/job_2015115_05346/2HDM_MZP600/2HDM_MZP600*.root
-hadd /afs/cern.ch/work/m/mzientek/private/25ns_v7_EV_05Nov/2HDM_mZP800.root		../../output/job_2015115_05354/2HDM_MZP800/2HDM_MZP800*.root
-hadd /afs/cern.ch/work/m/mzientek/private/25ns_v7_EV_05Nov/2HDM_mZP1000.root		../../output/job_2015115_05357/2HDM_MZP1000/2HDM_MZP1000*.root
-hadd /afs/cern.ch/work/m/mzientek/private/25ns_v7_EV_05Nov/2HDM_mZP1200.root		../../output/job_2015115_05359/2HDM_MZP1200/2HDM_MZP1200*.root
-hadd /afs/cern.ch/work/m/mzientek/private/25ns_v7_EV_05Nov/2HDM_mZP1400.root		../../output/job_2015115_0543/2HDM_MZP1400/2HDM_MZP1400*.root
-hadd /afs/cern.ch/work/m/mzientek/private/25ns_v7_EV_05Nov/2HDM_mZP1700.root		../../output/job_2015115_0545/2HDM_MZP1700/2HDM_MZP1700*.root
-hadd /afs/cern.ch/work/m/mzientek/private/25ns_v7_EV_05Nov/2HDM_mZP2000.root		../../output/job_2015115_0547/2HDM_MZP2000/2HDM_MZP2000*.root
-hadd /afs/cern.ch/work/m/mzientek/private/25ns_v7_EV_05Nov/2HDM_mZP2500.root		../../output/job_2015115_05458/2HDM_MZP2500/2HDM_MZP2500*.root
+hadd /afs/cern.ch/work/m/mzientek/private/25ns_v7_EV_Tight/2HDM_mZP600.root		../../output/job_2015116_103957/2HDM_MZP600/2HDM_MZP600*.root
+hadd /afs/cern.ch/work/m/mzientek/private/25ns_v7_EV_Tight/2HDM_mZP800.root		../../output/job_2015116_10401/2HDM_MZP800/2HDM_MZP800*.root
+hadd /afs/cern.ch/work/m/mzientek/private/25ns_v7_EV_Tight/2HDM_mZP1000.root		../../output/job_2015116_10405/2HDM_MZP1000/2HDM_MZP1000*.root
+hadd /afs/cern.ch/work/m/mzientek/private/25ns_v7_EV_Tight/2HDM_mZP1200.root		../../output/job_2015116_104010/2HDM_MZP1200/2HDM_MZP1200*.root
+hadd /afs/cern.ch/work/m/mzientek/private/25ns_v7_EV_Tight/2HDM_mZP1400.root		../../output/job_2015116_114953/2HDM_MZP1400/2HDM_MZP1400*.root
+hadd /afs/cern.ch/work/m/mzientek/private/25ns_v7_EV_Tight/2HDM_mZP1700.root		../../output/job_2015116_104019/2HDM_MZP1700/2HDM_MZP1700*.root
+hadd /afs/cern.ch/work/m/mzientek/private/25ns_v7_EV_Tight/2HDM_mZP2000.root		../../output/job_2015116_104022/2HDM_MZP2000/2HDM_MZP2000*.root
+hadd /afs/cern.ch/work/m/mzientek/private/25ns_v7_EV_Tight/2HDM_mZP2500.root		../../output/job_2015116_104026/2HDM_MZP2500/2HDM_MZP2500*.root
 
-hadd /afs/cern.ch/work/m/mzientek/private/25ns_v7_EV_05Nov/DiPhoton.root		../../output/job_2015115_03028/DiPhoton/DiPhoton*.root
-hadd /afs/cern.ch/work/m/mzientek/private/25ns_v7_EV_05Nov/GJet_Pt-20to40.root		../../output/job_2015115_03046/GJet_Pt-20to40/GJet_Pt-20to40*.root
-hadd /afs/cern.ch/work/m/mzientek/private/25ns_v7_EV_05Nov/GJet_Pt-40toInf.root		../../output/job_2015115_03051/GJet_Pt-40toInf/GJet_Pt-40toInf*.root
-hadd /afs/cern.ch/work/m/mzientek/private/25ns_v7_EV_05Nov/QCD_Pt-30to40.root		../../output/job_2015115_03111/QCD_Pt-30to40/QCD_Pt-30to40*.root
-hadd /afs/cern.ch/work/m/mzientek/private/25ns_v7_EV_05Nov/QCD_Pt-30toInf.root		../../output/job_2015115_03116/QCD_Pt-30toInf/QCD_Pt-30toInf*.root
-hadd /afs/cern.ch/work/m/mzientek/private/25ns_v7_EV_05Nov/QCD_Pt-40toInf.root		../../output/job_2015115_03129/QCD_Pt-40toInf/QCD_Pt-40toInf*.root
-hadd /afs/cern.ch/work/m/mzientek/private/25ns_v7_EV_05Nov/GluGluHToGG.root		../../output/job_2015115_03133/GluGluHToGG/GluGluHToGG*.root
-hadd /afs/cern.ch/work/m/mzientek/private/25ns_v7_EV_05Nov/VH.root			../../output/job_2015115_03135/VH/VH*.root
-hadd /afs/cern.ch/work/m/mzientek/private/25ns_v7_EV_05Nov/DYJetsToLL.root		../../output/job_2015115_03137/DYJetsToLL/DYJetsToLL*.root
+hadd /afs/cern.ch/work/m/mzientek/private/25ns_v7_EV_Tight/DiPhoton.root		../../output/job_2015116_121224/DiPhoton/DiPhoton*.root
+hadd /afs/cern.ch/work/m/mzientek/private/25ns_v7_EV_Tight/GJet_Pt-20to40.root		../../output/job_2015116_121248/GJet_Pt-20to40/GJet_Pt-20to40*.root
+hadd /afs/cern.ch/work/m/mzientek/private/25ns_v7_EV_Tight/GJet_Pt-40toInf.root		../../output/job_2015116_121256/GJet_Pt-40toInf/GJet_Pt-40toInf*.root
+hadd /afs/cern.ch/work/m/mzientek/private/25ns_v7_EV_Tight/QCD_Pt-30to40.root		../../output/job_2015116_121325/QCD_Pt-30to40/QCD_Pt-30to40*.root
+hadd /afs/cern.ch/work/m/mzientek/private/25ns_v7_EV_Tight/QCD_Pt-30toInf.root		../../output/job_2015116_121331/QCD_Pt-30toInf/QCD_Pt-30toInf*.root
+hadd /afs/cern.ch/work/m/mzientek/private/25ns_v7_EV_Tight/QCD_Pt-40toInf.root		../../output/job_2015116_121345/QCD_Pt-40toInf/QCD_Pt-40toInf*.root
+hadd /afs/cern.ch/work/m/mzientek/private/25ns_v7_EV_Tight/GluGluHToGG.root		../../output/job_2015116_121355/GluGluHToGG/GluGluHToGG*.root
+hadd /afs/cern.ch/work/m/mzientek/private/25ns_v7_EV_Tight/VH.root			../../output/job_2015116_121357/VH/VH*.root
+hadd /afs/cern.ch/work/m/mzientek/private/25ns_v7_EV_Tight/DYJetsToLL.root		../../output/job_2015116_121358/DYJetsToLL/DYJetsToLL*.root
 
-hadd /afs/cern.ch/work/m/mzientek/private/25ns_v7_EV_05Nov/DoubleEG_p.root		../../output/job_2015115_03620/DoubleEG_2015D_05Oct2015_v1/DoubleEG*.root
-hadd /afs/cern.ch/work/m/mzientek/private/25ns_v7_EV_05Nov/DoubleEG_0.root		../../output/job_2015115_04025/DoubleEG_2015D_PromptV0/DoubleEG*.root
-hadd /afs/cern.ch/work/m/mzientek/private/25ns_v7_EV_05Nov/DoubleEG_1.root		../../output/job_2015115_04233/DoubleEG_2015D_PromptV1/DoubleEG*.root
-hadd /afs/cern.ch/work/m/mzientek/private/25ns_v7_EV_05Nov/DoubleEG_2.root		../../output/job_2015115_04253/DoubleEG_2015D_PromptV2/DoubleEG*.root
+hadd /afs/cern.ch/work/m/mzientek/private/25ns_v7_EV_Tight/DoubleEG_p.root		../../output/job_2015116_102414/DoubleEG_2015D_05Oct2015_v1/DoubleEG*.root
+hadd /afs/cern.ch/work/m/mzientek/private/25ns_v7_EV_Tight/DoubleEG_0.root		../../output/job_2015116_103223/DoubleEG_2015D_PromptV0/DoubleEG*.root
+hadd /afs/cern.ch/work/m/mzientek/private/25ns_v7_EV_Tight/DoubleEG_1.root		../../output/job_2015116_103738/DoubleEG_2015D_PromptV1/DoubleEG*.root
+hadd /afs/cern.ch/work/m/mzientek/private/25ns_v7_EV_Tight/DoubleEG_2.root		../../output/job_2015116_103811/DoubleEG_2015D_PromptV2/DoubleEG*.root
 
+hadd /afs/cern.ch/work/m/mzientek/private/25ns_v7_EV_Tight/DoubleEG.root		../../output/job_2015116_10124/DoubleEG/DoubleEG*.root
+#hadd /afs/cern.ch/work/m/mzientek/private/25ns_v7_EV_Tight/testSig.root		../../output/job_2015116_10/testSig/testSig*.root
 
 #using PUrw file from MonoJ 
 #hadd data/50ns_betaV4/GluGluHToGG.root		../../output/job_2015102_122023/GluGluHToGG/GluGluHToGG*.root
