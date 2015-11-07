@@ -156,7 +156,7 @@ void Plotter::DoPlots(){
     //if (!passEV1 || !passEV2) std::cout << "Eleveto didn't work! " << std::endl;
 
     //start full selection for plots
-    if (mgg >= 100){
+    if (mgg >= 100 && mgg < 200){
     //if ( pt1 > mgg/3 && pt2 > mgg/4 /*&& passEV1 && passEV2*/){
       fTH1DMap["eff_sel"]->Fill(1.5,Weight);
       if (hltDiphoton30Mass95==1){ //passes trigger
@@ -164,12 +164,12 @@ void Plotter::DoPlots(){
         fTH1DMap["eff_sel"]->Fill(2.5,Weight);
         //Fill histograms
         if (isData && doBlind){ // BLIND THE DATA mgg and met distributions
-	  if (mgg < 110 || mgg > 150){
+	  if (mgg < 100 || mgg > 150){
 	    fTH1DMap["mgg"]->Fill(mgg,Weight);
             fTH2DMap["mgg_PU"]->Fill(nvtx,mgg,Weight);
             fTH2DMap["mgg_ptgg"]->Fill(ptgg,mgg,Weight);
 	  }
-	  if (t1pfmet < 100){
+	  if (t1pfmet < 0){
             fTH1DMap["t1pfmet"]->Fill(t1pfmet,Weight);
             fTH1DMap["t1pfmet_zoom"]->Fill(t1pfmet,Weight);
             fTH2DMap["t1pfmet_PU"]->Fill(nvtx,t1pfmet,Weight);
@@ -218,7 +218,8 @@ void Plotter::DoPlots(){
   	fTH1DMap["phigg"]->Fill(fLorenzVecgg.Phi(),Weight); 
         fTH1DMap["dphi_ggmet"]->Fill(deltaPhi(fLorenzVecgg.Phi(),t1pfmetphi),Weight);
         fTH1DMap["absdphi_ggmet"]->Fill(TMath::Abs(deltaPhi(fLorenzVecgg.Phi(),t1pfmetphi)),Weight);
-
+        fTH1DMap["deta_gg"]->Fill((eta1-eta2),Weight);
+        fTH1DMap["absdeta_gg"]->Fill(TMath::Abs(eta1-eta2),Weight);
 
         //std::cout << passCH1 <<" "<< passNH1 <<" "<< passPH1 <<" "<< passHE1 <<" "<< passS1 << std::endl; 
         //std::cout << passCH2 <<" "<< passNH2 <<" "<< passPH2 <<" "<< passHE2 <<" "<< passS2 << std::endl; 
@@ -256,11 +257,11 @@ void Plotter::DoPlots(){
           fTH1DMap["pfmetphi_n-1"]->Fill(pfmetphi,Weight);
           fTH1DMap["calometphi_n-1"]->Fill(calometphi,Weight);
 	  if (isData && doBlind){// BLIND THE DATA
-            if (mgg < 110 || mgg > 150){
+            if (mgg < 100 || mgg > 150){
 	      fTH1DMap["mgg_n-1"]->Fill(mgg,Weight);  
-              if (t1pfmet < 100) fTH2DMap["t1pfmet_mgg"]->Fill(mgg,t1pfmet,Weight);
+              if (t1pfmet < 0) fTH2DMap["t1pfmet_mgg"]->Fill(mgg,t1pfmet,Weight);
 	    }
-            if (t1pfmet < 100) fTH1DMap["t1pfmet_n-1"]->Fill(t1pfmet,Weight);  
+            if (t1pfmet < 0) fTH1DMap["t1pfmet_n-1"]->Fill(t1pfmet,Weight);  
             if (pfmet < 100)   fTH1DMap["pfmet_n-1"]->Fill(pfmet,Weight);
             if (calomet < 100) fTH1DMap["calomet_n-1"]->Fill(calomet,Weight);
             //if (mgg >= 110 && mgg <= 130) fTH1DMap["t1pfmet_selmgg"]->Fill(t1pfmet,Weight); 
@@ -364,8 +365,8 @@ void Plotter::DoPlots(){
 void Plotter::SetUpPlots(){
   // fill all plots from tree
   fTH1DMap["nvtx"]		= Plotter::MakeTH1DPlot("nvtx","",40,0.,40.,"nvtx","");
-  fTH1DMap["mgg"]		= Plotter::MakeTH1DPlot("mgg","",30,100.,180.,"m_{#gamma#gamma} (GeV)","");  
-  fTH1DMap["ptgg"]		= Plotter::MakeTH1DPlot("ptgg","",30,0.,300.,"p_{T,#gamma#gamma} (GeV)","");
+  fTH1DMap["mgg"]		= Plotter::MakeTH1DPlot("mgg","",25,100.,150.,"m_{#gamma#gamma} (GeV)","");  
+  fTH1DMap["ptgg"]		= Plotter::MakeTH1DPlot("ptgg","",60,0.,600.,"p_{T,#gamma#gamma} (GeV)","");
   fTH1DMap["t1pfmet"]		= Plotter::MakeTH1DPlot("t1pfmet","",25,0.,200,"t1PF MET (GeV)","");
   fTH1DMap["t1pfmetphi"]	= Plotter::MakeTH1DPlot("t1pfmetphi","",20,-4.,4.,"t1PF MET #phi","");
   fTH1DMap["pfmet"]		= Plotter::MakeTH1DPlot("pfmet","",100,0.,1000,"PF MET (GeV)","");
@@ -376,8 +377,8 @@ void Plotter::SetUpPlots(){
   fTH1DMap["phi2"]		= Plotter::MakeTH1DPlot("phi2","",20,-4.,4.,"#phi(#gamma2)","");
   fTH1DMap["eta1"]		= Plotter::MakeTH1DPlot("eta1","",20,-3.,3.,"#eta(#gamma1)","");
   fTH1DMap["eta2"]		= Plotter::MakeTH1DPlot("eta2","",20,-3.,3.,"#eta(#gamma2)","");
-  fTH1DMap["pt1"]		= Plotter::MakeTH1DPlot("pt1","",30,0.,300.,"p_{T,#gamma1} (GeV)","");
-  fTH1DMap["pt2"]		= Plotter::MakeTH1DPlot("pt2","",30,0.,300.,"p_{T,#gamma2} (GeV)","");
+  fTH1DMap["pt1"]		= Plotter::MakeTH1DPlot("pt1","",60,0.,600.,"p_{T,#gamma1} (GeV)","");
+  fTH1DMap["pt2"]		= Plotter::MakeTH1DPlot("pt2","",60,0.,600.,"p_{T,#gamma2} (GeV)","");
   fTH1DMap["chiso1"]		= Plotter::MakeTH1DPlot("chiso1","",75,-5.,15.,"CHiso(#gamma1)","");
   fTH1DMap["chiso2"]		= Plotter::MakeTH1DPlot("chiso2","",75,-5.,15.,"CHiso(#gamma2)","");
   fTH1DMap["neuiso1"]		= Plotter::MakeTH1DPlot("neuiso1","",75,-5.,15.,"NHiso(#gamma1)","");
@@ -395,8 +396,8 @@ void Plotter::SetUpPlots(){
 
   // n minus 1 plots
   fTH1DMap["nvtx_n-1"]		= Plotter::MakeTH1DPlot("nvtx_n-1","",40,0.,40.,"nvtx","");
-  fTH1DMap["mgg_n-1"]		= Plotter::MakeTH1DPlot("mgg_n-1","",30,100.,180.,"m_{#gamma#gamma} (GeV)","");  
-  fTH1DMap["ptgg_n-1"]		= Plotter::MakeTH1DPlot("ptgg_n-1","",30,0.,300.,"p_{T,#gamma#gamma} (GeV)","");
+  fTH1DMap["mgg_n-1"]		= Plotter::MakeTH1DPlot("mgg_n-1","",25,100.,150.,"m_{#gamma#gamma} (GeV)","");  
+  fTH1DMap["ptgg_n-1"]		= Plotter::MakeTH1DPlot("ptgg_n-1","",60,0.,600.,"p_{T,#gamma#gamma} (GeV)","");
   fTH1DMap["t1pfmet_n-1"]	= Plotter::MakeTH1DPlot("t1pfmet_n-1","",25,0.,200.,"t1PF MET (GeV)","");
   fTH1DMap["t1pfmetphi_n-1"]	= Plotter::MakeTH1DPlot("t1pfmetphi_n-1","",20,-4.,4.,"t1PF MET #phi","");
   fTH1DMap["pfmet_n-1"]		= Plotter::MakeTH1DPlot("pfmet_n-1","",100,0.,1000,"PF MET (GeV)","");
@@ -407,8 +408,8 @@ void Plotter::SetUpPlots(){
   fTH1DMap["phi2_n-1"]		= Plotter::MakeTH1DPlot("phi2_n-1","",20,-4.,4.,"#phi(#gamma2)","");
   fTH1DMap["eta1_n-1"]		= Plotter::MakeTH1DPlot("eta1_n-1","",20,-3.,3.,"#eta(#gamma1)","");
   fTH1DMap["eta2_n-1"]		= Plotter::MakeTH1DPlot("eta2_n-1","",20,-3.,3.,"#eta(#gamma2)","");
-  fTH1DMap["pt1_n-1"]		= Plotter::MakeTH1DPlot("pt1_n-1","",30,0.,300.,"p_{T,#gamma1} (GeV)","");
-  fTH1DMap["pt2_n-1"]		= Plotter::MakeTH1DPlot("pt2_n-1","",30,0.,300.,"p_{T,#gamma2} (GeV)","");
+  fTH1DMap["pt1_n-1"]		= Plotter::MakeTH1DPlot("pt1_n-1","",60,0.,600.,"p_{T,#gamma1} (GeV)","");
+  fTH1DMap["pt2_n-1"]		= Plotter::MakeTH1DPlot("pt2_n-1","",60,0.,600.,"p_{T,#gamma2} (GeV)","");
   fTH1DMap["chiso1_n-1"]	= Plotter::MakeTH1DPlot("chiso1_n-1","",75,-5.,15.,"CHiso(#gamma1)","");
   fTH1DMap["chiso2_n-1"]	= Plotter::MakeTH1DPlot("chiso2_n-1","",75,-5.,15.,"CHiso(#gamma2)","");
   fTH1DMap["neuiso1_n-1"]	= Plotter::MakeTH1DPlot("neuiso1_n-1","",75,-5.,15.,"NHiso(#gamma1)","");
@@ -431,6 +432,8 @@ void Plotter::SetUpPlots(){
   fTH1DMap["phi1_pho2pass"]     = Plotter::MakeTH1DPlot("phi1_pho2pass","",80,-4.,4.,"","");
   fTH1DMap["phi2_pho1pass"]     = Plotter::MakeTH1DPlot("phi2_pho1pass","",80,-4.,4.,"","");
   fTH1DMap["t1pfmet_zoom"]	= Plotter::MakeTH1DPlot("t1pfmet_zoom","",60,0.,300.,"t1PF MET (GEV)","");
+  fTH1DMap["deta_gg"]		= Plotter::MakeTH1DPlot("deta_gg","",20,-3.,3.,"#Delta#eta(#gamma#gamma)","");
+  fTH1DMap["absdeta_gg"]	= Plotter::MakeTH1DPlot("absdeta_gg","",20,0.,3.,"|#Delta#eta(#gamma#gamma)|","");
 
   // efficiency plots
   fTH1DMap["eff_sel"]		= Plotter::MakeTH1DPlot("eff_sel","",10,0.,10.,"","");
@@ -449,9 +452,13 @@ void Plotter::SetUpPlots(){
 }// end Plotter::SetUpPlots
 
 TH1D * Plotter::MakeTH1DPlot(const TString hname, const TString htitle, const Int_t nbins, const Double_t xlow, const Double_t xhigh, const TString xtitle, const TString ytitle){
+  TString ytitleNew;
+  if (ytitle=="") ytitleNew = Form("Events");
+  else ytitleNew = ytitle;
+ 
   TH1D * hist = new TH1D(hname.Data(),htitle.Data(),nbins,xlow,xhigh);
   hist->GetXaxis()->SetTitle(xtitle.Data());
-  hist->GetYaxis()->SetTitle(ytitle.Data());
+  hist->GetYaxis()->SetTitle(ytitleNew.Data());
   hist->Sumw2();
   gStyle->SetOptStat(1111111);
   return hist;

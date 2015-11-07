@@ -626,8 +626,8 @@ void ABCDMethod::SetRooVariables(){
 
 void ABCDMethod::WriteDataCard( const TString fSigName, const RooRealVar* sigrate, const Double_t expsig, const DblVecVec bkgrates, const RooVecVec bkgrate){
   TString sig = *sigrate->format(2,"");
-  TString vh  = *bkgrate[7][i_vh]->format(2,"");
-  TString hgg = *bkgrate[7][i_hgg]->format(2,"");
+  TString vh  = *bkgrate[2][i_vh]->format(2,"");
+  TString hgg = *bkgrate[2][i_hgg]->format(2,"");
   TString dy  = *bkgrate[7][i_dy]->format(2,"");
   TString gg  = *bkgrate[7][i_gg]->format(2,"");
   TString qcd = *bkgrate[7][i_qcd]->format(2,""); 

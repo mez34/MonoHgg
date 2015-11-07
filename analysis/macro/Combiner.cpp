@@ -98,13 +98,19 @@ Combiner::~Combiner(){
 void Combiner::DoComb(){
   // copy th1d plots into output hists/stacks
   for (UInt_t th1d = 0; th1d < fNTH1D; th1d++){
+
+    // sig: just add to legend
+    for (UInt_t mc = 0; mc < fNSig; mc++){
+      //fInSigTH1DHists[th1d][mc]->Scale(lumi);
+      fTH1DLegends[th1d]->AddEntry(fInSigTH1DHists[th1d][mc],fSampleTitleMap[fSigNames[mc]],"l");
+    }
+
     // data : copy first histogram & add all others too it 
     //if (fNData > 0){
       for (UInt_t data = 0; data < fNData; data++){
         if (data == 0) fOutDataTH1DHists[th1d] = (TH1D*)fInDataTH1DHists[th1d][data]->Clone(); 
         else fOutDataTH1DHists[th1d]->Add(fInDataTH1DHists[th1d][data]);
       }
-     if (fNData > 0 && doStack) fTH1DLegends[th1d]->AddEntry(fOutDataTH1DHists[th1d],"Data","pl"); //add data entry to legend
     //}// end if ndata>0
 
     // bkg : copy histos and add to stacks
@@ -143,11 +149,11 @@ void Combiner::DoComb(){
     fOutBkgTH1DStacksForUncer[th1d]->Add(fOutBkgTH1DHists[th1d],"E2");
     if (doStack) fTH1DLegends[th1d]->AddEntry(fOutBkgTH1DHists[th1d],"Bkg Uncertainty","F");
 
-    // sig: just add to legend
-    for (UInt_t mc = 0; mc < fNSig; mc++){
-      //fInSigTH1DHists[th1d][mc]->Scale(lumi);
-      fTH1DLegends[th1d]->AddEntry(fInSigTH1DHists[th1d][mc],fSampleTitleMap[fSigNames[mc]],"l");
-    }
+    // add data to legend if int > 0
+    Double_t dataInt = fOutDataTH1DHists[th1d]->Integral();
+    if (fNData > 0 && doStack && dataInt > 0) fTH1DLegends[th1d]->AddEntry(fOutDataTH1DHists[th1d],"Data","pl");
+
+
 
 
     
@@ -204,7 +210,7 @@ void Combiner::MakeEffPlots(){
   eff_mDM->Draw("PE");
   eff_mDM->Write();
   
-  CMSLumi(c,0,lumi);
+  CMSLumi(c,11,lumi);
   c->SetLogx();
   c->SaveAs(Form("%scomb/eff_mDM.%s",fOutDir.Data(),fType.Data()));
   delete c; 
@@ -292,7 +298,7 @@ void Combiner::DrawCanvasOverlay(const UInt_t th1d, const Bool_t isLogY){
   fOutTH1DStackPads[th1d]->SetLogy(isLogY);
   fOutTH1DCanvases[th1d]->cd();
 
-  CMSLumi(fOutTH1DCanvases[th1d],0,lumi);
+  CMSLumi(fOutTH1DCanvases[th1d],11,lumi);
 
   fOutTH1DCanvases[th1d]->SaveAs(Form("%scomb/%s_comb%s%s.%s",fOutDir.Data(),fTH1DNames[th1d].Data(),addText.Data(),suffix.Data(),fType.Data()));  
   fOutFile->cd();
@@ -328,7 +334,7 @@ void Combiner::DrawCanvasStack(const UInt_t th1d, const Bool_t isLogY){
 
 
   // start by drawing the sig first
-  if (isLogY) fInSigTH1DHists[th1d][0]->SetMaximum(maxval*10);
+  if (isLogY) fInSigTH1DHists[th1d][0]->SetMaximum(maxval*50);
   else fInSigTH1DHists[th1d][0]->SetMaximum(maxval*1.1);
   //if (fNData > 0) fInSigTH1DHists[th1d][0]->SetMinimum(minval);
   fInSigTH1DHists[th1d][0]->SetTitle("");
@@ -338,7 +344,10 @@ void Combiner::DrawCanvasStack(const UInt_t th1d, const Bool_t isLogY){
   //fOutBkgTH1DHists[th1d]->Draw("E2 SAME");//E2 draws error as rectangle
   //fOutBkgTH1DStacksForUncer[th1d]->Draw("nostack E2 SAME");
 
-  if (fNData > 0){
+  // check that the blinding does not completely cover the plot
+  // this could be problematic in the future
+  Double_t dataInt = fOutDataTH1DHists[th1d]->Integral();
+  if (fNData > 0 && dataInt > 0){
     fOutDataTH1DHists[th1d]->Draw("PE SAME");
   }
 
@@ -359,7 +368,7 @@ void Combiner::DrawCanvasStack(const UInt_t th1d, const Bool_t isLogY){
 
   fOutTH1DCanvases[th1d]->cd();
 
-  if (fNData > 0){ // make & draw ratio plots
+  if (fNData > 0 && dataInt > 0){ // make & draw ratio plots
     Combiner::MakeRatioPlots();
     Combiner::MakeRatioLine(th1d);
 
@@ -384,7 +393,7 @@ void Combiner::DrawCanvasStack(const UInt_t th1d, const Bool_t isLogY){
   } 
 
 
-  CMSLumi(fOutTH1DCanvases[th1d],0,lumi);
+  CMSLumi(fOutTH1DCanvases[th1d],11,lumi);
 
   fOutTH1DCanvases[th1d]->SaveAs(Form("%scomb/%s_stack%s%s.%s",fOutDir.Data(),fTH1DNames[th1d].Data(),addText.Data(),suffix.Data(),fType.Data()));  
   fOutFile->cd();
@@ -571,11 +580,11 @@ void Combiner::InitCanvAndHists(){
 
   fTH1DLegends.resize(fNTH1D);
   for (UInt_t th1d = 0; th1d < fNTH1D; th1d++){
-    fTH1DLegends[th1d] = new TLegend(0.6075,0.6536441,0.8575,0.9340678);
-    //fTH1DLegends[th1d] = new TLegend(0.65,0.5,0.9,0.89); // (x1,y1,x2,y2)
+    //fTH1DLegends[th1d] = new TLegend(0.6075,0.6536441,0.8575,0.9340678);
+    fTH1DLegends[th1d] = new TLegend(0.6075,0.6,0.9,0.934); // (x1,y1,x2,y2)
     fTH1DLegends[th1d]->SetBorderSize(4);
     fTH1DLegends[th1d]->SetLineColor(kBlack);
-    fTH1DLegends[th1d]->SetTextSize(0.04);//0.03
+    fTH1DLegends[th1d]->SetTextSize(0.035);//0.03
     fTH1DLegends[th1d]->SetLineWidth(2);
   }
 
@@ -594,14 +603,18 @@ void Combiner::InitCanvAndHists(){
     fOutTH1DCanvases[th1d]->cd();
 
     //fOutTH1DStackPads[th1d] = new TPad("","",0,0.3,1.0,0.99);
-    fOutTH1DStackPads[th1d] = new TPad("","",0.01,0.13,0.75,1.);
+    fOutTH1DStackPads[th1d] = new TPad("","",0.01,0.13,0.99,1.);//x1,y1,x2,y2
     fOutTH1DStackPads[th1d]->SetBottomMargin(0); // upper and lower pad are joined
+    fOutTH1DStackPads[th1d]->SetRightMargin(0.06); 
+    fOutTH1DStackPads[th1d]->SetLeftMargin(0.12); 
 
     //if (fNData > 0){// for lower pad with ratio plot
       //fOutTH1DRatioPads[th1d] = new TPad("","",0,0.05,1.0,0.3);
-      fOutTH1DRatioPads[th1d] = new TPad("","",0.01,0.001,0.75,0.2);
+      fOutTH1DRatioPads[th1d] = new TPad("","",0.01,0.001,0.99,0.2);//x1,y1,x2,y2
       fOutTH1DRatioPads[th1d]->SetTopMargin(0);
-      fOutTH1DRatioPads[th1d]->SetBottomMargin(0.2);
+      fOutTH1DRatioPads[th1d]->SetRightMargin(0.06);
+      fOutTH1DRatioPads[th1d]->SetLeftMargin(0.12);
+      fOutTH1DRatioPads[th1d]->SetBottomMargin(0.4);
       fOutTH1DRatioLines[th1d] = new TLine();
     //}
   }
@@ -623,65 +636,43 @@ void Combiner::InitTH1DNames(){
   //fTH1DNames.push_back("calometphi");
   //fTH1DNames.push_back("calomet");
 
-  // photon variables
-  fTH1DNames.push_back("pt1");
-  fTH1DNames.push_back("pt2");     
-  fTH1DNames.push_back("eta1");
-  fTH1DNames.push_back("eta2");
-  fTH1DNames.push_back("phi1");
-  fTH1DNames.push_back("phi2");
-  fTH1DNames.push_back("r91");
-  fTH1DNames.push_back("r92");
+  //// photon variables
+  //fTH1DNames.push_back("pt1");
+  //fTH1DNames.push_back("pt2");     
+  //fTH1DNames.push_back("eta1");
+  //fTH1DNames.push_back("eta2");
+  //fTH1DNames.push_back("phi1");
+  //fTH1DNames.push_back("phi2");
+  //fTH1DNames.push_back("r91");
+  //fTH1DNames.push_back("r92");
 
-  // photon ID variables
-  fTH1DNames.push_back("hoe1");
-  fTH1DNames.push_back("hoe2");
-  fTH1DNames.push_back("sieie1");
-  fTH1DNames.push_back("sieie2");
-  fTH1DNames.push_back("phoiso1");
-  fTH1DNames.push_back("phoiso2");
-  fTH1DNames.push_back("chiso1");
-  fTH1DNames.push_back("chiso2");
-  fTH1DNames.push_back("neuiso1");
-  fTH1DNames.push_back("neuiso2");
+  //// photon ID variables
+  //fTH1DNames.push_back("hoe1");
+  //fTH1DNames.push_back("hoe2");
+  //fTH1DNames.push_back("sieie1");
+  //fTH1DNames.push_back("sieie2");
+  //fTH1DNames.push_back("phoiso1");
+  //fTH1DNames.push_back("phoiso2");
+  //fTH1DNames.push_back("chiso1");
+  //fTH1DNames.push_back("chiso2");
+  //fTH1DNames.push_back("neuiso1");
+  //fTH1DNames.push_back("neuiso2");
 
   if (addText!="_n-1"){ // plots that don't have n-1 versions 
-    //fTH1DNames.push_back("eleveto1");
-    //fTH1DNames.push_back("eleveto2");
-    //fTH1DNames.push_back("phi1_pho2pass");
-    //fTH1DNames.push_back("phi2_pho1pass");
-    fTH1DNames.push_back("t1pfmet_zoom");
-    fTH1DNames.push_back("mgg_selt1pfmet");
-    fTH1DNames.push_back("t1pfmet_selmgg");
-    fTH1DNames.push_back("phigg");
-    fTH1DNames.push_back("dphi_ggmet");
-    fTH1DNames.push_back("absdphi_ggmet");
-    fTH1DNames.push_back("selection");
+    ////fTH1DNames.push_back("eleveto1");
+    ////fTH1DNames.push_back("eleveto2");
+    ////fTH1DNames.push_back("phi1_pho2pass");
+    ////fTH1DNames.push_back("phi2_pho1pass");
+    //fTH1DNames.push_back("t1pfmet_zoom");
+    //fTH1DNames.push_back("mgg_selt1pfmet");
+    //fTH1DNames.push_back("t1pfmet_selmgg");
+    //fTH1DNames.push_back("phigg");
+    //fTH1DNames.push_back("dphi_ggmet");
+    //fTH1DNames.push_back("absdphi_ggmet");
+    //fTH1DNames.push_back("deta_gg");
+    //fTH1DNames.push_back("absdeta_gg");
+    //fTH1DNames.push_back("selection");
     fTH1DNames.push_back("eff_sel");
     fIndexEff = fTH1DNames.size()-1;
   }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }// end Combiner::InitTH1DNames

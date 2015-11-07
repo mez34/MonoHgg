@@ -68,16 +68,16 @@ void CMSLumi(TCanvas *& canvas, const Int_t iPosX, const Double_t inlumi){
   TString extraText      = "Preliminary";
   Double_t extraTextFont = 52;  // default is helvetica-italics
 
-  TString lumiText = Form("#sqrt{s} = 13 TeV, L = %3.1f pb^{-1}", inlumi);
+  TString lumiText = Form("%3.1f pb^{-1} (13 TeV)", inlumi);
   
   // text sizes and text offsets with respect to the top frame
   // in unit of the top margin size
   Double_t lumiTextSize     = 0.6;
-  Double_t lumiTextOffset   = 0.2;
+  Double_t lumiTextOffset   = 0.1;
   Double_t cmsTextSize      = 0.75;
-  Double_t cmsTextOffset    = 0.1;  // only used in outOfFrame version
+  Double_t cmsTextOffset    = 0.05;  // only used in outOfFrame version
 
-  Double_t relPosX    = 0.045;
+  Double_t relPosX    = 0.003;//0.045;
   Double_t relPosY    = 0.035;
   Double_t relExtraDY = 1.2;
  
@@ -167,6 +167,7 @@ void CMSLumi(TCanvas *& canvas, const Int_t iPosX, const Double_t inlumi){
 
 
 void SetTDRStyle(TStyle *& tdrStyle) {
+
   // For the canvas:
   tdrStyle->SetCanvasBorderMode(0);
   tdrStyle->SetCanvasColor(kWhite);
@@ -290,6 +291,17 @@ void SetTDRStyle(TStyle *& tdrStyle) {
   tdrStyle->SetOptLogy(0);
   tdrStyle->SetOptLogz(0);
 
+
+  tdrStyle->SetOptTitle(0);
+  tdrStyle->SetPadBottomMargin(0.14);
+  tdrStyle->SetPadLeftMargin(0.18);
+  tdrStyle->SetPadRightMargin(0.15); // per la paletta !
+  tdrStyle->SetTitleXOffset(1.0);
+  tdrStyle->SetTitleYOffset(1.3);
+  tdrStyle->SetNdivisions(505, "X");
+  tdrStyle->SetErrorX(0.5);
+
+  tdrStyle->SetPalette(1,0);
 
   const Int_t NRGBs = 5;
   const Int_t NCont = 255;
