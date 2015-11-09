@@ -507,9 +507,9 @@ void NewDiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& 
 
         int passLeadElVeto = 0;
 	if (diphoPtr->leadingPhoton()->passElectronVeto()) passLeadElVeto = 1;
-	int passLeadPixelSeed = 1;
-        if (diphoPtr->leadingPhoton()->hasPixelSeed()) passLeadPixelSeed = 0;// veto events which have a PixelSeed
-        bool leadSelel      = testPhotonIsolation( passLeadSieie, passLeadCHiso, passLeadNHiso, passLeadPHiso, passLeadHoe, passLeadPixelSeed);//passLeadElVeto);// FIXME 
+	//int passLeadPixelSeed = 1;
+        //if (diphoPtr->leadingPhoton()->hasPixelSeed()) passLeadPixelSeed = 0;// veto events which have a PixelSeed
+        bool leadSelel      = testPhotonIsolation( passLeadSieie, passLeadCHiso, passLeadNHiso, passLeadPHiso, passLeadHoe, 1);//passLeadElVeto);// FIXME 
         bool leadTightSelel = testPhotonIsolation( passTightLeadSieie, passTightLeadCHiso, passTightLeadNHiso, passTightLeadPHiso, passTightLeadHoe, passLeadElVeto); 
 
 	float subleadPt     = diphoPtr->subLeadingPhoton()->et();
@@ -539,9 +539,9 @@ void NewDiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& 
 
         int passSubLeadElVeto = 0;
 	if (diphoPtr->subLeadingPhoton()->passElectronVeto()) passSubLeadElVeto = 1;
-	int passSubLeadPixelSeed = 1;
-        if (diphoPtr->subLeadingPhoton()->hasPixelSeed()) passSubLeadPixelSeed = 0;// veto events which have a PixelSeed
-        bool subleadSelel      = testPhotonIsolation( passSubLeadSieie, passSubLeadCHiso, passSubLeadNHiso, passSubLeadPHiso, passSubLeadHoe, passSubLeadPixelSeed);// passSubLeadElVeto);// FIXME
+	//int passSubLeadPixelSeed = 1;
+        //if (diphoPtr->subLeadingPhoton()->hasPixelSeed()) passSubLeadPixelSeed = 0;// veto events which have a PixelSeed
+        bool subleadSelel      = testPhotonIsolation( passSubLeadSieie, passSubLeadCHiso, passSubLeadNHiso, passSubLeadPHiso, passSubLeadHoe, 1);// passSubLeadElVeto);// FIXME
         bool subleadTightSelel = testPhotonIsolation( passTightSubLeadSieie, passTightSubLeadCHiso, passTightSubLeadNHiso, passTightSubLeadPHiso, passTightSubLeadHoe, passSubLeadElVeto);
 
         int numpassingmed = 0;

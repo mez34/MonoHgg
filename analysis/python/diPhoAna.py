@@ -4,9 +4,10 @@ import FWCore.PythonUtilities.LumiList as LumiList
 import FWCore.ParameterSet.Types as CfgTypes  
 
 isMC = True;
+#shouldn't need to change the bools below:
 is25ns = True;
 is2015D =  True;
-is2015DFromChiara = False;
+is2015DFromChiara = True;
 
 process = cms.Process("diPhoAna")
 
@@ -27,7 +28,7 @@ elif (isMC):
     process.GlobalTag = GlobalTag(process.GlobalTag, 'MCRUN2_74_V9', '')
     print "MCRUN2_74_V9"
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32( 10000 ) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32( 5000 ) )
 
 process.source = cms.Source("PoolSource",
                             fileNames=cms.untracked.vstring(
@@ -55,7 +56,8 @@ process.source = cms.Source("PoolSource",
 	#"/store/group/phys_higgs/cmshgg/musella/flashgg/ExoPhys14ANv1/diphotonsPhys14AnV1/GJets_HT-100to200_Tune4C_13TeV-madgraph-tauola/ExoPhys14ANv1-diphotonsPhys14AnV1-v0-Phys14DR-PU20bx25_PHYS14_25_V1-v1/150330_141300/0000/diphotonsMicroAOD_1.root",
 	#"/store/group/phys_higgs/cmshgg/sethzenz/flashgg/RunIISpring15-ReMiniAOD-BetaV7-25ns/Spring15BetaV7/DiPhotonJetsBox_MGG-80toInf_13TeV-Sherpa/RunIISpring15-ReMiniAOD-BetaV7-25ns-Spring15BetaV7-v0-RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/151021_151551/0000/myMicroAODOutputFile_10.root" 
 	#"/store/group/phys_higgs/cmshgg/sethzenz/flashgg/RunIISpring15-ReMiniAOD-BetaV7-25ns/Spring15BetaV7/GJet_Pt-20to40_DoubleEMEnriched_MGG-80toInf_TuneCUETP8M1_13TeV_Pythia8/RunIISpring15-ReMiniAOD-BetaV7-25ns-Spring15BetaV7-v0-RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/151021_151907/0000/myMicroAODOutputFile_1.root" 
-	"/store/group/phys_higgs/cmshgg/sethzenz/flashgg/RunIISpring15-ReMiniAOD-BetaV7-25ns/Spring15BetaV7/QCD_Pt-40toInf_DoubleEMEnriched_MGG-80toInf_TuneCUETP8M1_13TeV_Pythia8/RunIISpring15-ReMiniAOD-BetaV7-25ns-Spring15BetaV7-v0-RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/151021_152445/0000/myMicroAODOutputFile_1.root" 
+	#"/store/group/phys_higgs/cmshgg/sethzenz/flashgg/RunIISpring15-ReMiniAOD-BetaV7-25ns/Spring15BetaV7/QCD_Pt-40toInf_DoubleEMEnriched_MGG-80toInf_TuneCUETP8M1_13TeV_Pythia8/RunIISpring15-ReMiniAOD-BetaV7-25ns-Spring15BetaV7-v0-RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/151021_152445/0000/myMicroAODOutputFile_1.root" 
+	"/store/user/mzientek/MonoHgg_2HDM_MZP600_A0300_13TeV/mzientek_test_MonoH_2HDM_MZP600_A0300_RunIISpring15-25ns-Spring15BetaV7/151104_142438/0000/myMicroAODOutputFile_1.root"
         )
                             )
 if (isMC==False and is2015DFromChiara):
