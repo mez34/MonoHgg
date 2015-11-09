@@ -46,9 +46,9 @@ int main(){
   bool doBlind = true;		// use to blind the analysis for Data (don't use distributions for met>100 & 110<mgg<150)
   bool makePURWfiles = false;	// recompute PURW and make files (need also doReweightPU=true for this to run)
   bool doReweightPU = true;	// use PURW from old files if !makePURWfiles
-  bool doPlots = false;		// make plots for each sample individually
-  bool doComb = true;		// make stack/overlay plots
-  bool doABCD = false;		// run ABCD method 
+  bool doPlots = true;		// make plots for each sample individually
+  bool doComb = false;		// make stack/overlay plots
+  bool doABCD = true;		// run ABCD method 
 
   Double_t lumi = 1263.9; // in pb^-1 
   UInt_t nBins_vtx = 60; // number of bins for PURW 
@@ -428,9 +428,9 @@ int main(){
     // Combiner( Samples, lumi, colorMap , outDir, doNmin1plots, doStack)
     
     // do overlay plots for normal plots
-    //Combiner *combAll = new Combiner(Samples,lumi,colorMap,outDir,false,false,type);
-    //combAll->DoComb();
-    //delete combAll;   
+    Combiner *combAll = new Combiner(Samples,lumi,colorMap,outDir,false,false,type);
+    combAll->DoComb();
+    delete combAll;   
     // do stack plots for normal plots
     Combiner *stackAll = new Combiner(Samples,lumi,colorMap,outDir,false,true,type);
     stackAll->DoComb();

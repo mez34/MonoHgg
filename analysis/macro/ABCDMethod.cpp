@@ -13,11 +13,11 @@ ABCDMethod::ABCDMethod( SamplePairVec Samples, const Double_t inLumi, const TStr
 
   // values for the different bin edges
   mgg_minAB1 = 100.;
-  mgg_minCD  = 110.;
+  mgg_minCD  = 120.;
   mgg_maxCD  = 130.;
-  mgg_maxAB2 = 180.; 
+  mgg_maxAB2 = 150.; 
   met_minB   = 0.;
-  met_minD   = 70.;
+  met_minD   = 250.;
   met_maxD   = 800.;
 
   // titles for output Latex table
@@ -138,7 +138,7 @@ void ABCDMethod::DoAnalysis(){
   fOutSelBkgTH2DHists[0]->Add(fInBkgTH2DHists[0][i_qcd]);    
  
   for (UInt_t mc = 0; mc < fNBkg; mc++){
-    //fInBkgTH2DHists[0][mc]->Scale(300000./40.);// in order to scale to 300fb-1
+    //fInBkgTH2DHists[0][mc]->Scale(3000./1260.);// in order to scale to 3fb-1
     //std::cout << "number entries in bkg in " << fInBkgTH2DHists[0][mc]->GetEntries() << std::endl;
     // use below if summing over all backgrounds
     if (mc == 0) fOutBkgTH2DHists[0] = (TH2D*)fInBkgTH2DHists[0][mc]->Clone();
@@ -146,7 +146,7 @@ void ABCDMethod::DoAnalysis(){
   } 
   // just scale the signal by lumi, don't add together 
   for (UInt_t mc = 0; mc < fNSig; mc++){
-    //fInSigTH2DHists[0][mc]->Scale(300000./40.);// in order to scale to 300fb-1
+    //fInSigTH2DHists[0][mc]->Scale(3000./1260.);// in order to scale to 3fb-1
     //std::cout << "number entries in sig in " << fInSigTH2DHists[0][mc]->GetEntries() << std::endl;
   }
  
@@ -687,7 +687,7 @@ void ABCDMethod::WriteDataCard( const TString fSigName, const RooRealVar* sigrat
     fOutTxtFile << "id_eff_eb  lnN	1.02000		-		-		-		-		1.02000    	1.02000   " << std::endl;    
     fOutTxtFile << "vtxEff     lnN	0.996/1.008	-		-		-		-		0.996/1.008	0.996/1.008" << std::endl; 
     fOutTxtFile << "#background related" << std::endl;
-    fOutTxtFile << "abcd_estimate lnN	-	1.27000		1.27000	   1.27000	1.27000		-	-	-  " << std::endl;
+    //fOutTxtFile << "abcd_estimate lnN	-	1.27000		1.27000	   1.27000	1.27000		-	-	-  " << std::endl;
     fOutTxtFile << Form("gg_norm  gmN 	%s	-	%s	   -		-		-	-	-  ",N_C[i_gg].Data(),fac_gg.Data()) << std::endl;
     fOutTxtFile << Form("dy_norm  gmN 	%s	-	-	   %s		-		-	-	-  ",N_C[i_dy].Data(),fac_dy.Data()) << std::endl;
     fOutTxtFile << Form("qcd_norm gmN 	%s	-	- 	   -		%s		-	-	-  ",N_C[i_qcd].Data(),fac_qcd.Data()) << std::endl;

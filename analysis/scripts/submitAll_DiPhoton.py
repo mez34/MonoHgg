@@ -15,26 +15,26 @@
 #./submitBatchDiPho.py --cfg diPhoAnaBATCH.py DoubleEG           		0 10001 pippo 1 1
 #./submitBatchDiPho.py --cfg diPhoAnaBATCH.py DoubleEG_RunD           		0 10006 pippo 1 1
 #
-./submitBatchDiPho.py --cfg diPhoAnaBATCH.py DiPhoton				0 15  /afs/cern.ch/user/m/mzientek/public/pileupWeights___processedAndGolden_2015D_oct25.root  84.0 1
-./submitBatchDiPho.py --cfg diPhoAnaBATCH.py GJet_Pt-20to40     		0  1  /afs/cern.ch/user/m/mzientek/public/pileupWeights___processedAndGolden_2015D_oct25.root  218.6108 1  
-./submitBatchDiPho.py --cfg diPhoAnaBATCH.py GJet_Pt-40toInf    		0  2  /afs/cern.ch/user/m/mzientek/public/pileupWeights___processedAndGolden_2015D_oct25.root  863.1088 1
-./submitBatchDiPho.py --cfg diPhoAnaBATCH.py QCD_Pt-30to40      		0  3  /afs/cern.ch/user/m/mzientek/public/pileupWeights___processedAndGolden_2015D_oct25.root  24300   1
-./submitBatchDiPho.py --cfg diPhoAnaBATCH.py QCD_Pt-30toInf     		0  4  /afs/cern.ch/user/m/mzientek/public/pileupWeights___processedAndGolden_2015D_oct25.root  259296  1
-./submitBatchDiPho.py --cfg diPhoAnaBATCH.py QCD_Pt-40toInf     		0  5  /afs/cern.ch/user/m/mzientek/public/pileupWeights___processedAndGolden_2015D_oct25.root  108240  1
-./submitBatchDiPho.py --cfg diPhoAnaBATCH.py GluGluHToGG	     		0  10 /afs/cern.ch/user/m/mzientek/public/pileupWeights___processedAndGolden_2015D_oct25.root  0.08784 1     #value=xsec*br (xsec=43.92,br=0.002)
-./submitBatchDiPho.py --cfg diPhoAnaBATCH.py VH					0  11 /afs/cern.ch/user/m/mzientek/public/pileupWeights___processedAndGolden_2015D_oct25.root  0.0044992 1   #value=xsec(ZH+WH)*br (xsec=2.2496,br=0.002)
-./submitBatchDiPho.py --cfg diPhoAnaBATCH.py DYJetsToLL				0  12 /afs/cern.ch/user/m/mzientek/public/pileupWeights___processedAndGolden_2015D_oct25.root  6025.2 1 
+#./submitBatchDiPho.py --cfg diPhoAnaBATCH.py DiPhoton				0 15  /afs/cern.ch/user/m/mzientek/public/pileupWeights___processedAndGolden_2015D_oct25.root  84.0 1
+#./submitBatchDiPho.py --cfg diPhoAnaBATCH.py GJet_Pt-20to40     		0  1  /afs/cern.ch/user/m/mzientek/public/pileupWeights___processedAndGolden_2015D_oct25.root  218.6108 1  
+#./submitBatchDiPho.py --cfg diPhoAnaBATCH.py GJet_Pt-40toInf    		0  2  /afs/cern.ch/user/m/mzientek/public/pileupWeights___processedAndGolden_2015D_oct25.root  863.1088 1
+#./submitBatchDiPho.py --cfg diPhoAnaBATCH.py QCD_Pt-30to40      		0  3  /afs/cern.ch/user/m/mzientek/public/pileupWeights___processedAndGolden_2015D_oct25.root  24300   1
+#./submitBatchDiPho.py --cfg diPhoAnaBATCH.py QCD_Pt-30toInf     		0  4  /afs/cern.ch/user/m/mzientek/public/pileupWeights___processedAndGolden_2015D_oct25.root  259296  1
+#./submitBatchDiPho.py --cfg diPhoAnaBATCH.py QCD_Pt-40toInf     		0  5  /afs/cern.ch/user/m/mzientek/public/pileupWeights___processedAndGolden_2015D_oct25.root  108240  1
+#./submitBatchDiPho.py --cfg diPhoAnaBATCH.py GluGluHToGG	     		0  10 /afs/cern.ch/user/m/mzientek/public/pileupWeights___processedAndGolden_2015D_oct25.root  0.08784 1     #value=xsec*br (xsec=43.92,br=0.002)
+#./submitBatchDiPho.py --cfg diPhoAnaBATCH.py VH					0  11 /afs/cern.ch/user/m/mzientek/public/pileupWeights___processedAndGolden_2015D_oct25.root  0.0044992 1   #value=xsec(ZH+WH)*br (xsec=2.2496,br=0.002)
+#./submitBatchDiPho.py --cfg diPhoAnaBATCH.py DYJetsToLL				0  12 /afs/cern.ch/user/m/mzientek/public/pileupWeights___processedAndGolden_2015D_oct25.root  6025.2 1 
 
 #./submitBatchDiPho.py --cfg diPhoAnaBATCH.py testSig				0  110 pippo 0.00009338  1 
 #
-#./submitBatchDiPho.py --cfg diPhoAnaBATCH.py 2HDM_MZP600			0  100 pippo 0.00009338  1 #46.69fb xsec * 0.002br
-#./submitBatchDiPho.py --cfg diPhoAnaBATCH.py 2HDM_MZP800			0  101 pippo 0.00010348  1 #51.74fb xsec * 0.002br
-#./submitBatchDiPho.py --cfg diPhoAnaBATCH.py 2HDM_MZP1000			0  102 pippo 0.00008394  1 #41.97fb xsec * 0.002br
-#./submitBatchDiPho.py --cfg diPhoAnaBATCH.py 2HDM_MZP1200			0  103 pippo 0.00006352  1 #31.76fb xsec * 0.002br
-#./submitBatchDiPho.py --cfg diPhoAnaBATCH.py 2HDM_MZP1400			0  104 pippo 0.00004712  1 #23.56fb xsec * 0.002br
-#./submitBatchDiPho.py --cfg diPhoAnaBATCH.py 2HDM_MZP1700			0  105 pippo 0.00003020  1 #15.10fb xsec * 0.002br
+./submitBatchDiPho.py --cfg diPhoAnaBATCH.py 2HDM_MZP600			0  100 pippo 0.00009338  1 #46.69fb xsec * 0.002br
+./submitBatchDiPho.py --cfg diPhoAnaBATCH.py 2HDM_MZP800			0  101 pippo 0.00010348  1 #51.74fb xsec * 0.002br
+./submitBatchDiPho.py --cfg diPhoAnaBATCH.py 2HDM_MZP1000			0  102 pippo 0.00008394  1 #41.97fb xsec * 0.002br
+./submitBatchDiPho.py --cfg diPhoAnaBATCH.py 2HDM_MZP1200			0  103 pippo 0.00006352  1 #31.76fb xsec * 0.002br
+./submitBatchDiPho.py --cfg diPhoAnaBATCH.py 2HDM_MZP1400			0  104 pippo 0.00004712  1 #23.56fb xsec * 0.002br
+./submitBatchDiPho.py --cfg diPhoAnaBATCH.py 2HDM_MZP1700			0  105 pippo 0.00003020  1 #15.10fb xsec * 0.002br
 #./submitBatchDiPho.py --cfg diPhoAnaBATCH.py 2HDM_MZP2000			0  106 pippo 0.000019468 1 #9.734fb xsec * 0.002br
-#./submitBatchDiPho.py --cfg diPhoAnaBATCH.py 2HDM_MZP2500			0  107 pippo 0.00000972  1 #4.860fb xsec * 0.002br
+./submitBatchDiPho.py --cfg diPhoAnaBATCH.py 2HDM_MZP2500			0  107 pippo 0.00000972  1 #4.860fb xsec * 0.002br
 
 
 

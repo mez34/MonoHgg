@@ -3,9 +3,9 @@
 
 #mkdir -p data/mergedFinal
 
-hadd data/25ns_v7_EV_Tight/GJets.root	data/25ns_v7_EV_Tight/GJet_Pt-20to40.root	data/25ns_v7_EV_Tight/GJet_Pt-40toInf.root 
-hadd data/25ns_v7_EV_Tight/QCD.root		data/25ns_v7_EV_Tight/QCD_Pt-30to40.root	data/25ns_v7_EV_Tight/QCD_Pt-30toInf.root	data/25ns_v7_EV_Tight/QCD_Pt-40toInf.root 
-hadd data/25ns_v7_EV_Tight/DoubleEG.root	data/25ns_v7_EV_Tight/DoubleEG_p.root	data/25ns_v7_EV_Tight/DoubleEG_0.root	data/25ns_v7_EV_Tight/DoubleEG_1.root	data/25ns_v7_EV_Tight/DoubleEG_2.root 
+hadd data/25ns_v7_EV/GJets.root	data/25ns_v7_EV/GJet_Pt-20to40.root	data/25ns_v7_EV/GJet_Pt-40toInf.root 
+hadd data/25ns_v7_EV/QCD.root		data/25ns_v7_EV/QCD_Pt-30to40.root	data/25ns_v7_EV/QCD_Pt-30toInf.root	data/25ns_v7_EV/QCD_Pt-40toInf.root 
+hadd data/25ns_v7_EV/DoubleEG.root	data/25ns_v7_EV/DoubleEG_p.root	data/25ns_v7_EV/DoubleEG_0.root	data/25ns_v7_EV/DoubleEG_1.root	data/25ns_v7_EV/DoubleEG_2.root 
 
 #hadd data/50ns/GJets.root data/50ns/GJet_Pt-20to40.root data/50ns/GJet_Pt-40toInf.root 
 #hadd data/50ns/QCD.root data/50ns/QCD_Pt-30to40.root data/50ns/QCD_Pt-30toInf.root data/50ns/QCD_Pt-40toInf.root 

@@ -116,13 +116,13 @@ void CMSLumi(TCanvas *& canvas, const Int_t iPosX, const Double_t inlumi){
   latex.SetTextFont(42);
   latex.SetTextAlign(31); 
   latex.SetTextSize(lumiTextSize*t);    
-  latex.DrawLatex(1-r,1-t+lumiTextOffset*t,lumiText);
+  latex.DrawLatex(1-r+0.08,1-t+lumiTextOffset*t+0.01,lumiText);
 
   if (outOfFrame) {
     latex.SetTextFont(cmsTextFont);
     latex.SetTextAlign(11); 
     latex.SetTextSize(cmsTextSize*t);    
-    latex.DrawLatex(l,1-t+lumiTextOffset*t,cmsText);
+    latex.DrawLatex(l,1-t+cmsTextOffset*t,cmsText);
   }
   
   Double_t posX_;
@@ -263,7 +263,7 @@ void SetTDRStyle(TStyle *& tdrStyle) {
 
   tdrStyle->SetTitleColor(1, "XYZ");
   tdrStyle->SetTitleFont(42, "XYZ");
-  tdrStyle->SetTitleSize(0.06, "XYZ");
+  tdrStyle->SetTitleSize(0.04, "XYZ");
   // tdrStyle->SetTitleXSize(Float_t size = 0.02); // Another way to set the size?
   // tdrStyle->SetTitleYSize(Float_t size = 0.02);
   tdrStyle->SetTitleXOffset(0.9);
@@ -275,14 +275,14 @@ void SetTDRStyle(TStyle *& tdrStyle) {
   tdrStyle->SetLabelColor(1, "XYZ");
   tdrStyle->SetLabelFont(42, "XYZ");
   tdrStyle->SetLabelOffset(0.007, "XYZ");
-  tdrStyle->SetLabelSize(0.05, "XYZ");
+  tdrStyle->SetLabelSize(0.025, "XYZ");
 
   // For the axis:
 
   tdrStyle->SetAxisColor(1, "XYZ");
   tdrStyle->SetStripDecimals(kTRUE);
   tdrStyle->SetTickLength(0.03, "XYZ");
-  tdrStyle->SetNdivisions(505, "XYZ");
+  //tdrStyle->SetNdivisions(505, "XYZ");
   tdrStyle->SetPadTickX(1);  // To get tick marks on the opposite side of the frame
   tdrStyle->SetPadTickY(1);
 
@@ -298,7 +298,7 @@ void SetTDRStyle(TStyle *& tdrStyle) {
   tdrStyle->SetPadRightMargin(0.15); // per la paletta !
   tdrStyle->SetTitleXOffset(1.0);
   tdrStyle->SetTitleYOffset(1.3);
-  tdrStyle->SetNdivisions(505, "X");
+  //tdrStyle->SetNdivisions(505, "X");
   tdrStyle->SetErrorX(0.5);
 
   tdrStyle->SetPalette(1,0);

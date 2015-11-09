@@ -2,25 +2,25 @@
 #run extractJSONS.py for all samples in file
 
 # All FLASHgg version Spring15BetaV7:
-#python extractJSONS.py -i datasets/datasets_7415_betaV7_sig.json	-o 2HDM_MZP600		-d lists_25ns_v7/MC
-#python extractJSONS.py -i datasets/datasets_7415_betaV7_sig.json	-o 2HDM_MZP800		-d lists_25ns_v7/MC
-#python extractJSONS.py -i datasets/datasets_7415_betaV7_sig.json	-o 2HDM_MZP1000		-d lists_25ns_v7/MC
-#python extractJSONS.py -i datasets/datasets_7415_betaV7_sig.json	-o 2HDM_MZP1200		-d lists_25ns_v7/MC
-#python extractJSONS.py -i datasets/datasets_7415_betaV7_sig.json	-o 2HDM_MZP1400		-d lists_25ns_v7/MC
-#python extractJSONS.py -i datasets/datasets_7415_betaV7_sig.json	-o 2HDM_MZP1700		-d lists_25ns_v7/MC
-#python extractJSONS.py -i datasets/datasets_7415_betaV7_sig.json	-o 2HDM_MZP2000		-d lists_25ns_v7/MC
-#python extractJSONS.py -i datasets/datasets_7415_betaV7_sig.json	-o 2HDM_MZP2500		-d lists_25ns_v7/MC
-python extractJSONS.py -i datasets/datasets_7415_betaV7.json	-o DiPhoton		-d lists_25ns_v7/MC
-python extractJSONS.py -i datasets/datasets_7415_betaV7.json	-o DYJetsToLL		-d lists_25ns_v7/MC
-python extractJSONS.py -i datasets/datasets_7415_betaV7.json	-o QCD_Pt-30to40	-d lists_25ns_v7/MC
-python extractJSONS.py -i datasets/datasets_7415_betaV7.json	-o QCD_Pt-40toInf	-d lists_25ns_v7/MC
-python extractJSONS.py -i datasets/datasets_7415_betaV7.json	-o QCD_Pt-30toInf	-d lists_25ns_v7/MC
-python extractJSONS.py -i datasets/datasets_7415_betaV7.json	-o GJet_Pt-20to40	-d lists_25ns_v7/MC
-python extractJSONS.py -i datasets/datasets_7415_betaV7.json	-o GJet_Pt-40toInf	-d lists_25ns_v7/MC
-python extractJSONS.py -i datasets/datasets_7415_betaV7.json	-o GluGluHToGG_M-125	-d lists_25ns_v7/MC
-python extractJSONS.py -i datasets/datasets_7415_betaV7.json	-o VHToGG_M125		-d lists_25ns_v7/MC
-
-python extractJSONS.py -i datasets/datasets_7415_betaV7metaV1.json	-o DoubleEG 	-d lists_25ns_v7/Data
+python extractJSONS.py -i datasets/datasets_7415_betaV7_sig.json	-o 2HDM_MZP600		-d lists_25ns_v7/MC
+python extractJSONS.py -i datasets/datasets_7415_betaV7_sig.json	-o 2HDM_MZP800		-d lists_25ns_v7/MC
+python extractJSONS.py -i datasets/datasets_7415_betaV7_sig.json	-o 2HDM_MZP1000		-d lists_25ns_v7/MC
+python extractJSONS.py -i datasets/datasets_7415_betaV7_sig.json	-o 2HDM_MZP1200		-d lists_25ns_v7/MC
+python extractJSONS.py -i datasets/datasets_7415_betaV7_sig.json	-o 2HDM_MZP1400		-d lists_25ns_v7/MC
+python extractJSONS.py -i datasets/datasets_7415_betaV7_sig.json	-o 2HDM_MZP1700		-d lists_25ns_v7/MC
+python extractJSONS.py -i datasets/datasets_7415_betaV7_sig.json	-o 2HDM_MZP2000		-d lists_25ns_v7/MC
+python extractJSONS.py -i datasets/datasets_7415_betaV7_sig.json	-o 2HDM_MZP2500		-d lists_25ns_v7/MC
+#python extractJSONS.py -i datasets/datasets_7415_betaV7.json	-o DiPhoton		-d lists_25ns_v7/MC
+#python extractJSONS.py -i datasets/datasets_7415_betaV7.json	-o DYJetsToLL		-d lists_25ns_v7/MC
+#python extractJSONS.py -i datasets/datasets_7415_betaV7.json	-o QCD_Pt-30to40	-d lists_25ns_v7/MC
+#python extractJSONS.py -i datasets/datasets_7415_betaV7.json	-o QCD_Pt-40toInf	-d lists_25ns_v7/MC
+#python extractJSONS.py -i datasets/datasets_7415_betaV7.json	-o QCD_Pt-30toInf	-d lists_25ns_v7/MC
+#python extractJSONS.py -i datasets/datasets_7415_betaV7.json	-o GJet_Pt-20to40	-d lists_25ns_v7/MC
+#python extractJSONS.py -i datasets/datasets_7415_betaV7.json	-o GJet_Pt-40toInf	-d lists_25ns_v7/MC
+#python extractJSONS.py -i datasets/datasets_7415_betaV7.json	-o GluGluHToGG_M-125	-d lists_25ns_v7/MC
+#python extractJSONS.py -i datasets/datasets_7415_betaV7.json	-o VHToGG_M125		-d lists_25ns_v7/MC
+#
+#python extractJSONS.py -i datasets/datasets_7415_betaV7metaV1.json	-o DoubleEG 	-d lists_25ns_v7/Data
 # FLASHgg v7 data separate by runD & runC:
 #python extractJSONS.py -i datasets/datasets_7415_betaV7metaV1.json	-o DoubleEG/RunIISpring15-ReMiniAOD-BetaV7-25ns-Spring15BetaV7-v0-Run2015D 	-d lists_25ns_v7/Data
 #python extractJSONS.py -i datasets/datasets_7415_betaV7.json	-o DoubleEG/RunIISpring15-ReMiniAOD-BetaV7-25ns-Spring15BetaV7-v0-Run2015C	-d lists_25ns_v7/Data

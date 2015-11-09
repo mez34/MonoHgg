@@ -386,7 +386,7 @@ void Combiner::DrawCanvasStack(const UInt_t th1d, const Bool_t isLogY){
 
     fOutRatioTH1DHists[th1d]->GetYaxis()->SetLabelSize(0.11);
     fOutRatioTH1DHists[th1d]->GetYaxis()->SetTitleSize(0.15);
-    fOutRatioTH1DHists[th1d]->GetYaxis()->SetTitleOffset(0.5);
+    fOutRatioTH1DHists[th1d]->GetYaxis()->SetTitleOffset(0.35);
 
     fOutRatioTH1DHistsCopy[th1d]->Draw("E2 SAME");
     fOutRatioTH1DHists[th1d]->Draw("EP SAME");
@@ -631,47 +631,47 @@ void Combiner::InitTH1DNames(){
   fTH1DNames.push_back("nvtx"); 
   fTH1DNames.push_back("t1pfmetphi");
   fTH1DNames.push_back("t1pfmet");
-  //fTH1DNames.push_back("pfmetphi");
-  //fTH1DNames.push_back("pfmet");
-  //fTH1DNames.push_back("calometphi");
-  //fTH1DNames.push_back("calomet");
+  fTH1DNames.push_back("pfmetphi");
+  fTH1DNames.push_back("pfmet");
+  fTH1DNames.push_back("calometphi");
+  fTH1DNames.push_back("calomet");
 
-  //// photon variables
-  //fTH1DNames.push_back("pt1");
-  //fTH1DNames.push_back("pt2");     
-  //fTH1DNames.push_back("eta1");
-  //fTH1DNames.push_back("eta2");
-  //fTH1DNames.push_back("phi1");
-  //fTH1DNames.push_back("phi2");
-  //fTH1DNames.push_back("r91");
-  //fTH1DNames.push_back("r92");
+  // photon variables
+  fTH1DNames.push_back("pt1");
+  fTH1DNames.push_back("pt2");     
+  fTH1DNames.push_back("eta1");
+  fTH1DNames.push_back("eta2");
+  fTH1DNames.push_back("phi1");
+  fTH1DNames.push_back("phi2");
+  fTH1DNames.push_back("r91");
+  fTH1DNames.push_back("r92");
 
-  //// photon ID variables
-  //fTH1DNames.push_back("hoe1");
-  //fTH1DNames.push_back("hoe2");
-  //fTH1DNames.push_back("sieie1");
-  //fTH1DNames.push_back("sieie2");
-  //fTH1DNames.push_back("phoiso1");
-  //fTH1DNames.push_back("phoiso2");
-  //fTH1DNames.push_back("chiso1");
-  //fTH1DNames.push_back("chiso2");
-  //fTH1DNames.push_back("neuiso1");
-  //fTH1DNames.push_back("neuiso2");
+  // photon ID variables
+  fTH1DNames.push_back("hoe1");
+  fTH1DNames.push_back("hoe2");
+  fTH1DNames.push_back("sieie1");
+  fTH1DNames.push_back("sieie2");
+  fTH1DNames.push_back("phoiso1");
+  fTH1DNames.push_back("phoiso2");
+  fTH1DNames.push_back("chiso1");
+  fTH1DNames.push_back("chiso2");
+  fTH1DNames.push_back("neuiso1");
+  fTH1DNames.push_back("neuiso2");
 
   if (addText!="_n-1"){ // plots that don't have n-1 versions 
-    ////fTH1DNames.push_back("eleveto1");
-    ////fTH1DNames.push_back("eleveto2");
-    ////fTH1DNames.push_back("phi1_pho2pass");
-    ////fTH1DNames.push_back("phi2_pho1pass");
-    //fTH1DNames.push_back("t1pfmet_zoom");
-    //fTH1DNames.push_back("mgg_selt1pfmet");
-    //fTH1DNames.push_back("t1pfmet_selmgg");
-    //fTH1DNames.push_back("phigg");
-    //fTH1DNames.push_back("dphi_ggmet");
-    //fTH1DNames.push_back("absdphi_ggmet");
-    //fTH1DNames.push_back("deta_gg");
-    //fTH1DNames.push_back("absdeta_gg");
-    //fTH1DNames.push_back("selection");
+    //fTH1DNames.push_back("eleveto1");
+    //fTH1DNames.push_back("eleveto2");
+    //fTH1DNames.push_back("phi1_pho2pass");
+    //fTH1DNames.push_back("phi2_pho1pass");
+    fTH1DNames.push_back("t1pfmet_zoom");
+    fTH1DNames.push_back("mgg_selt1pfmet");
+    fTH1DNames.push_back("t1pfmet_selmgg");
+    fTH1DNames.push_back("phigg");
+    fTH1DNames.push_back("dphi_ggmet");
+    fTH1DNames.push_back("absdphi_ggmet");
+    fTH1DNames.push_back("deta_gg");
+    fTH1DNames.push_back("absdeta_gg");
+    fTH1DNames.push_back("selection");
     fTH1DNames.push_back("eff_sel");
     fIndexEff = fTH1DNames.size()-1;
   }
