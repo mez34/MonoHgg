@@ -47,8 +47,8 @@ OBSmasses = []
 EXPmasses = []
 
 
-OBSmassesT = [600,800,1000,1200,1400,1700,2000]#,2500]#[1,10,100,1000]
-EXPmassesT = [600,800,1000,1200,1400,1700,2000]#,2500]#[1,10,100,1000]
+OBSmassesT = [600,800,1000,1200,1400]#,1700,2000]#,2500]#[1,10,100,1000]
+EXPmassesT = [600,800,1000,1200,1400]#,1700,2000]#,2500]#[1,10,100,1000]
 
 
 for m in OBSmassesT:
@@ -63,8 +63,8 @@ FILLSTYLE=1001
 SMFILLSTYLE=3244
 FILLCOLOR_95=ROOT.kYellow
 FILLCOLOR_68=ROOT.kGreen
-RANGEYABS=[0.01,100]
-RANGEYRAT=[0.1,2000]
+RANGEYABS=[0.0001,100]
+RANGEYRAT=[0.0001,10]
 #RANGEYRAT=[0.0, 2.2]
 RANGEMU = [-4,3.0]
 MINPV = 0.5*10E-5
@@ -230,7 +230,7 @@ def MakeMlfPlot(MG):
     dhist.GetXaxis().SetLabelSize(0.04)
     dhist.GetXaxis().SetRangeUser(MINMH,MAXMH)
     dhist.GetYaxis().SetRangeUser(RANGEMU[0],RANGEMU[1])
-    dhist.GetXaxis().SetTitle("m_{X} (GeV)")
+    dhist.GetXaxis().SetTitle("m_{Z'} (GeV)")
     dhist.GetYaxis().SetTitle("Best fit #sigma/#sigma_{SM}")
     dhist.Draw("AXIS")
 
@@ -433,7 +433,7 @@ def MakeLimitPlot(MG):
     mytextPrel.SetTextSize(0.0285);
     mytextPrel.SetLineWidth(2);
     # mytext.DrawLatex(0.12,0.96,"CMS Preliminary, 19.5 fb^{-1}                                                   #sqrt{s} = 8 TeV")
-    mytextlumi.DrawLatex(0.92,0.96,"150.1 pb^{-1} (13 TeV)")
+    mytextlumi.DrawLatex(0.92,0.96,"3 fb^{-1} (13 TeV)")
     mytextCMS.DrawLatex(0.17915,0.89165,"CMS")
     mytextPrel.DrawLatex(0.17915,0.84665,"Preliminary")
     for t,lineT in enumerate(options.addtxt):
@@ -454,6 +454,8 @@ def MakeLimitPlot(MG):
     if options.doRatio: www_outputname+="_ratio"
     if options.append!="": outputname+="_"+options.append
     if options.append!="": www_outputname+="_"+options.append
+    outputname+="_met250_3fb"
+    www_outputname+="_met250_3fb"
     types=[".pdf",".png",".eps"]
     for type in types: C.SaveAs(outputname+type)
     for type in types: C.SaveAs(www_outputname+type)
@@ -476,6 +478,7 @@ for i,mass,f in zip(range(len(EXPfiles)),EXPmasses,EXPfiles):
   dn95   = array.array('d',[0])
 
   if not options.doRatio:
+      #sm=1.0
       if mass == 600:
           sm=0.00227*0.04669
       if mass == 800:
@@ -572,7 +575,8 @@ if options.doSmooth:
      sm150=1.0
   
   
-  if not options.doRatio:
+  if not options.doRatio: 
+     #sm = 1.0
      if mass == 600:
          sm=0.00227*0.04669
      if mass == 800:
