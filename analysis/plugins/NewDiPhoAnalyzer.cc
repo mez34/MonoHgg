@@ -683,9 +683,9 @@ void NewDiPhoAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup& 
 		mgg  = candDiphoPtr->mass();
 				
 		if (hltDiphoton30Mass95){
-		  if (mgg >= 110 && mgg <= 130){
+		  if (mgg >= 120 && mgg <= 130){
 	 	    h_selection->Fill(6.,perEveW);
-		    if (t1pfmet >= 100){
+		    if (t1pfmet >= 250){
 		      eff_end++;
 		      h_selection->Fill(7.,perEveW);
 		    }

@@ -62,6 +62,9 @@ private:
 
   UInt_t	fIndexEff;
   UInt_t	fIndexMgg;
+  UInt_t 	fIndexPtgg;
+  UInt_t	fIndexDphi;
+  UInt_t	fIndexDeta;
 
   UInt_t	fNTH1D;
   TStrVec	fTH1DNames;

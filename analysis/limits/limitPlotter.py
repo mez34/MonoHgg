@@ -454,8 +454,8 @@ def MakeLimitPlot(MG):
     if options.doRatio: www_outputname+="_ratio"
     if options.append!="": outputname+="_"+options.append
     if options.append!="": www_outputname+="_"+options.append
-    outputname+="_met250_3fb"
-    www_outputname+="_met250_3fb"
+    outputname+="_met250_3fb_new"
+    www_outputname+="_met250_3fb_new"
     types=[".pdf",".png",".eps"]
     for type in types: C.SaveAs(outputname+type)
     for type in types: C.SaveAs(www_outputname+type)
@@ -478,23 +478,23 @@ for i,mass,f in zip(range(len(EXPfiles)),EXPmasses,EXPfiles):
   dn95   = array.array('d',[0])
 
   if not options.doRatio:
-      #sm=1.0
-      if mass == 600:
-          sm=0.00227*0.04669
-      if mass == 800:
-          sm=0.00227*0.05174
-      if mass == 1000:
-          sm=0.00227*0.04197
-      if mass == 1200:
-          sm=0.00227*0.03176
-      if mass == 1400:
-          sm=0.00227*0.02356
-      if mass == 1700:
-          sm=0.00227*0.01510
-      if mass == 2000:
-          sm=0.00227*0.009734
-      if mass == 2500:
-          sm=0.00227*0.004860
+      sm=1.0
+      #if mass == 600:
+      #    sm=0.00227*0.04669
+      #if mass == 800:
+      #    sm=0.00227*0.05174
+      #if mass == 1000:
+      #    sm=0.00227*0.04197
+      #if mass == 1200:
+      #    sm=0.00227*0.03176
+      #if mass == 1400:
+      #    sm=0.00227*0.02356
+      #if mass == 1700:
+      #    sm=0.00227*0.01510
+      #if mass == 2000:
+      #    sm=0.00227*0.009734
+      #if mass == 2500:
+      #    sm=0.00227*0.004860
   if Method == "Asymptotic" or Method=="AsymptoticNew":   
       median[0] = getOBSERVED(f,2)
       up95[0]   = getOBSERVED(f,4)
@@ -576,23 +576,23 @@ if options.doSmooth:
   
   
   if not options.doRatio: 
-     #sm = 1.0
-     if mass == 600:
-         sm=0.00227*0.04669
-     if mass == 800:
-         sm=0.00227*0.05174
-     if mass == 1000:
-         sm=0.00227*0.04197
-     if mass == 1200:
-         sm=0.00227*0.03176
-     if mass == 1400:
-         sm=0.00227*0.02356
-     if mass == 1700:
-         sm=0.00227*0.01510
-     if mass == 2000:
-         sm=0.00227*0.009734
-     if mass == 2500:
-          sm=0.00227*0.004860
+     sm = 1.0
+     #if mass == 600:
+     #    sm=0.00227*0.04669
+     #if mass == 800:
+     #    sm=0.00227*0.05174
+     #if mass == 1000:
+     #    sm=0.00227*0.04197
+     #if mass == 1200:
+     #    sm=0.00227*0.03176
+     #if mass == 1400:
+     #    sm=0.00227*0.02356
+     #if mass == 1700:
+     #    sm=0.00227*0.01510
+     #if mass == 2000:
+     #    sm=0.00227*0.009734
+     #if mass == 2500:
+     #     sm=0.00227*0.004860
      #if mass == 10:
      #    sm=0.00227*10
      #if mass == 100:

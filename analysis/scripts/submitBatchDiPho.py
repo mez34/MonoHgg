@@ -19,7 +19,7 @@ def main():
     now = datetime.datetime.now()
     defaultoutputdir='job_'+str(now.year)+str(now.month)+str(now.day)+"_"+str(now.hour)+str(now.minute)+str(now.second)
 
-    parser.add_option('-q', '--queue', action='store', dest='queue', help='run in batch in queue specified as option (default -q 8nh)', default='8nh')
+    parser.add_option('-q', '--queue', action='store', dest='queue', help='run in batch in queue specified as option (default -q 8nh)', default='8nm')
     parser.add_option('-n', '--nfileperjob', action='store', dest='nfileperjob', help='split the jobs with n files read/batch job' , default=1, type='int')
     parser.add_option('-p', '--prefix', action='store', dest='prefix', help='the prefix to be added to the output' , default=defaultoutputdir)
     parser.add_option('-a', '--application', action='store', dest='application', help='the executable to be run' , default='cmsRun')

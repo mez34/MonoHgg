@@ -18,7 +18,7 @@ ABCDMethod::ABCDMethod( SamplePairVec Samples, const Double_t inLumi, const TStr
   mgg_maxAB2 = 150.; 
   met_minB   = 0.;
   met_minD   = 250.;
-  met_maxD   = 800.;
+  met_maxD   = 999.;
 
   // titles for output Latex table
   fSampleTitleMap["Data"]		= "Data";

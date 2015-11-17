@@ -6,29 +6,29 @@ echo "Adding weights for " $lumi " pb-1..."
 root -l -b <<EOF
 .L addWeightsToTree.cc++  
  
-addWeights("data/25ns_v7_EV/GJet_Pt-20to40.root", $lumi);
-addWeights("data/25ns_v7_EV/GJet_Pt-40toInf.root", $lumi);
-addWeights("data/25ns_v7_EV/QCD_Pt-30to40.root", $lumi);
-addWeights("data/25ns_v7_EV/QCD_Pt-30toInf.root", $lumi);
-addWeights("data/25ns_v7_EV/QCD_Pt-40toInf.root", $lumi);
-addWeights("data/25ns_v7_EV/GluGluHToGG.root", $lumi);
-addWeights("data/25ns_v7_EV/DiPhoton.root", $lumi);
-addWeights("data/25ns_v7_EV/VH.root", $lumi);
-addWeights("data/25ns_v7_EV/DYJetsToLL.root", $lumi);
+addWeights("data/25ns_v7_noEV_3fb/GJet_Pt-20to40.root", $lumi);
+addWeights("data/25ns_v7_noEV_3fb/GJet_Pt-40toInf.root", $lumi);
+addWeights("data/25ns_v7_noEV_3fb/QCD_Pt-30to40.root", $lumi);
+addWeights("data/25ns_v7_noEV_3fb/QCD_Pt-30toInf.root", $lumi);
+addWeights("data/25ns_v7_noEV_3fb/QCD_Pt-40toInf.root", $lumi);
+addWeights("data/25ns_v7_noEV_3fb/GluGluHToGG.root", $lumi);
+addWeights("data/25ns_v7_noEV_3fb/DiPhoton.root", $lumi);
+addWeights("data/25ns_v7_noEV_3fb/VH.root", $lumi);
+addWeights("data/25ns_v7_noEV_3fb/DYJetsToLL.root", $lumi);
 
-addWeights("data/25ns_v7_EV/2HDM_mZP600.root", $lumi);
-addWeights("data/25ns_v7_EV/2HDM_mZP800.root", $lumi);
-addWeights("data/25ns_v7_EV/2HDM_mZP1000.root", $lumi);
-addWeights("data/25ns_v7_EV/2HDM_mZP1200.root", $lumi);
-addWeights("data/25ns_v7_EV/2HDM_mZP1400.root", $lumi);
-addWeights("data/25ns_v7_EV/2HDM_mZP1700.root", $lumi);
-addWeights("data/25ns_v7_EV/2HDM_mZP2000.root", $lumi);
-addWeights("data/25ns_v7_EV/2HDM_mZP2500.root", $lumi);
+addWeights("data/25ns_v7_noEV_3fb/2HDM_mZP600.root", $lumi);
+addWeights("data/25ns_v7_noEV_3fb/2HDM_mZP800.root", $lumi);
+addWeights("data/25ns_v7_noEV_3fb/2HDM_mZP1000.root", $lumi);
+addWeights("data/25ns_v7_noEV_3fb/2HDM_mZP1200.root", $lumi);
+addWeights("data/25ns_v7_noEV_3fb/2HDM_mZP1400.root", $lumi);
+addWeights("data/25ns_v7_noEV_3fb/2HDM_mZP1700.root", $lumi);
+addWeights("data/25ns_v7_noEV_3fb/2HDM_mZP2000.root", $lumi);
+addWeights("data/25ns_v7_noEV_3fb/2HDM_mZP2500.root", $lumi);
 
-addWeights("data/25ns_v7_EV/DoubleEG_p.root", $lumi);
-addWeights("data/25ns_v7_EV/DoubleEG_0.root", $lumi);
-addWeights("data/25ns_v7_EV/DoubleEG_1.root", $lumi);
-addWeights("data/25ns_v7_EV/DoubleEG_2.root", $lumi);
+addWeights("data/25ns_v7_noEV_3fb/DoubleEG_p.root", $lumi);
+addWeights("data/25ns_v7_noEV_3fb/DoubleEG_0.root", $lumi);
+addWeights("data/25ns_v7_noEV_3fb/DoubleEG_1.root", $lumi);
+addWeights("data/25ns_v7_noEV_3fb/DoubleEG_2.root", $lumi);
 
 .q
 

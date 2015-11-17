@@ -160,7 +160,7 @@ void Combiner::DoComb(){
 
   }// end loop over th1d histos
 
-  //if (addText!="_n-1") Combiner::MakeEffPlots();
+  if (addText!="_n-1") Combiner::MakeEffPlots();
   Combiner::MakeOutputCanvas();
 
 }// end Combiner::DoComb
@@ -172,7 +172,7 @@ void Combiner::MakeEffPlots(){
   TCanvas *c = new TCanvas();
   c->cd();
 
-  TH1D *eff_mDM = new TH1D("eff_mDM","",1001,1,1001);
+  TH1D *eff_mDM = new TH1D("eff_mDM","",1000,500,1500);
 
   Double_t eff_val = 0.;
   Double_t eff_num = 0.;
@@ -180,32 +180,34 @@ void Combiner::MakeEffPlots(){
   Double_t num_err = 0.;
   Double_t den_err = 0.;
   Double_t eff_err = 0.;
+  std::vector<Double_t> numer = {15634, 37582, 41561, 21185, 22538};
+  std::vector<Double_t> denom = {33854, 70376, 72970, 36018, 37448};
   //std::vector<Double_t> numer = {4864,6780,10451,18428};
   //std::vector<Double_t> denom = {40918,57500,55092,56656};
-  //std::vector<Double_t> value = {0,0,0,0};
-  //std::vector<Double_t> error = {0,0,0,0};
-  std::vector<Double_t> mass = {1,10,100,1000}; 
+  std::vector<Double_t> value = {0,0,0,0};
+  std::vector<Double_t> error = {0,0,0,0};
+  std::vector<Double_t> mass =  {600,800,1000,1200,1400};//{1,10,100,1000}; 
   Int_t binForMass = 0;
 
   for (UInt_t mc = 0; mc < fNSig; mc++){
-    eff_num = fInSigTH1DHists[fIndexEff][mc]->GetBinContent(10); // events passing sel,mgg,met
-    eff_den = fInSigTH1DHists[fIndexEff][mc]->GetBinContent(1);  // events only require pass presel
-    num_err = TMath::Sqrt(eff_num);
-    den_err = TMath::Sqrt(eff_den);
-    if (eff_den > 0) eff_val = eff_num/eff_den;
-    eff_err = TMath::Sqrt(eff_val*(1.0-eff_val)/eff_den); 
+    //eff_num = fInSigTH1DHists[fIndexEff][mc]->GetBinContent(8); // events passing sel,mgg,met
+    //eff_den = fInSigTH1DHists[fIndexEff][mc]->GetBinContent(1);  // events only require pass presel
+    //num_err = TMath::Sqrt(eff_num);
+    //den_err = TMath::Sqrt(eff_den);
+    //if (eff_den > 0) eff_val = eff_num/eff_den;
+    //eff_err = TMath::Sqrt(eff_val*(1.0-eff_val)/eff_den); 
     binForMass = eff_mDM->FindBin(mass[mc]);
     eff_mDM->SetBinContent(binForMass,eff_val);
     eff_mDM->SetBinError(binForMass,eff_err);
-    //value[mc]  = numer[mc]/denom[mc];
-    //error[mc]  = TMath::Sqrt(value[mc]*(1.0-value[mc])/denom[mc]);
-    //eff_mDM->SetBinContent(binForMass,value[mc]);
-    //eff_mDM->SetBinError(binForMass,error[mc]);
+    value[mc]  = numer[mc]/denom[mc];
+    error[mc]  = TMath::Sqrt(value[mc]*(1.0-value[mc])/denom[mc]);
+    eff_mDM->SetBinContent(binForMass,value[mc]);
+    eff_mDM->SetBinError(binForMass,error[mc]);
   }
 
   eff_mDM->SetMaximum(1.0);
   eff_mDM->SetMinimum(0.0);
-  eff_mDM->GetXaxis()->SetTitle("m_{DM} [GeV]");
+  eff_mDM->GetXaxis()->SetTitle("m_{Z'} [GeV]");
   eff_mDM->GetYaxis()->SetTitle("Efficiency");
   eff_mDM->Draw("PE");
   eff_mDM->Write();
@@ -214,6 +216,35 @@ void Combiner::MakeEffPlots(){
   c->SetLogx();
   c->SaveAs(Form("%scomb/eff_mDM.%s",fOutDir.Data(),fType.Data()));
   delete c; 
+
+  //// make significance plots for ptgg, absdphi, deta
+  //UInt_t num_sel = 20;
+  //TH1D *signif_ptgg = new TH1D("signif_ptgg","",num_sel,-0.5,19.5);
+  //TH1D *signif_dphi = new TH1D("signif_dphi","",num_sel,-0.5,19.5);
+  //TH1D *signif_deta = new TH1D("signif_deta","",num_sel,-0.5,19.5);
+
+  //DblVecVec signal_ptgg, signal_dphi, signal_deta;
+  //DblVec    totbkg_ptgg, totbkg_dphi, totbkg_deta;
+  //signal_ptgg.resize(fNSig);
+  //signal_dphi.resize(fNSig);
+  //signal_deta.resize(fNSig);
+  //
+  //for (UInt_t mc = 0; mc < fNSig; mc++){
+  //  signal_ptgg[mc].resize(num_sel); 
+  //  signal_dphi[mc].resize(num_sel); 
+  //  signal_deta[mc].resize(num_sel); 
+  //  for (UInt_t cut = 0; cut < num_sel; cut++){
+  //     //fInSigTH1DHists[fIndexPtgg][mc]->Integral();  
+  //     //fInSigTH1DHists[fIndexDphi][mc]->Integral();  
+  //     //fInSigTH1DHists[fIndexDeta][mc]->Integral();  
+  //  }    
+  //} 
+
+  
+
+
+
+
 
 }// end Combiner::MakeEffPlots
 
@@ -271,7 +302,7 @@ void Combiner::DrawCanvasOverlay(const UInt_t th1d, const Bool_t isLogY){
   //minOverlay = Combiner::GetMinimum(th1d, false);  
 
   // start by drawing the sig first
-  if (isLogY) fInSigTH1DHists[th1d][0]->SetMaximum(maxOverlay*50);
+  if (isLogY) fInSigTH1DHists[th1d][0]->SetMaximum(maxOverlay*1000);
   else fInSigTH1DHists[th1d][0]->SetMaximum(maxOverlay*1.1);
   //if (fNData > 0) fInSigTH1DHists[th1d][0]->SetMinimum(minOverlay*0.9);
   if (th1d==fIndexMgg){ 
@@ -329,14 +360,15 @@ void Combiner::DrawCanvasStack(const UInt_t th1d, const Bool_t isLogY){
 
   Double_t maxval = -100;
   maxval = Combiner::GetMaximum(th1d, true);
-  //Double_t minval = 1E20;
+  Double_t minval = 1E20;
+  minval = 1E-6;
   //minval = Combiner::GetMinimum(th1d, true);
 
 
   // start by drawing the sig first
-  if (isLogY) fInSigTH1DHists[th1d][0]->SetMaximum(maxval*50);
+  if (isLogY) fInSigTH1DHists[th1d][0]->SetMaximum(maxval*1000000);
   else fInSigTH1DHists[th1d][0]->SetMaximum(maxval*1.1);
-  //if (fNData > 0) fInSigTH1DHists[th1d][0]->SetMinimum(minval);
+  if (fNData > 0) fInSigTH1DHists[th1d][0]->SetMinimum(minval);
   fInSigTH1DHists[th1d][0]->SetTitle("");
   fInSigTH1DHists[th1d][0]->Draw("HIST");
 
@@ -506,7 +538,7 @@ Double_t Combiner::GetMaximum(const UInt_t th1d, const Bool_t stack) {
 
 Double_t Combiner::GetMinimum(const UInt_t th1d, const Bool_t stack) {
   // need to loop through to check bin != 0
-  Double_t datamin  = 1e9;
+  Double_t datamin  = 1e20;
 
   if (fNData > 0){ 
     for (Int_t bin = 1; bin <= fOutDataTH1DHists[th1d]->GetNbinsX(); bin++){
@@ -628,15 +660,16 @@ void Combiner::InitTH1DNames(){
   fTH1DNames.push_back("mgg");
   fIndexMgg = fTH1DNames.size()-1;
   fTH1DNames.push_back("ptgg");
+  fIndexPtgg = fTH1DNames.size()-1;
   fTH1DNames.push_back("nvtx"); 
   fTH1DNames.push_back("t1pfmetphi");
   fTH1DNames.push_back("t1pfmet");
-  fTH1DNames.push_back("pfmetphi");
-  fTH1DNames.push_back("pfmet");
-  fTH1DNames.push_back("calometphi");
-  fTH1DNames.push_back("calomet");
+  //fTH1DNames.push_back("pfmetphi");
+  //fTH1DNames.push_back("pfmet");
+  //fTH1DNames.push_back("calometphi");
+  //fTH1DNames.push_back("calomet");
 
-  // photon variables
+  //// photon variables
   fTH1DNames.push_back("pt1");
   fTH1DNames.push_back("pt2");     
   fTH1DNames.push_back("eta1");
@@ -669,10 +702,12 @@ void Combiner::InitTH1DNames(){
     fTH1DNames.push_back("phigg");
     fTH1DNames.push_back("dphi_ggmet");
     fTH1DNames.push_back("absdphi_ggmet");
+    fIndexDphi = fTH1DNames.size()-1;
     fTH1DNames.push_back("deta_gg");
     fTH1DNames.push_back("absdeta_gg");
+    fIndexDeta = fTH1DNames.size()-1;
     fTH1DNames.push_back("selection");
-    fTH1DNames.push_back("eff_sel");
     fIndexEff = fTH1DNames.size()-1;
+    fTH1DNames.push_back("eff_sel");
   }
 }// end Combiner::InitTH1DNames
